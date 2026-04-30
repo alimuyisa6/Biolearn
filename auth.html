@@ -1,0 +1,775 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=yes">
+  <meta name="description" content="Amour - Secure authentication portal. Sign in or create your account.">
+  <title>Amour · Access Portal</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,300;14..32,400;14..32,500;14..32,600;14..32,700&display=swap" rel="stylesheet">
+  <script src="https://unpkg.com/lucide@latest"></script>
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Inter', -apple-system, BlinkMacSystemFont, sans-serif;
+      background: radial-gradient(circle at 10% 30%, #fefaf7 0%, #fce8f0 100%);
+      min-height: 100vh;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      padding: 1.5rem;
+      position: relative;
+    }
+
+    /* animated background blobs */
+    .bg-blob {
+      position: fixed;
+      border-radius: 50%;
+      filter: blur(70px);
+      z-index: 0;
+      opacity: 0.45;
+      animation: floatBlob 20s infinite ease-in-out;
+      pointer-events: none;
+    }
+
+    .blob-1 {
+      width: 50vw;
+      height: 50vw;
+      background: #ffb3d1;
+      top: -20vh;
+      left: -10vw;
+      animation-duration: 24s;
+    }
+
+    .blob-2 {
+      width: 55vw;
+      height: 55vw;
+      background: #ffe0f0;
+      bottom: -25vh;
+      right: -15vw;
+      animation-duration: 28s;
+      animation-delay: -4s;
+    }
+
+    @keyframes floatBlob {
+      0% { transform: translate(0, 0) scale(1); }
+      50% { transform: translate(3%, 5%) scale(1.05); }
+      100% { transform: translate(0, 0) scale(1); }
+    }
+
+    /* main card */
+    .auth-card {
+      position: relative;
+      z-index: 10;
+      width: 100%;
+      max-width: 480px;
+      background: rgba(255, 255, 255, 0.94);
+      backdrop-filter: blur(16px);
+      border-radius: 2rem;
+      box-shadow: 0 25px 45px -12px rgba(0, 0, 0, 0.2), 0 0 0 1px rgba(255, 255, 255, 0.5);
+      overflow: hidden;
+      transition: transform 0.2s ease;
+    }
+
+    .auth-card:hover {
+      transform: translateY(-2px);
+    }
+
+    /* top accent bar */
+    .accent-bar {
+      height: 4px;
+      background: linear-gradient(90deg, #e84393, #ff8faa, #e84393);
+      background-size: 200%;
+      animation: shimmer 3s infinite linear;
+    }
+
+    @keyframes shimmer {
+      0% { background-position: 0%; }
+      100% { background-position: 200%; }
+    }
+
+    .auth-inner {
+      padding: 2rem 1.8rem 2.2rem;
+    }
+
+    /* brand header */
+    .brand-section {
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 10px;
+      margin-bottom: 1rem;
+    }
+
+    .brand-icon {
+      background: #e84393;
+      border-radius: 60px;
+      padding: 8px;
+      display: inline-flex;
+      color: white;
+      box-shadow: 0 6px 14px rgba(232, 67, 147, 0.2);
+    }
+
+    .brand-icon svg {
+      width: 26px;
+      height: 26px;
+    }
+
+    .brand-title {
+      font-size: 1.8rem;
+      font-weight: 700;
+      background: linear-gradient(135deg, #e84393, #b23b6d);
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      letter-spacing: -0.3px;
+    }
+
+    .brand-sub {
+      text-align: center;
+      color: #7a6370;
+      font-size: 0.8rem;
+      margin-bottom: 1.8rem;
+      font-weight: 450;
+    }
+
+    /* mode toggle switch */
+    .mode-switch {
+      background: #f3e5ec;
+      border-radius: 60px;
+      display: flex;
+      padding: 5px;
+      margin-bottom: 2rem;
+      position: relative;
+      border: 1px solid rgba(255, 255, 255, 0.5);
+    }
+
+    .mode-option {
+      flex: 1;
+      text-align: center;
+      padding: 10px 0;
+      font-weight: 600;
+      border-radius: 50px;
+      transition: all 0.25s cubic-bezier(0.2, 0.9, 0.4, 1.1);
+      color: #9b6e7e;
+      z-index: 2;
+      background: transparent;
+      border: none;
+      font-family: inherit;
+      font-size: 0.9rem;
+      cursor: pointer;
+      letter-spacing: 0.2px;
+    }
+
+    .mode-option.active {
+      background: white;
+      color: #e84393;
+      box-shadow: 0 3px 10px rgba(0, 0, 0, 0.04);
+    }
+
+    .mode-glow {
+      position: absolute;
+      top: 5px;
+      bottom: 5px;
+      width: calc(50% - 5px);
+      background: white;
+      border-radius: 50px;
+      transition: transform 0.3s ease;
+      box-shadow: 0 2px 8px rgba(232, 67, 147, 0.15);
+      pointer-events: none;
+    }
+
+    /* form styles */
+    .auth-form {
+      transition: opacity 0.2s ease;
+    }
+
+    .input-field {
+      margin-bottom: 1.2rem;
+      position: relative;
+    }
+
+    .input-field label {
+      display: block;
+      font-size: 0.75rem;
+      font-weight: 600;
+      color: #4b3b42;
+      margin-bottom: 6px;
+      letter-spacing: 0.3px;
+      text-transform: uppercase;
+    }
+
+    .input-icon {
+      position: relative;
+    }
+
+    .input-icon svg {
+      position: absolute;
+      left: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      color: #e84393;
+      width: 18px;
+      height: 18px;
+      opacity: 0.7;
+      pointer-events: none;
+    }
+
+    .input-icon input {
+      width: 100%;
+      padding: 12px 16px 12px 44px;
+      border-radius: 100px;
+      border: 1.5px solid #f0dbeb;
+      background: white;
+      font-family: 'Inter', sans-serif;
+      font-size: 0.9rem;
+      transition: all 0.2s;
+      outline: none;
+      color: #1e1e2a;
+    }
+
+    .input-icon input:focus {
+      border-color: #e84393;
+      box-shadow: 0 0 0 3px rgba(232, 67, 147, 0.15);
+    }
+
+    /* password toggle */
+    .password-container {
+      position: relative;
+    }
+
+    .toggle-password {
+      position: absolute;
+      right: 14px;
+      top: 50%;
+      transform: translateY(-50%);
+      background: none;
+      border: none;
+      cursor: pointer;
+      color: #b28b9c;
+      padding: 4px;
+      border-radius: 30px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      transition: all 0.2s;
+      z-index: 5;
+    }
+
+    .toggle-password:hover {
+      color: #e84393;
+      background: rgba(232, 67, 147, 0.08);
+    }
+
+    .toggle-password svg {
+      width: 18px;
+      height: 18px;
+    }
+
+    /* form extras */
+    .form-extras {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin: 1rem 0 1.6rem;
+      font-size: 0.75rem;
+    }
+
+    .checkbox-label {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      cursor: pointer;
+    }
+
+    .checkbox-label input {
+      width: 16px;
+      height: 16px;
+      accent-color: #e84393;
+      cursor: pointer;
+    }
+
+    .link-recovery {
+      color: #e84393;
+      text-decoration: none;
+      font-weight: 500;
+      border-bottom: 1px dashed #e84393;
+      font-size: 0.75rem;
+    }
+
+    /* submit button */
+    .submit-button {
+      width: 100%;
+      background: linear-gradient(135deg, #e84393, #c72a7a);
+      border: none;
+      padding: 12px;
+      border-radius: 100px;
+      font-weight: 600;
+      font-size: 0.95rem;
+      color: white;
+      cursor: pointer;
+      transition: all 0.2s;
+      box-shadow: 0 6px 14px rgba(232, 67, 147, 0.25);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      gap: 8px;
+    }
+
+    .submit-button:active {
+      transform: scale(0.97);
+    }
+
+    .submit-button:disabled {
+      opacity: 0.65;
+      cursor: not-allowed;
+      transform: none;
+    }
+
+    /* redirect helper */
+    .redirect-helper {
+      text-align: center;
+      margin-top: 1.4rem;
+      font-size: 0.8rem;
+      color: #7c6270;
+    }
+
+    .inline-switch {
+      background: none;
+      border: none;
+      color: #e84393;
+      font-weight: 600;
+      cursor: pointer;
+      margin-left: 5px;
+      text-decoration: underline;
+      text-underline-offset: 3px;
+      font-size: 0.8rem;
+    }
+
+    /* feedback messages */
+    .feedback-area {
+      text-align: center;
+      margin-top: 1rem;
+      font-size: 0.75rem;
+      padding: 8px 12px;
+      border-radius: 40px;
+      background: rgba(0, 0, 0, 0.02);
+    }
+
+    .feedback-success {
+      color: #1f6e43;
+      background: #e3f5ea;
+    }
+
+    .feedback-error {
+      color: #bc4742;
+      background: #ffe6e5;
+    }
+
+    /* animation */
+    .fade-transition {
+      animation: gentleFade 0.25s ease;
+    }
+
+    @keyframes gentleFade {
+      0% { opacity: 0; transform: translateY(6px); }
+      100% { opacity: 1; transform: translateY(0); }
+    }
+
+    @media (max-width: 500px) {
+      .auth-inner {
+        padding: 1.5rem;
+      }
+      .brand-title {
+        font-size: 1.5rem;
+      }
+      .form-extras {
+        flex-direction: column;
+        align-items: flex-start;
+        gap: 10px;
+      }
+    }
+  </style>
+</head>
+<body>
+  <div class="bg-blob blob-1"></div>
+  <div class="bg-blob blob-2"></div>
+
+  <div class="auth-card">
+    <div class="accent-bar"></div>
+    <div class="auth-inner">
+      <div class="brand-section">
+        <span class="brand-icon"><i data-lucide="heart"></i></span>
+        <span class="brand-title">Amour</span>
+      </div>
+      <div class="brand-sub">secure access · meaningful connections</div>
+
+      <!-- mode slider -->
+      <div class="mode-switch" id="modeSwitchContainer">
+        <div class="mode-glow" id="modeGlow"></div>
+        <button class="mode-option active" data-mode="login">Sign in</button>
+        <button class="mode-option" data-mode="signup">Create account</button>
+      </div>
+
+      <!-- login form -->
+      <div id="loginFormPanel" class="auth-form">
+        <div class="input-field">
+          <label>Email address</label>
+          <div class="input-icon">
+            <i data-lucide="mail"></i>
+            <input type="email" id="loginEmail" placeholder="your@email.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="input-field">
+          <label>Password</label>
+          <div class="password-container">
+            <div class="input-icon">
+              <i data-lucide="lock"></i>
+              <input type="password" id="loginPassword" placeholder="••••••••" autocomplete="current-password">
+            </div>
+            <button type="button" class="toggle-password" data-target="loginPassword" aria-label="Show password">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-extras">
+          <label class="checkbox-label">
+            <input type="checkbox" id="stayLoggedIn"> <span>Keep me signed in</span>
+          </label>
+          <a href="#" id="resetPasswordLink" class="link-recovery">Forgot password?</a>
+        </div>
+        <button class="submit-button" id="loginSubmitBtn">
+          <i data-lucide="log-in"></i> <span>Sign in securely</span>
+        </button>
+        <div class="redirect-helper">
+          No account yet? <button class="inline-switch" data-switch="signup">Join Amour →</button>
+        </div>
+      </div>
+
+      <!-- signup form (initially hidden) -->
+      <div id="signupFormPanel" class="auth-form" style="display: none;">
+        <div class="input-field">
+          <label>Display name (optional)</label>
+          <div class="input-icon">
+            <i data-lucide="user"></i>
+            <input type="text" id="signupName" placeholder="How we call you" autocomplete="name">
+          </div>
+        </div>
+        <div class="input-field">
+          <label>Email address</label>
+          <div class="input-icon">
+            <i data-lucide="mail"></i>
+            <input type="email" id="signupEmail" placeholder="hello@amour.com" autocomplete="email">
+          </div>
+        </div>
+        <div class="input-field">
+          <label>Create password</label>
+          <div class="password-container">
+            <div class="input-icon">
+              <i data-lucide="lock"></i>
+              <input type="password" id="signupPassword" placeholder="min. 6 characters" autocomplete="new-password">
+            </div>
+            <button type="button" class="toggle-password" data-target="signupPassword" aria-label="Show password">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="input-field">
+          <label>Confirm password</label>
+          <div class="password-container">
+            <div class="input-icon">
+              <i data-lucide="shield-check"></i>
+              <input type="password" id="signupConfirm" placeholder="confirm your password">
+            </div>
+            <button type="button" class="toggle-password" data-target="signupConfirm" aria-label="Show password">
+              <i data-lucide="eye"></i>
+            </button>
+          </div>
+        </div>
+        <div class="form-extras">
+          <label class="checkbox-label">
+            <input type="checkbox" id="termsCheckbox"> <span>I agree to the <a href="#" id="termsLink" style="color:#e84393;">terms of service</a></span>
+          </label>
+        </div>
+        <button class="submit-button" id="signupSubmitBtn">
+          <i data-lucide="sparkles"></i> <span>Start my journey</span>
+        </button>
+        <div class="redirect-helper">
+          Already have an account? <button class="inline-switch" data-switch="login">Sign in →</button>
+        </div>
+      </div>
+
+      <div id="globalFeedback" class="feedback-area"></div>
+    </div>
+  </div>
+
+  <script>
+    (function() {
+      // Supabase configuration
+      const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+      const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+      
+      let supabaseClient = null;
+      let currentMode = 'login';
+      
+      // DOM elements
+      const loginPanel = document.getElementById('loginFormPanel');
+      const signupPanel = document.getElementById('signupFormPanel');
+      const modeGlow = document.getElementById('modeGlow');
+      const modeOptions = document.querySelectorAll('.mode-option');
+      const feedbackDiv = document.getElementById('globalFeedback');
+      const loginBtn = document.getElementById('loginSubmitBtn');
+      const signupBtn = document.getElementById('signupSubmitBtn');
+      const resetLink = document.getElementById('resetPasswordLink');
+      const switchBtns = document.querySelectorAll('.inline-switch');
+      
+      // Helper: show feedback
+      function showFeedback(message, isError = false) {
+        feedbackDiv.textContent = message;
+        feedbackDiv.className = `feedback-area ${isError ? 'feedback-error' : 'feedback-success'}`;
+        setTimeout(() => {
+          if (feedbackDiv.textContent === message) {
+            feedbackDiv.textContent = '';
+            feedbackDiv.className = 'feedback-area';
+          }
+        }, 5000);
+      }
+      
+      // Initialize supabase client
+      async function getSupabase() {
+        if (supabaseClient) return supabaseClient;
+        let attempts = 0;
+        while (!window.supabase || !window.supabase.createClient) {
+          if (attempts > 30) {
+            showFeedback('Connection error. Please refresh the page.', true);
+            return null;
+          }
+          await new Promise(r => setTimeout(r, 100));
+          attempts++;
+        }
+        supabaseClient = window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY, {
+          auth: { persistSession: true, autoRefreshToken: true }
+        });
+        return supabaseClient;
+      }
+      
+      // Setup password visibility toggles
+      function setupPasswordToggles() {
+        document.querySelectorAll('.toggle-password').forEach(btn => {
+          btn.removeEventListener('click', window._toggleHandler);
+          const handler = function(e) {
+            e.preventDefault();
+            const targetId = this.getAttribute('data-target');
+            const input = document.getElementById(targetId);
+            if (!input) return;
+            const isPassword = input.type === 'password';
+            input.type = isPassword ? 'text' : 'password';
+            const icon = this.querySelector('i');
+            if (icon) {
+              icon.setAttribute('data-lucide', isPassword ? 'eye-off' : 'eye');
+              if (window.lucide) lucide.createIcons();
+            }
+          };
+          btn.addEventListener('click', handler);
+          window._toggleHandler = handler;
+        });
+      }
+      
+      // Switch between login / signup modes
+      function setMode(mode) {
+        currentMode = mode;
+        const containerRect = document.getElementById('modeSwitchContainer').getBoundingClientRect();
+        const activeBtn = document.querySelector(`.mode-option[data-mode="${mode}"]`);
+        if (activeBtn && modeGlow) {
+          const btnRect = activeBtn.getBoundingClientRect();
+          const parentRect = activeBtn.parentElement.getBoundingClientRect();
+          modeGlow.style.transform = `translateX(${btnRect.left - parentRect.left}px)`;
+          modeGlow.style.width = `${btnRect.width}px`;
+        }
+        modeOptions.forEach(opt => {
+          if (opt.getAttribute('data-mode') === mode) opt.classList.add('active');
+          else opt.classList.remove('active');
+        });
+        
+        if (mode === 'login') {
+          signupPanel.style.display = 'none';
+          loginPanel.style.display = 'block';
+          loginPanel.classList.add('fade-transition');
+          setTimeout(() => loginPanel.classList.remove('fade-transition'), 250);
+        } else {
+          loginPanel.style.display = 'none';
+          signupPanel.style.display = 'block';
+          signupPanel.classList.add('fade-transition');
+          setTimeout(() => signupPanel.classList.remove('fade-transition'), 250);
+        }
+        feedbackDiv.textContent = '';
+        feedbackDiv.className = 'feedback-area';
+      }
+      
+      // Handle login
+      async function handleLogin() {
+        const email = document.getElementById('loginEmail').value.trim();
+        const password = document.getElementById('loginPassword').value;
+        if (!email || !password) {
+          showFeedback('Please enter both email and password.', true);
+          return;
+        }
+        const sb = await getSupabase();
+        if (!sb) return;
+        loginBtn.disabled = true;
+        const originalHtml = loginBtn.innerHTML;
+        loginBtn.innerHTML = '<i data-lucide="loader-circle"></i> <span>Signing in...</span>';
+        if (window.lucide) lucide.createIcons();
+        
+        try {
+          const { error } = await sb.auth.signInWithPassword({ email, password });
+          if (error) throw error;
+          showFeedback('Authentication successful. Redirecting...', false);
+          setTimeout(() => {
+            window.location.href = '/index.html';
+          }, 800);
+        } catch (err) {
+          showFeedback(err.message || 'Invalid credentials. Please try again.', true);
+          loginBtn.disabled = false;
+          loginBtn.innerHTML = originalHtml;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+      
+      // Handle signup
+      async function handleSignup() {
+        const name = document.getElementById('signupName').value.trim();
+        const email = document.getElementById('signupEmail').value.trim();
+        const password = document.getElementById('signupPassword').value;
+        const confirm = document.getElementById('signupConfirm').value;
+        const termsAccepted = document.getElementById('termsCheckbox').checked;
+        
+        if (!email || !password) {
+          showFeedback('Email and password are required.', true);
+          return;
+        }
+        if (password !== confirm) {
+                    showFeedback('Passwords do not match.', true);
+          return;
+        }
+        if (password.length < 6) {
+          showFeedback('Password must be at least 6 characters.', true);
+          return;
+        }
+        if (!termsAccepted) {
+          showFeedback('Please accept the terms of service.', true);
+          return;
+        }
+        
+        const sb = await getSupabase();
+        if (!sb) return;
+        signupBtn.disabled = true;
+        const originalHtml = signupBtn.innerHTML;
+        signupBtn.innerHTML = '<i data-lucide="loader-circle"></i> <span>Creating account...</span>';
+        if (window.lucide) lucide.createIcons();
+        
+        try {
+          const { error } = await sb.auth.signUp({
+            email,
+            password,
+            options: { data: { display_name: name || email.split('@')[0] } }
+          });
+          if (error) throw error;
+          showFeedback('Account created! Please check your email to verify.', false);
+          setTimeout(() => {
+            setMode('login');
+            document.getElementById('loginEmail').value = email;
+            document.getElementById('loginPassword').value = '';
+            showFeedback('Verification email sent. After confirming, sign in above.', false);
+          }, 1500);
+        } catch (err) {
+          showFeedback(err.message || 'Signup failed. Try again.', true);
+        } finally {
+          signupBtn.disabled = false;
+          signupBtn.innerHTML = originalHtml;
+          if (window.lucide) lucide.createIcons();
+        }
+      }
+      
+      // Password reset handler
+      async function handlePasswordReset() {
+        const email = document.getElementById('loginEmail').value.trim();
+        if (!email) {
+          showFeedback('Enter your email address to receive a reset link.', true);
+          return;
+        }
+        const sb = await getSupabase();
+        if (!sb) return;
+        const { error } = await sb.auth.resetPasswordForEmail(email, {
+          redirectTo: window.location.origin + '/reset-password.html',
+        });
+        if (error) {
+          showFeedback(error.message, true);
+        } else {
+          showFeedback('Password reset link sent to your email.', false);
+        }
+      }
+      
+      // Check existing session and redirect if already logged in (prevent loop)
+      async function checkSessionAndRedirect() {
+        const sb = await getSupabase();
+        if (!sb) return;
+        const { data } = await sb.auth.getSession();
+        if (data.session) {
+          window.location.replace('/index.html');
+        }
+      }
+      
+      // Event bindings
+      function bindEvents() {
+        loginBtn.addEventListener('click', handleLogin);
+        signupBtn.addEventListener('click', handleSignup);
+        if (resetLink) resetLink.addEventListener('click', (e) => { e.preventDefault(); handlePasswordReset(); });
+        
+        modeOptions.forEach(opt => {
+          opt.addEventListener('click', () => {
+            const mode = opt.getAttribute('data-mode');
+            setMode(mode);
+          });
+        });
+        
+        switchBtns.forEach(btn => {
+          btn.addEventListener('click', (e) => {
+            const targetMode = btn.getAttribute('data-switch');
+            if (targetMode === 'login') setMode('login');
+            else if (targetMode === 'signup') setMode('signup');
+          });
+        });
+        
+        const loginPass = document.getElementById('loginPassword');
+        const signupPass = document.getElementById('signupPassword');
+        if (loginPass) loginPass.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleLogin(); });
+        if (signupPass) signupPass.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSignup(); });
+        document.getElementById('signupEmail')?.addEventListener('keypress', (e) => { if (e.key === 'Enter') handleSignup(); });
+        
+        const termsLink = document.getElementById('termsLink');
+        if (termsLink) termsLink.addEventListener('click', (e) => { e.preventDefault(); showFeedback('Terms can be reviewed on the main page.', false); });
+      }
+      
+      // Initialize UI and session check
+      async function init() {
+        await checkSessionAndRedirect();
+        await getSupabase();
+        setupPasswordToggles();
+        bindEvents();
+        setMode('login');
+        if (window.lucide) lucide.createIcons();
+      }
+      
+      init();
+    })();
+  </script>
+</body>
+</html>
