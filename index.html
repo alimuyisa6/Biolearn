@@ -536,485 +536,571 @@
     </footer>
 
     <script type="module">
-    // ── Supabase client (for AUTH ONLY) ──
-    const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
-    const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
-    const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
-    if (!supabase) {
-        console.error('Supabase client not loaded.');
-        document.getElementById('resources-container').innerHTML = '<p style="text-align:center; color:red;">Failed to load database client.</p>';
-    }
-
-    // ── Helpers for Vercel API routes ──
-    const API_BASE = '/api';
-
-    /** Fetch from our edge function, injecting auth token if available */
-    async function apiFetch(endpoint, options = {}) {
-        const session = (await supabase.auth.getSession()).data.session;
-        const headers = { 'Content-Type': 'application/json', ...options.headers };
-        if (session?.access_token) {
-            headers['Authorization'] = `Bearer ${session.access_token}`;
+        // ── Supabase client (for AUTH ONLY) ──
+        const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+        const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
+        if (!supabase) {
+            console.error('Supabase client not loaded.');
+            document.getElementById('resources-container').innerHTML = '<p style="text-align:center; color:red;">Failed to load database client.</p>';
         }
-        const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
-        if (!res.ok) {
-            const err = await res.json().catch(() => ({}));
-            throw new Error(err.error || `Request failed (${res.status})`);
-        }
-        return res.json();
-    }
 
-    // ── Escape HTML, URL validation (unchanged) ──
-    function escapeHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
-    function safeUrl(url, fallback = '#') {
-        if (typeof url !== 'string') return fallback;
-        const trimmed = url.trim();
-        if (!trimmed) return fallback;
-        if (/^(javascript|data|vbscript):/i.test(trimmed)) return fallback;
-        if (/^\/\//.test(trimmed)) return fallback;
-        return trimmed;
-    }
-    function sanitizeBackgroundUrl(url) {
-        if (!url || typeof url !== 'string') return '';
-        const trimmed = url.trim();
-        if (!/^https?:\/\//i.test(trimmed)) return '';
-        return `url("${trimmed.replace(/["\\]/g, '\\$&')}")`;
-    }
+        // Cloudflare Turnstile site key (public)
+        const TURNSTILE_SITE_KEY = '0x4AAAAAADJoKTgQ_HvcsSZ-';
+        let turnstileWidgetId = null;
 
-    // ── Load site sections (now via edge function) ──
-    async function loadSiteSections() {
-        try {
-            const data = await apiFetch('/site-sections');
-            if (!data || data.length === 0) {
-                showError('No data found in site_sections table');
-                return;
-            }
+        // ── Helpers for Vercel API routes ──
+        const API_BASE = '/api';
 
-            const builders = {
-                hero: (d) => {
-                    const heroSection = document.getElementById('hero-section');
-                    const heroContent = document.getElementById('hero-content');
-                    if (!heroContent || !heroSection) return;
-                    const ctaLink = safeUrl(d.cta_link || '#');
-                    heroContent.innerHTML = `
-                        <h1>${escapeHtml(d.title || '')}</h1>
-                        <p>${escapeHtml(d.subtitle || '')}</p>
-                        <a href="${escapeHtml(ctaLink)}" class="btn">
-                            <i class="fa-solid fa-book-open"></i> ${escapeHtml(d.cta_text || '')}
-                        </a>`;
-                    if (d.background_image) {
-                        const bgCss = sanitizeBackgroundUrl(d.background_image);
-                        if (bgCss) heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.4)), ${bgCss}`;
-                    }
-                },
-                navigation: (d) => {
-                    const links = d.links || [];
-                    const processedLinks = links.map(link => {
-                        let href = link.href ? link.href.trim() : '';
-                        if (!href || href === '#') href = `?section=${encodeURIComponent((link.label || '').replace(/\s+/g, '-').toLowerCase())}`;
-                        return { ...link, href: safeUrl(href, '#') };
-                    });
-                    const desktopNav = document.getElementById('desktop-nav-links');
-                    if (desktopNav) {
-                        desktopNav.innerHTML = processedLinks.map(link =>
-                            `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`
-                        ).join('');
-                    }
-                    const mobilePanel = document.getElementById('mobile-nav-panel');
-                    if (mobilePanel) {
-                        mobilePanel.innerHTML = processedLinks.map(link =>
-                            `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`
-                        ).join('');
-                        mobilePanel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-                    }
-                },
-                footer: (d) => {
-                    const footerInner = document.getElementById('footer-inner');
-                    if (!footerInner) return;
-                    const columns = d.columns || [];
-                    footerInner.innerHTML = columns.map(col => {
-                        const heading = escapeHtml(col.heading);
-                        const items = (col.items || []).map(item => {
-                            let href = item.href ? item.href.trim() : '';
-                            if (!href || href === '#') href = `?section=${encodeURIComponent((item.label || '').replace(/\s+/g, '-').toLowerCase())}`;
-                            href = safeUrl(href, '#');
-                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                        }).join('');
-                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-                    }).join('');
-                },
-                filters: (d) => { populateFilterDropdowns(d); }
-            };
-
-            let filtersData = null;
-            data.forEach(row => {
-                const builder = builders[row.section];
-                if (!builder) {
-                    if (row.section !== 'message') console.warn(`No builder for section "${row.section}"`);
-                    return;
-                }
-                if (!row.data || typeof row.data !== 'object') {
-                    console.warn(`Invalid data for section "${row.section}"`, row.data);
-                    return;
-                }
-                try {
-                    if (row.section === 'filters') filtersData = row.data;
-                    builder(row.data);
-                } catch (e) {
-                    console.error(`Failed to build section "${row.section}":`, e);
-                    if (row.section === 'hero') document.getElementById('hero-content').innerHTML = `<p style="color:red;">Error: ${escapeHtml(e.message)}</p>`;
-                    else if (row.section === 'navigation') {
-                        document.getElementById('desktop-nav-links').innerHTML = `<li style="color:red;">Error: ${escapeHtml(e.message)}</li>`;
-                        document.getElementById('mobile-nav-panel').innerHTML = `<a href="#" style="color:red;">Error: ${escapeHtml(e.message)}</a>`;
-                    } else if (row.section === 'footer') document.getElementById('footer-inner').innerHTML = `<div class="footer-links" style="color:red;">Error: ${escapeHtml(e.message)}</div>`;
-                }
-            });
-
-            if (!filtersData) {
-                console.log('No filters section, loading from biology_notes...');
-                loadFilterOptionsFromBioNotes();
-            }
-            handleQuerySectionNavigation();
-        } catch (err) {
-            console.error('Unexpected error loading site sections:', err);
-            showError(`Unexpected error: ${err.message || JSON.stringify(err)}`);
-        }
-    }
-
-    function populateFilterDropdowns(filterData) {
-        const levels = filterData.levels || [];
-        const categories = filterData.categories || [];
-        const tags = filterData.tags || [];
-        const levelSel = document.getElementById('filter-level');
-        const catSel = document.getElementById('filter-category');
-        const tagSel = document.getElementById('filter-tag');
-        levelSel.innerHTML = '<option value="">All Levels</option>';
-        catSel.innerHTML = '<option value="">All Categories</option>';
-        tagSel.innerHTML = '<option value="">All Tags</option>';
-        levels.forEach(level => { const o = document.createElement('option'); o.value = level; o.textContent = level; levelSel.appendChild(o); });
-        categories.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); });
-        tags.forEach(tag => { const o = document.createElement('option'); o.value = tag; o.textContent = tag; tagSel.appendChild(o); });
-    }
-
-    async function loadFilterOptionsFromBioNotes() {
-        try {
-            const { levels, categories } = await apiFetch('/filter-options');
-            const levelSel = document.getElementById('filter-level');
-            (levels || []).forEach(lvl => { if(lvl){ const o = document.createElement('option'); o.value = lvl; o.textContent = lvl; levelSel.appendChild(o); }});
-            const catSel = document.getElementById('filter-category');
-            (categories || []).forEach(cat => { if(cat){ const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); }});
-        } catch (err) { console.warn('Fallback filter load failed', err); }
-    }
-
-    // ── Resources (via edge function) ──
-    async function loadResources(filters = {}) {
-        const container = document.getElementById('resources-container');
-        container.classList.add('loading');
-        try {
-            const params = new URLSearchParams();
-            if (filters.level) params.set('level', filters.level);
-            if (filters.category) params.set('category', filters.category);
-            if (filters.tag) params.set('tag', filters.tag);
-            const data = await apiFetch(`/resources${params.toString() ? '?' + params.toString() : ''}`);
-            const grouped = groupResourcesBySection(data || []);
-            renderResources(grouped);
-        } catch (err) {
-            console.error('Failed to load resources:', err);
-            removeSpinner();
-            container.innerHTML = '<p style="text-align:center; color:red;">Failed to load resources.</p>';
-        } finally {
-            container.classList.remove('loading');
-        }
-    }
-
-    function applyFilters() {
-        const level = document.getElementById('filter-level').value;
-        const category = document.getElementById('filter-category').value;
-        const tag = document.getElementById('filter-tag').value;
-        loadResources({ level, category, tag });
-    }
-
-    // ── Authentication UI (unchanged, still uses supabase.auth) ──
-    function updateAuthUI(session) {
-        const container = document.getElementById('auth-buttons-container');
-        if (!container) return;
-        if (session && session.user) {
-            const email = session.user.email;
-            container.innerHTML = `
-                <span style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center;">
-                    <span style="color:var(--color-text-muted); font-size:0.9rem;">Signed in as <strong>${escapeHtml(email)}</strong></span>
-                    <button class="btn-action btn-signin" id="sign-out-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
-                </span>`;
-            document.getElementById('sign-out-btn')?.addEventListener('click', async () => { await supabase.auth.signOut(); });
-            checkMessageLimit(session.user.id);
-        } else {
-            container.innerHTML = `
-                <button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                <button class="btn-action btn-create" id="show-auth-form-btn-signup"><i class="fa-solid fa-user-plus"></i> Create Account</button>`;
-            const signInBtn = document.getElementById('show-auth-form-btn');
-            const signUpBtn = document.getElementById('show-auth-form-btn-signup');
-            const buttonStates = new Map();
-            function createToggleHandler(mode, buttonEl) {
-                if (!buttonStates.has(buttonEl)) buttonStates.set(buttonEl, { tapCount:0, disabled:false, timerId:null, originalText:buttonEl.innerHTML });
-                const st = buttonStates.get(buttonEl);
-                return function toggleForm() {
-                    if (st.disabled) return;
-                    const form = document.getElementById('auth-form-container');
-                    if (form) { form.remove(); st.tapCount++; } else { showAuthForm(mode); st.tapCount++; }
-                    if (st.tapCount > 3) {
-                        st.disabled = true; buttonEl.disabled = true; let remaining = 150;
-                        buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
-                        st.timerId = setInterval(() => {
-                            remaining--;
-                            if (remaining <= 0) { clearInterval(st.timerId); buttonEl.disabled = false; buttonEl.innerHTML = st.originalText; st.disabled = false; st.tapCount = 0; st.timerId = null; }
-                            else buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
-                        }, 1000);
-                    }
-                };
-            }
-            signInBtn.addEventListener('click', createToggleHandler('signin', signInBtn));
-            signUpBtn.addEventListener('click', createToggleHandler('signup', signUpBtn));
-            document.getElementById('message-signin-required').style.display = 'block';
-            document.getElementById('message-form').style.display = 'none';
-            document.getElementById('message-limit-reached').style.display = 'none';
-        }
-    }
-
-    function showAuthForm(mode) {
-        const container = document.getElementById('auth-buttons-container');
-        document.getElementById('auth-form-container')?.remove();
-        const formHtml = `
-            <div id="auth-form-container" style="width:100%; max-width:360px; margin:1rem auto; background:var(--color-bg-white); padding:1.5rem; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); text-align:left;">
-                <h3 style="margin-bottom:1rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
-                <form id="auth-form">
-                    <label style="display:block; margin-bottom:0.8rem; font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
-                    <label style="display:block; margin-bottom:1rem; font-size:0.9rem;">Password<input type="password" id="auth-password" required minlength="6" style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
-                    <div style="display:flex; gap:0.5rem; justify-content:flex-end; flex-wrap:wrap;">
-                        <button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button>
-                        <button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
-                    </div>
-                </form>
-                <p style="margin-top:0.8rem; font-size:0.85rem; text-align:center;">${mode === 'signin' ? "Don't have an account? <a href='#' id='switch-to-signup'>Create one</a>" : "Already have an account? <a href='#' id='switch-to-signin'>Sign in</a>"}</p>
-            </div>`;
-        container.insertAdjacentHTML('beforeend', formHtml);
-        const form = document.getElementById('auth-form');
-        document.getElementById('auth-cancel').addEventListener('click', () => document.getElementById('auth-form-container')?.remove());
-        const switchLink = mode === 'signin' ? document.getElementById('switch-to-signup') : document.getElementById('switch-to-signin');
-        switchLink?.addEventListener('click', (e) => { e.preventDefault(); document.getElementById('auth-form-container')?.remove(); showAuthForm(mode === 'signin' ? 'signup' : 'signin'); });
-        form.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-            try {
-                if (mode === 'signin') { const { error } = await supabase.auth.signInWithPassword({ email, password }); if (error) throw error; }
-                else { const { error } = await supabase.auth.signUp({ email, password }); if (error) throw error; alert('Account created! Please check your email for confirmation (if required).'); }
-            } catch (error) { alert(error.message); }
-        });
-    }
-
-    // ── Message handling (via edge function) ──
-    async function checkMessageLimit(userId) {
-        // The 24‑hour limit is now enforced server‑side, so we just show the form.
-        // This function is kept to avoid breaking the UI update flow.
-        const signinPrompt = document.getElementById('message-signin-required');
-        const form = document.getElementById('message-form');
-        const limitMsg = document.getElementById('message-limit-reached');
-        if (!userId) {
-            signinPrompt.style.display = 'block';
-            form.style.display = 'none';
-            limitMsg.style.display = 'none';
-            return;
-        }
-        signinPrompt.style.display = 'none';
-        form.style.display = 'flex';
-        limitMsg.style.display = 'none';
-        document.getElementById('message-status').innerText = '';
-    }
-
-    async function submitMessage(userId, messageText) {
-        // Client‑side validation only – the edge function re‑validates as well.
-        if (!messageText || !messageText.trim()) throw new Error('Message cannot be empty.');
-        if (messageText.length > 2000) throw new Error('Message must be under 2000 characters.');
-        await apiFetch('/messages', {
-            method: 'POST',
-            body: JSON.stringify({ message: messageText.trim() })
-        });
-    }
-
-    // ── Initialization ──
-    document.addEventListener('DOMContentLoaded', () => {
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-        initHeaderScroll();
-        initMobileNav();
-        loadSiteSections().finally(() => loadResources());
-        initAuth();
-
-        const messageForm = document.getElementById('message-form');
-        messageForm.addEventListener('submit', async (e) => {
-            e.preventDefault();
+        async function apiFetch(endpoint, options = {}) {
             const session = (await supabase.auth.getSession()).data.session;
-            if (!session) {
-                alert('You must be signed in to send a message.');
+            const headers = { 'Content-Type': 'application/json', ...options.headers };
+            if (session?.access_token) {
+                headers['Authorization'] = `Bearer ${session.access_token}`;
+            }
+            const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+            if (!res.ok) {
+                const err = await res.json().catch(() => ({}));
+                throw new Error(err.error || `Request failed (${res.status})`);
+            }
+            return res.json();
+        }
+
+        // ── Security helpers ──
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+        function safeUrl(url, fallback = '#') {
+            if (typeof url !== 'string') return fallback;
+            const trimmed = url.trim();
+            if (!trimmed) return fallback;
+            if (/^(javascript|data|vbscript):/i.test(trimmed)) return fallback;
+            if (/^\/\//.test(trimmed)) return fallback;
+            return trimmed;
+        }
+        function sanitizeBackgroundUrl(url) {
+            if (!url || typeof url !== 'string') return '';
+            const trimmed = url.trim();
+            if (!/^https?:\/\//i.test(trimmed)) return '';
+            return `url("${trimmed.replace(/["\\]/g, '\\$&')}")`;
+        }
+
+        // ── Load site sections (via edge function) ──
+        async function loadSiteSections() {
+            try {
+                const data = await apiFetch('/site-sections');
+                if (!data || data.length === 0) {
+                    showError('No data found in site_sections table');
+                    return;
+                }
+
+                const builders = {
+                    hero: (d) => {
+                        const heroSection = document.getElementById('hero-section');
+                        const heroContent = document.getElementById('hero-content');
+                        if (!heroContent || !heroSection) return;
+                        const ctaLink = safeUrl(d.cta_link || '#');
+                        heroContent.innerHTML = `
+                            <h1>${escapeHtml(d.title || '')}</h1>
+                            <p>${escapeHtml(d.subtitle || '')}</p>
+                            <a href="${escapeHtml(ctaLink)}" class="btn">
+                                <i class="fa-solid fa-book-open"></i> ${escapeHtml(d.cta_text || '')}
+                            </a>`;
+                        if (d.background_image) {
+                            const bgCss = sanitizeBackgroundUrl(d.background_image);
+                            if (bgCss) heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.4)), ${bgCss}`;
+                        }
+                    },
+                    navigation: (d) => {
+                        const links = d.links || [];
+                        const processedLinks = links.map(link => {
+                            let href = link.href ? link.href.trim() : '';
+                            if (!href || href === '#') href = `?section=${encodeURIComponent((link.label || '').replace(/\s+/g, '-').toLowerCase())}`;
+                            return { ...link, href: safeUrl(href, '#') };
+                        });
+                        const desktopNav = document.getElementById('desktop-nav-links');
+                        if (desktopNav) {
+                            desktopNav.innerHTML = processedLinks.map(link =>
+                                `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`
+                            ).join('');
+                        }
+                        const mobilePanel = document.getElementById('mobile-nav-panel');
+                        if (mobilePanel) {
+                            mobilePanel.innerHTML = processedLinks.map(link =>
+                                `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`
+                            ).join('');
+                            mobilePanel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+                        }
+                    },
+                    footer: (d) => {
+                        const footerInner = document.getElementById('footer-inner');
+                        if (!footerInner) return;
+                        const columns = d.columns || [];
+                        footerInner.innerHTML = columns.map(col => {
+                            const heading = escapeHtml(col.heading);
+                            const items = (col.items || []).map(item => {
+                                let href = item.href ? item.href.trim() : '';
+                                if (!href || href === '#') href = `?section=${encodeURIComponent((item.label || '').replace(/\s+/g, '-').toLowerCase())}`;
+                                href = safeUrl(href, '#');
+                                let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                                return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                            }).join('');
+                            return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+                        }).join('');
+                    },
+                    filters: (d) => { populateFilterDropdowns(d); }
+                };
+
+                let filtersData = null;
+                data.forEach(row => {
+                    const builder = builders[row.section];
+                    if (!builder) {
+                        if (row.section !== 'message') console.warn(`No builder for section "${row.section}"`);
+                        return;
+                    }
+                    if (!row.data || typeof row.data !== 'object') {
+                        console.warn(`Invalid data for section "${row.section}"`, row.data);
+                        return;
+                    }
+                    try {
+                        if (row.section === 'filters') filtersData = row.data;
+                        builder(row.data);
+                    } catch (e) {
+                        console.error(`Failed to build section "${row.section}":`, e);
+                        if (row.section === 'hero') document.getElementById('hero-content').innerHTML = `<p style="color:red;">Error: ${escapeHtml(e.message)}</p>`;
+                        else if (row.section === 'navigation') {
+                            document.getElementById('desktop-nav-links').innerHTML = `<li style="color:red;">Error: ${escapeHtml(e.message)}</li>`;
+                            document.getElementById('mobile-nav-panel').innerHTML = `<a href="#" style="color:red;">Error: ${escapeHtml(e.message)}</a>`;
+                        } else if (row.section === 'footer') document.getElementById('footer-inner').innerHTML = `<div class="footer-links" style="color:red;">Error: ${escapeHtml(e.message)}</div>`;
+                    }
+                });
+
+                if (!filtersData) {
+                    console.log('No filters section, loading from biology_notes...');
+                    loadFilterOptionsFromBioNotes();
+                }
+                handleQuerySectionNavigation();
+            } catch (err) {
+                console.error('Unexpected error loading site sections:', err);
+                showError(`Unexpected error: ${err.message || JSON.stringify(err)}`);
+            }
+        }
+
+        function populateFilterDropdowns(filterData) {
+            const levels = filterData.levels || [];
+            const categories = filterData.categories || [];
+            const tags = filterData.tags || [];
+            const levelSel = document.getElementById('filter-level');
+            const catSel = document.getElementById('filter-category');
+            const tagSel = document.getElementById('filter-tag');
+            levelSel.innerHTML = '<option value="">All Levels</option>';
+            catSel.innerHTML = '<option value="">All Categories</option>';
+            tagSel.innerHTML = '<option value="">All Tags</option>';
+            levels.forEach(level => { const o = document.createElement('option'); o.value = level; o.textContent = level; levelSel.appendChild(o); });
+            categories.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); });
+            tags.forEach(tag => { const o = document.createElement('option'); o.value = tag; o.textContent = tag; tagSel.appendChild(o); });
+        }
+
+        async function loadFilterOptionsFromBioNotes() {
+            try {
+                const { levels, categories } = await apiFetch('/filter-options');
+                const levelSel = document.getElementById('filter-level');
+                (levels || []).forEach(lvl => { if(lvl){ const o = document.createElement('option'); o.value = lvl; o.textContent = lvl; levelSel.appendChild(o); }});
+                const catSel = document.getElementById('filter-category');
+                (categories || []).forEach(cat => { if(cat){ const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); }});
+            } catch (err) { console.warn('Fallback filter load failed', err); }
+        }
+
+        // ── Resources (via edge function) ──
+        async function loadResources(filters = {}) {
+            const container = document.getElementById('resources-container');
+            container.classList.add('loading');
+            try {
+                const params = new URLSearchParams();
+                if (filters.level) params.set('level', filters.level);
+                if (filters.category) params.set('category', filters.category);
+                if (filters.tag) params.set('tag', filters.tag);
+                const data = await apiFetch(`/resources${params.toString() ? '?' + params.toString() : ''}`);
+                const grouped = groupResourcesBySection(data || []);
+                renderResources(grouped);
+            } catch (err) {
+                console.error('Failed to load resources:', err);
+                removeSpinner();
+                container.innerHTML = '<p style="text-align:center; color:red;">Failed to load resources.</p>';
+            } finally {
+                container.classList.remove('loading');
+            }
+        }
+
+        function applyFilters() {
+            const level = document.getElementById('filter-level').value;
+            const category = document.getElementById('filter-category').value;
+            const tag = document.getElementById('filter-tag').value;
+            loadResources({ level, category, tag });
+        }
+
+        // ── Authentication UI with Turnstile CAPTCHA ──
+        function cleanupTurnstile() {
+            if (turnstileWidgetId !== null) {
+                window.turnstile?.remove(turnstileWidgetId);
+                turnstileWidgetId = null;
+            }
+        }
+
+        function updateAuthUI(session) {
+            const container = document.getElementById('auth-buttons-container');
+            if (!container) return;
+            if (session && session.user) {
+                const email = session.user.email;
+                container.innerHTML = `
+                    <span style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center;">
+                        <span style="color:var(--color-text-muted); font-size:0.9rem;">Signed in as <strong>${escapeHtml(email)}</strong></span>
+                        <button class="btn-action btn-signin" id="sign-out-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+                    </span>`;
+                document.getElementById('sign-out-btn')?.addEventListener('click', async () => { await supabase.auth.signOut(); });
+                checkMessageLimit(session.user.id);
+            } else {
+                container.innerHTML = `
+                    <button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+                    <button class="btn-action btn-create" id="show-auth-form-btn-signup"><i class="fa-solid fa-user-plus"></i> Create Account</button>`;
+                const signInBtn = document.getElementById('show-auth-form-btn');
+                const signUpBtn = document.getElementById('show-auth-form-btn-signup');
+                const buttonStates = new Map();
+                function createToggleHandler(mode, buttonEl) {
+                    if (!buttonStates.has(buttonEl)) buttonStates.set(buttonEl, { tapCount:0, disabled:false, timerId:null, originalText:buttonEl.innerHTML });
+                    const st = buttonStates.get(buttonEl);
+                    return function toggleForm() {
+                        if (st.disabled) return;
+                        const form = document.getElementById('auth-form-container');
+                        if (form) { form.remove(); st.tapCount++; } else { showAuthForm(mode); st.tapCount++; }
+                        if (st.tapCount > 3) {
+                            st.disabled = true; buttonEl.disabled = true; let remaining = 150;
+                            buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
+                            st.timerId = setInterval(() => {
+                                remaining--;
+                                if (remaining <= 0) { clearInterval(st.timerId); buttonEl.disabled = false; buttonEl.innerHTML = st.originalText; st.disabled = false; st.tapCount = 0; st.timerId = null; }
+                                else buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
+                            }, 1000);
+                        }
+                    };
+                }
+                signInBtn.addEventListener('click', createToggleHandler('signin', signInBtn));
+                signUpBtn.addEventListener('click', createToggleHandler('signup', signUpBtn));
+                document.getElementById('message-signin-required').style.display = 'block';
+                document.getElementById('message-form').style.display = 'none';
+                document.getElementById('message-limit-reached').style.display = 'none';
+            }
+        }
+
+        function showAuthForm(mode) {
+            const container = document.getElementById('auth-buttons-container');
+            document.getElementById('auth-form-container')?.remove();
+            cleanupTurnstile();
+
+            const turnstileContainerId = 'turnstile-widget-' + Date.now();
+            let formHtml = '';
+
+            if (mode === 'reset') {
+                formHtml = `
+                <div id="auth-form-container" style="width:100%; max-width:360px; margin:1rem auto; background:var(--color-bg-white); padding:1.5rem; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); text-align:left;">
+                    <h3 style="margin-bottom:1rem;">Reset Password</h3>
+                    <p style="font-size:0.9rem; margin-bottom:1rem; color:var(--color-text-muted);">Enter your email to receive a password reset link.</p>
+                    <form id="auth-form">
+                        <label style="display:block; margin-bottom:1.2rem; font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
+                        <div id="${turnstileContainerId}" style="margin-bottom: 1rem;"></div>
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end; flex-wrap:wrap;">
+                            <button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button>
+                            <button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">Send Reset Link</button>
+                        </div>
+                    </form>
+                    <p style="margin-top:0.8rem; font-size:0.85rem; text-align:center;"><a href="#" id="switch-to-signin">Back to Sign In</a></p>
+                </div>`;
+            } else {
+                formHtml = `
+                <div id="auth-form-container" style="width:100%; max-width:360px; margin:1rem auto; background:var(--color-bg-white); padding:1.5rem; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); text-align:left;">
+                    <h3 style="margin-bottom:1rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
+                    <form id="auth-form">
+                        <label style="display:block; margin-bottom:0.8rem; font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
+                        <label style="display:block; margin-bottom:1rem; font-size:0.9rem;">Password<input type="password" id="auth-password" required minlength="6" style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
+                        <div id="${turnstileContainerId}" style="margin-bottom: 1rem;"></div>
+                        <div style="display:flex; gap:0.5rem; justify-content:flex-end; flex-wrap:wrap;">
+                            <button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button>
+                            <button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
+                        </div>
+                    </form>
+                    <p style="margin-top:0.8rem; font-size:0.85rem; text-align:center;">
+                        ${mode === 'signin' ? "Don't have an account? <a href='#' id='switch-to-signup'>Create one</a><br><a href='#' id='switch-to-reset'>Forgot password?</a>" 
+                          : "Already have an account? <a href='#' id='switch-to-signin'>Sign in</a>"}
+                    </p>
+                </div>`;
+            }
+
+            container.insertAdjacentHTML('beforeend', formHtml);
+
+            let captchaToken = null;
+
+            setTimeout(() => {
+                if (window.turnstile) {
+                    turnstileWidgetId = window.turnstile.render(`#${turnstileContainerId}`, {
+                        sitekey: TURNSTILE_SITE_KEY,
+                        callback: function(token) { captchaToken = token; },
+                        'expired-callback': function() { captchaToken = null; }
+                    });
+                } else {
+                    console.error('Turnstile script not loaded.');
+                }
+            }, 100);
+
+            const form = document.getElementById('auth-form');
+            document.getElementById('auth-cancel').addEventListener('click', () => document.getElementById('auth-form-container')?.remove());
+
+            if (mode === 'signin') {
+                document.getElementById('switch-to-signup')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signup'); });
+                document.getElementById('switch-to-reset')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('reset'); });
+            } else if (mode === 'signup') {
+                document.getElementById('switch-to-signin')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signin'); });
+            } else if (mode === 'reset') {
+                document.getElementById('switch-to-signin')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signin'); });
+            }
+
+            form.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const email = document.getElementById('auth-email').value.trim();
+                const password = (mode !== 'reset') ? document.getElementById('auth-password').value : null;
+
+                if (!captchaToken) {
+                    alert('Please complete the CAPTCHA challenge.');
+                    return;
+                }
+
+                try {
+                    if (mode === 'signin') {
+                        const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
+                        if (error) throw error;
+                    } else if (mode === 'signup') {
+                        const { error } = await supabase.auth.signUp({ email, password, options: { captchaToken } });
+                        if (error) throw error;
+                        alert('Account created! Please check your email for confirmation (if required).');
+                    } else if (mode === 'reset') {
+                        const { error } = await supabase.auth.resetPasswordForEmail(email, { captchaToken });
+                        if (error) throw error;
+                        alert('Password reset link sent! Check your email.');
+                        document.getElementById('auth-form-container')?.remove();
+                    }
+                } catch (error) {
+                    alert(error.message);
+                }
+            });
+        }
+
+        // ── Message handling (via edge function) ──
+        async function checkMessageLimit(userId) {
+            const signinPrompt = document.getElementById('message-signin-required');
+            const form = document.getElementById('message-form');
+            const limitMsg = document.getElementById('message-limit-reached');
+            if (!userId) {
+                signinPrompt.style.display = 'block';
+                form.style.display = 'none';
+                limitMsg.style.display = 'none';
                 return;
             }
-            const messageText = document.getElementById('message-text').value.trim();
-            if (!messageText) return;
-            try {
-                await submitMessage(session.user.id, messageText);
-                document.getElementById('message-text').value = '';
-                document.getElementById('message-status').innerText = 'Message sent successfully!';
-                // Limit check is now server‑side, so no further action needed.
-            } catch (error) {
-                document.getElementById('message-status').innerText = error.message;
-                console.error(error);
+            signinPrompt.style.display = 'none';
+            form.style.display = 'flex';
+            limitMsg.style.display = 'none';
+            document.getElementById('message-status').innerText = '';
+        }
+
+        async function submitMessage(userId, messageText) {
+            if (!messageText || !messageText.trim()) throw new Error('Message cannot be empty.');
+            if (messageText.length > 2000) throw new Error('Message must be under 2000 characters.');
+            await apiFetch('/messages', {
+                method: 'POST',
+                body: JSON.stringify({ message: messageText.trim() })
+            });
+        }
+
+        // ── Initialization ──
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            initHeaderScroll();
+            initMobileNav();
+            loadSiteSections().finally(() => loadResources());
+            initAuth();
+
+            const messageForm = document.getElementById('message-form');
+            messageForm.addEventListener('submit', async (e) => {
+                e.preventDefault();
+                const session = (await supabase.auth.getSession()).data.session;
+                if (!session) {
+                    alert('You must be signed in to send a message.');
+                    return;
+                }
+                const messageText = document.getElementById('message-text').value.trim();
+                if (!messageText) return;
+                try {
+                    await submitMessage(session.user.id, messageText);
+                    document.getElementById('message-text').value = '';
+                    document.getElementById('message-status').innerText = 'Message sent successfully!';
+                } catch (error) {
+                    document.getElementById('message-status').innerText = error.message;
+                    console.error(error);
+                }
+            });
+
+            document.getElementById('filter-submit').addEventListener('click', applyFilters);
+            document.getElementById('search-btn').addEventListener('click', () => {
+                const term = document.getElementById('search-input').value.trim().toLowerCase();
+                if (!term) { loadResources(); return; }
+                document.getElementById('resources-section').scrollIntoView({ behavior: 'smooth' });
+                showSpinnerInContainer();
+                setTimeout(() => {
+                    const container = document.getElementById('resources-container');
+                    container.innerHTML = fullResourcesHTML;
+                    const cards = container.querySelectorAll('.resource-card');
+                    let anyVisible = false;
+                    cards.forEach(card => {
+                        const titleEl = card.querySelector('.resource-title');
+                        const descEl = card.querySelector('.resource-description');
+                        const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
+                        const descText = descEl ? descEl.textContent.toLowerCase() : '';
+                        const visible = titleText.includes(term) || descText.includes(term);
+                        card.style.display = visible ? '' : 'none';
+                        if (visible) anyVisible = true;
+                    });
+                    document.getElementById('no-results').hidden = anyVisible;
+                }, 500);
+            });
+        });
+
+        // ── Helper functions ──
+        function initMobileNav() {
+            const hamburgerAction = document.getElementById('hamburger-action');
+            const panel = document.getElementById('mobile-nav-panel');
+            const overlay = document.getElementById('mobile-nav-overlay');
+            function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburgerAction.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
+            window.closeNav = function() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburgerAction.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; };
+            hamburgerAction.addEventListener('click', () => { panel.classList.contains('active') ? closeNav() : openNav(); });
+            overlay.addEventListener('click', closeNav);
+            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+        }
+
+        function initHeaderScroll() {
+            const header = document.getElementById('site-header');
+            window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+        }
+
+        function initAuth() {
+            if (!supabase) return;
+            supabase.auth.getSession().then(({ data: { session } }) => updateAuthUI(session));
+            supabase.auth.onAuthStateChange((_event, session) => updateAuthUI(session));
+        }
+
+        function handleQuerySectionNavigation() {
+            const params = new URLSearchParams(window.location.search);
+            const sectionSlug = params.get('section');
+            if (sectionSlug) {
+                setTimeout(() => {
+                    let target = document.getElementById(sectionSlug);
+                    if (!target) {
+                        const headings = document.querySelectorAll('.descriptive-section h2, .resource-section .section-heading');
+                        for (const h of headings) {
+                            const slug = h.textContent.trim().replace(/\s+/g, '-').toLowerCase();
+                            if (slug === sectionSlug) { target = h.closest('section') || h; break; }
+                        }
+                    }
+                    if (target) target.scrollIntoView({ behavior: 'smooth' });
+                }, 600);
+            }
+        }
+
+        function showError(message) {
+            const heroContent = document.getElementById('hero-content');
+            if (heroContent) heroContent.innerHTML = `<div style="background: rgba(255,0,0,0.8); color: white; padding: 2rem; border-radius: 8px;"><h2>⚠️ Error</h2><p>${escapeHtml(message)}</p><p><small>Check console for details.</small></p></div>`;
+            const desktopNav = document.getElementById('desktop-nav-links');
+            if (desktopNav) desktopNav.innerHTML = '<li style="color:red;">Navigation unavailable</li>';
+            const mobilePanel = document.getElementById('mobile-nav-panel');
+            if (mobilePanel) mobilePanel.innerHTML = '<a href="#" style="color:red;">Menu unavailable</a>';
+            const footerInner = document.getElementById('footer-inner');
+            if (footerInner) footerInner.innerHTML = '<div class="footer-links" style="color:red;">Footer links unavailable</div>';
+        }
+
+        function closeNav() {
+            const panel = document.getElementById('mobile-nav-panel');
+            const overlay = document.getElementById('mobile-nav-overlay');
+            const hamburger = document.getElementById('hamburger-action');
+            panel.classList.remove('active');
+            overlay.classList.remove('active');
+            hamburger.setAttribute('aria-expanded', 'false');
+            document.body.style.overflow = '';
+        }
+
+        document.addEventListener('click', (e) => {
+            const link = e.target.closest('a[href^="#"]');
+            if (link && link.getAttribute('href') !== '#') {
+                e.preventDefault();
+                const target = document.getElementById(link.getAttribute('href').substring(1));
+                if (target) target.scrollIntoView({ behavior: 'smooth' });
             }
         });
 
-        document.getElementById('filter-submit').addEventListener('click', applyFilters);
-        document.getElementById('search-btn').addEventListener('click', () => {
-            const term = document.getElementById('search-input').value.trim().toLowerCase();
-            if (!term) { loadResources(); return; }
-            document.getElementById('resources-section').scrollIntoView({ behavior: 'smooth' });
-            showSpinnerInContainer();
-            setTimeout(() => {
-                const container = document.getElementById('resources-container');
-                container.innerHTML = fullResourcesHTML;
-                const cards = container.querySelectorAll('.resource-card');
-                let anyVisible = false;
-                cards.forEach(card => {
-                    const titleEl = card.querySelector('.resource-title');
-                    const descEl = card.querySelector('.resource-description');
-                    const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
-                    const descText = descEl ? descEl.textContent.toLowerCase() : '';
-                    const visible = titleText.includes(term) || descText.includes(term);
-                    card.style.display = visible ? '' : 'none';
-                    if (visible) anyVisible = true;
-                });
-                document.getElementById('no-results').hidden = anyVisible;
-            }, 500);
-        });
-    });
-
-    // ── Helpers (unchanged) ──
-    function handleQuerySectionNavigation() {
-        const params = new URLSearchParams(window.location.search);
-        const sectionSlug = params.get('section');
-        if (sectionSlug) {
-            setTimeout(() => {
-                let target = document.getElementById(sectionSlug);
-                if (!target) {
-                    const headings = document.querySelectorAll('.descriptive-section h2, .resource-section .section-heading');
-                    for (const h of headings) {
-                        const slug = h.textContent.trim().replace(/\s+/g, '-').toLowerCase();
-                        if (slug === sectionSlug) { target = h.closest('section') || h; break; }
-                    }
-                }
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
-            }, 600);
+        function removeSpinner() { document.getElementById('loading-spinner')?.remove(); }
+        function showSpinnerInContainer() {
+            document.getElementById('resources-container').innerHTML = `<div class="spinner-wrapper" id="loading-spinner"><i class="fa-solid fa-dna spinner-icon"></i><div class="spinner-brand">BioLearn</div><p class="spinner-message">Searching resources…</p></div>`;
         }
-    }
 
-    function showError(message) {
-        const heroContent = document.getElementById('hero-content');
-        if (heroContent) heroContent.innerHTML = `<div style="background: rgba(255,0,0,0.8); color: white; padding: 2rem; border-radius: 8px;"><h2>⚠️ Error</h2><p>${escapeHtml(message)}</p><p><small>Check console for details.</small></p></div>`;
-        const desktopNav = document.getElementById('desktop-nav-links');
-        if (desktopNav) desktopNav.innerHTML = '<li style="color:red;">Navigation unavailable</li>';
-        const mobilePanel = document.getElementById('mobile-nav-panel');
-        if (mobilePanel) mobilePanel.innerHTML = '<a href="#" style="color:red;">Menu unavailable</a>';
-        const footerInner = document.getElementById('footer-inner');
-        if (footerInner) footerInner.innerHTML = '<div class="footer-links" style="color:red;">Footer links unavailable</div>';
-    }
-
-    function closeNav() {
-        const panel = document.getElementById('mobile-nav-panel');
-        const overlay = document.getElementById('mobile-nav-overlay');
-        const hamburger = document.getElementById('hamburger-action');
-        panel.classList.remove('active');
-        overlay.classList.remove('active');
-        hamburger.setAttribute('aria-expanded', 'false');
-        document.body.style.overflow = '';
-    }
-
-    document.addEventListener('click', (e) => {
-        const link = e.target.closest('a[href^="#"]');
-        if (link && link.getAttribute('href') !== '#') {
-            e.preventDefault();
-            const target = document.getElementById(link.getAttribute('href').substring(1));
-            if (target) target.scrollIntoView({ behavior: 'smooth' });
-        }
-    });
-
-    function removeSpinner() { document.getElementById('loading-spinner')?.remove(); }
-    function showSpinnerInContainer() {
-        document.getElementById('resources-container').innerHTML = `<div class="spinner-wrapper" id="loading-spinner"><i class="fa-solid fa-dna spinner-icon"></i><div class="spinner-brand">BioLearn</div><p class="spinner-message">Searching resources…</p></div>`;
-    }
-
-    function groupResourcesBySection(resources) {
-        const groups = {};
-        resources.forEach(item => {
-            const section = (item.section_type || 'All Resources').trim();
-            if (!groups[section]) groups[section] = [];
-            if (!item.id) item.id = `gen-${Math.random().toString(36).substr(2, 9)}`;
-            groups[section].push(item);
-        });
-        return Object.entries(groups).map(([name, items]) => ({ sectionName: name, items }));
-    }
-
-    function renderResources(groupedSections) { /* ... same as before ... */ }
-    // (Keep `renderResources` exactly as in your original file – too long to repeat but unchanged)
-    // I'll include a compact version for completeness below:
-    function renderResources(groupedSections) {
-        const container = document.getElementById('resources-container');
-        const noResults = document.getElementById('no-results');
-        const allItems = groupedSections.flatMap(sec => sec.items);
-        if (!allItems.length) { container.innerHTML = ''; noResults.hidden = false; fullResourcesHTML = ''; return; }
-        noResults.hidden = true;
-        let html = '';
-        groupedSections.forEach(({ sectionName, items }) => {
-            html += `<div class="resource-section"><h2 class="section-heading">${escapeHtml(sectionName)}</h2><div class="resources-grid">`;
-            items.forEach(item => {
-                const uniqueId = item.id;
-                const fileUrl = safeUrl(item.file_url);
-                const displayFileUrl = fileUrl && fileUrl !== '#' ? fileUrl : '#';
-                html += `
-                <div class="resource-card" id="res-${escapeHtml(String(uniqueId))}">
-                    <div class="resource-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                    <a href="#res-${escapeHtml(String(uniqueId))}" class="resource-title" title="Jump to this item">${escapeHtml(item.title || '')}</a>
-                    <p class="resource-description">${escapeHtml(item.description || '')}</p>
-                    <div class="resource-meta">
-                        <span><i class="fa-regular fa-user"></i> ${escapeHtml(item.author || 'Unknown')}</span>
-                        <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(item.created_at || '')}</span>
-                        <span><i class="fa-regular fa-file"></i> ${escapeHtml(item.file_size || 'N/A')}</span>
-                    </div>
-                    <div class="resource-actions">
-                        <a href="${escapeHtml(displayFileUrl)}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
-                        <div class="share-buttons">
-                            <a href="#" class="share-btn" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                            <a href="#" class="share-btn" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                            <a href="#" class="share-btn" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                        </div>
-                    </div>
-                </div>`;
+        function groupResourcesBySection(resources) {
+            const groups = {};
+            resources.forEach(item => {
+                const section = (item.section_type || 'All Resources').trim();
+                if (!groups[section]) groups[section] = [];
+                if (!item.id) item.id = `gen-${Math.random().toString(36).substr(2, 9)}`;
+                groups[section].push(item);
             });
-            html += `</div></div>`;
-        });
-        fullResourcesHTML = html;
-        removeSpinner();
-        container.innerHTML = html;
-    }
+            return Object.entries(groups).map(([name, items]) => ({ sectionName: name, items }));
+        }
 
-    function initMobileNav() { /* unchanged */ }
-    function initHeaderScroll() { /* unchanged */ }
-    function initAuth() {
-        if (!supabase) return;
-        supabase.auth.getSession().then(({ data: { session } }) => updateAuthUI(session));
-        supabase.auth.onAuthStateChange((_event, session) => updateAuthUI(session));
-    }
+        function renderResources(groupedSections) {
+            const container = document.getElementById('resources-container');
+            const noResults = document.getElementById('no-results');
+            const allItems = groupedSections.flatMap(sec => sec.items);
+            if (!allItems.length) { container.innerHTML = ''; noResults.hidden = false; fullResourcesHTML = ''; return; }
+            noResults.hidden = true;
+            let html = '';
+            groupedSections.forEach(({ sectionName, items }) => {
+                html += `<div class="resource-section"><h2 class="section-heading">${escapeHtml(sectionName)}</h2><div class="resources-grid">`;
+                items.forEach(item => {
+                    const uniqueId = item.id;
+                    const fileUrl = safeUrl(item.file_url);
+                    const displayFileUrl = fileUrl && fileUrl !== '#' ? fileUrl : '#';
+                    html += `
+                    <div class="resource-card" id="res-${escapeHtml(String(uniqueId))}">
+                        <div class="resource-icon"><i class="fa-solid fa-file-pdf"></i></div>
+                        <a href="#res-${escapeHtml(String(uniqueId))}" class="resource-title" title="Jump to this item">${escapeHtml(item.title || '')}</a>
+                        <p class="resource-description">${escapeHtml(item.description || '')}</p>
+                        <div class="resource-meta">
+                            <span><i class="fa-regular fa-user"></i> ${escapeHtml(item.author || 'Unknown')}</span>
+                            <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(item.created_at || '')}</span>
+                            <span><i class="fa-regular fa-file"></i> ${escapeHtml(item.file_size || 'N/A')}</span>
+                        </div>
+                        <div class="resource-actions">
+                            <a href="${escapeHtml(displayFileUrl)}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
+                            <div class="share-buttons">
+                                <a href="#" class="share-btn" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
+                                <a href="#" class="share-btn" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
+                                <a href="#" class="share-btn" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
+                            </div>
+                        </div>
+                    </div>`;
+                });
+                html += `</div></div>`;
+            });
+            fullResourcesHTML = html;
+            removeSpinner();
+            container.innerHTML = html;
+        }
 
-    let fullResourcesHTML = '';
-</script>
+        let fullResourcesHTML = '';
+    </script>
 </body>
 </html>
