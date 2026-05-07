@@ -1095,7 +1095,7 @@
                     html += `
                     <div class="resource-card" id="res-${escapeHtml(String(uniqueId))}">
                         <div class="resource-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                        <a href="#res-${escapeHtml(String(uniqueId))}" class="resource-title" title="Jump to this item">${escapeHtml(item.title || '')}</a>
+                       <a href="notes.html?id=${escapeHtml(String(uniqueId))}" class="resource-title">${escapeHtml(item.title || '')}</a>
                         <p class="resource-description">${escapeHtml(item.description || '')}</p>
                         <div class="resource-meta">
                             <span><i class="fa-regular fa-user"></i> ${escapeHtml(item.author || 'Unknown')}</span>

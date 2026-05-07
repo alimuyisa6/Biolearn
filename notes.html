@@ -1,0 +1,399 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>BioLearn – Study Notes</title>
+    <meta name="description" content="Read full O‑ and A‑Level biology notes.">
+    <!-- Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <!-- Font Awesome 6 -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
+          integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
+          crossorigin="anonymous" referrerpolicy="no-referrer" />
+    
+    <style>
+        :root {
+            --color-primary: #1a365d;
+            --color-primary-light: #2a4a7f;
+            --color-secondary: #3b82f6;
+            --color-accent: #60a5fa;
+            --color-gold: #f59e0b;
+            --color-gold-light: #fcd34d;
+            --color-surface: #f0f4f8;
+            --color-bg-white: #ffffff;
+            --color-text: #111827;
+            --color-text-muted: #6b7280;
+            --color-border: #d1d5db;
+            --radius-sm: 0.5rem;
+            --radius-md: 0.75rem;
+            --radius-lg: 1.25rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
+            --shadow-md: 0 6px 18px rgba(0,0,0,0.06);
+            --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
+            --transition-fast: 180ms ease;
+            --transition-smooth: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+            --max-width: 1200px;
+            --header-height: 4.5rem;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        body {
+            font-family: 'Inter', system-ui, sans-serif;
+            background: var(--color-surface);
+            color: var(--color-text);
+            line-height: 1.6;
+            min-height: 100vh;
+            display: flex;
+            flex-direction: column;
+        }
+        .site-header {
+            position: sticky; top: 0; z-index: 100;
+            background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
+            -webkit-backdrop-filter: blur(16px);
+            border-bottom: 1px solid var(--color-border);
+            height: var(--header-height); display: flex; align-items: center;
+            transition: box-shadow var(--transition-smooth);
+        }
+        .site-header.scrolled { box-shadow: var(--shadow-md); }
+        .header-inner {
+            width: 100%; max-width: var(--max-width); margin: 0 auto;
+            padding: 0 1.8rem; display: flex; align-items: center;
+            justify-content: space-between; gap: 1.2rem;
+        }
+        .logo {
+            display: flex; align-items: center; gap: 0.5rem;
+            text-decoration: none; font-weight: 700; font-size: 1.3rem;
+            font-family: 'Merriweather', serif;
+            color: var(--color-primary);
+        }
+        .logo i { font-size: 1.4rem; color: var(--color-secondary); }
+        .home-btn {
+            background: var(--color-secondary); color: white;
+            padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 600;
+            text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem;
+            transition: background var(--transition-fast);
+        }
+        .home-btn:hover { background: var(--color-primary); }
+        .home-btn i { font-size: 0.9rem; }
+
+        .notes-container {
+            max-width: var(--max-width); margin: 2rem auto; padding: 0 1.8rem;
+            display: grid; grid-template-columns: 280px 1fr; gap: 2rem; align-items: start;
+        }
+        @media (max-width: 768px) {
+            .notes-container { grid-template-columns: 1fr; }
+        }
+        .level-toggle {
+            grid-column: 1 / -1;
+            display: flex; gap: 0.5rem; margin-bottom: 1rem;
+            justify-content: center; flex-wrap: wrap;
+        }
+        .toggle-btn {
+            padding: 0.65rem 2rem; border-radius: 30px; font-weight: 600;
+            border: 2px solid var(--color-border); background: white; cursor: pointer;
+            transition: all var(--transition-fast);
+        }
+        .toggle-btn.active {
+            background: var(--color-primary); color: white; border-color: var(--color-primary);
+        }
+        .sidebar {
+            background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border); padding: 1.5rem;
+            max-height: calc(100vh - var(--header-height) - 4rem); overflow-y: auto;
+        }
+        .sidebar h3 {
+            font-family: 'Merriweather', serif; margin-bottom: 1rem; color: var(--color-primary);
+        }
+        .note-list-item {
+            display: block; padding: 0.75rem 1rem; border-radius: var(--radius-md);
+            margin-bottom: 0.4rem; text-decoration: none; color: var(--color-text);
+            transition: background var(--transition-fast); font-size: 0.9rem;
+            border: 1px solid transparent;
+        }
+        .note-list-item:hover { background: var(--color-surface); }
+        .note-list-item.active {
+            background: var(--color-accent); color: white; border-color: var(--color-secondary);
+        }
+        .detail-pane {
+            background: white; border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border); padding: 2rem;
+        }
+        .detail-title {
+            font-family: 'Merriweather', serif; font-size: 2rem; margin-bottom: 0.5rem;
+            color: var(--color-primary);
+        }
+        .detail-meta {
+            display: flex; flex-wrap: wrap; gap: 1rem; margin-bottom: 1.5rem;
+            font-size: 0.9rem; color: var(--color-text-muted);
+        }
+        .detail-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
+        .detail-description { margin-bottom: 1.5rem; line-height: 1.7; }
+        .btn-download {
+            display: inline-flex; align-items: center; gap: 0.4rem;
+            background: var(--color-primary); color: white; padding: 0.6rem 1.4rem;
+            border-radius: 30px; text-decoration: none; font-weight: 600;
+            transition: background var(--transition-fast);
+        }
+        .btn-download:hover { background: var(--color-primary-light); }
+        .empty-state { text-align: center; padding: 4rem 2rem; color: var(--color-text-muted); }
+
+        /* Mobile nav panel */
+        .mobile-nav-panel {
+            position: fixed; top: 0; right: -320px; width: 280px;
+            height: auto; max-height: 100vh; overflow-y: auto;
+            background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12);
+            z-index: 200; padding: 5rem 1.8rem 2rem;
+            display: flex; flex-direction: column; gap: 0.8rem;
+            opacity: 0; transition: right 0.35s ease, opacity 0.35s ease;
+        }
+        .mobile-nav-panel.active { right: 0; opacity: 1; }
+        .mobile-nav-panel a {
+            display: block; padding: 0.8rem 1rem; text-decoration: none;
+            color: var(--color-text); font-weight: 500; border-radius: 30px;
+            transition: background var(--transition-fast);
+        }
+        .mobile-nav-panel a:hover { background: var(--color-surface); }
+        .mobile-nav-overlay {
+            position: fixed; inset: 0; background: rgba(0,0,0,0.35);
+            z-index: 150; opacity: 0; pointer-events: none;
+            transition: opacity 0.35s ease;
+        }
+        .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
+        .hamburger-action {
+            background: white; border: 2px solid var(--color-border);
+            color: var(--color-primary); font-size: 1.3rem; padding: 0.7rem 1.6rem;
+            border-radius: 30px; display: none; cursor: pointer;
+        }
+        .hamburger-action:hover { background: #e5e7eb; }
+        @media (max-width: 768px) { .hamburger-action { display: inline-flex; } }
+
+        /* Footer same as index */
+        .site-footer {
+            background: #0f172a; color: #cbd5e1; padding: 3rem 1.5rem 2rem; margin-top: auto;
+        }
+        .footer-intro {
+            max-width: var(--max-width); margin: 0 auto 2rem;
+            text-align: center; padding-bottom: 1.5rem;
+            border-bottom: 1px solid rgba(255,255,255,0.08);
+        }
+        .footer-intro .logo { color: #f0f9ff; }
+        .footer-inner {
+            max-width: var(--max-width); margin: 0 auto;
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+            gap: 2.5rem;
+        }
+        .footer-links h4 {
+            font-weight: 700; font-size: 0.85rem; text-transform: uppercase;
+            letter-spacing: 0.06em; color: #f0f9ff; margin-bottom: 1rem;
+        }
+        .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color var(--transition-fast); }
+        .footer-links a:hover { color: var(--color-gold-light); }
+        .footer-bottom {
+            max-width: var(--max-width); margin: 2.5rem auto 0; padding-top: 1.5rem;
+            border-top: 1px solid rgba(255,255,255,0.08); text-align: center;
+            font-size: 0.82rem; color: #64748b;
+        }
+    </style>
+</head>
+<body>
+    <header class="site-header" id="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="logo" aria-label="BioLearn Home">
+                <i class="fa-solid fa-dna"></i> BioLearn
+            </a>
+            <a href="index.html" class="home-btn"><i class="fa-solid fa-home"></i> Home</a>
+            <button class="hamburger-action" id="hamburger-action" aria-label="Open menu" aria-expanded="false">
+                <i class="fa-solid fa-bars"></i>
+            </button>
+        </div>
+    </header>
+
+    <main>
+        <div class="notes-container">
+            <!-- Level toggle -->
+            <div class="level-toggle" id="level-toggle">
+                <button class="toggle-btn active" data-level="O-Level">O‑Level</button>
+                <button class="toggle-btn" data-level="A-Level">A‑Level</button>
+            </div>
+            <!-- Sidebar list -->
+            <aside class="sidebar" id="note-list"></aside>
+            <!-- Detail pane -->
+            <section class="detail-pane" id="detail-pane">
+                <div class="empty-state">
+                    <i class="fa-solid fa-book-open" style="font-size:3rem; color:var(--color-accent); margin-bottom:1rem;"></i>
+                    <p>Select a note from the sidebar to view its content.</p>
+                </div>
+            </section>
+        </div>
+    </main>
+
+    <div class="mobile-nav-panel" id="mobile-nav-panel">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+    </div>
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+    <footer class="site-footer" id="site-footer">
+        <div class="footer-intro">
+            <a href="index.html" class="logo"><i class="fa-solid fa-dna"></i> BioLearn</a>
+            <p>Free biology notes for O‑ and A‑Level learners.</p>
+        </div>
+        <div class="footer-inner" id="footer-inner"></div>
+        <div class="footer-bottom">
+            <p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p>
+        </div>
+    </footer>
+
+    <script type="module">
+        const API_BASE = '/api';
+        let currentLevel = 'O-Level';
+        let notes = [];
+        let activeNoteId = null;
+
+        // Fetch footer from site_sections
+        async function loadFooter() {
+            try {
+                const res = await fetch(`${API_BASE}/site-sections`);
+                const data = await res.json();
+                const footerData = data.find(row => row.section === 'footer');
+                if (footerData?.data?.columns) {
+                    renderFooter(footerData.data.columns);
+                }
+            } catch (err) { console.warn('Footer load failed', err); }
+        }
+
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
+        }
+
+        function renderFooter(columns) {
+            const footerInner = document.getElementById('footer-inner');
+            if (!footerInner) return;
+            footerInner.innerHTML = columns.map(col => {
+                const heading = escapeHtml(col.heading);
+                const items = (col.items || []).map(item => {
+                    let href = item.href ? item.href.trim() : '#';
+                    let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                    return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                }).join('');
+                return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+            }).join('');
+        }
+
+        // Load all notes for a given level
+        async function loadNotes(level) {
+            try {
+                const res = await fetch(`${API_BASE}/resources?level=${encodeURIComponent(level)}`);
+                notes = await res.json();
+                renderNoteList(notes);
+                // If there's a note id in URL, try to activate it
+                const urlParams = new URLSearchParams(window.location.search);
+                const id = urlParams.get('id');
+                if (id) activateNoteById(id);
+            } catch (err) { console.error('Failed to load notes', err); }
+        }
+
+        function renderNoteList(list) {
+            const container = document.getElementById('note-list');
+            if (!list.length) {
+                container.innerHTML = '<p style="color:var(--color-text-muted); text-align:center;">No notes found for this level.</p>';
+                return;
+            }
+            container.innerHTML = list.map(note => `
+                <a href="#" class="note-list-item${activeNoteId == note.id ? ' active' : ''}" data-id="${note.id}">
+                    ${escapeHtml(note.title)}
+                </a>
+            `).join('');
+
+            // Click handler for sidebar items
+            container.querySelectorAll('.note-list-item').forEach(link => {
+                link.addEventListener('click', (e) => {
+                    e.preventDefault();
+                    const id = link.dataset.id;
+                    activateNoteById(id);
+                    // Update URL without reload
+                    const newUrl = new URL(window.location);
+                    newUrl.searchParams.set('id', id);
+                    history.pushState(null, '', newUrl);
+                });
+            });
+        }
+
+        async function activateNoteById(id) {
+            if (!id) return;
+            activeNoteId = id;
+            // Highlight sidebar
+            document.querySelectorAll('.note-list-item').forEach(el => {
+                el.classList.toggle('active', el.dataset.id == id);
+            });
+            // Fetch full note details
+            try {
+                const res = await fetch(`${API_BASE}/note?id=${encodeURIComponent(id)}`);
+                if (!res.ok) throw new Error('Note not found');
+                const note = await res.json();
+                renderNoteDetail(note);
+            } catch (err) {
+                document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Failed to load note.</p>';
+            }
+        }
+
+        function renderNoteDetail(note) {
+            const pane = document.getElementById('detail-pane');
+            const fileUrl = note.file_url || '#';
+            pane.innerHTML = `
+                <h1 class="detail-title">${escapeHtml(note.title || '')}</h1>
+                <div class="detail-meta">
+                    <span><i class="fa-regular fa-user"></i> ${escapeHtml(note.author || 'Unknown')}</span>
+                    <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(note.created_at || '')}</span>
+                    <span><i class="fa-regular fa-file"></i> ${escapeHtml(note.file_size || 'N/A')}</span>
+                    <span><i class="fa-solid fa-tag"></i> ${escapeHtml(note.category || '')}</span>
+                </div>
+                <div class="detail-description">${escapeHtml(note.description || 'No description provided.')}</div>
+                <a href="${escapeHtml(fileUrl)}" class="btn-download" download>
+                    <i class="fa-solid fa-download"></i> Download Note
+                </a>
+            `;
+        }
+
+        // Level toggle
+        document.getElementById('level-toggle').addEventListener('click', (e) => {
+            const btn = e.target.closest('.toggle-btn');
+            if (!btn) return;
+            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            btn.classList.add('active');
+            currentLevel = btn.dataset.level;
+            loadNotes(currentLevel);
+        });
+
+        // Mobile nav
+        function initMobileNav() {
+            const hamburger = document.getElementById('hamburger-action');
+            const panel = document.getElementById('mobile-nav-panel');
+            const overlay = document.getElementById('mobile-nav-overlay');
+            function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburger.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
+            function closeNav() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburger.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
+            hamburger.addEventListener('click', () => panel.classList.contains('active') ? closeNav() : openNav());
+            overlay.addEventListener('click', closeNav);
+            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+        }
+
+        function initHeaderScroll() {
+            const header = document.getElementById('site-header');
+            window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
+        }
+
+        // Init
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            initHeaderScroll();
+            initMobileNav();
+            loadFooter();
+            loadNotes(currentLevel);
+        });
+    </script>
+</body>
+</html>
