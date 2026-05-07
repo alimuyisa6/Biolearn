@@ -1,4 +1,7 @@
 {
+  "buildCommand": "# static site",
+  "outputDirectory": ".",
+  "public": true,
   "rewrites": [
     {
       "source": "/(.*).html",
