@@ -1,29 +1,24 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioLearn Digital Library — Free Biology Notes</title>
     <meta name="description" content="Download free O‑ and A‑Level biology notes, past papers, and study resources. Sharebility-inspired digital library for advanced learners.">
-    
     <!-- Fonts: Inter body, Merriweather headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    
     <!-- Font Awesome 6 icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
-    
     <!-- Supabase client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    
     <!-- Cloudflare Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
 
     <style>
-        /* ── Design tokens (unchanged) ── */
         :root {
             --color-primary: #1a365d;
             --color-primary-light: #2a4a7f;
@@ -60,7 +55,6 @@
             display: flex;
             flex-direction: column;
         }
-
         .skip-link {
             position: absolute; top: -100%; left: 1rem; z-index: 1000;
             background: var(--color-primary); color: #fff;
@@ -515,6 +509,13 @@
                 </div>
             </div>
         </section>
+
+        <!-- NEW: Inbox Section -->
+        <section class="descriptive-section" id="inbox-section" style="display:none;">
+            <h2>Your Messages</h2>
+            <p class="section-desc">Here are the messages you've sent us.</p>
+            <div id="messages-list" style="max-width:600px; margin:1.5rem auto; text-align:left;"></div>
+        </section>
     </main>
 
     <div class="mobile-nav-panel" id="mobile-nav-panel">
@@ -536,7 +537,6 @@
     </footer>
 
     <script type="module">
-        // ── Supabase client (for AUTH ONLY) ──
         const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
@@ -545,11 +545,9 @@
             document.getElementById('resources-container').innerHTML = '<p style="text-align:center; color:red;">Failed to load database client.</p>';
         }
 
-        // Cloudflare Turnstile site key (public)
         const TURNSTILE_SITE_KEY = '0x4AAAAAADJoKTgQ_HvcsSZ-';
         let turnstileWidgetId = null;
 
-        // ── Helpers for Vercel API routes ──
         const API_BASE = '/api';
 
         async function apiFetch(endpoint, options = {}) {
@@ -566,7 +564,6 @@
             return res.json();
         }
 
-        // ── Security helpers ──
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, m => map[m]);
@@ -586,7 +583,6 @@
             return `url("${trimmed.replace(/["\\]/g, '\\$&')}")`;
         }
 
-        // ── Load site sections (via edge function) ──
         async function loadSiteSections() {
             try {
                 const data = await apiFetch('/site-sections');
@@ -594,7 +590,6 @@
                     showError('No data found in site_sections table');
                     return;
                 }
-
                 const builders = {
                     hero: (d) => {
                         const heroSection = document.getElementById('hero-section');
@@ -712,7 +707,6 @@
             } catch (err) { console.warn('Fallback filter load failed', err); }
         }
 
-        // ── Resources (via edge function) ──
         async function loadResources(filters = {}) {
             const container = document.getElementById('resources-container');
             container.classList.add('loading');
@@ -740,7 +734,6 @@
             loadResources({ level, category, tag });
         }
 
-        // ── Authentication UI with Turnstile CAPTCHA ──
         function cleanupTurnstile() {
             if (turnstileWidgetId !== null) {
                 window.turnstile?.remove(turnstileWidgetId);
@@ -760,6 +753,7 @@
                     </span>`;
                 document.getElementById('sign-out-btn')?.addEventListener('click', async () => { await supabase.auth.signOut(); });
                 checkMessageLimit(session.user.id);
+                loadMessages(); // <-- NEW: fetch messages on sign-in
             } else {
                 container.innerHTML = `
                     <button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
@@ -790,6 +784,7 @@
                 document.getElementById('message-signin-required').style.display = 'block';
                 document.getElementById('message-form').style.display = 'none';
                 document.getElementById('message-limit-reached').style.display = 'none';
+                document.getElementById('inbox-section').style.display = 'none'; // hide inbox on sign-out
             }
         }
 
@@ -894,7 +889,6 @@
             });
         }
 
-        // ── Message handling (via edge function) ──
         async function checkMessageLimit(userId) {
             const signinPrompt = document.getElementById('message-signin-required');
             const form = document.getElementById('message-form');
@@ -920,7 +914,33 @@
             });
         }
 
-        // ── Initialization ──
+        // NEW: Fetch messages from /api/get-messages
+        async function loadMessages() {
+            const session = (await supabase.auth.getSession()).data.session;
+            if (!session) return;
+            try {
+                const data = await apiFetch('/get-messages');
+                const container = document.getElementById('messages-list');
+                if (!data.messages || data.messages.length === 0) {
+                    container.innerHTML = '<p style="color:var(--color-text-muted);">No messages yet.</p>';
+                } else {
+                    let html = '';
+                    data.messages.forEach(msg => {
+                        const date = msg.created_at ? new Date(msg.created_at).toLocaleString() : '';
+                        html += `<div style="background:var(--color-surface); padding:1rem; border-radius:var(--radius-md); margin-bottom:0.8rem;">
+                            <p><strong>From:</strong> ${escapeHtml(msg.user_id || 'Unknown')}</p>
+                            <p>${escapeHtml(msg.message)}</p>
+                            <small style="color:var(--color-text-muted);">${date}</small>
+                        </div>`;
+                    });
+                    container.innerHTML = html;
+                }
+                document.getElementById('inbox-section').style.display = 'block';
+            } catch (err) {
+                console.error('Loading messages failed', err);
+            }
+        }
+
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
             initHeaderScroll();
@@ -973,7 +993,6 @@
             });
         });
 
-        // ── Helper functions ──
         function initMobileNav() {
             const hamburgerAction = document.getElementById('hamburger-action');
             const panel = document.getElementById('mobile-nav-panel');
