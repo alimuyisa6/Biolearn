@@ -1,8 +1,9 @@
 {
-  "buildCommand": "# static site",
-  "outputDirectory": ".",
-  "public": true,
   "rewrites": [
+    {
+      "source": "/api/(.*)",
+      "destination": "/api/$1"
+    },
     {
       "source": "/(.*).html",
       "destination": "/$1.html"
