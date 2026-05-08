@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -510,7 +510,7 @@
             </div>
         </section>
 
-        <!-- NEW: Inbox Section -->
+        <!-- Inbox Section -->
         <section class="descriptive-section" id="inbox-section" style="display:none;">
             <h2>Your Messages</h2>
             <p class="section-desc">Here are the messages you've sent us.</p>
@@ -585,7 +585,7 @@
 
         async function loadSiteSections() {
             try {
-                const data = await apiFetch('/site-sections');
+                const data = await apiFetch('/data?action=site-sections');
                 if (!data || data.length === 0) {
                     showError('No data found in site_sections table');
                     return;
@@ -699,7 +699,7 @@
 
         async function loadFilterOptionsFromBioNotes() {
             try {
-                const { levels, categories } = await apiFetch('/filter-options');
+                const { levels, categories } = await apiFetch('/data?action=filter-options');
                 const levelSel = document.getElementById('filter-level');
                 (levels || []).forEach(lvl => { if(lvl){ const o = document.createElement('option'); o.value = lvl; o.textContent = lvl; levelSel.appendChild(o); }});
                 const catSel = document.getElementById('filter-category');
@@ -715,7 +715,7 @@
                 if (filters.level) params.set('level', filters.level);
                 if (filters.category) params.set('category', filters.category);
                 if (filters.tag) params.set('tag', filters.tag);
-                const data = await apiFetch(`/resources${params.toString() ? '?' + params.toString() : ''}`);
+                const data = await apiFetch(`/data?action=resources${params.toString() ? '&' + params.toString() : ''}`);
                 const grouped = groupResourcesBySection(data || []);
                 renderResources(grouped);
             } catch (err) {
@@ -753,7 +753,7 @@
                     </span>`;
                 document.getElementById('sign-out-btn')?.addEventListener('click', async () => { await supabase.auth.signOut(); });
                 checkMessageLimit(session.user.id);
-                loadMessages(); // <-- NEW: fetch messages on sign-in
+                loadMessages();
             } else {
                 container.innerHTML = `
                     <button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
@@ -784,7 +784,7 @@
                 document.getElementById('message-signin-required').style.display = 'block';
                 document.getElementById('message-form').style.display = 'none';
                 document.getElementById('message-limit-reached').style.display = 'none';
-                document.getElementById('inbox-section').style.display = 'none'; // hide inbox on sign-out
+                document.getElementById('inbox-section').style.display = 'none';
             }
         }
 
@@ -908,18 +908,17 @@
         async function submitMessage(userId, messageText) {
             if (!messageText || !messageText.trim()) throw new Error('Message cannot be empty.');
             if (messageText.length > 2000) throw new Error('Message must be under 2000 characters.');
-            await apiFetch('/messages', {
+            await apiFetch('/actions?action=send-message', {
                 method: 'POST',
                 body: JSON.stringify({ message: messageText.trim() })
             });
         }
 
-        // NEW: Fetch messages from /api/get-messages
         async function loadMessages() {
             const session = (await supabase.auth.getSession()).data.session;
             if (!session) return;
             try {
-                const data = await apiFetch('/get-messages');
+                const data = await apiFetch('/actions?action=get-messages');
                 const container = document.getElementById('messages-list');
                 if (!data.messages || data.messages.length === 0) {
                     container.innerHTML = '<p style="color:var(--color-text-muted);">No messages yet.</p>';

@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -80,39 +80,73 @@
         .home-btn i { font-size: 0.9rem; }
 
         .main-content {
-            max-width: 800px; margin: 3rem auto; padding: 0 1.8rem; width: 100%;
+            max-width: var(--max-width); margin: 0 auto; padding: 3rem 1.8rem; width: 100%;
         }
-        .page-title {
-            font-family: 'Merriweather', serif; font-size: 2.2rem; margin-bottom: 1.5rem;
-            color: var(--color-primary);
+        .hero-mini {
+            text-align: center; padding: 3rem 0 2rem;
         }
-        .section-text {
-            font-size: 1.05rem; line-height: 1.7; color: var(--color-text);
-            margin-bottom: 2rem;
+        .hero-mini h1 {
+            font-family: 'Merriweather', serif; font-size: 2.8rem; color: var(--color-primary); margin-bottom: 1rem;
         }
-        .highlight-box {
-            background: var(--color-bg-white); border-radius: var(--radius-lg);
-            box-shadow: var(--shadow-sm); border: 1px solid var(--color-border);
-            padding: 2rem; margin: 2rem 0;
+        .hero-mini p {
+            font-size: 1.2rem; color: var(--color-text-muted); max-width: 600px; margin: 0 auto;
         }
-        .highlight-box h3 {
-            font-family: 'Merriweather', serif; margin-bottom: 1rem; color: var(--color-primary);
+
+        .grid-2 {
+            display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; margin-bottom: 3rem;
         }
-        .team-list {
-            list-style: none; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;
+        @media (max-width: 768px) {
+            .grid-2 { grid-template-columns: 1fr; }
         }
-        .team-list li {
-            text-align: center; padding: 1.5rem; background: var(--color-bg-white);
-            border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+        .card {
+            background: var(--color-bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm);
+            border: 1px solid var(--color-border); padding: 2rem;
         }
-        .team-list li i { font-size: 2rem; color: var(--color-accent); margin-bottom: 0.5rem; }
-        .btn-gold {
+        .card h3 {
+            font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--color-primary); margin-bottom: 1rem;
+        }
+        .card p, .card li {
+            font-size: 1rem; color: var(--color-text); line-height: 1.7;
+        }
+        .val-list {
+            list-style: none; padding: 0; margin: 1.5rem 0 0;
+        }
+        .val-list li {
+            margin-bottom: 1rem; display: flex; align-items: center; gap: 0.8rem;
+        }
+        .val-list li i {
+            font-size: 1.2rem; color: var(--color-gold); width: 1.5rem; text-align: center;
+        }
+
+        .team-grid {
+            display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1.5rem;
+            margin-top: 1.5rem;
+        }
+        .team-card {
+            text-align: center; background: var(--color-bg-white); border-radius: var(--radius-lg);
+            padding: 2rem 1rem; box-shadow: var(--shadow-sm); transition: transform var(--transition-fast);
+        }
+        .team-card:hover { transform: translateY(-4px); box-shadow: var(--shadow-lg); }
+        .team-card i {
+            font-size: 2.5rem; color: var(--color-accent); margin-bottom: 1rem;
+        }
+        .team-card h4 { font-size: 1.1rem; color: var(--color-primary); margin-bottom: 0.3rem; }
+        .team-card p { font-size: 0.9rem; color: var(--color-text-muted); }
+
+        .cta-section {
+            text-align: center; background: linear-gradient(135deg, #1a365d, #3b82f6); color: white;
+            border-radius: var(--radius-lg); padding: 3rem 2rem; margin-top: 3rem;
+        }
+        .cta-section h2 {
+            font-family: 'Merriweather', serif; font-size: 2rem; margin-bottom: 1rem;
+        }
+        .btn-outline-white {
             display: inline-flex; align-items: center; gap: 0.5rem;
-            background: var(--color-gold); color: white; padding: 0.75rem 2rem;
+            border: 2px solid white; color: white; padding: 0.75rem 2rem;
             border-radius: 30px; font-weight: 600; text-decoration: none;
-            transition: background var(--transition-fast);
+            transition: background var(--transition-fast), color var(--transition-fast);
         }
-        .btn-gold:hover { background: #d97706; }
+        .btn-outline-white:hover { background: white; color: var(--color-primary); }
 
         /* Mobile nav */
         .mobile-nav-panel {
@@ -144,7 +178,7 @@
         .hamburger-action:hover { background: #e5e7eb; }
         @media (max-width: 768px) { .hamburger-action { display: inline-flex; } }
 
-        /* Footer (same as all pages) */
+        /* Footer */
         .site-footer {
             background: #0f172a; color: #cbd5e1; padding: 3rem 1.5rem 2rem; margin-top: auto;
         }
@@ -186,51 +220,8 @@
         </div>
     </header>
 
-    <main class="main-content">
-        <h1 class="page-title">About BioLearn</h1>
-        
-        <p class="section-text">
-            BioLearn is a free, community‑driven digital library dedicated to providing high‑quality O‑Level and A‑Level biology resources. Our mission is to empower learners everywhere — regardless of location or background — with the tools they need to excel in biology.
-        </p>
-
-        <div class="highlight-box">
-            <h3>Our Story</h3>
-            <p>Founded by a team of passionate educators and developers, BioLearn started as a small collection of notes shared among friends. Today, it serves thousands of students across Uganda and beyond, offering carefully curated notes, past papers, and study materials — all completely free.</p>
-        </div>
-
-        <div class="highlight-box">
-            <h3>Core Values</h3>
-            <ul style="list-style: none; padding:0; margin:0;">
-                <li style="margin-bottom:1rem;"><i class="fa-solid fa-check-circle" style="color:var(--color-secondary); margin-right:0.5rem;"></i> <strong>Free for All:</strong> Education should be accessible, not a privilege.</li>
-                <li style="margin-bottom:1rem;"><i class="fa-solid fa-check-circle" style="color:var(--color-secondary); margin-right:0.5rem;"></i> <strong>Quality First:</strong> Every resource is reviewed by subject experts.</li>
-                <li style="margin-bottom:1rem;"><i class="fa-solid fa-check-circle" style="color:var(--color-secondary); margin-right:0.5rem;"></i> <strong>Community‑Powered:</strong> Users can contribute and share knowledge.</li>
-            </ul>
-        </div>
-
-        <div class="highlight-box">
-            <h3>Meet the Team</h3>
-            <ul class="team-list">
-                <li>
-                    <i class="fa-solid fa-user-graduate"></i>
-                    <h4>Alimuyisa6</h4>
-                    <p style="font-size:0.9rem; color:var(--color-text-muted);">Founder & Lead Developer</p>
-                </li>
-                <li>
-                    <i class="fa-solid fa-flask"></i>
-                    <h4>Dr. Amina Wanjiru</h4>
-                    <p style="font-size:0.9rem; color:var(--color-text-muted);">Biology Consultant</p>
-                </li>
-                <li>
-                    <i class="fa-solid fa-code"></i>
-                    <h4>Open Source Contributors</h4>
-                    <p style="font-size:0.9rem; color:var(--color-text-muted);">Developers worldwide</p>
-                </li>
-            </ul>
-        </div>
-
-        <div style="text-align: center; margin-top: 3rem;">
-            <a href="submit.html" class="btn-gold"><i class="fa-solid fa-paper-plane"></i> Submit a Resource</a>
-        </div>
+    <main class="main-content" id="about-content">
+        <p style="text-align:center; padding:3rem;">Loading...</p>
     </main>
 
     <div class="mobile-nav-panel" id="mobile-nav-panel">
@@ -253,38 +244,114 @@
     </footer>
 
     <script type="module">
-        // Load footer from site_sections
-        (async () => {
-            try {
-                const res = await fetch('/api/site-sections');
-                const data = await res.json();
-                const footerData = data.find(row => row.section === 'footer');
-                if (footerData?.data?.columns) {
-                    renderFooter(footerData.data.columns);
-                }
-            } catch (err) { console.warn('Footer load failed'); }
-        })();
-
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        function renderFooter(columns) {
-            const footerInner = document.getElementById('footer-inner');
-            if (!footerInner) return;
-            footerInner.innerHTML = columns.map(col => {
-                const heading = escapeHtml(col.heading);
-                const items = (col.items || []).map(item => {
-                    let href = item.href ? item.href.trim() : '#';
-                    let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                    return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                }).join('');
-                return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-            }).join('');
+        async function loadFooter() {
+            try {
+                const res = await fetch('/api/data?action=site-sections');
+                const data = await res.json();
+                const footerData = data.find(row => row.section === 'footer');
+                if (footerData?.data?.columns) {
+                    const footerInner = document.getElementById('footer-inner');
+                    footerInner.innerHTML = footerData.data.columns.map(col => {
+                        const heading = escapeHtml(col.heading);
+                        const items = (col.items || []).map(item => {
+                            let href = item.href ? item.href.trim() : '#';
+                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                        }).join('');
+                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+                    }).join('');
+                }
+            } catch (err) { console.warn('Footer load failed'); }
         }
 
-        // Mobile nav
+        async function loadAboutContent() {
+            const container = document.getElementById('about-content');
+            try {
+                const res = await fetch('/api/data?action=site-sections');
+                const data = await res.json();
+                const aboutData = data.find(row => row.section === 'about');
+                if (!aboutData?.data) throw new Error('About data not found');
+                const d = aboutData.data;
+
+                let html = '';
+                html += `
+                <div class="hero-mini">
+                    <h1>${escapeHtml(d.title)}</h1>
+                    <p>${escapeHtml(d.subtitle)}</p>
+                </div>`;
+
+                html += `<div class="grid-2">`;
+                if (d.mission) {
+                    html += `
+                    <div class="card">
+                        <h3>${escapeHtml(d.mission.heading)}</h3>
+                        <p>${escapeHtml(d.mission.body)}</p>
+                        ${d.mission.extra ? `<p style="margin-top:1rem;">${escapeHtml(d.mission.extra)}</p>` : ''}
+                    </div>`;
+                }
+                if (d.vision) {
+                    html += `
+                    <div class="card">
+                        <h3>${escapeHtml(d.vision.heading)}</h3>
+                        <p>${escapeHtml(d.vision.body)}</p>
+                        ${d.vision.values ? `
+                        <ul class="val-list">
+                            ${d.vision.values.map(v => `
+                                <li><i class="fa-solid fa-check-circle"></i> ${escapeHtml(v)}</li>
+                            `).join('')}
+                        </ul>` : ''}
+                    </div>`;
+                }
+                html += `</div>`;
+
+                if (d.story) {
+                    html += `
+                    <div class="card" style="margin-bottom:2rem;">
+                        <h3>${escapeHtml(d.story.heading)}</h3>
+                        <p>${escapeHtml(d.story.body)}</p>
+                        ${d.story.extra ? `<p style="margin-top:1rem;">${escapeHtml(d.story.extra)}</p>` : ''}
+                    </div>`;
+                }
+
+                if (d.team) {
+                    html += `
+                    <div class="card" style="margin-bottom:2rem;">
+                        <h3>${escapeHtml(d.team.heading)}</h3>
+                        <div class="team-grid">
+                            ${(d.team.members || []).map(m => `
+                                <div class="team-card">
+                                    <i class="${escapeHtml(m.icon)}"></i>
+                                    <h4>${escapeHtml(m.name)}</h4>
+                                    <p>${escapeHtml(m.role)}</p>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>`;
+                }
+
+                if (d.cta) {
+                    html += `
+                    <div class="cta-section">
+                        <h2>${escapeHtml(d.cta.heading)}</h2>
+                        <p style="margin-bottom:1.5rem; font-size:1.1rem;">${escapeHtml(d.cta.body)}</p>
+                        <a href="${escapeHtml(d.cta.button_link || '#')}" class="btn-outline-white">
+                            <i class="fa-solid fa-upload"></i> ${escapeHtml(d.cta.button_text)}
+                        </a>
+                    </div>`;
+                }
+
+                container.innerHTML = html;
+            } catch (err) {
+                container.innerHTML = '<p style="text-align:center; padding:3rem; color:red;">Failed to load about content.</p>';
+                console.error(err);
+            }
+        }
+
         function initMobileNav() {
             const hamburger = document.getElementById('hamburger-action');
             const panel = document.getElementById('mobile-nav-panel');
@@ -295,14 +362,16 @@
             overlay.addEventListener('click', closeNav);
             panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
         }
-        initMobileNav();
 
-        // Header scroll shadow
-        window.addEventListener('scroll', () => {
-            document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
-        }, { passive: true });
-
-        document.getElementById('current-year').textContent = new Date().getFullYear();
+        document.addEventListener('DOMContentLoaded', async () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            initMobileNav();
+            window.addEventListener('scroll', () => {
+                document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10);
+            }, { passive: true });
+            loadFooter();
+            await loadAboutContent();
+        });
     </script>
 </body>
 </html>

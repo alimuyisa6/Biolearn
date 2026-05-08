@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8"/>
@@ -165,7 +165,6 @@
     <div class="toast" id="toast"></div>
 
     <script type="module">
-        // Supabase auth client
         const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
@@ -174,7 +173,6 @@
         const API_BASE = '/api';
         let currentSection = 'dashboard';
 
-        // ---------- Helpers ----------
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, m => map[m]);
@@ -200,7 +198,7 @@
             setTimeout(() => { toast.style.display = 'none'; }, 3000);
         }
 
-        // ---------- Navigation ----------
+        // Navigation
         document.querySelectorAll('.sidebar nav a').forEach(link => {
             link.addEventListener('click', (e) => {
                 e.preventDefault();
@@ -221,7 +219,7 @@
         async function loadSection(section) {
             switch (section) {
                 case 'dashboard': loadStats(); break;
-                case 'upload': break; // form is static
+                case 'upload': break;
                 case 'submissions': loadSubmissions(); break;
                 case 'messages': loadMessages(); break;
                 case 'users': loadUsers(); break;
@@ -229,10 +227,10 @@
             }
         }
 
-        // ---------- Dashboard Stats ----------
+        // Stats
         async function loadStats() {
             try {
-                const stats = await apiFetch('/admin-stats');
+                const stats = await apiFetch('/admin?action=stats');
                 document.getElementById('stats-grid').innerHTML = `
                     <div class="stat"><div class="num">${stats.resources}</div><div class="label">Resources</div></div>
                     <div class="stat"><div class="num">${stats.pendingSubmissions}</div><div class="label">Pending Submissions</div></div>
@@ -241,7 +239,7 @@
             } catch (err) { showToast('Failed to load stats'); }
         }
 
-        // ---------- Upload ----------
+        // Upload
         document.getElementById('upload-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const payload = {
@@ -255,17 +253,17 @@
                 file_size: document.getElementById('up-filesize').value
             };
             try {
-                await apiFetch('/admin-upload', { method: 'POST', body: JSON.stringify(payload) });
+                await apiFetch('/admin?action=upload', { method: 'POST', body: JSON.stringify(payload) });
                 document.getElementById('upload-msg').textContent = 'Published!';
                 document.getElementById('upload-form').reset();
             } catch (err) { document.getElementById('upload-msg').textContent = 'Error: ' + err.message; }
         });
 
-        // ---------- Submissions ----------
+        // Submissions
         async function loadSubmissions() {
             const container = document.getElementById('submissions-list');
             try {
-                const data = await apiFetch('/admin-submissions');
+                const data = await apiFetch('/admin?action=submissions');
                 if (!data.length) { container.innerHTML = '<p>No submissions found.</p>'; return; }
                 let html = '';
                 data.forEach(sub => {
@@ -284,7 +282,6 @@
                     </div>`;
                 });
                 container.innerHTML = html;
-                // Action buttons
                 container.querySelectorAll('.btn-success, .btn-danger').forEach(btn => {
                     btn.addEventListener('click', () => handleApproval(btn.dataset.id, btn.dataset.action));
                 });
@@ -293,17 +290,17 @@
 
         async function handleApproval(id, action) {
             try {
-                await apiFetch('/admin-approve', { method: 'POST', body: JSON.stringify({ submissionId: parseInt(id), action }) });
+                await apiFetch('/admin?action=approve', { method: 'POST', body: JSON.stringify({ submissionId: parseInt(id), action }) });
                 showToast('Submission ' + action + 'd');
                 loadSubmissions();
             } catch (err) { showToast('Error: ' + err.message); }
         }
 
-        // ---------- Messages ----------
+        // Messages
         async function loadMessages() {
             const container = document.getElementById('messages-list');
             try {
-                const data = await apiFetch('/get-messages');
+                const data = await apiFetch('/actions?action=get-messages');
                 if (!data.messages?.length) { container.innerHTML = '<p>No messages.</p>'; return; }
                 let html = '';
                 data.messages.forEach(msg => {
@@ -317,11 +314,11 @@
             } catch (err) { container.innerHTML = '<p>Error loading messages.</p>'; }
         }
 
-        // ---------- Users ----------
+        // Users
         async function loadUsers() {
             const container = document.getElementById('users-table');
             try {
-                const users = await apiFetch('/admin-users');
+                const users = await apiFetch('/admin?action=users');
                 if (!users.length) { container.innerHTML = '<p>No users found.</p>'; return; }
                 let rows = users.map(u => `
                     <tr>
@@ -339,7 +336,6 @@
                 `).join('');
                 container.innerHTML = `<table><thead><tr><th>Email</th><th>Joined</th><th>Last Sign-in</th><th>Status</th><th>Actions</th></tr></thead><tbody>${rows}</tbody></table>`;
 
-                // Event delegation
                 container.querySelectorAll('.block-btn').forEach(btn => {
                     btn.addEventListener('click', () => blockUser(btn.dataset.id, btn.dataset.block === 'true'));
                 });
@@ -351,7 +347,7 @@
 
         async function blockUser(userId, block) {
             try {
-                await apiFetch('/admin-block-user', { method: 'POST', body: JSON.stringify({ userId, block }) });
+                await apiFetch('/admin?action=block', { method: 'POST', body: JSON.stringify({ userId, block }) });
                 showToast(block ? 'User blocked' : 'User unblocked');
                 loadUsers();
             } catch (err) { showToast('Error: ' + err.message); }
@@ -360,39 +356,36 @@
         async function deleteUser(userId) {
             if (!confirm('Are you sure you want to permanently delete this user?')) return;
             try {
-                await apiFetch('/admin-delete-user', { method: 'DELETE', body: JSON.stringify({ userId }) });
+                await apiFetch('/admin?action=delete-user', { method: 'DELETE', body: JSON.stringify({ userId }) });
                 showToast('User deleted');
                 loadUsers();
             } catch (err) { showToast('Error: ' + err.message); }
         }
 
-        // ---------- Notify ----------
+        // Notify
         document.getElementById('notify-form').addEventListener('submit', async (e) => {
             e.preventDefault();
             const message = document.getElementById('notify-msg').value;
             const all = document.getElementById('notify-all').checked;
             try {
-                await apiFetch('/admin-notify', { method: 'POST', body: JSON.stringify({ message, recipient_all: all }) });
+                await apiFetch('/admin?action=notify', { method: 'POST', body: JSON.stringify({ message, recipient_all: all }) });
                 document.getElementById('notify-status').textContent = 'Notification sent!';
                 document.getElementById('notify-form').reset();
             } catch (err) { document.getElementById('notify-status').textContent = 'Error: ' + err.message; }
         });
 
-        // ---------- Auth & Redirect ----------
+        // Auth & Init
         async function init() {
             const { data: { session } } = await supabase.auth.getSession();
             if (!session) { window.location.href = 'index.html#account-section'; return; }
-            // Verify admin
             try {
-                await apiFetch('/admin-stats'); // throws if not admin
-                // now load current section
+                await apiFetch('/admin?action=stats');
                 loadSection(currentSection);
             } catch (err) {
                 document.getElementById('admin-main').innerHTML = `<h2 style="color:red;">Access Denied</h2><p>${escapeHtml(err.message)}</p>`;
             }
         }
 
-        // Sign out
         document.getElementById('signout-btn').addEventListener('click', async () => {
             await supabase.auth.signOut();
             window.location.href = 'index.html';

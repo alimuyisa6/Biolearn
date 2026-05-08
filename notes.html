@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -253,10 +253,9 @@
         let notes = [];
         let activeNoteId = null;
 
-        // Fetch footer from site_sections
         async function loadFooter() {
             try {
-                const res = await fetch(`${API_BASE}/site-sections`);
+                const res = await fetch(`${API_BASE}/data?action=site-sections`);
                 const data = await res.json();
                 const footerData = data.find(row => row.section === 'footer');
                 if (footerData?.data?.columns) {
@@ -284,13 +283,11 @@
             }).join('');
         }
 
-        // Load all notes for a given level
         async function loadNotes(level) {
             try {
-                const res = await fetch(`${API_BASE}/resources?level=${encodeURIComponent(level)}`);
+                const res = await fetch(`${API_BASE}/data?action=resources&level=${encodeURIComponent(level)}`);
                 notes = await res.json();
                 renderNoteList(notes);
-                // If there's a note id in URL, try to activate it
                 const urlParams = new URLSearchParams(window.location.search);
                 const id = urlParams.get('id');
                 if (id) activateNoteById(id);
@@ -309,13 +306,11 @@
                 </a>
             `).join('');
 
-            // Click handler for sidebar items
             container.querySelectorAll('.note-list-item').forEach(link => {
                 link.addEventListener('click', (e) => {
                     e.preventDefault();
                     const id = link.dataset.id;
                     activateNoteById(id);
-                    // Update URL without reload
                     const newUrl = new URL(window.location);
                     newUrl.searchParams.set('id', id);
                     history.pushState(null, '', newUrl);
@@ -326,13 +321,11 @@
         async function activateNoteById(id) {
             if (!id) return;
             activeNoteId = id;
-            // Highlight sidebar
             document.querySelectorAll('.note-list-item').forEach(el => {
                 el.classList.toggle('active', el.dataset.id == id);
             });
-            // Fetch full note details
             try {
-                const res = await fetch(`${API_BASE}/note?id=${encodeURIComponent(id)}`);
+                const res = await fetch(`${API_BASE}/data?action=note&id=${encodeURIComponent(id)}`);
                 if (!res.ok) throw new Error('Note not found');
                 const note = await res.json();
                 renderNoteDetail(note);
@@ -359,7 +352,6 @@
             `;
         }
 
-        // Level toggle
         document.getElementById('level-toggle').addEventListener('click', (e) => {
             const btn = e.target.closest('.toggle-btn');
             if (!btn) return;
@@ -369,7 +361,6 @@
             loadNotes(currentLevel);
         });
 
-        // Mobile nav
         function initMobileNav() {
             const hamburger = document.getElementById('hamburger-action');
             const panel = document.getElementById('mobile-nav-panel');
@@ -386,7 +377,6 @@
             window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
         }
 
-        // Init
         document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
             initHeaderScroll();

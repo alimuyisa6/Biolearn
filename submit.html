@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -216,27 +216,22 @@
     </footer>
 
     <script type="module">
-        // Supabase client (for AUTH ONLY)
         const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
-        if (!supabase) {
-            console.error('Supabase client not loaded.');
-        }
+        if (!supabase) { console.error('Supabase client not loaded.'); }
 
         const API_BASE = '/api';
         let categories = [];
 
-        // Escape HTML
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        // Fetch footer
         async function loadFooter() {
             try {
-                const res = await fetch(`${API_BASE}/site-sections`);
+                const res = await fetch(`${API_BASE}/data?action=site-sections`);
                 const data = await res.json();
                 const footerData = data.find(row => row.section === 'footer');
                 if (footerData?.data?.columns) {
@@ -259,16 +254,14 @@
             }).join('');
         }
 
-        // Fetch filter options (for category dropdown)
         async function loadFilterOptions() {
             try {
-                const res = await fetch(`${API_BASE}/filter-options`);
+                const res = await fetch(`${API_BASE}/data?action=filter-options`);
                 const data = await res.json();
                 categories = data.categories || [];
             } catch (err) { console.warn('Could not load categories'); }
         }
 
-        // Check auth and show form or prompt
         async function checkAuthAndRender() {
             const container = document.getElementById('auth-state');
             const { data: { session } } = await supabase.auth.getSession();
@@ -365,7 +358,6 @@
                 file_size: document.getElementById('file_size').value.trim()
             };
 
-            // Quick client-side validation
             if (!payload.title || !payload.description) {
                 statusEl.innerText = 'Title and description are required.';
                 btn.disabled = false;
@@ -373,7 +365,7 @@
             }
 
             try {
-                const res = await fetch(`${API_BASE}/submit-resource`, {
+                const res = await fetch(`${API_BASE}/actions?action=submit-resource`, {
                     method: 'POST',
                     headers: {
                         'Content-Type': 'application/json',
@@ -392,7 +384,6 @@
             }
         }
 
-        // Mobile nav
         function initMobileNav() {
             const hamburger = document.getElementById('hamburger-action');
             const panel = document.getElementById('mobile-nav-panel');
@@ -409,7 +400,6 @@
             window.addEventListener('scroll', () => header.classList.toggle('scrolled', window.scrollY > 10), { passive: true });
         }
 
-        // Init
         document.addEventListener('DOMContentLoaded', async () => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
             initHeaderScroll();
@@ -417,7 +407,7 @@
             loadFooter();
             await loadFilterOptions();
             supabase.auth.onAuthStateChange(() => checkAuthAndRender());
-            checkAuthAndRender(); // initial call
+            checkAuthAndRender();
         });
     </script>
 </body>
