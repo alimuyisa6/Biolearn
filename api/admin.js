@@ -1,213 +1,201 @@
- import { createClient } from '@supabase/supabase-js';
+ import { serve } from "https://deno.land/std@0.168.0/http/server.ts";
+import { createClient } from "https://esm.sh/@supabase/supabase-js@2";
 
-export default async function handler(req, res) {
-  // ── auth check ──────────────────────────────────────────
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) {
-    return res.status(401).json({ error: 'Missing token' });
+const supabaseAdmin = createClient(
+  Deno.env.get("SUPABASE_URL")!,
+  Deno.env.get("SUPABASE_SERVICE_ROLE_KEY")!   // service role for admin operations
+);
+
+serve(async (req) => {
+  // ── CORS headers (allow your domain) ──
+  if (req.method === "OPTIONS") {
+    return new Response(null, {
+      headers: {
+        "Access-Control-Allow-Origin": "*",   // or your exact domain
+        "Access-Control-Allow-Headers": "Authorization, Content-Type",
+        "Access-Control-Allow-Methods": "GET, POST, DELETE, OPTIONS",
+      },
+    });
   }
-  const token = authHeader.split('Bearer ')[1];
 
-  const supabase = createClient(
-    process.env.SUPABASE_URL,
-    process.env.SUPABASE_SERVICE_ROLE_KEY   // service‑role for admin ops
-  );
+  // ── Auth check ──
+  const authHeader = req.headers.get("Authorization");
+  if (!authHeader?.startsWith("Bearer ")) {
+    return new Response(JSON.stringify({ error: "Missing token" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    });
+  }
 
-  const { data: { user }, error: authError } = await supabase.auth.getUser(token);
+  const token = authHeader.split(" ")[1];
+  const { data: { user }, error: authError } = await supabaseAdmin.auth.getUser(token);
   if (authError || !user) {
-    return res.status(401).json({ error: 'Invalid token' });
+    return new Response(JSON.stringify({ error: "Invalid token" }), {
+      status: 401,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    });
   }
 
-  const { data: adminRow } = await supabase
-    .from('admin_users')
-    .select('user_id')
-    .eq('user_id', user.id)
+  // ── Admin permission check ──
+  const { data: adminRow } = await supabaseAdmin
+    .from("admin_users")
+    .select("user_id")
+    .eq("user_id", user.id)
     .maybeSingle();
 
   if (!adminRow) {
-    return res.status(403).json({ error: 'Forbidden' });
+    return new Response(JSON.stringify({ error: "Forbidden – you are not an admin" }), {
+      status: 403,
+      headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
+    });
   }
 
-  const action = req.query.action || req.body?.action;
+  // ── Parse action ──
+  const url = new URL(req.url);
+  const action = url.searchParams.get("action");
 
-  // ── GET /api/admin?action=stats ─────────────────────────
-  if (req.method === 'GET' && action === 'stats') {
+  // ---------- STATS ----------
+  if (req.method === "GET" && action === "stats") {
     try {
-      const [
-        { count: resources },
-        { count: pendingSubmissions },
-        { count: messages }
-      ] = await Promise.all([
-        supabase.from('biology_notes').select('*', { count: 'exact', head: true }),
-        supabase.from('resource_submissions').select('*', { count: 'exact', head: true }).eq('status', 'pending'),
-        supabase.from('site_sections').select('*', { count: 'exact', head: true }).eq('section', 'message'),
-      ]);
-
-      // ✅ legally count users via admin API
-      const { data: { users }, error: userError } = await supabase.auth.admin.listUsers();
+      const [{ count: resources }, { count: pendingSubmissions }, { count: messages }] =
+        await Promise.all([
+          supabaseAdmin.from("biology_notes").select("*", { count: "exact", head: true }),
+          supabaseAdmin.from("resource_submissions").select("*", { count: "exact", head: true }).eq("status", "pending"),
+          supabaseAdmin.from("site_sections").select("*", { count: "exact", head: true }).eq("section", "message"),
+        ]);
+      const { data: { users }, error: userError } = await supabaseAdmin.auth.admin.listUsers();
       if (userError) throw userError;
 
-      return res.status(200).json({
+      return new Response(JSON.stringify({
         resources: resources ?? 0,
         pendingSubmissions: pendingSubmissions ?? 0,
         users: users?.length ?? 0,
         messages: messages ?? 0,
-      });
+      }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
     } catch (err) {
-      return res.status(500).json({ error: 'Stats error: ' + err.message });
-    }
-  }
-
-  // ── GET /api/admin?action=submissions ───────────────────
-  if (req.method === 'GET' && action === 'submissions') {
-    const statusFilter = req.query.status;
-    let query = supabase
-      .from('resource_submissions')
-      .select('*')
-      .order('created_at', { ascending: false });
-
-    if (statusFilter) query = query.eq('status', statusFilter);
-    const { data, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json(data);
-  }
-
-  // ── POST /api/admin?action=approve ──────────────────────
-  if (req.method === 'POST' && action === 'approve') {
-    const { submissionId, action: subAction } = req.body;
-    if (!submissionId || !['approve', 'reject'].includes(subAction)) {
-      return res.status(400).json({ error: 'Invalid request' });
-    }
-
-    const { data: submission, error: fetchError } = await supabase
-      .from('resource_submissions')
-      .select('*')
-      .eq('id', submissionId)
-      .single();
-
-    if (fetchError || !submission) return res.status(404).json({ error: 'Submission not found' });
-    if (submission.status !== 'pending') return res.status(400).json({ error: 'Already processed' });
-
-    if (subAction === 'approve') {
-      const { error: insertError } = await supabase.from('biology_notes').insert({
-        title: submission.title,
-        description: submission.description,
-        author: submission.author,
-        level: submission.level,
-        category: submission.category,
-        tag: submission.tag,
-        file_url: submission.file_url,
-        file_size: submission.file_size,
-        section_type: submission.level ? `${submission.level} Notes` : 'All Resources',
+      return new Response(JSON.stringify({ error: err.message }), {
+        status: 500,
+        headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" },
       });
-      if (insertError) return res.status(500).json({ error: insertError.message });
     }
-
-    const { error: updateError } = await supabase
-      .from('resource_submissions')
-      .update({ status: subAction === 'approve' ? 'approved' : 'rejected' })
-      .eq('id', submissionId);
-
-    if (updateError) return res.status(500).json({ error: updateError.message });
-    return res.status(200).json({ success: true });
   }
 
-  // ── POST /api/admin?action=upload ───────────────────────
-  if (req.method === 'POST' && action === 'upload') {
-    const { title, description, author, level, category, tag, file_url, file_size } = req.body;
+  // ---------- SUBMISSIONS ----------
+  if (req.method === "GET" && action === "submissions") {
+    const statusFilter = url.searchParams.get("status");
+    let query = supabaseAdmin.from("resource_submissions").select("*").order("created_at", { ascending: false });
+    if (statusFilter) query = query.eq("status", statusFilter);
+    const { data, error } = await query;
+    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+    return new Response(JSON.stringify(data), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+  }
+
+  // ---------- APPROVE / REJECT ----------
+  if (req.method === "POST" && action === "approve") {
+    const { submissionId, action: subAction } = await req.json();
+    if (!submissionId || !["approve", "reject"].includes(subAction)) {
+      return new Response(JSON.stringify({ error: "Invalid request" }), { status: 400, headers: { ... } });
+    }
+    const { data: submission, error: fetchError } = await supabaseAdmin
+      .from("resource_submissions").select("*").eq("id", submissionId).single();
+    if (fetchError || !submission) return new Response(JSON.stringify({ error: "Submission not found" }), { status: 404 });
+    if (submission.status !== "pending") return new Response(JSON.stringify({ error: "Already processed" }), { status: 400 });
+
+    if (subAction === "approve") {
+      const { error: insertError } = await supabaseAdmin.from("biology_notes").insert({
+        title: submission.title, description: submission.description, author: submission.author,
+        level: submission.level, category: submission.category, tag: submission.tag,
+        file_url: submission.file_url, file_size: submission.file_size,
+        section_type: submission.level ? `${submission.level} Notes` : "All Resources",
+      });
+      if (insertError) return new Response(JSON.stringify({ error: insertError.message }), { status: 500 });
+    }
+
+    const { error: updateError } = await supabaseAdmin
+      .from("resource_submissions")
+      .update({ status: subAction === "approve" ? "approved" : "rejected" })
+      .eq("id", submissionId);
+    if (updateError) return new Response(JSON.stringify({ error: updateError.message }), { status: 500 });
+
+    return new Response(JSON.stringify({ success: true }), { headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
+  }
+
+  // ---------- UPLOAD ----------
+  if (req.method === "POST" && action === "upload") {
+    const { title, description, author, level, category, tag, file_url, file_size } = await req.json();
     if (!title?.trim() || !description?.trim()) {
-      return res.status(400).json({ error: 'Title and description required' });
+      return new Response(JSON.stringify({ error: "Title and description required" }), { status: 400 });
     }
-
-    const { error } = await supabase.from('biology_notes').insert({
-      title: title.trim(),
-      description: description.trim(),
-      author: author?.trim() || null,
-      level: level || null,
-      category: category || null,
-      tag: tag || null,
-      file_url: file_url || null,
-      file_size: file_size || null,
-      section_type: level ? `${level} Notes` : 'All Resources',
+    const { error } = await supabaseAdmin.from("biology_notes").insert({
+      title: title.trim(), description: description.trim(), author: author?.trim() || null,
+      level: level || null, category: category || null, tag: tag || null,
+      file_url: file_url || null, file_size: file_size || null,
+      section_type: level ? `${level} Notes` : "All Resources",
     });
-
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(201).json({ success: true });
+    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ success: true }), { status: 201, headers: { "Content-Type": "application/json", "Access-Control-Allow-Origin": "*" } });
   }
 
-  // ── GET /api/admin?action=users ─────────────────────────
-  if (req.method === 'GET' && action === 'users') {
-    const { data: authUsers, error } = await supabase.auth.admin.listUsers();
-    if (error) return res.status(500).json({ error: error.message });
-
-    const { data: blocked } = await supabase.from('blocked_users').select('user_id');
-    const blockedIds = new Set((blocked || []).map(b => b.user_id));
-
-    const users = (authUsers.users || []).map(u => ({
+  // ---------- USERS ----------
+  if (req.method === "GET" && action === "users") {
+    const { data: authUsers, error } = await supabaseAdmin.auth.admin.listUsers();
+    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    const { data: blocked } = await supabaseAdmin.from("blocked_users").select("user_id");
+    const blockedIds = new Set((blocked || []).map((b: any) => b.user_id));
+    const users = (authUsers.users || []).map((u: any) => ({
       id: u.id,
       email: u.email,
       created_at: u.created_at,
       last_sign_in_at: u.last_sign_in_at,
       blocked: blockedIds.has(u.id),
     }));
-
-    return res.status(200).json(users);
+    return new Response(JSON.stringify(users), { headers: { ... } });
   }
 
-  // ── POST /api/admin?action=block ────────────────────────
-  if (req.method === 'POST' && action === 'block') {
-    const { userId, block } = req.body;
-    if (!userId || typeof block !== 'boolean') {
-      return res.status(400).json({ error: 'Invalid request' });
-    }
+  // ---------- BLOCK / UNBLOCK ----------
+  if (req.method === "POST" && action === "block") {
+    const { userId, block } = await req.json();
+    if (!userId || typeof block !== "boolean") return new Response(JSON.stringify({ error: "Invalid request" }), { status: 400 });
     if (block) {
-      await supabase.from('blocked_users').upsert({ user_id: userId });
+      await supabaseAdmin.from("blocked_users").upsert({ user_id: userId });
     } else {
-      await supabase.from('blocked_users').delete().eq('user_id', userId);
+      await supabaseAdmin.from("blocked_users").delete().eq("user_id", userId);
     }
-    return res.status(200).json({ success: true });
+    return new Response(JSON.stringify({ success: true }), { headers: { ... } });
   }
 
-  // ── DELETE /api/admin?action=delete-user ────────────────
-  if (req.method === 'DELETE' && action === 'delete-user') {
-    const { userId } = req.body;
-    if (!userId) return res.status(400).json({ error: 'Missing user ID' });
-
-    // ✅ use the correct admin method
-    const { error } = await supabase.auth.admin.deleteUser(userId);
-    if (error) return res.status(500).json({ error: error.message });
-
-    // also clean up blocked_users entry if exists
-    await supabase.from('blocked_users').delete().eq('user_id', userId);
-
-    return res.status(200).json({ success: true });
+  // ---------- DELETE USER ----------
+  if (req.method === "DELETE" && action === "delete-user") {
+    const { userId } = await req.json();
+    if (!userId) return new Response(JSON.stringify({ error: "Missing user ID" }), { status: 400 });
+    const { error } = await supabaseAdmin.auth.admin.deleteUser(userId);
+    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    await supabaseAdmin.from("blocked_users").delete().eq("user_id", userId);
+    return new Response(JSON.stringify({ success: true }), { headers: { ... } });
   }
 
-  // ── POST /api/admin?action=notify ───────────────────────
-  if (req.method === 'POST' && action === 'notify') {
-    const { message, recipient_all } = req.body;
-    if (!message?.trim()) {
-      return res.status(400).json({ error: 'Message required' });
-    }
-    await supabase.from('notifications').insert({
+  // ---------- NOTIFY ----------
+  if (req.method === "POST" && action === "notify") {
+    const { message, recipient_all } = await req.json();
+    if (!message?.trim()) return new Response(JSON.stringify({ error: "Message required" }), { status: 400 });
+    await supabaseAdmin.from("notifications").insert({
       message: message.trim(),
       sender_id: user.id,
       recipient_all: !!recipient_all,
     });
-    return res.status(201).json({ success: true });
+    return new Response(JSON.stringify({ success: true }), { status: 201 });
   }
 
-  // ── GET /api/admin?action=messages (matches your front‑end call) ──
-  if (req.method === 'GET' && action === 'messages') {
-    const { data: messages, error } = await supabase
-      .from('site_sections')
-      .select('*')
-      .eq('section', 'message')
-      .order('created_at', { ascending: false });
-
-    if (error) return res.status(500).json({ error: error.message });
-    return res.status(200).json({ messages });
+  // ---------- MESSAGES (contact form) ----------
+  if (req.method === "GET" && action === "messages") {
+    const { data: messages, error } = await supabaseAdmin
+      .from("site_sections")
+      .select("*")
+      .eq("section", "message")
+      .order("created_at", { ascending: false });
+    if (error) return new Response(JSON.stringify({ error: error.message }), { status: 500 });
+    return new Response(JSON.stringify({ messages }), { headers: { ... } });
   }
 
-  return res.status(400).json({ error: 'Unknown admin action' });
-}
+  return new Response(JSON.stringify({ error: "Unknown action" }), { status: 400 });
+});
