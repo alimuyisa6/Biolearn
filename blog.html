@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -37,15 +37,11 @@
         .hero-mini { text-align: center; padding: 2rem 0 2.5rem; }
         .hero-mini h1 { font-family: 'Merriweather', serif; font-size: 2.6rem; color: var(--color-primary); margin-bottom: 0.8rem; }
         .hero-mini p { font-size: 1.15rem; color: var(--color-text-muted); max-width: 600px; margin: 0 auto; }
-
-        /* Tabs */
         .tab-bar { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-border); flex-wrap: wrap; justify-content: center; }
         .tab-btn { padding: 0.7rem 2rem; border: none; background: transparent; font-weight: 600; font-size: 1rem; color: var(--color-text-muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: inherit; transition: all var(--transition-fast); display: inline-flex; align-items: center; gap: 0.5rem; }
         .tab-btn:hover { color: var(--color-primary); }
         .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-secondary); }
         .tab-btn i { font-size: 0.9rem; }
-
-        /* Posts Grid */
         .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
         @media (max-width: 768px) { .posts-grid { grid-template-columns: 1fr; } }
         .post-card { background: var(--color-bg-white); border-radius: var(--radius-lg); overflow: hidden; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); transition: all var(--transition-fast); display: flex; flex-direction: column; }
@@ -60,8 +56,6 @@
         .post-meta span { display: inline-flex; align-items: center; gap: 0.3rem; }
         .btn-read { display: inline-flex; align-items: center; gap: 0.4rem; color: var(--color-secondary); font-weight: 600; font-size: 0.85rem; text-decoration: none; margin-top: 0.5rem; }
         .btn-read:hover { text-decoration: underline; }
-
-        /* Newsletter */
         .newsletter-card { background: linear-gradient(135deg, #1a365d, #3b82f6); color: white; border-radius: var(--radius-lg); padding: 2.5rem 2rem; text-align: center; margin-top: 2.5rem; }
         .newsletter-card h3 { font-family: 'Merriweather', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
         .newsletter-card p { opacity: 0.85; margin-bottom: 1.5rem; }
@@ -69,16 +63,12 @@
         .newsletter-form input { flex: 1; padding: 0.7rem 1rem; border: none; border-radius: 2rem; font-family: inherit; font-size: 0.9rem; }
         .newsletter-form button { background: var(--color-gold); color: white; border: none; padding: 0.7rem 1.5rem; border-radius: 2rem; font-weight: 600; cursor: pointer; font-family: inherit; white-space: nowrap; }
         .newsletter-form button:hover { background: #d97706; }
-
-        /* Mobile nav */
         .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; height: auto; max-height: 100vh; overflow-y: auto; background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s ease, opacity 0.35s ease; }
         .mobile-nav-panel.active { right: 0; opacity: 1; }
         .mobile-nav-panel a { display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--color-text); font-weight: 500; border-radius: 30px; transition: background var(--transition-fast); }
         .mobile-nav-panel a:hover { background: var(--color-surface); }
         .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
         .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
-
-        /* Footer */
         .site-footer { background: #0f172a; color: #cbd5e1; padding: 3rem 1.5rem 2rem; margin-top: auto; }
         .footer-intro { max-width: var(--max-width); margin: 0 auto 2rem; text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
         .footer-intro .logo { color: #f0f9ff; }
@@ -126,102 +116,100 @@
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
     </footer>
 
-  <script type="module">
-    import { supabase, getSession, pageCache } from './auth-check.js';
+    <script>
+        let blogData = null;
 
-    function escapeHtml(text) {
-        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(text).replace(/[&<>"']/g, m => map[m]);
-    }
-
-    async function fetchPageData(action) {
-        const res = await fetch(`/api/page-data?action=${action}`);
-        if (!res.ok) throw new Error(`HTTP ${res.status}`);
-        return res.json();
-    }
-
-    let blogData = null, currentTab = 'articles';
-
-    async function loadFooter() {
-        try { const data = await fetchPageData('footer'); if (data?.columns) renderFooter(data.columns); }
-        catch (err) { console.warn('Footer failed', err); }
-    }
-
-    function renderFooter(columns) {
-        const footerInner = document.getElementById('footer-inner');
-        if (!footerInner) return;
-        footerInner.innerHTML = columns.map(col => {
-            const heading = escapeHtml(col.heading);
-            const items = (col.items || []).map(item => {
-                let href = item.href ? item.href.trim() : '#';
-                let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-            }).join('');
-            return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-        }).join('');
-    }
-
-    async function loadBlog() {
-        const container = document.getElementById('blog-content');
-        try {
-            const data = await fetchPageData('blog');
-            if (!data?.tabs?.length) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
-            blogData = data;
-            const tabs = data.tabs;
-
-            let html = `<div class="hero-mini"><h1>${escapeHtml(data.title||'Articles & Blog')}</h1><p>${escapeHtml(data.subtitle||'')}</p></div>`;
-            html += '<div class="tab-bar">';
-            tabs.forEach((tab,i) => { html += `<button class="tab-btn${i===0?' active':''}" data-tab="${escapeHtml(tab.id)}"><i class="fa-solid ${escapeHtml(tab.icon||'fa-newspaper')}"></i> ${escapeHtml(tab.label)}</button>`; });
-            html += '</div><div class="posts-grid" id="posts-grid"></div>';
-            html += `<div class="newsletter-card"><h3>Stay Updated</h3><p>Get the latest articles and study tips.</p><form class="newsletter-form"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>`;
-            container.innerHTML = html;
-
-            renderPosts(tabs[0].posts);
-
-            document.querySelectorAll('.tab-btn').forEach(btn => {
-                btn.addEventListener('click', () => {
-                    document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                    btn.classList.add('active');
-                    const tab = tabs.find(t => t.id === btn.dataset.tab);
-                    if (tab) renderPosts(tab.posts);
-                });
-            });
-        } catch (err) {
-            container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed to load: ${escapeHtml(err.message)}</p>`;
+        function escapeHtml(text) {
+            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+            return String(text).replace(/[&<>"']/g, m => map[m]);
         }
-    }
 
-    function renderPosts(posts) {
-        const grid = document.getElementById('posts-grid');
-        if (!posts?.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
-        grid.innerHTML = posts.map(post => `
-            <div class="post-card">
-                <div class="post-image" style="background-image:url('${escapeHtml(post.image||'')}');"><span class="post-category">${escapeHtml(post.category||'General')}</span></div>
-                <div class="post-body">
-                    <a href="${escapeHtml(post.link||'#')}" class="post-title">${escapeHtml(post.title)}</a>
-                    <p class="post-excerpt">${escapeHtml(post.excerpt||'')}</p>
-                    <div class="post-meta"><span><i class="fa-regular fa-user"></i> ${escapeHtml(post.author)}</span><span><i class="fa-regular fa-calendar"></i> ${escapeHtml(post.date)}</span><span><i class="fa-regular fa-clock"></i> ${escapeHtml(post.read_time)}</span></div>
-                    <a href="${escapeHtml(post.link||'#')}" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a>
-                </div>
-            </div>`).join('');
-    }
+        async function loadBlog() {
+            const container = document.getElementById('blog-content');
+            try {
+                const res = await fetch('/api/data?action=site-sections');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('Invalid response');
 
-    function initMobileNav() {
-        const h=document.getElementById('hamburger-action'), p=document.getElementById('mobile-nav-panel'), o=document.getElementById('mobile-nav-overlay');
-        function open(){ p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
-        function close(){ p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
-        h.addEventListener('click',()=>p.classList.contains('active')?close():open());
-        o.addEventListener('click',close);
-        p.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
-    }
+                // Footer
+                const footerRow = data.find(r => r.section === 'footer');
+                if (footerRow?.data?.columns) {
+                    document.getElementById('footer-inner').innerHTML = footerRow.data.columns.map(col => {
+                        const heading = escapeHtml(col.heading);
+                        const items = (col.items || []).map(item => {
+                            let href = item.href ? item.href.trim() : '#';
+                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                        }).join('');
+                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+                    }).join('');
+                }
 
-    document.addEventListener('DOMContentLoaded',()=>{
-        document.getElementById('current-year').textContent=new Date().getFullYear();
-        initMobileNav();
-        window.addEventListener('scroll',()=>{document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10);},{passive:true});
-        loadFooter();
-        loadBlog();
-    });
-  </script>
+                // Blog content
+                const blogRow = data.find(r => r.section === 'blog');
+                if (!blogRow?.data?.tabs?.length) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
+                blogData = blogRow.data;
+                const tabs = blogData.tabs;
+
+                let html = `<div class="hero-mini"><h1>${escapeHtml(blogData.title||'Articles & Blog')}</h1><p>${escapeHtml(blogData.subtitle||'')}</p></div>`;
+                html += '<div class="tab-bar">';
+                tabs.forEach((tab, i) => { html += `<button class="tab-btn${i===0?' active':''}" data-tab="${escapeHtml(tab.id)}"><i class="fa-solid ${escapeHtml(tab.icon||'fa-newspaper')}"></i> ${escapeHtml(tab.label)}</button>`; });
+                html += '</div><div class="posts-grid" id="posts-grid"></div>';
+                html += '<div class="newsletter-card"><h3>Stay Updated</h3><p>Get the latest articles and study tips.</p><form class="newsletter-form"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>';
+                container.innerHTML = html;
+
+                renderPosts(tabs[0].posts);
+
+                document.querySelectorAll('.tab-btn').forEach(btn => {
+                    btn.addEventListener('click', () => {
+                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
+                        btn.classList.add('active');
+                        const tab = tabs.find(t => t.id === btn.dataset.tab);
+                        if (tab) renderPosts(tab.posts);
+                    });
+                });
+
+                document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
+                    e.preventDefault(); alert('Thanks for subscribing!'); e.target.reset();
+                });
+            } catch (err) {
+                container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed: ${escapeHtml(err.message)}</p>`;
+            }
+        }
+
+        function renderPosts(posts) {
+            const grid = document.getElementById('posts-grid');
+            if (!posts?.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
+            grid.innerHTML = posts.map(post => `
+                <div class="post-card">
+                    <div class="post-image" style="background-image:url('${escapeHtml(post.image||'')}');"><span class="post-category">${escapeHtml(post.category||'General')}</span></div>
+                    <div class="post-body">
+                        <a href="${escapeHtml(post.link||'#')}" class="post-title">${escapeHtml(post.title)}</a>
+                        <p class="post-excerpt">${escapeHtml(post.excerpt||'')}</p>
+                        <div class="post-meta"><span><i class="fa-regular fa-user"></i> ${escapeHtml(post.author)}</span><span><i class="fa-regular fa-calendar"></i> ${escapeHtml(post.date)}</span><span><i class="fa-regular fa-clock"></i> ${escapeHtml(post.read_time)}</span></div>
+                        <a href="${escapeHtml(post.link||'#')}" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a>
+                    </div>
+                </div>`).join('');
+        }
+
+        function initMobileNav() {
+            const h = document.getElementById('hamburger-action');
+            const p = document.getElementById('mobile-nav-panel');
+            const o = document.getElementById('mobile-nav-overlay');
+            function open() { p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
+            function close() { p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+            h.addEventListener('click', () => p.classList.contains('active') ? close() : open());
+            o.addEventListener('click', close);
+            p.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
+        }
+
+        document.addEventListener('DOMContentLoaded', () => {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            initMobileNav();
+            window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            loadBlog();
+        });
+    </script>
 </body>
 </html>

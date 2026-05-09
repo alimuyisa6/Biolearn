@@ -103,103 +103,73 @@
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
     </footer>
 
-    <script type="module">
-        import { supabase, getSession, pageCache } from './auth-check.js';
-
+    <script>
         function escapeHtml(text) {
             const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        async function loadSiteSections() {
-            if (pageCache.siteSections) return pageCache.siteSections;
-            const res = await fetch('/api/data?action=site-sections');
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (!Array.isArray(data)) throw new Error('Invalid site sections response');
-            pageCache.siteSections = data;
-            return data;
-        }
-
-        function loadFooter(data) {
-            const footerData = data.find(row => row.section === 'footer');
-            if (footerData?.data?.columns) renderFooter(footerData.data.columns);
-        }
-
-        function renderFooter(columns) {
-            const footerInner = document.getElementById('footer-inner');
-            if (!footerInner) return;
-            footerInner.innerHTML = columns.map(col => {
-                const heading = escapeHtml(col.heading);
-                const items = (col.items || []).map(item => {
-                    let href = item.href ? item.href.trim() : '#';
-                    let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                    return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                }).join('');
-                return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-            }).join('');
-        }
-
         async function loadAboutContent() {
             const container = document.getElementById('about-content');
             try {
-                const data = await loadSiteSections();
-                loadFooter(data);
+                const res = await fetch('/api/data?action=site-sections');
+                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const data = await res.json();
+                if (!Array.isArray(data)) throw new Error('Invalid response');
 
-                const aboutData = data.find(row => row.section === 'about');
-                if (!aboutData?.data) {
-                    container.innerHTML = '<p style="text-align:center; padding:3rem; color:var(--color-text-muted);">About section not configured yet. Please add it in the admin panel.</p>';
+                // Footer
+                const footerRow = data.find(r => r.section === 'footer');
+                if (footerRow?.data?.columns) {
+                    document.getElementById('footer-inner').innerHTML = footerRow.data.columns.map(col => {
+                        const heading = escapeHtml(col.heading);
+                        const items = (col.items || []).map(item => {
+                            let href = item.href ? item.href.trim() : '#';
+                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                        }).join('');
+                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+                    }).join('');
+                }
+
+                // About content
+                const aboutRow = data.find(r => r.section === 'about');
+                if (!aboutRow?.data) {
+                    container.innerHTML = '<p style="text-align:center;padding:3rem;">About section not configured yet.</p>';
                     return;
                 }
-                const d = aboutData.data;
+                const d = aboutRow.data;
 
-                let html = '';
-                html += `<div class="hero-mini"><h1>${escapeHtml(d.title)}</h1><p>${escapeHtml(d.subtitle)}</p></div>`;
-
+                let html = `<div class="hero-mini"><h1>${escapeHtml(d.title)}</h1><p>${escapeHtml(d.subtitle)}</p></div>`;
                 html += `<div class="grid-2">`;
-                if (d.mission) {
-                    html += `<div class="card"><h3>${escapeHtml(d.mission.heading)}</h3><p>${escapeHtml(d.mission.body)}</p>${d.mission.extra ? `<p style="margin-top:1rem;">${escapeHtml(d.mission.extra)}</p>` : ''}</div>`;
-                }
-                if (d.vision) {
-                    html += `<div class="card"><h3>${escapeHtml(d.vision.heading)}</h3><p>${escapeHtml(d.vision.body)}</p>${d.vision.values ? `<ul class="val-list">${d.vision.values.map(v => `<li><i class="fa-solid fa-check-circle"></i> ${escapeHtml(v)}</li>`).join('')}</ul>` : ''}</div>`;
-                }
+                if (d.mission) html += `<div class="card"><h3>${escapeHtml(d.mission.heading)}</h3><p>${escapeHtml(d.mission.body)}</p>${d.mission.extra?`<p style="margin-top:1rem;">${escapeHtml(d.mission.extra)}</p>`:''}</div>`;
+                if (d.vision) html += `<div class="card"><h3>${escapeHtml(d.vision.heading)}</h3><p>${escapeHtml(d.vision.body)}</p>${d.vision.values?`<ul class="val-list">${d.vision.values.map(v=>`<li><i class="fa-solid fa-check-circle"></i> ${escapeHtml(v)}</li>`).join('')}</ul>`:''}</div>`;
                 html += `</div>`;
-
-                if (d.story) {
-                    html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.story.heading)}</h3><p>${escapeHtml(d.story.body)}</p>${d.story.extra ? `<p style="margin-top:1rem;">${escapeHtml(d.story.extra)}</p>` : ''}</div>`;
-                }
-
-                if (d.team) {
-                    html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.team.heading)}</h3><div class="team-grid">${(d.team.members || []).map(m => `<div class="team-card"><i class="${escapeHtml(m.icon)}"></i><h4>${escapeHtml(m.name)}</h4><p>${escapeHtml(m.role)}</p></div>`).join('')}</div></div>`;
-                }
-
-                if (d.cta) {
-                    html += `<div class="cta-section"><h2>${escapeHtml(d.cta.heading)}</h2><p style="margin-bottom:1.5rem; font-size:1.1rem;">${escapeHtml(d.cta.body)}</p><a href="${escapeHtml(d.cta.button_link || '#')}" class="btn-outline-white"><i class="fa-solid fa-upload"></i> ${escapeHtml(d.cta.button_text)}</a></div>`;
-                }
+                if (d.story) html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.story.heading)}</h3><p>${escapeHtml(d.story.body)}</p>${d.story.extra?`<p style="margin-top:1rem;">${escapeHtml(d.story.extra)}</p>`:''}</div>`;
+                if (d.team) html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.team.heading)}</h3><div class="team-grid">${(d.team.members||[]).map(m=>`<div class="team-card"><i class="${escapeHtml(m.icon)}"></i><h4>${escapeHtml(m.name)}</h4><p>${escapeHtml(m.role)}</p></div>`).join('')}</div></div>`;
+                if (d.cta) html += `<div class="cta-section"><h2>${escapeHtml(d.cta.heading)}</h2><p style="margin-bottom:1.5rem;font-size:1.1rem;">${escapeHtml(d.cta.body)}</p><a href="${escapeHtml(d.cta.button_link||'#')}" class="btn-outline-white"><i class="fa-solid fa-upload"></i> ${escapeHtml(d.cta.button_text)}</a></div>`;
 
                 container.innerHTML = html;
             } catch (err) {
-                console.error('About load error:', err);
-                container.innerHTML = `<p style="text-align:center; padding:3rem; color:red;">Failed to load about content: ${escapeHtml(err.message)}</p>`;
+                container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed: ${escapeHtml(err.message)}</p>`;
             }
         }
 
         function initMobileNav() {
-            const hamburger = document.getElementById('hamburger-action');
-            const panel = document.getElementById('mobile-nav-panel');
-            const overlay = document.getElementById('mobile-nav-overlay');
-            function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburger.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
-            function closeNav() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburger.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
-            hamburger.addEventListener('click', () => panel.classList.contains('active') ? closeNav() : openNav());
-            overlay.addEventListener('click', closeNav);
-            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+            const h = document.getElementById('hamburger-action');
+            const p = document.getElementById('mobile-nav-panel');
+            const o = document.getElementById('mobile-nav-overlay');
+            function open() { p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
+            function close() { p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+            h.addEventListener('click', () => p.classList.contains('active') ? close() : open());
+            o.addEventListener('click', close);
+            p.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
         }
 
-        document.addEventListener('DOMContentLoaded', async () => {
+        document.addEventListener('DOMContentLoaded', () => {
             document.getElementById('current-year').textContent = new Date().getFullYear();
             initMobileNav();
             window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
-            await loadAboutContent();
+            loadAboutContent();
         });
     </script>
 </body>
