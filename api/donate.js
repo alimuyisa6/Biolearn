@@ -1,7 +1,7 @@
 process.noDeprecation = true;
 
 // ── Your secret API key goes here ONLY ──
-var NOWPAYMENTS_API_KEY = '56GM15R-BTDMSTD-HR9BSKN-MD4MF';
+var NOWPAYMENTS_API_KEY = 'TNS7XTK-KRCM4ZD-N52126H-MHCGXAP';
 
 export default async function handler(req, res) {
   if (req.method !== 'POST') return res.status(405).end();
