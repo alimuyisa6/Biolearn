@@ -126,163 +126,102 @@
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
     </footer>
 
-    <script type="module">
-        import { supabase, getSession, pageCache } from './auth-check.js';
+  <script type="module">
+    import { supabase, getSession, pageCache } from './auth-check.js';
 
-        const API_BASE = '/api';
-        let currentTab = 'articles';
-        let blogData = null;
+    function escapeHtml(text) {
+        const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(text).replace(/[&<>"']/g, m => map[m]);
+    }
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
+    async function fetchPageData(action) {
+        const res = await fetch(`/api/page-data?action=${action}`);
+        if (!res.ok) throw new Error(`HTTP ${res.status}`);
+        return res.json();
+    }
 
-        async function loadSiteSections() {
-            if (pageCache.siteSections) return pageCache.siteSections;
-            const res = await fetch(`${API_BASE}/data?action=site-sections`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (!Array.isArray(data)) throw new Error('Invalid response');
-            pageCache.siteSections = data;
-            return data;
-        }
+    let blogData = null, currentTab = 'articles';
 
-        function loadFooter(data) {
-            const footerData = data.find(row => row.section === 'footer');
-            if (footerData?.data?.columns) renderFooter(footerData.data.columns);
-        }
+    async function loadFooter() {
+        try { const data = await fetchPageData('footer'); if (data?.columns) renderFooter(data.columns); }
+        catch (err) { console.warn('Footer failed', err); }
+    }
 
-        function renderFooter(columns) {
-            const footerInner = document.getElementById('footer-inner');
-            if (!footerInner) return;
-            footerInner.innerHTML = columns.map(col => {
-                const heading = escapeHtml(col.heading);
-                const items = (col.items || []).map(item => {
-                    let href = item.href ? item.href.trim() : '#';
-                    let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                    return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                }).join('');
-                return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+    function renderFooter(columns) {
+        const footerInner = document.getElementById('footer-inner');
+        if (!footerInner) return;
+        footerInner.innerHTML = columns.map(col => {
+            const heading = escapeHtml(col.heading);
+            const items = (col.items || []).map(item => {
+                let href = item.href ? item.href.trim() : '#';
+                let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
+                return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
             }).join('');
-        }
+            return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+        }).join('');
+    }
 
-        function renderPage(data) {
-            const container = document.getElementById('blog-content');
-            const blogSection = data.find(row => row.section === 'blog');
-            
-            if (!blogSection?.data) {
-                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>Blog section not configured yet. Add it in the admin panel.</p></div>';
-                return;
-            }
+    async function loadBlog() {
+        const container = document.getElementById('blog-content');
+        try {
+            const data = await fetchPageData('blog');
+            if (!data?.tabs?.length) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
+            blogData = data;
+            const tabs = data.tabs;
 
-            blogData = blogSection.data;
-            const tabs = blogData.tabs || [];
-
-            if (!tabs.length) {
-                container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts available yet.</p></div>';
-                return;
-            }
-
-            let html = '';
-            html += `<div class="hero-mini"><h1>${escapeHtml(blogData.title || 'Articles & Blog')}</h1><p>${escapeHtml(blogData.subtitle || '')}</p></div>`;
-
-            // Tab bar
-            html += '<div class="tab-bar" id="tab-bar">';
-            tabs.forEach((tab, i) => {
-                html += `<button class="tab-btn${i === 0 ? ' active' : ''}" data-tab="${escapeHtml(tab.id)}"><i class="fa-solid ${escapeHtml(tab.icon || 'fa-newspaper')}"></i> ${escapeHtml(tab.label)}</button>`;
-            });
-            html += '</div>';
-
-            // Posts grid
-            html += '<div class="posts-grid" id="posts-grid"></div>';
-
-            // Newsletter
-            html += `
-            <div class="newsletter-card">
-                <h3>Stay Updated</h3>
-                <p>Get the latest articles and study tips delivered to your inbox.</p>
-                <form class="newsletter-form" id="newsletter-form">
-                    <input type="email" placeholder="Your email address" required>
-                    <button type="submit">Subscribe</button>
-                </form>
-            </div>`;
-
+            let html = `<div class="hero-mini"><h1>${escapeHtml(data.title||'Articles & Blog')}</h1><p>${escapeHtml(data.subtitle||'')}</p></div>`;
+            html += '<div class="tab-bar">';
+            tabs.forEach((tab,i) => { html += `<button class="tab-btn${i===0?' active':''}" data-tab="${escapeHtml(tab.id)}"><i class="fa-solid ${escapeHtml(tab.icon||'fa-newspaper')}"></i> ${escapeHtml(tab.label)}</button>`; });
+            html += '</div><div class="posts-grid" id="posts-grid"></div>';
+            html += `<div class="newsletter-card"><h3>Stay Updated</h3><p>Get the latest articles and study tips.</p><form class="newsletter-form"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>`;
             container.innerHTML = html;
 
-            // Render first tab's posts
             renderPosts(tabs[0].posts);
 
-            // Tab click handlers
             document.querySelectorAll('.tab-btn').forEach(btn => {
                 btn.addEventListener('click', () => {
                     document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
                     btn.classList.add('active');
-                    currentTab = btn.dataset.tab;
-                    const tab = tabs.find(t => t.id === currentTab);
+                    const tab = tabs.find(t => t.id === btn.dataset.tab);
                     if (tab) renderPosts(tab.posts);
                 });
             });
-
-            // Newsletter handler
-            document.getElementById('newsletter-form').addEventListener('submit', (e) => {
-                e.preventDefault();
-                alert('Thank you for subscribing! (Newsletter feature coming soon)');
-                e.target.reset();
-            });
+        } catch (err) {
+            container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed to load: ${escapeHtml(err.message)}</p>`;
         }
+    }
 
-        function renderPosts(posts) {
-            const grid = document.getElementById('posts-grid');
-            if (!grid) return;
-
-            if (!posts || !posts.length) {
-                grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts in this section yet.</p></div>';
-                return;
-            }
-
-            grid.innerHTML = posts.map(post => `
-                <div class="post-card">
-                    <div class="post-image" style="background-image: url('${escapeHtml(post.image || '')}');">
-                        <span class="post-category">${escapeHtml(post.category || 'General')}</span>
-                    </div>
-                    <div class="post-body">
-                        <a href="${escapeHtml(post.link || '#')}" class="post-title">${escapeHtml(post.title)}</a>
-                        <p class="post-excerpt">${escapeHtml(post.excerpt || '')}</p>
-                        <div class="post-meta">
-                            <span><i class="fa-regular fa-user"></i> ${escapeHtml(post.author || 'Unknown')}</span>
-                            <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(post.date || '')}</span>
-                            <span><i class="fa-regular fa-clock"></i> ${escapeHtml(post.read_time || '')}</span>
-                        </div>
-                        <a href="${escapeHtml(post.link || '#')}" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
+    function renderPosts(posts) {
+        const grid = document.getElementById('posts-grid');
+        if (!posts?.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
+        grid.innerHTML = posts.map(post => `
+            <div class="post-card">
+                <div class="post-image" style="background-image:url('${escapeHtml(post.image||'')}');"><span class="post-category">${escapeHtml(post.category||'General')}</span></div>
+                <div class="post-body">
+                    <a href="${escapeHtml(post.link||'#')}" class="post-title">${escapeHtml(post.title)}</a>
+                    <p class="post-excerpt">${escapeHtml(post.excerpt||'')}</p>
+                    <div class="post-meta"><span><i class="fa-regular fa-user"></i> ${escapeHtml(post.author)}</span><span><i class="fa-regular fa-calendar"></i> ${escapeHtml(post.date)}</span><span><i class="fa-regular fa-clock"></i> ${escapeHtml(post.read_time)}</span></div>
+                    <a href="${escapeHtml(post.link||'#')}" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a>
                 </div>
-            `).join('');
-        }
+            </div>`).join('');
+    }
 
-        function initMobileNav() {
-            const hamburger = document.getElementById('hamburger-action');
-            const panel = document.getElementById('mobile-nav-panel');
-            const overlay = document.getElementById('mobile-nav-overlay');
-            function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburger.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
-            function closeNav() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburger.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
-            hamburger.addEventListener('click', () => panel.classList.contains('active') ? closeNav() : openNav());
-            overlay.addEventListener('click', closeNav);
-            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-        }
+    function initMobileNav() {
+        const h=document.getElementById('hamburger-action'), p=document.getElementById('mobile-nav-panel'), o=document.getElementById('mobile-nav-overlay');
+        function open(){ p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
+        function close(){ p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
+        h.addEventListener('click',()=>p.classList.contains('active')?close():open());
+        o.addEventListener('click',close);
+        p.querySelectorAll('a').forEach(a=>a.addEventListener('click',close));
+    }
 
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
-            initMobileNav();
-            try {
-                const data = await loadSiteSections();
-                loadFooter(data);
-                renderPage(data);
-            } catch (err) {
-                document.getElementById('blog-content').innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed to load: ${escapeHtml(err.message)}</p>`;
-            }
-        });
-    </script>
+    document.addEventListener('DOMContentLoaded',()=>{
+        document.getElementById('current-year').textContent=new Date().getFullYear();
+        initMobileNav();
+        window.addEventListener('scroll',()=>{document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10);},{passive:true});
+        loadFooter();
+        loadBlog();
+    });
+  </script>
 </body>
 </html>
