@@ -2,7 +2,7 @@ process.noDeprecation = true;
 import { createClient } from '@supabase/supabase-js';
 import crypto from 'crypto';
 
-var IPN_SECRET = 'YOUR_IPN_SECRET_HERE'; // Generate in Dashboard → Payment Settings → IPN
+var IPN_SECRET = '/WgeK+CVDcH5L+x+NDf5aZKBgfezSnz5'; // Generate in Dashboard → Payment Settings → IPN
 
 function sortObject(obj) {
   if (obj === null || typeof obj !== 'object') return obj;
