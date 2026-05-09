@@ -1,0 +1,280 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Study Tips – BioLearn</title>
+    <meta name="description" content="Biology study tips, exam strategies, and revision techniques to help you excel.">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" crossorigin="anonymous" referrerpolicy="no-referrer" />
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+    <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
+    <style>
+        :root {
+            --color-primary: #1a365d; --color-primary-light: #2a4a7f; --color-secondary: #3b82f6;
+            --color-accent: #60a5fa; --color-gold: #f59e0b; --color-gold-light: #fcd34d;
+            --color-surface: #f0f4f8; --color-bg-white: #ffffff; --color-text: #111827;
+            --color-text-muted: #6b7280; --color-border: #d1d5db; --color-success: #10b981;
+            --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1.25rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 6px 18px rgba(0,0,0,0.06);
+            --shadow-lg: 0 14px 32px rgba(0,0,0,0.08); --transition-fast: 180ms ease;
+            --transition-smooth: 320ms cubic-bezier(0.4,0,0.2,1); --max-width: 1200px; --header-height: 4.5rem;
+        }
+        * { box-sizing: border-box; margin: 0; padding: 0; }
+        html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; }
+        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--color-surface); color: var(--color-text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+        .site-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--color-border); height: var(--header-height); display: flex; align-items: center; transition: box-shadow var(--transition-smooth); }
+        .site-header.scrolled { box-shadow: var(--shadow-md); }
+        .header-inner { width: 100%; max-width: var(--max-width); margin: 0 auto; padding: 0 1.8rem; display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 700; font-size: 1.3rem; font-family: 'Merriweather', serif; letter-spacing: -0.02em; color: var(--color-primary); background: linear-gradient(135deg, #1a365d, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+        .logo i { font-size: 1.4rem; color: var(--color-secondary); -webkit-text-fill-color: initial; background: none; }
+        .home-btn { background: var(--color-secondary); color: white; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: background var(--transition-fast); }
+        .home-btn:hover { background: var(--color-primary); }
+        .home-btn i { font-size: 0.9rem; }
+        .hamburger-action { background: white; border: 2px solid var(--color-border); color: var(--color-primary); font-size: 1.3rem; padding: 0.7rem 1.6rem; border-radius: 30px; display: none; cursor: pointer; }
+        .hamburger-action:hover { background: #e5e7eb; }
+        @media (max-width: 768px) { .hamburger-action { display: inline-flex; } }
+        .main-content { max-width: var(--max-width); margin: 0 auto; padding: 2rem 1.8rem; width: 100%; }
+        .hero-mini { text-align: center; padding: 2rem 0 2.5rem; }
+        .hero-mini h1 { font-family: 'Merriweather', serif; font-size: 2.6rem; color: var(--color-primary); margin-bottom: 0.8rem; }
+        .hero-mini p { font-size: 1.15rem; color: var(--color-text-muted); max-width: 600px; margin: 0 auto; }
+
+        /* Section header */
+        .section-header { margin-bottom: 1.5rem; padding-left: 0.75rem; border-left: 4px solid var(--color-secondary); }
+        .section-header h2 { font-family: 'Merriweather', serif; font-size: 1.5rem; color: var(--color-primary); }
+        .section-header p { font-size: 0.9rem; color: var(--color-text-muted); margin-top: 0.2rem; }
+
+        /* Tip cards */
+        .tips-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(320px, 1fr)); gap: 1.5rem; margin-bottom: 2.5rem; }
+        @media (max-width: 768px) { .tips-grid { grid-template-columns: 1fr; } }
+        .tip-card { background: var(--color-bg-white); border-radius: var(--radius-lg); padding: 1.8rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); transition: all var(--transition-smooth); display: flex; gap: 1rem; align-items: flex-start; }
+        .tip-card:hover { transform: translateY(-3px); box-shadow: var(--shadow-lg); }
+        .tip-icon { width: 50px; height: 50px; border-radius: 50%; display: flex; align-items: center; justify-content: center; font-size: 1.4rem; flex-shrink: 0; }
+        .tip-icon.blue { background: #dbeafe; color: var(--color-secondary); }
+        .tip-icon.green { background: #d1fae5; color: var(--color-success); }
+        .tip-icon.gold { background: #fef3c7; color: var(--color-gold); }
+        .tip-content h4 { font-size: 1rem; color: var(--color-primary); margin-bottom: 0.3rem; }
+        .tip-content p { font-size: 0.88rem; color: var(--color-text-muted); line-height: 1.6; }
+
+        /* Strategy cards (full width) */
+        .strategy-card { background: var(--color-bg-white); border-radius: var(--radius-lg); padding: 2rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 1.5rem; display: flex; gap: 1.5rem; align-items: flex-start; }
+        @media (max-width: 768px) { .strategy-card { flex-direction: column; } }
+        .strategy-number { width: 48px; height: 48px; border-radius: 50%; background: var(--color-primary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1.3rem; flex-shrink: 0; font-family: 'Merriweather', serif; }
+        .strategy-body h4 { font-size: 1.1rem; color: var(--color-primary); margin-bottom: 0.4rem; }
+        .strategy-body p { font-size: 0.9rem; color: var(--color-text-muted); line-height: 1.7; }
+
+        /* Checklist */
+        .checklist { list-style: none; padding: 0; }
+        .checklist li { padding: 0.8rem 0; border-bottom: 1px solid var(--color-border); display: flex; align-items: center; gap: 0.8rem; font-size: 0.95rem; }
+        .checklist li:last-child { border-bottom: none; }
+        .checklist li i { color: var(--color-success); font-size: 1.1rem; }
+
+        /* CTA */
+        .cta-banner { background: linear-gradient(135deg, #1a365d, #3b82f6); color: white; border-radius: var(--radius-lg); padding: 2.5rem 2rem; text-align: center; margin-top: 2rem; }
+        .cta-banner h3 { font-family: 'Merriweather', serif; font-size: 1.5rem; margin-bottom: 0.5rem; }
+        .cta-banner p { opacity: 0.85; margin-bottom: 1.5rem; }
+        .btn-cta { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--color-gold); color: white; padding: 0.75rem 2rem; border-radius: 30px; font-weight: 600; text-decoration: none; box-shadow: 0 4px 14px rgba(245,158,11,0.3); transition: background var(--transition-fast); }
+        .btn-cta:hover { background: #d97706; }
+
+        /* Spinner */
+        .spinner-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1rem; text-align: center; }
+        .spinner-icon { font-size: 3rem; color: var(--color-secondary); animation: spin 1.2s linear infinite; margin-bottom: 0.8rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadePulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .spinner-message { font-size: 0.95rem; color: var(--color-text-muted); animation: fadePulse 2s ease-in-out infinite; }
+
+        /* Mobile nav */
+        .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; height: auto; max-height: 100vh; overflow-y: auto; background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s cubic-bezier(0.4,0,0.2,1), opacity 0.35s ease; }
+        .mobile-nav-panel.active { right: 0; opacity: 1; }
+        .mobile-nav-panel a { display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--color-text); font-weight: 500; border-radius: 30px; transition: background var(--transition-fast); }
+        .mobile-nav-panel a:hover { background: var(--color-surface); }
+        .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+        .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
+
+        /* Footer */
+        .site-footer { background: #0f172a; color: #cbd5e1; padding: 3rem 1.5rem 2rem; margin-top: auto; }
+        .footer-intro { max-width: var(--max-width); margin: 0 auto 2rem; text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .footer-intro .logo { color: #f0f9ff; background: none; -webkit-text-fill-color: #f0f9ff; margin-bottom: 0.6rem; }
+        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; }
+        .footer-links h4 { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: #f0f9ff; margin-bottom: 1rem; }
+        .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color var(--transition-fast); }
+        .footer-links a:hover { color: var(--color-gold-light); }
+        .footer-bottom { max-width: var(--max-width); margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 0.82rem; color: #64748b; }
+    </style>
+</head>
+<body>
+    <header class="site-header" id="site-header">
+        <div class="header-inner">
+            <a href="index.html" class="logo" aria-label="BioLearn Home"><i class="fa-solid fa-dna"></i> BioLearn</a>
+            <a href="index.html" class="home-btn"><i class="fa-solid fa-home"></i> Home</a>
+            <button class="hamburger-action" id="hamburger-action" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars"></i></button>
+        </div>
+    </header>
+
+    <main class="main-content" id="study-tips-content">
+        <div class="spinner-wrapper" id="loading-spinner">
+            <i class="fa-solid fa-dna spinner-icon"></i>
+            <p class="spinner-message">Loading study tips...</p>
+        </div>
+    </main>
+
+    <div class="mobile-nav-panel" id="mobile-nav-panel">
+        <a href="index.html"><i class="fa-solid fa-home"></i> Home</a>
+        <a href="resources.html"><i class="fa-solid fa-book"></i> All Resources</a>
+        <a href="notes.html"><i class="fa-solid fa-book-open"></i> Browse Notes</a>
+        <a href="submit.html"><i class="fa-solid fa-upload"></i> Submit a Resource</a>
+        <a href="guidelines.html"><i class="fa-solid fa-check-circle"></i> Guidelines</a>
+        <a href="blog.html"><i class="fa-solid fa-newspaper"></i> Articles & Blog</a>
+        <a href="study-tips.html"><i class="fa-solid fa-lightbulb"></i> Study Tips</a>
+        <a href="about.html"><i class="fa-solid fa-circle-info"></i> About</a>
+        <a href="contact.html"><i class="fa-solid fa-envelope"></i> Contact</a>
+    </div>
+    <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+    <footer class="site-footer" id="site-footer">
+        <div class="footer-intro"><a href="index.html" class="logo"><i class="fa-solid fa-dna"></i> BioLearn</a><p>Free biology notes for O‑ and A‑Level learners.</p></div>
+        <div class="footer-inner" id="footer-inner"></div>
+        <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
+    </footer>
+
+    <script>
+        // ── Config ──
+        var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+        var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        var API_BASE = '/api';
+        var pageCache = { siteSections: null };
+
+        // ── Session caching ──
+        function getCachedSession() {
+            var cached = sessionStorage.getItem('biolearn_session');
+            if (cached) { try { var p = JSON.parse(cached); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} }
+            return null;
+        }
+        function setCachedSession(session) {
+            if (session) sessionStorage.setItem('biolearn_session', JSON.stringify({session:session, timestamp:Date.now()}));
+            else sessionStorage.removeItem('biolearn_session');
+        }
+        async function getSession() {
+            var cached = getCachedSession(); if (cached) return cached;
+            if (!supabase) return null;
+            var _a = await supabase.auth.getSession(), session = _a.data.session;
+            setCachedSession(session); return session;
+        }
+        supabase && supabase.auth.onAuthStateChange(function(event) { if (event === 'SIGNED_OUT') sessionStorage.removeItem('biolearn_session'); });
+
+        // ── Helpers ──
+        function escapeHtml(text) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(text).replace(/[&<>"']/g, function(c){return m[c];}); }
+
+        function removeSpinner() { var s = document.getElementById('loading-spinner'); if (s) s.remove(); }
+
+        // ── Site sections ──
+        async function loadSiteSections() {
+            if (pageCache.siteSections) return pageCache.siteSections;
+            var res = await fetch(API_BASE + '/data?action=site-sections');
+            if (!res.ok) throw new Error('HTTP ' + res.status);
+            var data = await res.json();
+            if (!Array.isArray(data)) throw new Error('Invalid response');
+            pageCache.siteSections = data;
+            return data;
+        }
+
+        function loadFooter(data) {
+            var footerRow = data.find(function(r) { return r.section === 'footer'; });
+            if (footerRow && footerRow.data && footerRow.data.columns) {
+                var cols = footerRow.data.columns;
+                document.getElementById('footer-inner').innerHTML = cols.map(function(col) {
+                    var heading = escapeHtml(col.heading);
+                    var items = (col.items || []).map(function(item) {
+                        var href = item.href ? item.href.trim() : '#';
+                        var iconHtml = item.icon ? '<i class="' + escapeHtml(item.icon) + '"></i> ' : '';
+                        return '<li><a href="' + escapeHtml(href) + '">' + iconHtml + escapeHtml(item.label) + '</a></li>';
+                    }).join('');
+                    return '<div class="footer-links"><h4>' + heading + '</h4><ul>' + items + '</ul></div>';
+                }).join('');
+            }
+        }
+
+        // ── Render page ──
+        function renderPage(data) {
+            var container = document.getElementById('study-tips-content');
+            var tipsRow = data.find(function(r) { return r.section === 'study_tips'; });
+            
+            if (!tipsRow || !tipsRow.data) {
+                removeSpinner();
+                container.innerHTML = '<div class="hero-mini"><h1>Study Tips</h1><p>Tips are being prepared. Check back soon!</p></div>';
+                return;
+            }
+
+            var d = tipsRow.data;
+            var html = '';
+
+            // Hero
+            html += '<div class="hero-mini"><h1>' + escapeHtml(d.title || 'Study Tips') + '</h1><p>' + escapeHtml(d.subtitle || '') + '</p></div>';
+
+            // Quick Tips
+            if (d.quick_tips && d.quick_tips.length) {
+                html += '<div class="section-header"><h2>' + escapeHtml(d.quick_tips_heading || 'Quick Tips') + '</h2><p>' + escapeHtml(d.quick_tips_subtitle || '') + '</p></div>';
+                html += '<div class="tips-grid">';
+                d.quick_tips.forEach(function(tip) {
+                    var colorClass = tip.color || 'blue';
+                    html += '<div class="tip-card"><div class="tip-icon ' + colorClass + '"><i class="fa-solid ' + escapeHtml(tip.icon || 'fa-lightbulb') + '"></i></div><div class="tip-content"><h4>' + escapeHtml(tip.title) + '</h4><p>' + escapeHtml(tip.body) + '</p></div></div>';
+                });
+                html += '</div>';
+            }
+
+            // Exam Strategies
+            if (d.strategies && d.strategies.length) {
+                html += '<div class="section-header"><h2>' + escapeHtml(d.strategies_heading || 'Exam Strategies') + '</h2><p>' + escapeHtml(d.strategies_subtitle || '') + '</p></div>';
+                d.strategies.forEach(function(strat, i) {
+                    html += '<div class="strategy-card"><div class="strategy-number">' + (i + 1) + '</div><div class="strategy-body"><h4>' + escapeHtml(strat.title) + '</h4><p>' + escapeHtml(strat.body) + '</p></div></div>';
+                });
+            }
+
+            // Checklist
+            if (d.checklist && d.checklist.length) {
+                html += '<div class="section-header"><h2>' + escapeHtml(d.checklist_heading || 'Revision Checklist') + '</h2><p>' + escapeHtml(d.checklist_subtitle || '') + '</p></div>';
+                html += '<div class="tip-card" style="display:block;margin-bottom:1.5rem;"><ul class="checklist">';
+                d.checklist.forEach(function(item) {
+                    html += '<li><i class="fa-solid fa-circle-check"></i> ' + escapeHtml(item) + '</li>';
+                });
+                html += '</ul></div>';
+            }
+
+            // CTA
+            html += '<div class="cta-banner"><h3>' + escapeHtml(d.cta_heading || 'Ready to Test Your Knowledge?') + '</h3><p>' + escapeHtml(d.cta_body || 'Browse our collection of past papers and revision notes.') + '</p><a href="resources.html" class="btn-cta"><i class="fa-solid fa-book"></i> Browse Resources</a></div>';
+
+            removeSpinner();
+            container.innerHTML = html;
+        }
+
+        // ── Mobile nav ──
+        function initMobileNav() {
+            var ha = document.getElementById('hamburger-action'), panel = document.getElementById('mobile-nav-panel'), overlay = document.getElementById('mobile-nav-overlay');
+            function open() { panel.classList.add('active'); overlay.classList.add('active'); ha.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
+            function close() { panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
+            ha.addEventListener('click', function() { panel.classList.contains('active') ? close() : open(); });
+            overlay.addEventListener('click', close);
+            panel.querySelectorAll('a').forEach(function(link) { link.addEventListener('click', close); });
+        }
+
+        // ── Init ──
+        document.addEventListener('DOMContentLoaded', async function() {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            window.addEventListener('scroll', function() { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            initMobileNav();
+            try {
+                var data = await loadSiteSections();
+                loadFooter(data);
+                renderPage(data);
+            } catch(err) {
+                removeSpinner();
+                document.getElementById('study-tips-content').innerHTML = '<div class="hero-mini"><h1>Study Tips</h1><p>Unable to load tips. Please try again later.</p></div>';
+            }
+        });
+    </script>
+</body>
+</html>
