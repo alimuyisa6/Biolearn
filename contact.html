@@ -169,9 +169,7 @@
         }
         .signin-prompt a { color: var(--color-secondary); font-weight: 600; }
 
-        .faq-section {
-            margin-top: 0;
-        }
+        .faq-section { margin-top: 0; }
         .faq-item {
             border-bottom: 1px solid var(--color-border); padding: 1rem 0;
         }
@@ -182,9 +180,7 @@
             transition: color var(--transition-fast);
         }
         .faq-question:hover { color: var(--color-secondary); }
-        .faq-question i {
-            transition: transform var(--transition-fast); flex-shrink: 0;
-        }
+        .faq-question i { transition: transform var(--transition-fast); flex-shrink: 0; }
         .faq-answer {
             margin-top: 0.5rem; color: var(--color-text-muted); display: none; line-height: 1.7;
             padding-right: 2rem;
@@ -347,10 +343,8 @@
     </footer>
 
     <script type="module">
-        const SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
-        const SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
-        const supabase = window.supabase?.createClient?.(SUPABASE_URL, SUPABASE_ANON_KEY) ?? null;
-        if (!supabase) { console.error('Supabase client not loaded.'); }
+        // ── Import shared auth module ──
+        import { supabase, getSession, pageCache } from './auth-check.js';
 
         const API_BASE = '/api';
 
@@ -362,8 +356,13 @@
         // ── Footer ──
         async function loadFooter() {
             try {
+                if (pageCache.siteSections) {
+                    const footerData = pageCache.siteSections.find(row => row.section === 'footer');
+                    if (footerData?.data?.columns) { renderFooter(footerData.data.columns); return; }
+                }
                 const res = await fetch(`${API_BASE}/data?action=site-sections`);
                 const data = await res.json();
+                pageCache.siteSections = data;
                 const footerData = data.find(row => row.section === 'footer');
                 if (footerData?.data?.columns) {
                     renderFooter(footerData.data.columns);
@@ -389,8 +388,14 @@
         async function loadFaqs() {
             const container = document.getElementById('faq-container');
             try {
-                const res = await fetch(`${API_BASE}/data?action=site-sections`);
-                const data = await res.json();
+                let data;
+                if (pageCache.siteSections) {
+                    data = pageCache.siteSections;
+                } else {
+                    const res = await fetch(`${API_BASE}/data?action=site-sections`);
+                    data = await res.json();
+                    pageCache.siteSections = data;
+                }
                 const faqData = data.find(row => row.section === 'faqs');
 
                 if (!faqData?.data?.questions?.length) {
@@ -430,15 +435,11 @@
                     const answer = question.nextElementSibling;
                     const icon = question.querySelector('i');
                     const isOpen = answer.classList.contains('open');
-
-                    // Close all
                     document.querySelectorAll('.faq-answer').forEach(a => a.classList.remove('open'));
                     document.querySelectorAll('.faq-question i').forEach(i => {
                         i.classList.remove('fa-chevron-up');
                         i.classList.add('fa-chevron-down');
                     });
-
-                    // Toggle clicked
                     if (!isOpen) {
                         answer.classList.add('open');
                         icon.classList.remove('fa-chevron-down');
@@ -451,7 +452,7 @@
         // ── Auth & Form ──
         async function checkAuthAndRender() {
             const container = document.getElementById('auth-state');
-            const { data: { session } } = await supabase.auth.getSession();
+            const session = await getSession();
             if (!session) {
                 container.innerHTML = `
                     <p class="signin-prompt">Please <a href="index.html#account-section">sign in</a> to send a message.</p>`;
@@ -485,7 +486,6 @@
                     <div class="form-status" id="form-status"></div>
                 </form>
             `;
-
             document.getElementById('contact-form').addEventListener('submit', handleSubmit);
         }
 
@@ -495,30 +495,23 @@
             const statusEl = document.getElementById('form-status');
             btn.disabled = true;
             statusEl.innerText = '';
-
-            const session = (await supabase.auth.getSession()).data.session;
+            const session = await getSession();
             if (!session) {
                 statusEl.innerHTML = '<span style="color:red;">You must be signed in.</span>';
                 btn.disabled = false;
                 return;
             }
-
             const subject = document.getElementById('subject').value;
             const message = document.getElementById('message').value.trim();
-
             if (!message) {
                 statusEl.innerHTML = '<span style="color:red;">Please enter a message.</span>';
                 btn.disabled = false;
                 return;
             }
-
             try {
                 const res = await fetch(`${API_BASE}/actions?action=send-message`, {
                     method: 'POST',
-                    headers: {
-                        'Content-Type': 'application/json',
-                        'Authorization': `Bearer ${session.access_token}`
-                    },
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${session.access_token}` },
                     body: JSON.stringify({ message: subject ? `[${subject}] ${message}` : message })
                 });
                 const data = await res.json();
@@ -527,9 +520,7 @@
                 document.getElementById('contact-form').reset();
             } catch (err) {
                 statusEl.innerHTML = `<span style="color:red;">❌ ${escapeHtml(err.message)}</span>`;
-            } finally {
-                btn.disabled = false;
-            }
+            } finally { btn.disabled = false; }
         }
 
         // ── Mobile Nav ──
@@ -552,7 +543,7 @@
             }, { passive: true });
             initMobileNav();
             loadFooter();
-            loadFaqs();  // Dynamic from database
+            loadFaqs();
             supabase.auth.onAuthStateChange(() => checkAuthAndRender());
             checkAuthAndRender();
         });
