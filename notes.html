@@ -17,7 +17,7 @@
             --color-text-muted: #6b7280; --color-border: #d1d5db; --radius-sm: 0.5rem;
             --radius-md: 0.75rem; --radius-lg: 1.25rem; --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
             --shadow-md: 0 6px 18px rgba(0,0,0,0.06); --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
-            --transition-fast: 180ms ease; --transition-smooth: 320ms cubic-bezier(0.4, 0, 0.2, 1);
+            --transition-fast: 180ms ease; --transition-smooth: 320ms cubic-bezier(0.4,0,0.2,1);
             --max-width: 1200px; --header-height: 4.5rem;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -49,6 +49,14 @@
         .btn-download { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--color-primary); color: white; padding: 0.6rem 1.4rem; border-radius: 30px; text-decoration: none; font-weight: 600; transition: background var(--transition-fast); }
         .btn-download:hover { background: var(--color-primary-light); }
         .empty-state { text-align: center; padding: 4rem 2rem; color: var(--color-text-muted); }
+
+        /* ── Spinner (fade animation) ── */
+        .spinner-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1rem; text-align: center; }
+        .spinner-icon { font-size: 3rem; color: var(--color-secondary); animation: spin 1.2s linear infinite; margin-bottom: 0.8rem; }
+        @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+        @keyframes fadePulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
+        .spinner-message { font-size: 0.95rem; color: var(--color-text-muted); animation: fadePulse 2s ease-in-out infinite; }
+
         .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; height: auto; max-height: 100vh; overflow-y: auto; background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s ease, opacity 0.35s ease; }
         .mobile-nav-panel.active { right: 0; opacity: 1; }
         .mobile-nav-panel a { display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--color-text); font-weight: 500; border-radius: 30px; transition: background var(--transition-fast); }
@@ -67,9 +75,6 @@
         .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color var(--transition-fast); }
         .footer-links a:hover { color: var(--color-gold-light); }
         .footer-bottom { max-width: var(--max-width); margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 0.82rem; color: #64748b; }
-        .error-box { background: #fff5f5; border: 2px solid #ef4444; border-radius: 0.75rem; padding: 1.5rem; margin: 1rem 0; color: #991b1b; font-size: 0.9rem; word-break: break-all; }
-        .error-box strong { display: block; margin-bottom: 0.5rem; font-size: 1rem; }
-        .debug-info { background: #f0f4f8; border-radius: 0.5rem; padding: 0.75rem; margin: 0.5rem 0; font-family: monospace; font-size: 0.8rem; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -88,7 +93,10 @@
                 <button class="toggle-btn" data-level="A-Level">A‑Level</button>
             </div>
             <aside class="sidebar" id="note-list">
-                <p style="color:var(--color-text-muted);">Loading notes...</p>
+                <div class="spinner-wrapper" id="notes-spinner">
+                    <i class="fa-solid fa-dna spinner-icon"></i>
+                    <p class="spinner-message">Loading notes...</p>
+                </div>
             </aside>
             <section class="detail-pane" id="detail-pane">
                 <div class="empty-state">
@@ -97,7 +105,7 @@
                 </div>
             </section>
         </div>
-        <!-- DEBUG: Errors will show here -->
+        <!-- Debug area -->
         <div id="debug-area" style="max-width:var(--max-width);margin:0 auto;padding:0 1.8rem 2rem;"></div>
     </main>
 
@@ -116,118 +124,104 @@
     </footer>
 
     <script>
-        // ── Show errors visibly on the page ──
-        function showError(title, details) {
-            const debug = document.getElementById('debug-area');
-            const box = document.createElement('div');
-            box.className = 'error-box';
-            box.innerHTML = '<strong>❌ ' + title + '</strong>' + details;
-            debug.appendChild(box);
-            console.error(title, details);
+        var API_BASE = '/api';
+        var currentLevel = 'O-Level';
+        var notes = [];
+        var activeNoteId = null;
+        var notesCache = {};
+
+        function escapeHtml(text) {
+            var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'};
+            return String(text).replace(/[&<>"']/g, function(c){return m[c];});
         }
 
         function showDebug(label, info) {
-            const debug = document.getElementById('debug-area');
-            const box = document.createElement('div');
+            var debug = document.getElementById('debug-area');
+            var box = document.createElement('div');
             box.className = 'debug-info';
-            box.innerHTML = '<strong>🔍 ' + label + ':</strong> ' + info;
+            box.style.cssText = 'background:#f0f4f8;border-radius:0.5rem;padding:0.75rem;margin:0.5rem 0;font-family:monospace;font-size:0.8rem;color:#6b7280;';
+            box.innerHTML = '<strong>' + label + ':</strong> ' + info;
             debug.appendChild(box);
         }
 
-        const API_BASE = '/api';
-        let currentLevel = 'O-Level';
-        let notes = [];
-        let activeNoteId = null;
-        const notesCache = {};
-
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
+        function removeSpinner() {
+            var s = document.getElementById('notes-spinner');
+            if (s) s.remove();
         }
 
         async function loadFooter() {
             try {
-                showDebug('Footer', 'Fetching /api/data?action=site-sections...');
-                const res = await fetch(API_BASE + '/data?action=site-sections');
-                showDebug('Footer Response', 'Status: ' + res.status + ' ' + res.statusText);
-                if (!res.ok) {
-                    const text = await res.text();
-                    showError('Footer fetch failed', 'HTTP ' + res.status + '<br>Response: ' + escapeHtml(text.substring(0, 500)));
-                    return;
-                }
-                const data = await res.json();
-                showDebug('Footer Data', 'Got ' + (Array.isArray(data) ? data.length + ' sections' : typeof data));
-                const footerRow = Array.isArray(data) ? data.find(r => r.section === 'footer') : null;
-                if (footerRow?.data?.columns) {
-                    const cols = footerRow.data.columns;
-                    document.getElementById('footer-inner').innerHTML = cols.map(col => {
-                        const heading = escapeHtml(col.heading);
-                        const items = (col.items || []).map(item => {
-                            let href = item.href ? item.href.trim() : '#';
-                            let iconHtml = item.icon ? '<i class="' + escapeHtml(item.icon) + '"></i> ' : '';
+                var res = await fetch(API_BASE + '/data?action=site-sections');
+                if (!res.ok) return;
+                var data = await res.json();
+                var footerRow = Array.isArray(data) ? data.find(function(r){return r.section === 'footer';}) : null;
+                if (footerRow && footerRow.data && footerRow.data.columns) {
+                    var cols = footerRow.data.columns;
+                    document.getElementById('footer-inner').innerHTML = cols.map(function(col) {
+                        var heading = escapeHtml(col.heading);
+                        var items = (col.items || []).map(function(item) {
+                            var href = item.href ? item.href.trim() : '#';
+                            var iconHtml = item.icon ? '<i class="' + escapeHtml(item.icon) + '"></i> ' : '';
                             return '<li><a href="' + escapeHtml(href) + '">' + iconHtml + escapeHtml(item.label) + '</a></li>';
                         }).join('');
                         return '<div class="footer-links"><h4>' + heading + '</h4><ul>' + items + '</ul></div>';
                     }).join('');
-                    showDebug('Footer', '✅ Rendered successfully');
-                } else {
-                    showError('Footer', 'No footer data found in site_sections');
                 }
-            } catch (err) {
-                showError('Footer exception', escapeHtml(err.message));
-            }
+            } catch(err) { console.warn('Footer failed:', err.message); }
         }
 
         async function loadNotes(level) {
-            const cacheKey = 'notes_' + level;
+            var cacheKey = 'notes_' + level;
             if (notesCache[cacheKey]) {
-                showDebug('Notes', 'Using cached notes for ' + level);
+                showDebug('Notes', 'Using cache for ' + level);
                 notes = notesCache[cacheKey];
+                removeSpinner();
                 renderNoteList(notes);
                 checkUrlForId();
                 return;
             }
-            document.getElementById('note-list').innerHTML = '<p style="padding:1rem;color:var(--color-text-muted);">Loading notes...</p>';
+            // Spinner already showing from HTML
             try {
-                const url = API_BASE + '/data?action=resources&level=' + encodeURIComponent(level);
-                showDebug('Notes', 'Fetching ' + url);
-                const res = await fetch(url);
-                showDebug('Notes Response', 'Status: ' + res.status + ' ' + res.statusText);
+                var url = API_BASE + '/data?action=resources&level=' + encodeURIComponent(level);
+                showDebug('Notes', 'Fetching...');
+                var res = await fetch(url);
                 if (!res.ok) {
-                    const text = await res.text();
-                    showError('Notes fetch failed', 'HTTP ' + res.status + '<br>URL: ' + escapeHtml(url) + '<br>Response: ' + escapeHtml(text.substring(0, 500)));
+                    removeSpinner();
                     document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Failed to load notes (HTTP ' + res.status + ')</p>';
                     return;
                 }
                 notes = await res.json();
                 if (!Array.isArray(notes)) {
-                    showError('Notes data', 'Expected array, got: ' + typeof notes + '<br>Value: ' + escapeHtml(JSON.stringify(notes).substring(0, 300)));
-                    document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Invalid notes data received</p>';
+                    removeSpinner();
+                    document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Invalid data received</p>';
                     return;
                 }
-                showDebug('Notes', '✅ Loaded ' + notes.length + ' notes for ' + level);
+                showDebug('Notes', 'Loaded ' + notes.length + ' notes for ' + level);
                 notesCache[cacheKey] = notes;
+                removeSpinner();
                 renderNoteList(notes);
                 checkUrlForId();
-            } catch (err) {
-                showError('Notes exception', escapeHtml(err.message));
+            } catch(err) {
+                removeSpinner();
                 document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Error: ' + escapeHtml(err.message) + '</p>';
             }
         }
 
         function checkUrlForId() {
-            const id = new URLSearchParams(window.location.search).get('id');
+            var id = new URLSearchParams(window.location.search).get('id');
             if (id) activateNoteById(id);
         }
 
         function renderNoteList(list) {
-            const container = document.getElementById('note-list');
+            var container = document.getElementById('note-list');
             if (!list.length) {
-                container.innerHTML = '<p style="color:var(--color-text-muted); text-align:center;padding:1rem;">No notes found for this level.</p>';
+                container.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;padding:1rem;">No notes found for this level.</p>';
                 return;
             }
-            container.innerHTML = list.map(note => '<a href="#" class="note-list-item' + (activeNoteId == note.id ? ' active' : '') + '" data-id="' + note.id + '">' + escapeHtml(note.title) + '</a>').join('');
-            container.querySelectorAll('.note-list-item').forEach(link => {
+            container.innerHTML = list.map(function(note) {
+                return '<a href="#" class="note-list-item' + (activeNoteId == note.id ? ' active' : '') + '" data-id="' + note.id + '">' + escapeHtml(note.title) + '</a>';
+            }).join('');
+            container.querySelectorAll('.note-list-item').forEach(function(link) {
                 link.addEventListener('click', function(e) {
                     e.preventDefault();
                     var id = this.dataset.id;
@@ -247,19 +241,12 @@
             document.getElementById('detail-pane').innerHTML = '<p style="color:var(--color-text-muted);">Loading note...</p>';
             try {
                 var url = API_BASE + '/data?action=note&id=' + encodeURIComponent(id);
-                showDebug('Note Detail', 'Fetching ' + url);
                 var res = await fetch(url);
-                if (!res.ok) {
-                    var text = await res.text();
-                    showError('Note detail failed', 'HTTP ' + res.status + '<br>ID: ' + escapeHtml(id) + '<br>Response: ' + escapeHtml(text.substring(0, 300)));
-                    document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Failed to load note (HTTP ' + res.status + ')</p>';
-                    return;
-                }
+                if (!res.ok) { document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Failed to load note (HTTP ' + res.status + ')</p>'; return; }
                 var note = await res.json();
                 notesCache['detail_' + id] = note;
                 renderNoteDetail(note);
-            } catch (err) {
-                showError('Note detail exception', escapeHtml(err.message));
+            } catch(err) {
                 document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Error: ' + escapeHtml(err.message) + '</p>';
             }
         }
@@ -284,6 +271,9 @@
             document.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             currentLevel = btn.dataset.level;
+            // Show spinner again
+            var container = document.getElementById('note-list');
+            container.innerHTML = '<div class="spinner-wrapper" id="notes-spinner"><i class="fa-solid fa-dna spinner-icon"></i><p class="spinner-message">Loading notes...</p></div>';
             loadNotes(currentLevel);
         });
 
@@ -299,7 +289,6 @@
         }
 
         document.addEventListener('DOMContentLoaded', function() {
-            showDebug('Page', '✅ DOM loaded, starting fetch...');
             document.getElementById('current-year').textContent = new Date().getFullYear();
             window.addEventListener('scroll', function() { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
             initMobileNav();
