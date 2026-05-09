@@ -67,6 +67,9 @@
         .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color var(--transition-fast); }
         .footer-links a:hover { color: var(--color-gold-light); }
         .footer-bottom { max-width: var(--max-width); margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 0.82rem; color: #64748b; }
+        .error-box { background: #fff5f5; border: 2px solid #ef4444; border-radius: 0.75rem; padding: 1.5rem; margin: 1rem 0; color: #991b1b; font-size: 0.9rem; word-break: break-all; }
+        .error-box strong { display: block; margin-bottom: 0.5rem; font-size: 1rem; }
+        .debug-info { background: #f0f4f8; border-radius: 0.5rem; padding: 0.75rem; margin: 0.5rem 0; font-family: monospace; font-size: 0.8rem; color: #6b7280; }
     </style>
 </head>
 <body>
@@ -84,7 +87,9 @@
                 <button class="toggle-btn active" data-level="O-Level">O‑Level</button>
                 <button class="toggle-btn" data-level="A-Level">A‑Level</button>
             </div>
-            <aside class="sidebar" id="note-list"></aside>
+            <aside class="sidebar" id="note-list">
+                <p style="color:var(--color-text-muted);">Loading notes...</p>
+            </aside>
             <section class="detail-pane" id="detail-pane">
                 <div class="empty-state">
                     <i class="fa-solid fa-book-open" style="font-size:3rem; color:var(--color-accent); margin-bottom:1rem;"></i>
@@ -92,6 +97,8 @@
                 </div>
             </section>
         </div>
+        <!-- DEBUG: Errors will show here -->
+        <div id="debug-area" style="max-width:var(--max-width);margin:0 auto;padding:0 1.8rem 2rem;"></div>
     </main>
 
     <div class="mobile-nav-panel" id="mobile-nav-panel">
@@ -108,8 +115,24 @@
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
     </footer>
 
-    <script type="module">
-        import { supabase, getSession, pageCache } from './auth-check.js';
+    <script>
+        // ── Show errors visibly on the page ──
+        function showError(title, details) {
+            const debug = document.getElementById('debug-area');
+            const box = document.createElement('div');
+            box.className = 'error-box';
+            box.innerHTML = '<strong>❌ ' + title + '</strong>' + details;
+            debug.appendChild(box);
+            console.error(title, details);
+        }
+
+        function showDebug(label, info) {
+            const debug = document.getElementById('debug-area');
+            const box = document.createElement('div');
+            box.className = 'debug-info';
+            box.innerHTML = '<strong>🔍 ' + label + ':</strong> ' + info;
+            debug.appendChild(box);
+        }
 
         const API_BASE = '/api';
         let currentLevel = 'O-Level';
@@ -122,56 +145,73 @@
             return String(text).replace(/[&<>"']/g, m => map[m]);
         }
 
-        async function loadSiteSections() {
-            if (pageCache.siteSections) return pageCache.siteSections;
-            const res = await fetch(`${API_BASE}/data?action=site-sections`);
-            if (!res.ok) throw new Error(`HTTP ${res.status}`);
-            const data = await res.json();
-            if (!Array.isArray(data)) throw new Error('Invalid response');
-            pageCache.siteSections = data;
-            return data;
-        }
-
         async function loadFooter() {
             try {
-                const data = await loadSiteSections();
-                const footerData = data.find(row => row.section === 'footer');
-                if (footerData?.data?.columns) renderFooter(footerData.data.columns);
-            } catch (err) { console.warn('Footer load failed', err); }
-        }
-
-        function renderFooter(columns) {
-            const footerInner = document.getElementById('footer-inner');
-            if (!footerInner) return;
-            footerInner.innerHTML = columns.map(col => {
-                const heading = escapeHtml(col.heading);
-                const items = (col.items || []).map(item => {
-                    let href = item.href ? item.href.trim() : '#';
-                    let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                    return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                }).join('');
-                return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-            }).join('');
+                showDebug('Footer', 'Fetching /api/data?action=site-sections...');
+                const res = await fetch(API_BASE + '/data?action=site-sections');
+                showDebug('Footer Response', 'Status: ' + res.status + ' ' + res.statusText);
+                if (!res.ok) {
+                    const text = await res.text();
+                    showError('Footer fetch failed', 'HTTP ' + res.status + '<br>Response: ' + escapeHtml(text.substring(0, 500)));
+                    return;
+                }
+                const data = await res.json();
+                showDebug('Footer Data', 'Got ' + (Array.isArray(data) ? data.length + ' sections' : typeof data));
+                const footerRow = Array.isArray(data) ? data.find(r => r.section === 'footer') : null;
+                if (footerRow?.data?.columns) {
+                    const cols = footerRow.data.columns;
+                    document.getElementById('footer-inner').innerHTML = cols.map(col => {
+                        const heading = escapeHtml(col.heading);
+                        const items = (col.items || []).map(item => {
+                            let href = item.href ? item.href.trim() : '#';
+                            let iconHtml = item.icon ? '<i class="' + escapeHtml(item.icon) + '"></i> ' : '';
+                            return '<li><a href="' + escapeHtml(href) + '">' + iconHtml + escapeHtml(item.label) + '</a></li>';
+                        }).join('');
+                        return '<div class="footer-links"><h4>' + heading + '</h4><ul>' + items + '</ul></div>';
+                    }).join('');
+                    showDebug('Footer', '✅ Rendered successfully');
+                } else {
+                    showError('Footer', 'No footer data found in site_sections');
+                }
+            } catch (err) {
+                showError('Footer exception', escapeHtml(err.message));
+            }
         }
 
         async function loadNotes(level) {
-            const cacheKey = `notes_${level}`;
+            const cacheKey = 'notes_' + level;
             if (notesCache[cacheKey]) {
+                showDebug('Notes', 'Using cached notes for ' + level);
                 notes = notesCache[cacheKey];
                 renderNoteList(notes);
                 checkUrlForId();
                 return;
             }
+            document.getElementById('note-list').innerHTML = '<p style="padding:1rem;color:var(--color-text-muted);">Loading notes...</p>';
             try {
-                const res = await fetch(`${API_BASE}/data?action=resources&level=${encodeURIComponent(level)}`);
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
+                const url = API_BASE + '/data?action=resources&level=' + encodeURIComponent(level);
+                showDebug('Notes', 'Fetching ' + url);
+                const res = await fetch(url);
+                showDebug('Notes Response', 'Status: ' + res.status + ' ' + res.statusText);
+                if (!res.ok) {
+                    const text = await res.text();
+                    showError('Notes fetch failed', 'HTTP ' + res.status + '<br>URL: ' + escapeHtml(url) + '<br>Response: ' + escapeHtml(text.substring(0, 500)));
+                    document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Failed to load notes (HTTP ' + res.status + ')</p>';
+                    return;
+                }
                 notes = await res.json();
-                if (!Array.isArray(notes)) throw new Error('Invalid notes response');
+                if (!Array.isArray(notes)) {
+                    showError('Notes data', 'Expected array, got: ' + typeof notes + '<br>Value: ' + escapeHtml(JSON.stringify(notes).substring(0, 300)));
+                    document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Invalid notes data received</p>';
+                    return;
+                }
+                showDebug('Notes', '✅ Loaded ' + notes.length + ' notes for ' + level);
                 notesCache[cacheKey] = notes;
                 renderNoteList(notes);
                 checkUrlForId();
             } catch (err) {
-                document.getElementById('note-list').innerHTML = `<p style="color:red;">Failed to load notes: ${escapeHtml(err.message)}</p>`;
+                showError('Notes exception', escapeHtml(err.message));
+                document.getElementById('note-list').innerHTML = '<p style="color:red;padding:1rem;">Error: ' + escapeHtml(err.message) + '</p>';
             }
         }
 
@@ -183,20 +223,16 @@
         function renderNoteList(list) {
             const container = document.getElementById('note-list');
             if (!list.length) {
-                container.innerHTML = '<p style="color:var(--color-text-muted); text-align:center;">No notes found for this level.</p>';
+                container.innerHTML = '<p style="color:var(--color-text-muted); text-align:center;padding:1rem;">No notes found for this level.</p>';
                 return;
             }
-            container.innerHTML = list.map(note => `
-                <a href="#" class="note-list-item${activeNoteId == note.id ? ' active' : ''}" data-id="${note.id}">
-                    ${escapeHtml(note.title)}
-                </a>
-            `).join('');
+            container.innerHTML = list.map(note => '<a href="#" class="note-list-item' + (activeNoteId == note.id ? ' active' : '') + '" data-id="' + note.id + '">' + escapeHtml(note.title) + '</a>').join('');
             container.querySelectorAll('.note-list-item').forEach(link => {
-                link.addEventListener('click', (e) => {
+                link.addEventListener('click', function(e) {
                     e.preventDefault();
-                    const id = link.dataset.id;
+                    var id = this.dataset.id;
                     activateNoteById(id);
-                    const newUrl = new URL(window.location);
+                    var newUrl = new URL(window.location);
                     newUrl.searchParams.set('id', id);
                     history.pushState(null, '', newUrl);
                 });
@@ -206,61 +242,66 @@
         async function activateNoteById(id) {
             if (!id) return;
             activeNoteId = id;
-            document.querySelectorAll('.note-list-item').forEach(el => el.classList.toggle('active', el.dataset.id == id));
-            if (notesCache[`detail_${id}`]) {
-                renderNoteDetail(notesCache[`detail_${id}`]);
-                return;
-            }
+            document.querySelectorAll('.note-list-item').forEach(function(el) { el.classList.toggle('active', el.dataset.id == id); });
+            if (notesCache['detail_' + id]) { renderNoteDetail(notesCache['detail_' + id]); return; }
+            document.getElementById('detail-pane').innerHTML = '<p style="color:var(--color-text-muted);">Loading note...</p>';
             try {
-                const res = await fetch(`${API_BASE}/data?action=note&id=${encodeURIComponent(id)}`);
-                if (!res.ok) throw new Error('Note not found');
-                const note = await res.json();
-                notesCache[`detail_${id}`] = note;
+                var url = API_BASE + '/data?action=note&id=' + encodeURIComponent(id);
+                showDebug('Note Detail', 'Fetching ' + url);
+                var res = await fetch(url);
+                if (!res.ok) {
+                    var text = await res.text();
+                    showError('Note detail failed', 'HTTP ' + res.status + '<br>ID: ' + escapeHtml(id) + '<br>Response: ' + escapeHtml(text.substring(0, 300)));
+                    document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Failed to load note (HTTP ' + res.status + ')</p>';
+                    return;
+                }
+                var note = await res.json();
+                notesCache['detail_' + id] = note;
                 renderNoteDetail(note);
             } catch (err) {
-                document.getElementById('detail-pane').innerHTML = `<p style="color:red;">Failed to load note: ${escapeHtml(err.message)}</p>`;
+                showError('Note detail exception', escapeHtml(err.message));
+                document.getElementById('detail-pane').innerHTML = '<p style="color:red;">Error: ' + escapeHtml(err.message) + '</p>';
             }
         }
 
         function renderNoteDetail(note) {
-            const pane = document.getElementById('detail-pane');
-            const fileUrl = note.file_url || '#';
-            pane.innerHTML = `
-                <h1 class="detail-title">${escapeHtml(note.title || '')}</h1>
-                <div class="detail-meta">
-                    <span><i class="fa-regular fa-user"></i> ${escapeHtml(note.author || 'Unknown')}</span>
-                    <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(note.created_at || '')}</span>
-                    <span><i class="fa-regular fa-file"></i> ${escapeHtml(note.file_size || 'N/A')}</span>
-                    <span><i class="fa-solid fa-tag"></i> ${escapeHtml(note.category || '')}</span>
-                </div>
-                <div class="detail-description">${escapeHtml(note.description || 'No description provided.')}</div>
-                <a href="${escapeHtml(fileUrl)}" class="btn-download" download><i class="fa-solid fa-download"></i> Download Note</a>
-            `;
+            var pane = document.getElementById('detail-pane');
+            var fileUrl = note.file_url || '#';
+            pane.innerHTML = '<h1 class="detail-title">' + escapeHtml(note.title || '') + '</h1>' +
+                '<div class="detail-meta">' +
+                '<span><i class="fa-regular fa-user"></i> ' + escapeHtml(note.author || 'Unknown') + '</span>' +
+                '<span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(note.created_at || '') + '</span>' +
+                '<span><i class="fa-regular fa-file"></i> ' + escapeHtml(note.file_size || 'N/A') + '</span>' +
+                '<span><i class="fa-solid fa-tag"></i> ' + escapeHtml(note.category || '') + '</span>' +
+                '</div>' +
+                '<div class="detail-description">' + escapeHtml(note.description || 'No description provided.') + '</div>' +
+                '<a href="' + escapeHtml(fileUrl) + '" class="btn-download" download><i class="fa-solid fa-download"></i> Download Note</a>';
         }
 
-        document.getElementById('level-toggle').addEventListener('click', (e) => {
-            const btn = e.target.closest('.toggle-btn');
+        document.getElementById('level-toggle').addEventListener('click', function(e) {
+            var btn = e.target.closest('.toggle-btn');
             if (!btn) return;
-            document.querySelectorAll('.toggle-btn').forEach(b => b.classList.remove('active'));
+            document.querySelectorAll('.toggle-btn').forEach(function(b) { b.classList.remove('active'); });
             btn.classList.add('active');
             currentLevel = btn.dataset.level;
             loadNotes(currentLevel);
         });
 
         function initMobileNav() {
-            const hamburger = document.getElementById('hamburger-action');
-            const panel = document.getElementById('mobile-nav-panel');
-            const overlay = document.getElementById('mobile-nav-overlay');
+            var hamburger = document.getElementById('hamburger-action');
+            var panel = document.getElementById('mobile-nav-panel');
+            var overlay = document.getElementById('mobile-nav-overlay');
             function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburger.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
             function closeNav() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburger.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
-            hamburger.addEventListener('click', () => panel.classList.contains('active') ? closeNav() : openNav());
+            hamburger.addEventListener('click', function() { panel.classList.contains('active') ? closeNav() : openNav(); });
             overlay.addEventListener('click', closeNav);
-            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
+            panel.querySelectorAll('a').forEach(function(link) { link.addEventListener('click', closeNav); });
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
+        document.addEventListener('DOMContentLoaded', function() {
+            showDebug('Page', '✅ DOM loaded, starting fetch...');
             document.getElementById('current-year').textContent = new Date().getFullYear();
-            window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            window.addEventListener('scroll', function() { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
             initMobileNav();
             loadFooter();
             loadNotes(currentLevel);
