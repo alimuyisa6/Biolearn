@@ -798,18 +798,23 @@
                 getSession().then(function(s) { updateAuthUI(s); });
                 supabase.auth.onAuthStateChange(function(_e, s) { updateAuthUI(s); });
             }
-            var mf = document.getElementById('message-form');
-            mf.addEventListener('submit', async function(e) {
-                e.preventDefault();
-                var session = await getSession();
-                if (!session) { alert('You must be signed in to send a message.'); return; }
-                var msg = document.getElementById('message-text').value.trim();
-                if (!msg) return;
-                // Send Turnstile token with the message
-                try {
-                    var body = { message: msg };
-                    if (lastTurnstileToken) body.captchaToken = lastTurnstileToken;
-                    var res = await fetch(API_BASE + '/actions?action=send-message', {
+             var mf = document.getElementById('message-form');
+mf.addEventListener('submit', async function(e) {
+    e.preventDefault();
+    var session = await getSession();
+    if (!session) { alert('You must be signed in to send a message.'); return; }
+    var msg = document.getElementById('message-text').value.trim();
+    if (!msg) return;
+    // Get fresh Turnstile token
+    if (turnstileWidgetId !== null && window.turnstile) {
+        window.turnstile.reset(turnstileWidgetId);
+        await new Promise(function(r) { setTimeout(r, 2000); });
+        lastTurnstileToken = window.turnstile.getResponse(turnstileWidgetId) || lastTurnstileToken;
+    }
+    try {
+        var body = { message: msg };
+        if (lastTurnstileToken) body.captchaToken = lastTurnstileToken;
+        var res = await fetch(API_BASE + '/actions?action=send-message', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
                         body: JSON.stringify(body)
