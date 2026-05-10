@@ -1,23 +1,18 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>BioLearn Digital Library — Free Biology Notes</title>
     <meta name="description" content="Download free O‑ and A‑Level biology notes, past papers, and study resources. Sharebility-inspired digital library for advanced learners.">
-    <!-- Fonts: Inter body, Merriweather headings -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
-    <!-- Font Awesome 6 icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" 
           integrity="sha512-DTOQO9RWCH3ppGqcWaEA1BIZOC6xxalwEsw9c2QQeAIftl+Vegovlnee1c9QX4TctnWMn13TZye+giMm8e2LwA==" 
           crossorigin="anonymous" referrerpolicy="no-referrer" />
-    <!-- Supabase client -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
-    <!-- Cloudflare Turnstile -->
     <script src="https://challenges.cloudflare.com/turnstile/v0/api.js?render=explicit" async defer></script>
-
     <style>
         :root {
             --color-primary: #1a365d;
@@ -42,7 +37,6 @@
             --max-width: 1200px;
             --header-height: 4.5rem;
         }
-
         * { box-sizing: border-box; margin: 0; padding: 0; }
         html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; }
         body {
@@ -62,7 +56,6 @@
             font-weight: 600; text-decoration: none; transition: top var(--transition-fast);
         }
         .skip-link:focus { top: 0.75rem; }
-
         .site-header {
             position: sticky; top: 0; z-index: 100;
             background: rgba(255,255,255,0.92); backdrop-filter: blur(16px);
@@ -105,7 +98,6 @@
             transition: background var(--transition-fast); flex-shrink: 0;
         }
         .search-bar button:hover { background: var(--color-primary); }
-
         .hero {
             position: relative;
             background: linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.4)), 
@@ -133,7 +125,6 @@
             box-shadow: 0 4px 12px rgba(0,0,0,0.2);
         }
         .hero .btn:hover { background: #d97706; }
-
         .filters-section {
             background: var(--color-bg-white); border-bottom: 1px solid var(--color-border);
             padding: 1.2rem 1.8rem;
@@ -163,7 +154,6 @@
             font-size: 0.9rem; cursor: pointer; transition: background var(--transition-fast);
         }
         .btn-submit:hover { background: var(--color-primary); }
-
         .resource-section { margin-bottom: 3rem; }
         .section-heading {
             font-family: 'Merriweather', serif; font-size: 1.6rem;
@@ -214,10 +204,8 @@
             transition: background var(--transition-fast), color var(--transition-fast);
         }
         .share-btn:hover { background: var(--color-secondary); color: white; }
-
         .dynamic-container { transition: opacity 0.3s; }
         .dynamic-container.loading { opacity: 0.6; pointer-events: none; }
-
         .spinner-wrapper {
             display: flex; flex-direction: column; align-items: center;
             justify-content: center; padding: 3rem 1rem; text-align: center;
@@ -239,7 +227,6 @@
             background-clip: text; margin-bottom: 0.3rem;
         }
         .spinner-message { font-size: 0.9rem; color: var(--color-text-muted); }
-
         .descriptive-section {
             background: var(--color-bg-white); border-top: 1px solid var(--color-border);
             padding: 3rem 1.8rem; text-align: center;
@@ -277,7 +264,6 @@
         .btn-action:disabled {
             opacity: 0.6; cursor: not-allowed; pointer-events: none;
         }
-
         .donate-section { background: linear-gradient(135deg, #fef3c7, #fff7ed); }
         .btn-donate {
             background: var(--color-gold); color: white;
@@ -285,7 +271,6 @@
             box-shadow: 0 4px 12px rgba(245, 158, 11, 0.2);
         }
         .btn-donate:hover { background: #d97706; border-color: #d97706; }
-
         .nav-section { background: var(--color-surface); }
         .nav-container {
             display: flex; align-items: center; justify-content: center;
@@ -306,7 +291,6 @@
             color: var(--color-primary); font-size: 1.3rem; padding: 0.7rem 1.6rem;
         }
         .hamburger-action:hover { background: #e5e7eb; }
-
         @media (max-width: 768px) {
             .desktop-nav-links { display: none; }
             .hamburger-action { display: inline-flex; }
@@ -315,7 +299,6 @@
             .hamburger-action { display: none; }
             .desktop-nav-links { display: flex; }
         }
-
         .message-section { background: var(--color-bg-white); border-top: 1px solid var(--color-border); }
         .message-form {
             display: flex; flex-direction: column; gap: 1rem;
@@ -326,7 +309,6 @@
             border-radius: 30px; font-family: inherit; font-size: 0.95rem; resize: vertical;
         }
         .message-status { margin-top: 0.5rem; font-size: 0.85rem; color: var(--color-text-muted); }
-
         .mobile-nav-panel {
             position: fixed; top: 0; right: -320px; width: 280px;
             height: auto; max-height: 100vh; overflow-y: auto;
@@ -348,7 +330,6 @@
             transition: opacity 0.35s ease;
         }
         .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
-
         .site-footer {
             background: #0f172a; color: #cbd5e1;
             padding: 3rem 1.5rem 2rem;
@@ -382,7 +363,6 @@
             padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08);
             text-align: center; font-size: 0.82rem; color: #64748b;
         }
-
         @media (max-width: 768px) {
             .hero h1 { font-size: 2rem; }
             .hero { padding: 4rem 1.2rem; }
@@ -536,267 +516,202 @@
         </div>
     </footer>
 
-    <script type="module">
-        // ── Import shared auth module ──
-        import { supabase, getSession } from './auth-check.js';
+    <script>
+        // ── Config ──
+        var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+        var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        var TURNSTILE_SITE_KEY = '0x4AAAAAADJoKTgQ_HvcsSZ-';
+        var turnstileWidgetId = null;
+        // Store the last valid Turnstile token — sent to backend with every sensitive action
+        var lastTurnstileToken = null;
+        var API_BASE = '/api';
+        var pageCache = { siteSections: null, groupedResources: null };
+        var fullResourcesHTML = '';
 
-        const TURNSTILE_SITE_KEY = '0x4AAAAAADJoKTgQ_HvcsSZ-';
-        let turnstileWidgetId = null;
+        // ── Session caching ──
+        function getCachedSession() { var c = sessionStorage.getItem('biolearn_session'); if (c) { try { var p = JSON.parse(c); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} } return null; }
+        function setCachedSession(s) { if (s) sessionStorage.setItem('biolearn_session', JSON.stringify({session:s, timestamp:Date.now()})); else sessionStorage.removeItem('biolearn_session'); }
+        async function getSession() { var c = getCachedSession(); if (c) return c; if (!supabase) return null; var _a = await supabase.auth.getSession(), s = _a.data.session; setCachedSession(s); return s; }
+        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') sessionStorage.removeItem('biolearn_session'); });
 
-        const API_BASE = '/api';
+        function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
+        function safeUrl(u, f) { f = f || '#'; if (typeof u !== 'string') return f; var t = u.trim(); if (!t || /^(javascript|data|vbscript):/i.test(t) || /^\/\//.test(t)) return f; return t; }
+        function sanitizeBackgroundUrl(u) { if (!u || typeof u !== 'string') return ''; var t = u.trim(); if (!/^https?:\/\//i.test(t)) return ''; return 'url("' + t.replace(/["\\]/g, '\\$&') + '")'; }
 
-        // ── Cache for fast navigation returns ──
-        const pageCache = { siteSections: null, resources: null, groupedResources: null };
-
-        async function apiFetch(endpoint, options = {}) {
-            const session = await getSession();
-            const headers = { 'Content-Type': 'application/json', ...options.headers };
-            if (session?.access_token) {
-                headers['Authorization'] = `Bearer ${session.access_token}`;
+        // ── API fetch — now sends Turnstile token on sensitive actions ──
+        async function apiFetch(endpoint, options) {
+            options = options || {};
+            var session = await getSession();
+            var headers = Object.assign({'Content-Type': 'application/json'}, options.headers || {});
+            if (session && session.access_token) headers['Authorization'] = 'Bearer ' + session.access_token;
+            // Attach Turnstile token to POST/PUT/DELETE requests for backend verification
+            if (options.method && options.method !== 'GET' && lastTurnstileToken) {
+                var body = options.body ? JSON.parse(options.body) : {};
+                body.captchaToken = lastTurnstileToken;
+                options.body = JSON.stringify(body);
             }
-            const res = await fetch(`${API_BASE}${endpoint}`, { ...options, headers });
+            var res = await fetch(API_BASE + endpoint, { method: options.method || 'GET', headers: headers, body: options.body || null });
             if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.error || `Request failed (${res.status})`);
+                var err = {};
+                try { err = await res.json(); } catch(e) {}
+                throw new Error(err.error || 'Request failed (' + res.status + ')');
             }
             return res.json();
         }
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
-        function safeUrl(url, fallback = '#') {
-            if (typeof url !== 'string') return fallback;
-            const trimmed = url.trim();
-            if (!trimmed) return fallback;
-            if (/^(javascript|data|vbscript):/i.test(trimmed)) return fallback;
-            if (/^\/\//.test(trimmed)) return fallback;
-            return trimmed;
-        }
-        function sanitizeBackgroundUrl(url) {
-            if (!url || typeof url !== 'string') return '';
-            const trimmed = url.trim();
-            if (!/^https?:\/\//i.test(trimmed)) return '';
-            return `url("${trimmed.replace(/["\\]/g, '\\$&')}")`;
-        }
-
+        // ── Site sections ──
         async function loadSiteSections() {
+            if (pageCache.siteSections) { buildSiteSections(pageCache.siteSections); return; }
             try {
-                // Use cache if available
-                if (pageCache.siteSections) {
-                    buildSiteSections(pageCache.siteSections);
-                    return;
-                }
-                const data = await apiFetch('/data?action=site-sections');
-                if (!data || data.length === 0) {
-                    showError('No data found in site_sections table');
-                    return;
-                }
+                var data = await apiFetch('/data?action=site-sections');
+                if (!data || !data.length) { document.getElementById('hero-content').innerHTML = '<p style="color:red;">Failed to load site data.</p>'; return; }
                 pageCache.siteSections = data;
                 buildSiteSections(data);
-            } catch (err) {
-                console.error('Unexpected error loading site sections:', err);
-                showError(`Unexpected error: ${err.message || JSON.stringify(err)}`);
-            }
+            } catch(err) { document.getElementById('hero-content').innerHTML = '<p style="color:red;">Failed to load site data. Please refresh.</p>'; }
         }
 
         function buildSiteSections(data) {
-            const builders = {
-                hero: (d) => {
-                    const heroSection = document.getElementById('hero-section');
-                    const heroContent = document.getElementById('hero-content');
-                    if (!heroContent || !heroSection) return;
-                    const ctaLink = safeUrl(d.cta_link || '#');
-                    heroContent.innerHTML = `
-                        <h1>${escapeHtml(d.title || '')}</h1>
-                        <p>${escapeHtml(d.subtitle || '')}</p>
-                        <a href="${escapeHtml(ctaLink)}" class="btn">
-                            <i class="fa-solid fa-book-open"></i> ${escapeHtml(d.cta_text || '')}
-                        </a>`;
-                    if (d.background_image) {
-                        const bgCss = sanitizeBackgroundUrl(d.background_image);
-                        if (bgCss) heroSection.style.backgroundImage = `linear-gradient(rgba(0,0,0,0.55), rgba(0,0,0,0.4)), ${bgCss}`;
-                    }
+            var builders = {
+                hero: function(d) {
+                    var hs = document.getElementById('hero-section'), hc = document.getElementById('hero-content');
+                    if (!hc || !hs) return;
+                    var cta = safeUrl(d.cta_link || '#');
+                    hc.innerHTML = '<h1>' + escapeHtml(d.title || '') + '</h1><p>' + escapeHtml(d.subtitle || '') + '</p><a href="' + escapeHtml(cta) + '" class="btn"><i class="fa-solid fa-book-open"></i> ' + escapeHtml(d.cta_text || '') + '</a>';
+                    if (d.background_image) { var bg = sanitizeBackgroundUrl(d.background_image); if (bg) hs.style.backgroundImage = 'linear-gradient(rgba(0,0,0,0.55),rgba(0,0,0,0.4)), ' + bg; }
                 },
-                navigation: (d) => {
-                    const links = d.links || [];
-                    const processedLinks = links.map(link => {
-                        let href = link.href ? link.href.trim() : '';
-                        if (!href || href === '#') href = `?section=${encodeURIComponent((link.label || '').replace(/\s+/g, '-').toLowerCase())}`;
-                        return { ...link, href: safeUrl(href, '#') };
-                    });
-                    const desktopNav = document.getElementById('desktop-nav-links');
-                    if (desktopNav) {
-                        desktopNav.innerHTML = processedLinks.map(link =>
-                            `<li><a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a></li>`
-                        ).join('');
-                    }
-                    const mobilePanel = document.getElementById('mobile-nav-panel');
-                    if (mobilePanel) {
-                        mobilePanel.innerHTML = processedLinks.map(link =>
-                            `<a href="${escapeHtml(link.href)}">${escapeHtml(link.label)}</a>`
-                        ).join('');
-                        mobilePanel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-                    }
+                navigation: function(d) {
+                    var links = (d.links || []).map(function(l) { var h = l.href ? l.href.trim() : ''; if (!h || h === '#') h = '?section=' + encodeURIComponent((l.label || '').replace(/\s+/g,'-').toLowerCase()); return {label:l.label, href:safeUrl(h,'#')}; });
+                    var dn = document.getElementById('desktop-nav-links');
+                    if (dn) dn.innerHTML = links.map(function(l) { return '<li><a href="' + escapeHtml(l.href) + '">' + escapeHtml(l.label) + '</a></li>'; }).join('');
+                    var mp = document.getElementById('mobile-nav-panel');
+                    if (mp) { mp.innerHTML = links.map(function(l) { return '<a href="' + escapeHtml(l.href) + '">' + escapeHtml(l.label) + '</a>'; }).join(''); mp.querySelectorAll('a').forEach(function(a) { a.addEventListener('click', closeNav); }); }
                 },
-                footer: (d) => {
-                    const footerInner = document.getElementById('footer-inner');
-                    if (!footerInner) return;
-                    const columns = d.columns || [];
-                    footerInner.innerHTML = columns.map(col => {
-                        const heading = escapeHtml(col.heading);
-                        const items = (col.items || []).map(item => {
-                            let href = item.href ? item.href.trim() : '';
-                            if (!href || href === '#') href = `?section=${encodeURIComponent((item.label || '').replace(/\s+/g, '-').toLowerCase())}`;
+                footer: function(d) {
+                    var fi = document.getElementById('footer-inner');
+                    if (!fi) return;
+                    var cols = d.columns || [];
+                    fi.innerHTML = cols.map(function(col) {
+                        var h = escapeHtml(col.heading);
+                        var items = (col.items || []).map(function(item) {
+                            var href = item.href ? item.href.trim() : '';
+                            if (!href || href === '#') href = '?section=' + encodeURIComponent((item.label || '').replace(/\s+/g,'-').toLowerCase());
                             href = safeUrl(href, '#');
-                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
+                            var icon = item.icon ? '<i class="' + escapeHtml(item.icon) + '"></i> ' : '';
+                            return '<li><a href="' + escapeHtml(href) + '">' + icon + escapeHtml(item.label) + '</a></li>';
                         }).join('');
-                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
+                        return '<div class="footer-links"><h4>' + h + '</h4><ul>' + items + '</ul></div>';
                     }).join('');
                 },
-                filters: (d) => { populateFilterDropdowns(d); }
+                filters: function(d) { populateFilterDropdowns(d); }
             };
-
-            let filtersData = null;
-            data.forEach(row => {
-                const builder = builders[row.section];
-                if (!builder) {
-                    if (row.section !== 'message') console.warn(`No builder for section "${row.section}"`);
-                    return;
-                }
-                if (!row.data || typeof row.data !== 'object') {
-                    console.warn(`Invalid data for section "${row.section}"`, row.data);
-                    return;
-                }
-                try {
-                    if (row.section === 'filters') filtersData = row.data;
-                    builder(row.data);
-                } catch (e) {
-                    console.error(`Failed to build section "${row.section}":`, e);
-                    if (row.section === 'hero') document.getElementById('hero-content').innerHTML = `<p style="color:red;">Error: ${escapeHtml(e.message)}</p>`;
-                    else if (row.section === 'navigation') {
-                        document.getElementById('desktop-nav-links').innerHTML = `<li style="color:red;">Error: ${escapeHtml(e.message)}</li>`;
-                        document.getElementById('mobile-nav-panel').innerHTML = `<a href="#" style="color:red;">Error: ${escapeHtml(e.message)}</a>`;
-                    } else if (row.section === 'footer') document.getElementById('footer-inner').innerHTML = `<div class="footer-links" style="color:red;">Error: ${escapeHtml(e.message)}</div>`;
-                }
+            var filtersData = null;
+            data.forEach(function(row) {
+                var builder = builders[row.section];
+                if (!builder) { if (row.section !== 'message') console.warn('No builder for section "' + row.section + '"'); return; }
+                if (!row.data || typeof row.data !== 'object') { console.warn('Invalid data for section "' + row.section + '"', row.data); return; }
+                try { if (row.section === 'filters') filtersData = row.data; builder(row.data); }
+                catch(e) { console.error('Failed to build section "' + row.section + '":', e); }
             });
-
-            if (!filtersData) {
-                console.log('No filters section, loading from biology_notes...');
-                loadFilterOptionsFromBioNotes();
-            }
-            handleQuerySectionNavigation();
+            if (!filtersData) loadFilterOptionsFromBioNotes();
         }
 
-        function populateFilterDropdowns(filterData) {
-            const levels = filterData.levels || [];
-            const categories = filterData.categories || [];
-            const tags = filterData.tags || [];
-            const levelSel = document.getElementById('filter-level');
-            const catSel = document.getElementById('filter-category');
-            const tagSel = document.getElementById('filter-tag');
-            levelSel.innerHTML = '<option value="">All Levels</option>';
-            catSel.innerHTML = '<option value="">All Categories</option>';
-            tagSel.innerHTML = '<option value="">All Tags</option>';
-            levels.forEach(level => { const o = document.createElement('option'); o.value = level; o.textContent = level; levelSel.appendChild(o); });
-            categories.forEach(cat => { const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); });
-            tags.forEach(tag => { const o = document.createElement('option'); o.value = tag; o.textContent = tag; tagSel.appendChild(o); });
+        function populateFilterDropdowns(fd) {
+            var setOpts = function(sel, arr) { sel.innerHTML = '<option value="">All</option>'; arr.forEach(function(v) { var o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); }); };
+            setOpts(document.getElementById('filter-level'), fd.levels || []);
+            setOpts(document.getElementById('filter-category'), fd.categories || []);
+            setOpts(document.getElementById('filter-tag'), fd.tags || []);
         }
 
         async function loadFilterOptionsFromBioNotes() {
             try {
-                const { levels, categories } = await apiFetch('/data?action=filter-options');
-                const levelSel = document.getElementById('filter-level');
-                (levels || []).forEach(lvl => { if(lvl){ const o = document.createElement('option'); o.value = lvl; o.textContent = lvl; levelSel.appendChild(o); }});
-                const catSel = document.getElementById('filter-category');
-                (categories || []).forEach(cat => { if(cat){ const o = document.createElement('option'); o.value = cat; o.textContent = cat; catSel.appendChild(o); }});
-            } catch (err) { console.warn('Fallback filter load failed', err); }
+                var d = await apiFetch('/data?action=filter-options');
+                var setO = function(sel, arr) { arr.forEach(function(v) { if(v) { var o = document.createElement('option'); o.value = v; o.textContent = v; sel.appendChild(o); } }); };
+                setO(document.getElementById('filter-level'), d.levels || []);
+                setO(document.getElementById('filter-category'), d.categories || []);
+            } catch(err) { console.warn('Fallback filter load failed'); }
         }
 
-        async function loadResources(filters = {}) {
-            const container = document.getElementById('resources-container');
+        // ── Resources ──
+        async function loadResources(filters) {
+            filters = filters || {};
+            var container = document.getElementById('resources-container');
             container.classList.add('loading');
             try {
-                // Use cache for unfiltered requests
-                const hasFilters = filters.level || filters.category || filters.tag;
-                if (!hasFilters && pageCache.groupedResources) {
-                    renderResources(pageCache.groupedResources);
-                    container.classList.remove('loading');
-                    return;
-                }
-                const params = new URLSearchParams();
+                var hasFilters = filters.level || filters.category || filters.tag;
+                if (!hasFilters && pageCache.groupedResources) { renderResources(pageCache.groupedResources); container.classList.remove('loading'); return; }
+                var params = new URLSearchParams();
                 if (filters.level) params.set('level', filters.level);
                 if (filters.category) params.set('category', filters.category);
                 if (filters.tag) params.set('tag', filters.tag);
-                const data = await apiFetch(`/data?action=resources${params.toString() ? '&' + params.toString() : ''}`);
-                const grouped = groupResourcesBySection(data || []);
+                var data = await apiFetch('/data?action=resources' + (params.toString() ? '&' + params.toString() : ''));
+                var grouped = groupResourcesBySection(data || []);
                 if (!hasFilters) pageCache.groupedResources = grouped;
                 renderResources(grouped);
-            } catch (err) {
-                console.error('Failed to load resources:', err);
-                removeSpinner();
-                container.innerHTML = '<p style="text-align:center; color:red;">Failed to load resources.</p>';
-            } finally {
-                container.classList.remove('loading');
-            }
+            } catch(err) { removeSpinner(); container.innerHTML = '<p style="text-align:center;color:red;">Failed to load resources.</p>'; }
+            finally { container.classList.remove('loading'); }
         }
 
         function applyFilters() {
-            const level = document.getElementById('filter-level').value;
-            const category = document.getElementById('filter-category').value;
-            const tag = document.getElementById('filter-tag').value;
-            loadResources({ level, category, tag });
+            loadResources({ level: document.getElementById('filter-level').value, category: document.getElementById('filter-category').value, tag: document.getElementById('filter-tag').value });
         }
 
-        function cleanupTurnstile() {
-            if (turnstileWidgetId !== null) {
-                window.turnstile?.remove(turnstileWidgetId);
-                turnstileWidgetId = null;
-            }
+        function groupResourcesBySection(resources) {
+            var g = {};
+            resources.forEach(function(item) { var s = (item.section_type || 'All Resources').trim(); if (!g[s]) g[s] = []; if (!item.id) item.id = 'gen-' + Math.random().toString(36).substr(2,9); g[s].push(item); });
+            return Object.entries(g).map(function(e) { return { sectionName: e[0], items: e[1] }; });
         }
 
+        function renderResources(groupedSections) {
+            var container = document.getElementById('resources-container');
+            var noResults = document.getElementById('no-results');
+            var allItems = groupedSections.flatMap(function(s) { return s.items; });
+            if (!allItems.length) { container.innerHTML = ''; noResults.hidden = false; fullResourcesHTML = ''; return; }
+            noResults.hidden = true;
+            var html = '';
+            groupedSections.forEach(function(sec) {
+                html += '<div class="resource-section"><h2 class="section-heading">' + escapeHtml(sec.sectionName) + '</h2><div class="resources-grid">';
+                sec.items.forEach(function(item) {
+                    var uid = item.id, fileUrl = safeUrl(item.file_url), displayUrl = fileUrl && fileUrl !== '#' ? fileUrl : '#';
+                    html += '<div class="resource-card" id="res-' + escapeHtml(String(uid)) + '"><div class="resource-icon"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=' + escapeHtml(String(uid)) + '" class="resource-title">' + escapeHtml(item.title || '') + '</a><p class="resource-description">' + escapeHtml(item.description || '') + '</p><div class="resource-meta"><span><i class="fa-regular fa-user"></i> ' + escapeHtml(item.author || 'Unknown') + '</span><span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(item.created_at || '') + '</span><span><i class="fa-regular fa-file"></i> ' + escapeHtml(item.file_size || 'N/A') + '</span></div><div class="resource-actions"><a href="' + escapeHtml(displayUrl) + '" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div class="share-buttons"><a href="#" class="share-btn" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>';
+                });
+                html += '</div></div>';
+            });
+            fullResourcesHTML = html;
+            removeSpinner();
+            container.innerHTML = html;
+        }
+
+        function removeSpinner() { var s = document.getElementById('loading-spinner'); if (s) s.remove(); }
+        function showSpinnerInContainer() { document.getElementById('resources-container').innerHTML = '<div class="spinner-wrapper" id="loading-spinner"><i class="fa-solid fa-dna spinner-icon"></i><div class="spinner-brand">BioLearn</div><p class="spinner-message">Searching resources…</p></div>'; }
+
+        // ── Auth UI ──
         function updateAuthUI(session) {
-            const container = document.getElementById('auth-buttons-container');
-            if (!container) return;
+            var c = document.getElementById('auth-buttons-container');
+            if (!c) return;
             if (session && session.user) {
-                const email = session.user.email;
-                container.innerHTML = `
-                    <span style="display:flex; align-items:center; gap:1rem; flex-wrap:wrap; justify-content:center;">
-                        <span style="color:var(--color-text-muted); font-size:0.9rem;">Signed in as <strong>${escapeHtml(email)}</strong></span>
-                        <button class="btn-action btn-signin" id="sign-out-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
-                    </span>`;
-                document.getElementById('sign-out-btn')?.addEventListener('click', async () => { await supabase.auth.signOut(); });
-                checkMessageLimit(session.user.id);
+                c.innerHTML = '<span style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center;"><span style="color:var(--color-text-muted);font-size:0.9rem;">Signed in as <strong>' + escapeHtml(session.user.email) + '</strong></span><button class="btn-action btn-signin" id="sign-out-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button></span>';
+                document.getElementById('sign-out-btn') && document.getElementById('sign-out-btn').addEventListener('click', async function() { await supabase.auth.signOut(); });
+                document.getElementById('message-signin-required').style.display = 'none';
+                document.getElementById('message-form').style.display = 'flex';
                 loadMessages();
             } else {
-                container.innerHTML = `
-                    <button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-                    <button class="btn-action btn-create" id="show-auth-form-btn-signup"><i class="fa-solid fa-user-plus"></i> Create Account</button>`;
-                const signInBtn = document.getElementById('show-auth-form-btn');
-                const signUpBtn = document.getElementById('show-auth-form-btn-signup');
-                const buttonStates = new Map();
-                function createToggleHandler(mode, buttonEl) {
-                    if (!buttonStates.has(buttonEl)) buttonStates.set(buttonEl, { tapCount:0, disabled:false, timerId:null, originalText:buttonEl.innerHTML });
-                    const st = buttonStates.get(buttonEl);
-                    return function toggleForm() {
+                c.innerHTML = '<button class="btn-action btn-signin" id="show-auth-form-btn"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button><button class="btn-action btn-create" id="show-auth-form-btn-signup"><i class="fa-solid fa-user-plus"></i> Create Account</button>';
+                var signInBtn = document.getElementById('show-auth-form-btn');
+                var signUpBtn = document.getElementById('show-auth-form-btn-signup');
+                var states = new Map();
+                function makeToggleHandler(mode, btn) {
+                    if (!states.has(btn)) states.set(btn, {tapCount:0,disabled:false,timerId:null,originalText:btn.innerHTML});
+                    var st = states.get(btn);
+                    return function() {
                         if (st.disabled) return;
-                        const form = document.getElementById('auth-form-container');
+                        var form = document.getElementById('auth-form-container');
                         if (form) { form.remove(); st.tapCount++; } else { showAuthForm(mode); st.tapCount++; }
-                        if (st.tapCount > 3) {
-                            st.disabled = true; buttonEl.disabled = true; let remaining = 150;
-                            buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
-                            st.timerId = setInterval(() => {
-                                remaining--;
-                                if (remaining <= 0) { clearInterval(st.timerId); buttonEl.disabled = false; buttonEl.innerHTML = st.originalText; st.disabled = false; st.tapCount = 0; st.timerId = null; }
-                                else buttonEl.innerHTML = `<i class="fa-solid fa-clock"></i> Disabled (${remaining}s)`;
-                            }, 1000);
-                        }
+                        if (st.tapCount > 3) { st.disabled = true; btn.disabled = true; var remaining = 150; btn.innerHTML = '<i class="fa-solid fa-clock"></i> Disabled (' + remaining + 's)'; st.timerId = setInterval(function() { remaining--; if (remaining <= 0) { clearInterval(st.timerId); btn.disabled = false; btn.innerHTML = st.originalText; st.disabled = false; st.tapCount = 0; st.timerId = null; } else btn.innerHTML = '<i class="fa-solid fa-clock"></i> Disabled (' + remaining + 's)'; }, 1000); }
                     };
                 }
-                signInBtn.addEventListener('click', createToggleHandler('signin', signInBtn));
-                signUpBtn.addEventListener('click', createToggleHandler('signup', signUpBtn));
+                signInBtn.addEventListener('click', makeToggleHandler('signin', signInBtn));
+                signUpBtn.addEventListener('click', makeToggleHandler('signup', signUpBtn));
                 document.getElementById('message-signin-required').style.display = 'block';
                 document.getElementById('message-form').style.display = 'none';
                 document.getElementById('message-limit-reached').style.display = 'none';
@@ -805,336 +720,131 @@
         }
 
         function showAuthForm(mode) {
-            const container = document.getElementById('auth-buttons-container');
-            document.getElementById('auth-form-container')?.remove();
-            cleanupTurnstile();
-
-            const turnstileContainerId = 'turnstile-widget-' + Date.now();
-            let formHtml = '';
-
+            var container = document.getElementById('auth-buttons-container');
+            var existing = document.getElementById('auth-form-container'); if (existing) existing.remove();
+            if (turnstileWidgetId !== null) { window.turnstile && window.turnstile.remove(turnstileWidgetId); turnstileWidgetId = null; }
+            var tid = 'turnstile-widget-' + Date.now();
+            var formHtml = '';
             if (mode === 'reset') {
-                formHtml = `
-                <div id="auth-form-container" style="width:100%; max-width:360px; margin:1rem auto; background:var(--color-bg-white); padding:1.5rem; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); text-align:left;">
-                    <h3 style="margin-bottom:1rem;">Reset Password</h3>
-                    <p style="font-size:0.9rem; margin-bottom:1rem; color:var(--color-text-muted);">Enter your email to receive a password reset link.</p>
-                    <form id="auth-form">
-                        <label style="display:block; margin-bottom:1.2rem; font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
-                        <div id="${turnstileContainerId}" style="margin-bottom: 1rem;"></div>
-                        <div style="display:flex; gap:0.5rem; justify-content:flex-end; flex-wrap:wrap;">
-                            <button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button>
-                            <button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">Send Reset Link</button>
-                        </div>
-                    </form>
-                    <p style="margin-top:0.8rem; font-size:0.85rem; text-align:center;"><a href="#" id="switch-to-signin">Back to Sign In</a></p>
-                </div>`;
+                formHtml = '<div id="auth-form-container" style="width:100%;max-width:360px;margin:1rem auto;background:var(--color-bg-white);padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);text-align:left;"><h3 style="margin-bottom:1rem;">Reset Password</h3><p style="font-size:0.9rem;margin-bottom:1rem;color:var(--color-text-muted);">Enter your email to receive a password reset link.</p><form id="auth-form"><label style="display:block;margin-bottom:1.2rem;font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-family:inherit;"></label><div id="' + tid + '" style="margin-bottom:1rem;"></div><div style="display:flex;gap:0.5rem;justify-content:flex-end;flex-wrap:wrap;"><button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button><button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">Send Reset Link</button></div></form><p style="margin-top:0.8rem;font-size:0.85rem;text-align:center;"><a href="#" id="switch-to-signin">Back to Sign In</a></p></div>';
             } else {
-                formHtml = `
-                <div id="auth-form-container" style="width:100%; max-width:360px; margin:1rem auto; background:var(--color-bg-white); padding:1.5rem; border-radius:var(--radius-lg); box-shadow:var(--shadow-md); text-align:left;">
-                    <h3 style="margin-bottom:1rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
-                    <form id="auth-form">
-                        <label style="display:block; margin-bottom:0.8rem; font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
-                        <label style="display:block; margin-bottom:1rem; font-size:0.9rem;">Password<input type="password" id="auth-password" required minlength="6" style="width:100%; padding:0.5rem; border:1px solid var(--color-border); border-radius:var(--radius-sm); font-family:inherit;"></label>
-                        <div id="${turnstileContainerId}" style="margin-bottom: 1rem;"></div>
-                        <div style="display:flex; gap:0.5rem; justify-content:flex-end; flex-wrap:wrap;">
-                            <button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button>
-                            <button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
-                        </div>
-                    </form>
-                    <p style="margin-top:0.8rem; font-size:0.85rem; text-align:center;">
-                        ${mode === 'signin' ? "Don't have an account? <a href='#' id='switch-to-signup'>Create one</a><br><a href='#' id='switch-to-reset'>Forgot password?</a>" 
-                          : "Already have an account? <a href='#' id='switch-to-signin'>Sign in</a>"}
-                    </p>
-                </div>`;
+                formHtml = '<div id="auth-form-container" style="width:100%;max-width:360px;margin:1rem auto;background:var(--color-bg-white);padding:1.5rem;border-radius:var(--radius-lg);box-shadow:var(--shadow-md);text-align:left;"><h3 style="margin-bottom:1rem;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</h3><form id="auth-form"><label style="display:block;margin-bottom:0.8rem;font-size:0.9rem;">Email<input type="email" id="auth-email" required style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-family:inherit;"></label><label style="display:block;margin-bottom:1rem;font-size:0.9rem;">Password<input type="password" id="auth-password" required minlength="6" style="width:100%;padding:0.5rem;border:1px solid var(--color-border);border-radius:var(--radius-sm);font-family:inherit;"></label><div id="' + tid + '" style="margin-bottom:1rem;"></div><div style="display:flex;gap:0.5rem;justify-content:flex-end;flex-wrap:wrap;"><button type="button" id="auth-cancel" class="btn-action btn-signin" style="padding:0.5rem 1.2rem;">Cancel</button><button type="submit" class="btn-action btn-create" style="padding:0.5rem 1.2rem;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</button></div></form><p style="margin-top:0.8rem;font-size:0.85rem;text-align:center;">' + (mode === 'signin' ? 'Don\'t have an account? <a href=\'#\' id=\'switch-to-signup\'>Create one</a><br><a href=\'#\' id=\'switch-to-reset\'>Forgot password?</a>' : 'Already have an account? <a href=\'#\' id=\'switch-to-signin\'>Sign in</a>') + '</p></div>';
             }
-
             container.insertAdjacentHTML('beforeend', formHtml);
-
-            let captchaToken = null;
-
-            setTimeout(() => {
+            var captchaToken = null;
+            setTimeout(function() {
                 if (window.turnstile) {
-                    turnstileWidgetId = window.turnstile.render(`#${turnstileContainerId}`, {
+                    turnstileWidgetId = window.turnstile.render('#' + tid, {
                         sitekey: TURNSTILE_SITE_KEY,
-                        callback: function(token) { captchaToken = token; },
-                        'expired-callback': function() { captchaToken = null; }
+                        callback: function(t) {
+                            captchaToken = t;
+                            lastTurnstileToken = t; // Store for backend verification on subsequent requests
+                        },
+                        'expired-callback': function() { captchaToken = null; lastTurnstileToken = null; }
                     });
-                } else {
-                    console.error('Turnstile script not loaded.');
                 }
             }, 100);
-
-            const form = document.getElementById('auth-form');
-            document.getElementById('auth-cancel').addEventListener('click', () => document.getElementById('auth-form-container')?.remove());
-
-            if (mode === 'signin') {
-                document.getElementById('switch-to-signup')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signup'); });
-                document.getElementById('switch-to-reset')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('reset'); });
-            } else if (mode === 'signup') {
-                document.getElementById('switch-to-signin')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signin'); });
-            } else if (mode === 'reset') {
-                document.getElementById('switch-to-signin')?.addEventListener('click', (e) => { e.preventDefault(); showAuthForm('signin'); });
-            }
-
-            form.addEventListener('submit', async (e) => {
+            var form = document.getElementById('auth-form');
+            document.getElementById('auth-cancel').addEventListener('click', function() { var f = document.getElementById('auth-form-container'); if (f) f.remove(); });
+            if (mode === 'signin') { document.getElementById('switch-to-signup') && document.getElementById('switch-to-signup').addEventListener('click', function(e) { e.preventDefault(); showAuthForm('signup'); }); document.getElementById('switch-to-reset') && document.getElementById('switch-to-reset').addEventListener('click', function(e) { e.preventDefault(); showAuthForm('reset'); }); }
+            else if (mode === 'signup') { document.getElementById('switch-to-signin') && document.getElementById('switch-to-signin').addEventListener('click', function(e) { e.preventDefault(); showAuthForm('signin'); }); }
+            else if (mode === 'reset') { document.getElementById('switch-to-signin') && document.getElementById('switch-to-signin').addEventListener('click', function(e) { e.preventDefault(); showAuthForm('signin'); }); }
+            form.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const email = document.getElementById('auth-email').value.trim();
-                const password = (mode !== 'reset') ? document.getElementById('auth-password').value : null;
-
-                if (!captchaToken) {
-                    alert('Please complete the CAPTCHA challenge.');
-                    return;
-                }
-
+                if (!captchaToken) { alert('Please complete the CAPTCHA challenge.'); return; }
+                var email = document.getElementById('auth-email').value.trim();
+                var password = (mode !== 'reset') ? document.getElementById('auth-password').value : null;
                 try {
-                    if (mode === 'signin') {
-                        const { error } = await supabase.auth.signInWithPassword({ email, password, options: { captchaToken } });
-                        if (error) throw error;
-                    } else if (mode === 'signup') {
-                        const { error } = await supabase.auth.signUp({ email, password, options: { captchaToken } });
-                        if (error) throw error;
-                        alert('Account created! Please check your email for confirmation (if required).');
-                    } else if (mode === 'reset') {
-                        const { error } = await supabase.auth.resetPasswordForEmail(email, { captchaToken });
-                        if (error) throw error;
-                        alert('Password reset link sent! Check your email.');
-                        document.getElementById('auth-form-container')?.remove();
-                    }
-                } catch (error) {
-                    alert(error.message);
-                }
-            });
-        }
-
-        async function checkMessageLimit(userId) {
-            const signinPrompt = document.getElementById('message-signin-required');
-            const form = document.getElementById('message-form');
-            const limitMsg = document.getElementById('message-limit-reached');
-            if (!userId) {
-                signinPrompt.style.display = 'block';
-                form.style.display = 'none';
-                limitMsg.style.display = 'none';
-                return;
-            }
-            signinPrompt.style.display = 'none';
-            form.style.display = 'flex';
-            limitMsg.style.display = 'none';
-            document.getElementById('message-status').innerText = '';
-        }
-
-        async function submitMessage(userId, messageText) {
-            if (!messageText || !messageText.trim()) throw new Error('Message cannot be empty.');
-            if (messageText.length > 2000) throw new Error('Message must be under 2000 characters.');
-            await apiFetch('/actions?action=send-message', {
-                method: 'POST',
-                body: JSON.stringify({ message: messageText.trim() })
+                    if (mode === 'signin') { var r = await supabase.auth.signInWithPassword({ email: email, password: password, options: { captchaToken: captchaToken } }); if (r.error) throw r.error; }
+                    else if (mode === 'signup') { var r2 = await supabase.auth.signUp({ email: email, password: password, options: { captchaToken: captchaToken } }); if (r2.error) throw r2.error; alert('Account created! Please check your email for confirmation (if required).'); }
+                    else if (mode === 'reset') { var r3 = await supabase.auth.resetPasswordForEmail(email, { captchaToken: captchaToken }); if (r3.error) throw r3.error; alert('Password reset link sent! Check your email.'); var fc = document.getElementById('auth-form-container'); if (fc) fc.remove(); }
+                } catch(err) { alert(err.message); }
             });
         }
 
         async function loadMessages() {
-            const session = await getSession();
+            var session = await getSession();
             if (!session) return;
             try {
-                const data = await apiFetch('/actions?action=get-messages');
-                const container = document.getElementById('messages-list');
-                if (!data.messages || data.messages.length === 0) {
-                    container.innerHTML = '<p style="color:var(--color-text-muted);">No messages yet.</p>';
-                } else {
-                    let html = '';
-                    data.messages.forEach(msg => {
-                        const date = msg.created_at ? new Date(msg.created_at).toLocaleString() : '';
-                        html += `<div style="background:var(--color-surface); padding:1rem; border-radius:var(--radius-md); margin-bottom:0.8rem;">
-                            <p><strong>From:</strong> ${escapeHtml(msg.user_id || 'Unknown')}</p>
-                            <p>${escapeHtml(msg.message)}</p>
-                            <small style="color:var(--color-text-muted);">${date}</small>
-                        </div>`;
-                    });
+                var data = await apiFetch('/actions?action=get-messages');
+                var container = document.getElementById('messages-list');
+                if (!data.messages || !data.messages.length) { container.innerHTML = '<p style="color:var(--color-text-muted);">No messages yet.</p>'; }
+                else {
+                    var html = '';
+                    data.messages.forEach(function(msg) { var date = msg.created_at ? new Date(msg.created_at).toLocaleString() : ''; html += '<div style="background:var(--color-surface);padding:1rem;border-radius:var(--radius-md);margin-bottom:0.8rem;"><p><strong>From:</strong> ' + escapeHtml(msg.user_id || 'Unknown') + '</p><p>' + escapeHtml(msg.message) + '</p><small style="color:var(--color-text-muted);">' + date + '</small></div>'; });
                     container.innerHTML = html;
                 }
                 document.getElementById('inbox-section').style.display = 'block';
-            } catch (err) {
-                console.error('Loading messages failed', err);
-            }
+            } catch(err) { console.error('Loading messages failed', err); }
         }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            initHeaderScroll();
-            initMobileNav();
-            loadSiteSections().finally(() => loadResources());
-            initAuth();
+        // ── Nav ──
+        function initMobileNav() {
+            var ha = document.getElementById('hamburger-action'), panel = document.getElementById('mobile-nav-panel'), overlay = document.getElementById('mobile-nav-overlay');
+            function open() { panel.classList.add('active'); overlay.classList.add('active'); ha.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
+            window.closeNav = function() { panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; };
+            ha.addEventListener('click', function() { panel.classList.contains('active') ? closeNav() : open(); });
+            overlay.addEventListener('click', closeNav);
+        }
+        function closeNav() { var panel = document.getElementById('mobile-nav-panel'), overlay = document.getElementById('mobile-nav-overlay'), ha = document.getElementById('hamburger-action'); panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; }
 
-            const messageForm = document.getElementById('message-form');
-            messageForm.addEventListener('submit', async (e) => {
+        // ── Init ──
+        document.addEventListener('DOMContentLoaded', function() {
+            document.getElementById('current-year').textContent = new Date().getFullYear();
+            window.addEventListener('scroll', function() { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
+            initMobileNav();
+            loadSiteSections().then(function() { return loadResources(); });
+            if (supabase) {
+                getSession().then(function(s) { updateAuthUI(s); });
+                supabase.auth.onAuthStateChange(function(_e, s) { updateAuthUI(s); });
+            }
+            var mf = document.getElementById('message-form');
+            mf.addEventListener('submit', async function(e) {
                 e.preventDefault();
-                const session = await getSession();
-                if (!session) {
-                    alert('You must be signed in to send a message.');
-                    return;
-                }
-                const messageText = document.getElementById('message-text').value.trim();
-                if (!messageText) return;
+                var session = await getSession();
+                if (!session) { alert('You must be signed in to send a message.'); return; }
+                var msg = document.getElementById('message-text').value.trim();
+                if (!msg) return;
+                // Send Turnstile token with the message
                 try {
-                    await submitMessage(session.user.id, messageText);
+                    var body = { message: msg };
+                    if (lastTurnstileToken) body.captchaToken = lastTurnstileToken;
+                    var res = await fetch(API_BASE + '/actions?action=send-message', {
+                        method: 'POST',
+                        headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
+                        body: JSON.stringify(body)
+                    });
+                    if (!res.ok) { var errData = await res.json().catch(function(){return{};}); throw new Error(errData.error || 'Failed'); }
                     document.getElementById('message-text').value = '';
                     document.getElementById('message-status').innerText = 'Message sent successfully!';
-                } catch (error) {
-                    document.getElementById('message-status').innerText = error.message;
-                    console.error(error);
-                }
+                } catch(err) { document.getElementById('message-status').innerText = err.message; }
             });
-
             document.getElementById('filter-submit').addEventListener('click', applyFilters);
-            document.getElementById('search-btn').addEventListener('click', () => {
-                const term = document.getElementById('search-input').value.trim().toLowerCase();
+            document.getElementById('search-btn').addEventListener('click', function() {
+                var term = document.getElementById('search-input').value.trim().toLowerCase();
                 if (!term) { loadResources(); return; }
                 document.getElementById('resources-section').scrollIntoView({ behavior: 'smooth' });
                 showSpinnerInContainer();
-                setTimeout(() => {
-                    const container = document.getElementById('resources-container');
+                setTimeout(function() {
+                    var container = document.getElementById('resources-container');
                     container.innerHTML = fullResourcesHTML;
-                    const cards = container.querySelectorAll('.resource-card');
-                    let anyVisible = false;
-                    cards.forEach(card => {
-                        const titleEl = card.querySelector('.resource-title');
-                        const descEl = card.querySelector('.resource-description');
-                        const titleText = titleEl ? titleEl.textContent.toLowerCase() : '';
-                        const descText = descEl ? descEl.textContent.toLowerCase() : '';
-                        const visible = titleText.includes(term) || descText.includes(term);
+                    var cards = container.querySelectorAll('.resource-card');
+                    var anyVisible = false;
+                    cards.forEach(function(card) {
+                        var titleEl = card.querySelector('.resource-title'), descEl = card.querySelector('.resource-description');
+                        var titleText = titleEl ? titleEl.textContent.toLowerCase() : '', descText = descEl ? descEl.textContent.toLowerCase() : '';
+                        var visible = titleText.includes(term) || descText.includes(term);
                         card.style.display = visible ? '' : 'none';
                         if (visible) anyVisible = true;
                     });
                     document.getElementById('no-results').hidden = anyVisible;
                 }, 500);
             });
-        });
-
-        function initMobileNav() {
-            const hamburgerAction = document.getElementById('hamburger-action');
-            const panel = document.getElementById('mobile-nav-panel');
-            const overlay = document.getElementById('mobile-nav-overlay');
-            function openNav() { panel.classList.add('active'); overlay.classList.add('active'); hamburgerAction.setAttribute('aria-expanded','true'); document.body.style.overflow = 'hidden'; }
-            window.closeNav = function() { panel.classList.remove('active'); overlay.classList.remove('active'); hamburgerAction.setAttribute('aria-expanded','false'); document.body.style.overflow = ''; };
-            hamburgerAction.addEventListener('click', () => { panel.classList.contains('active') ? closeNav() : openNav(); });
-            overlay.addEventListener('click', closeNav);
-            panel.querySelectorAll('a').forEach(link => link.addEventListener('click', closeNav));
-        }
-
-        function initHeaderScroll() {
-            const header = document.getElementById('site-header');
-            window.addEventListener('scroll', () => { header.classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
-        }
-
-        function initAuth() {
-            if (!supabase) return;
-            getSession().then((session) => updateAuthUI(session));
-            supabase.auth.onAuthStateChange((_event, session) => updateAuthUI(session));
-        }
-
-        function handleQuerySectionNavigation() {
-            const params = new URLSearchParams(window.location.search);
-            const sectionSlug = params.get('section');
-            if (sectionSlug) {
-                setTimeout(() => {
-                    let target = document.getElementById(sectionSlug);
-                    if (!target) {
-                        const headings = document.querySelectorAll('.descriptive-section h2, .resource-section .section-heading');
-                        for (const h of headings) {
-                            const slug = h.textContent.trim().replace(/\s+/g, '-').toLowerCase();
-                            if (slug === sectionSlug) { target = h.closest('section') || h; break; }
-                        }
-                    }
-                    if (target) target.scrollIntoView({ behavior: 'smooth' });
-                }, 600);
-            }
-        }
-
-        function showError(message) {
-            const heroContent = document.getElementById('hero-content');
-            if (heroContent) heroContent.innerHTML = `<div style="background: rgba(255,0,0,0.8); color: white; padding: 2rem; border-radius: 8px;"><h2>⚠️ Error</h2><p>${escapeHtml(message)}</p><p><small>Check console for details.</small></p></div>`;
-            const desktopNav = document.getElementById('desktop-nav-links');
-            if (desktopNav) desktopNav.innerHTML = '<li style="color:red;">Navigation unavailable</li>';
-            const mobilePanel = document.getElementById('mobile-nav-panel');
-            if (mobilePanel) mobilePanel.innerHTML = '<a href="#" style="color:red;">Menu unavailable</a>';
-            const footerInner = document.getElementById('footer-inner');
-            if (footerInner) footerInner.innerHTML = '<div class="footer-links" style="color:red;">Footer links unavailable</div>';
-        }
-
-        function closeNav() {
-            const panel = document.getElementById('mobile-nav-panel');
-            const overlay = document.getElementById('mobile-nav-overlay');
-            const hamburger = document.getElementById('hamburger-action');
-            panel.classList.remove('active');
-            overlay.classList.remove('active');
-            hamburger.setAttribute('aria-expanded', 'false');
-            document.body.style.overflow = '';
-        }
-
-        document.addEventListener('click', (e) => {
-            const link = e.target.closest('a[href^="#"]');
-            if (link && link.getAttribute('href') !== '#') {
-                e.preventDefault();
-                const target = document.getElementById(link.getAttribute('href').substring(1));
-                if (target) target.scrollIntoView({ behavior: 'smooth' });
-            }
-        });
-
-        function removeSpinner() { document.getElementById('loading-spinner')?.remove(); }
-        function showSpinnerInContainer() {
-            document.getElementById('resources-container').innerHTML = `<div class="spinner-wrapper" id="loading-spinner"><i class="fa-solid fa-dna spinner-icon"></i><div class="spinner-brand">BioLearn</div><p class="spinner-message">Searching resources…</p></div>`;
-        }
-
-        function groupResourcesBySection(resources) {
-            const groups = {};
-            resources.forEach(item => {
-                const section = (item.section_type || 'All Resources').trim();
-                if (!groups[section]) groups[section] = [];
-                if (!item.id) item.id = `gen-${Math.random().toString(36).substr(2, 9)}`;
-                groups[section].push(item);
+            document.addEventListener('click', function(e) {
+                var link = e.target.closest('a[href^="#"]');
+                if (link && link.getAttribute('href') !== '#') { e.preventDefault(); var target = document.getElementById(link.getAttribute('href').substring(1)); if (target) target.scrollIntoView({ behavior: 'smooth' }); }
             });
-            return Object.entries(groups).map(([name, items]) => ({ sectionName: name, items }));
-        }
-
-        function renderResources(groupedSections) {
-            const container = document.getElementById('resources-container');
-            const noResults = document.getElementById('no-results');
-            const allItems = groupedSections.flatMap(sec => sec.items);
-            if (!allItems.length) { container.innerHTML = ''; noResults.hidden = false; fullResourcesHTML = ''; return; }
-            noResults.hidden = true;
-            let html = '';
-            groupedSections.forEach(({ sectionName, items }) => {
-                html += `<div class="resource-section"><h2 class="section-heading">${escapeHtml(sectionName)}</h2><div class="resources-grid">`;
-                items.forEach(item => {
-                    const uniqueId = item.id;
-                    const fileUrl = safeUrl(item.file_url);
-                    const displayFileUrl = fileUrl && fileUrl !== '#' ? fileUrl : '#';
-                    html += `
-                    <div class="resource-card" id="res-${escapeHtml(String(uniqueId))}">
-                        <div class="resource-icon"><i class="fa-solid fa-file-pdf"></i></div>
-                       <a href="notes.html?id=${escapeHtml(String(uniqueId))}" class="resource-title">${escapeHtml(item.title || '')}</a>
-                        <p class="resource-description">${escapeHtml(item.description || '')}</p>
-                        <div class="resource-meta">
-                            <span><i class="fa-regular fa-user"></i> ${escapeHtml(item.author || 'Unknown')}</span>
-                            <span><i class="fa-regular fa-calendar"></i> ${escapeHtml(item.created_at || '')}</span>
-                            <span><i class="fa-regular fa-file"></i> ${escapeHtml(item.file_size || 'N/A')}</span>
-                        </div>
-                        <div class="resource-actions">
-                            <a href="${escapeHtml(displayFileUrl)}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
-                            <div class="share-buttons">
-                                <a href="#" class="share-btn" title="Share on Facebook"><i class="fa-brands fa-facebook-f"></i></a>
-                                <a href="#" class="share-btn" title="Share on Twitter"><i class="fa-brands fa-x-twitter"></i></a>
-                                <a href="#" class="share-btn" title="Share on WhatsApp"><i class="fa-brands fa-whatsapp"></i></a>
-                            </div>
-                        </div>
-                    </div>`;
-                });
-                html += `</div></div>`;
-            });
-            fullResourcesHTML = html;
-            removeSpinner();
-            container.innerHTML = html;
-        }
-
-        let fullResourcesHTML = '';
+        });
     </script>
 </body>
 </html>
