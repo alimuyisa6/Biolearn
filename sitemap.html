@@ -39,7 +39,6 @@
         .section-group h2 { font-family: 'Merriweather', serif; font-size: 1.3rem; color: var(--color-primary); margin-bottom: 0.8rem; padding-left: 0.6rem; border-left: 3px solid var(--color-secondary); }
         .sitemap-links { list-style: none; display: grid; grid-template-columns: 1fr 1fr; gap: 0.4rem; }
         @media (max-width: 500px) { .sitemap-links { grid-template-columns: 1fr; } }
-        .sitemap-links li { }
         .sitemap-links a { display: flex; align-items: center; gap: 0.6rem; padding: 0.6rem 0.8rem; text-decoration: none; color: var(--color-text); border-radius: var(--radius-lg); transition: background var(--transition-fast); font-size: 0.9rem; }
         .sitemap-links a:hover { background: var(--color-bg-white); box-shadow: var(--shadow-sm); }
         .sitemap-links a i { width: 1.2rem; text-align: center; color: var(--color-secondary); font-size: 0.85rem; }
@@ -104,16 +103,31 @@
     </footer>
 
     <script>
+        // ═══════════════════════════════════════════
+        // CENTRALIZED AUTH GUARD — BioLearn v2
+        // ═══════════════════════════════════════════
+        var AUTH = {
+            async getValidSession() {
+                if (!supabase) return null;
+                var cached = getCachedSession();
+                if (cached) { var exp = cached.expires_at || 0; var now = Math.floor(Date.now() / 1000); if (exp > now + 60) return cached; }
+                try { var _a = await supabase.auth.getSession(); var session = _a.data.session; if (session) { setCachedSession(session); return session; } } catch(e) {}
+                return null;
+            },
+            async logout() { sessionStorage.removeItem('biolearn_session'); if (supabase) await supabase.auth.signOut(); window.location.href = 'index.html'; }
+        };
+
+        // ── Config ──
         var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         var API_BASE = '/api';
         var pageCache = { siteSections: null };
 
-        function getCachedSession() { var c = sessionStorage.getItem('bl_sess'); if (c) { try { var p = JSON.parse(c); if (p.t && Date.now() - p.t < 300000) return p.s; } catch(e) {} } return null; }
-        function setCachedSession(s) { if (s) sessionStorage.setItem('bl_sess', JSON.stringify({s:s, t:Date.now()})); else sessionStorage.removeItem('bl_sess'); }
-        async function getSession() { var c = getCachedSession(); if (c) return c; if (!supabase) return null; var _a = await supabase.auth.getSession(), s = _a.data.session; setCachedSession(s); return s; }
-        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') sessionStorage.removeItem('bl_sess'); });
+        // ── Session caching ──
+        function getCachedSession() { var c = sessionStorage.getItem('biolearn_session'); if (c) { try { var p = JSON.parse(c); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} } return null; }
+        function setCachedSession(s) { if (s) sessionStorage.setItem('biolearn_session', JSON.stringify({session:s, timestamp:Date.now()})); else sessionStorage.removeItem('biolearn_session'); }
+        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') { sessionStorage.removeItem('biolearn_session'); } });
 
         function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
 
@@ -125,8 +139,6 @@
             var container = document.getElementById('sitemap-sections');
             var navRow = data.find(function(r){return r.section==='navigation';});
             var links = (navRow && navRow.data && navRow.data.links) ? navRow.data.links : [];
-
-            // Define categories
             var categories = [
                 { heading: 'Main', icon: 'fa-home', pages: ['Home'] },
                 { heading: 'Study Resources', icon: 'fa-book', pages: ['All Resources', 'Browse Notes'] },
@@ -136,19 +148,15 @@
                 { heading: 'About & Legal', icon: 'fa-circle-info', pages: ['About', 'Contact', 'Privacy Policy', 'Terms of Use'] },
                 { heading: 'More', icon: 'fa-sitemap', pages: ['Sitemap'] }
             ];
-
             var html = '';
             categories.forEach(function(cat) {
                 html += '<div class="section-group"><h2><i class="fa-solid ' + cat.icon + '" style="font-size:0.9rem;color:var(--color-secondary);margin-right:0.3rem;"></i> ' + cat.heading + '</h2><ul class="sitemap-links">';
                 cat.pages.forEach(function(pageName) {
                     var link = links.find(function(l) { return l.label === pageName; });
-                    if (link) {
-                        html += '<li><a href="' + escapeHtml(link.href) + '"><i class="fa-solid ' + escapeHtml(link.icon || 'fa-circle') + '"></i> ' + escapeHtml(link.label) + '</a></li>';
-                    }
+                    if (link) { html += '<li><a href="' + escapeHtml(link.href) + '"><i class="fa-solid ' + escapeHtml(link.icon || 'fa-circle') + '"></i> ' + escapeHtml(link.label) + '</a></li>'; }
                 });
                 html += '</ul></div>';
             });
-
             container.innerHTML = html;
         }
 

@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -517,13 +517,89 @@
     </footer>
 
     <script>
+        // ═══════════════════════════════════════════
+        // CENTRALIZED AUTH GUARD — BioLearn v2
+        // ═══════════════════════════════════════════
+        var AUTH = {
+            // Check if user is authenticated with valid session
+            async requireAuth() {
+                var session = await this.getValidSession();
+                if (!session) {
+                    alert('Please sign in to continue.');
+                    window.location.href = 'index.html#account-section';
+                    throw new Error('AUTH_REQUIRED');
+                }
+                return session;
+            },
+
+            // Get session and verify it's not expired or tampered
+            async getValidSession() {
+                if (!supabase) return null;
+                var cached = getCachedSession();
+                if (cached) {
+                    // Verify the cached session is still valid by checking expiry
+                    var exp = cached.expires_at || 0;
+                    var now = Math.floor(Date.now() / 1000);
+                    if (exp > now + 60) return cached;
+                }
+                // Fetch fresh from Supabase
+                try {
+                    var _a = await supabase.auth.getSession();
+                    var session = _a.data.session;
+                    if (session) {
+                        setCachedSession(session);
+                        // Store a browser fingerprint to prevent session theft
+                        this.storeFingerprint(session.user.id);
+                        return session;
+                    }
+                } catch(e) { console.error('[AUTH] Session validation failed:', e.message); }
+                return null;
+            },
+
+            // Browser fingerprint to bind session to this device
+            storeFingerprint(userId) {
+                var fp = navigator.userAgent + '|' + screen.width + '|' + navigator.language;
+                sessionStorage.setItem('biolearn_fp_' + userId, this.hashCode(fp).toString());
+            },
+
+            verifyFingerprint(userId) {
+                var stored = sessionStorage.getItem('biolearn_fp_' + userId);
+                if (!stored) return true; // First time, no fingerprint yet
+                var fp = navigator.userAgent + '|' + screen.width + '|' + navigator.language;
+                return this.hashCode(fp).toString() === stored;
+            },
+
+            hashCode(str) {
+                var hash = 0;
+                for (var i = 0; i < str.length; i++) {
+                    var char = str.charCodeAt(i);
+                    hash = ((hash << 5) - hash) + char;
+                    hash |= 0;
+                }
+                return Math.abs(hash);
+            },
+
+            // Hard logout — clears everything
+            async logout() {
+                sessionStorage.removeItem('biolearn_session');
+                sessionStorage.removeItem('biolearn_fp_' + (await this.getUserId()));
+                localStorage.removeItem('biolearn_settings');
+                if (supabase) await supabase.auth.signOut();
+                window.location.href = 'index.html';
+            },
+
+            async getUserId() {
+                var s = await this.getValidSession();
+                return s ? s.user.id : null;
+            }
+        };
+
         // ── Config ──
         var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         var TURNSTILE_SITE_KEY = '0x4AAAAAADJoKTgQ_HvcsSZ-';
         var turnstileWidgetId = null;
-        // Store the last valid Turnstile token — sent to backend with every sensitive action
         var lastTurnstileToken = null;
         var API_BASE = '/api';
         var pageCache = { siteSections: null, groupedResources: null };
@@ -532,26 +608,32 @@
         // ── Session caching ──
         function getCachedSession() { var c = sessionStorage.getItem('biolearn_session'); if (c) { try { var p = JSON.parse(c); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} } return null; }
         function setCachedSession(s) { if (s) sessionStorage.setItem('biolearn_session', JSON.stringify({session:s, timestamp:Date.now()})); else sessionStorage.removeItem('biolearn_session'); }
-        async function getSession() { var c = getCachedSession(); if (c) return c; if (!supabase) return null; var _a = await supabase.auth.getSession(), s = _a.data.session; setCachedSession(s); return s; }
-        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') sessionStorage.removeItem('biolearn_session'); });
+        async function getSession() { return AUTH.getValidSession(); }
+        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') { sessionStorage.removeItem('biolearn_session'); } });
 
         function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
         function safeUrl(u, f) { f = f || '#'; if (typeof u !== 'string') return f; var t = u.trim(); if (!t || /^(javascript|data|vbscript):/i.test(t) || /^\/\//.test(t)) return f; return t; }
         function sanitizeBackgroundUrl(u) { if (!u || typeof u !== 'string') return ''; var t = u.trim(); if (!/^https?:\/\//i.test(t)) return ''; return 'url("' + t.replace(/["\\]/g, '\\$&') + '")'; }
 
-        // ── API fetch — now sends Turnstile token on sensitive actions ──
+        // ── API fetch — sends JWT and Turnstile token ──
         async function apiFetch(endpoint, options) {
             options = options || {};
             var session = await getSession();
             var headers = Object.assign({'Content-Type': 'application/json'}, options.headers || {});
             if (session && session.access_token) headers['Authorization'] = 'Bearer ' + session.access_token;
-            // Attach Turnstile token to POST/PUT/DELETE requests for backend verification
             if (options.method && options.method !== 'GET' && lastTurnstileToken) {
                 var body = options.body ? JSON.parse(options.body) : {};
                 body.captchaToken = lastTurnstileToken;
                 options.body = JSON.stringify(body);
             }
             var res = await fetch(API_BASE + endpoint, { method: options.method || 'GET', headers: headers, body: options.body || null });
+            if (res.status === 401) {
+                // Session expired — clear and redirect
+                sessionStorage.removeItem('biolearn_session');
+                alert('Your session has expired. Please sign in again.');
+                window.location.href = 'index.html#account-section';
+                throw new Error('SESSION_EXPIRED');
+            }
             if (!res.ok) {
                 var err = {};
                 try { err = await res.json(); } catch(e) {}
@@ -691,7 +773,7 @@
             if (!c) return;
             if (session && session.user) {
                 c.innerHTML = '<span style="display:flex;align-items:center;gap:1rem;flex-wrap:wrap;justify-content:center;"><span style="color:var(--color-text-muted);font-size:0.9rem;">Signed in as <strong>' + escapeHtml(session.user.email) + '</strong></span><button class="btn-action btn-signin" id="sign-out-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button></span>';
-                document.getElementById('sign-out-btn') && document.getElementById('sign-out-btn').addEventListener('click', async function() { await supabase.auth.signOut(); });
+                document.getElementById('sign-out-btn') && document.getElementById('sign-out-btn').addEventListener('click', async function() { await AUTH.logout(); });
                 document.getElementById('message-signin-required').style.display = 'none';
                 document.getElementById('message-form').style.display = 'flex';
                 loadMessages();
@@ -736,10 +818,7 @@
                 if (window.turnstile) {
                     turnstileWidgetId = window.turnstile.render('#' + tid, {
                         sitekey: TURNSTILE_SITE_KEY,
-                        callback: function(t) {
-                            captchaToken = t;
-                            lastTurnstileToken = t; // Store for backend verification on subsequent requests
-                        },
+                        callback: function(t) { captchaToken = t; lastTurnstileToken = t; },
                         'expired-callback': function() { captchaToken = null; lastTurnstileToken = null; }
                     });
                 }
@@ -763,9 +842,8 @@
         }
 
         async function loadMessages() {
-            var session = await getSession();
-            if (!session) return;
             try {
+                var session = await AUTH.requireAuth();
                 var data = await apiFetch('/actions?action=get-messages');
                 var container = document.getElementById('messages-list');
                 if (!data.messages || !data.messages.length) { container.innerHTML = '<p style="color:var(--color-text-muted);">No messages yet.</p>'; }
@@ -775,7 +853,7 @@
                     container.innerHTML = html;
                 }
                 document.getElementById('inbox-section').style.display = 'block';
-            } catch(err) { console.error('Loading messages failed', err); }
+            } catch(err) { if (err.message !== 'AUTH_REQUIRED') console.error('Loading messages failed', err); }
         }
 
         // ── Nav ──
@@ -798,23 +876,21 @@
                 getSession().then(function(s) { updateAuthUI(s); });
                 supabase.auth.onAuthStateChange(function(_e, s) { updateAuthUI(s); });
             }
-             var mf = document.getElementById('message-form');
-mf.addEventListener('submit', async function(e) {
-    e.preventDefault();
-    var session = await getSession();
-    if (!session) { alert('You must be signed in to send a message.'); return; }
-    var msg = document.getElementById('message-text').value.trim();
-    if (!msg) return;
-    // Get fresh Turnstile token
-    if (turnstileWidgetId !== null && window.turnstile) {
-        window.turnstile.reset(turnstileWidgetId);
-        await new Promise(function(r) { setTimeout(r, 2000); });
-        lastTurnstileToken = window.turnstile.getResponse(turnstileWidgetId) || lastTurnstileToken;
-    }
-    try {
-        var body = { message: msg };
-        if (lastTurnstileToken) body.captchaToken = lastTurnstileToken;
-        var res = await fetch(API_BASE + '/actions?action=send-message', {
+            var mf = document.getElementById('message-form');
+            mf.addEventListener('submit', async function(e) {
+                e.preventDefault();
+                try {
+                    var session = await AUTH.requireAuth();
+                    var msg = document.getElementById('message-text').value.trim();
+                    if (!msg) return;
+                    if (turnstileWidgetId !== null && window.turnstile) {
+                        window.turnstile.reset(turnstileWidgetId);
+                        await new Promise(function(r) { setTimeout(r, 2000); });
+                        lastTurnstileToken = window.turnstile.getResponse(turnstileWidgetId) || lastTurnstileToken;
+                    }
+                    var body = { message: msg };
+                    if (lastTurnstileToken) body.captchaToken = lastTurnstileToken;
+                    var res = await fetch(API_BASE + '/actions?action=send-message', {
                         method: 'POST',
                         headers: { 'Content-Type': 'application/json', 'Authorization': 'Bearer ' + session.access_token },
                         body: JSON.stringify(body)
@@ -822,7 +898,7 @@ mf.addEventListener('submit', async function(e) {
                     if (!res.ok) { var errData = await res.json().catch(function(){return{};}); throw new Error(errData.error || 'Failed'); }
                     document.getElementById('message-text').value = '';
                     document.getElementById('message-status').innerText = 'Message sent successfully!';
-                } catch(err) { document.getElementById('message-status').innerText = err.message; }
+                } catch(err) { if (err.message !== 'AUTH_REQUIRED') document.getElementById('message-status').innerText = err.message; }
             });
             document.getElementById('filter-submit').addEventListener('click', applyFilters);
             document.getElementById('search-btn').addEventListener('click', function() {

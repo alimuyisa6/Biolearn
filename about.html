@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -104,73 +104,44 @@
     </footer>
 
     <script>
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
+        var AUTH = { async getValidSession() { if (!supabase) return null; var cached = getCachedSession(); if (cached) { var exp = cached.expires_at || 0; var now = Math.floor(Date.now() / 1000); if (exp > now + 60) return cached; } try { var _a = await supabase.auth.getSession(); var session = _a.data.session; if (session) { setCachedSession(session); return session; } } catch(e) {} return null; }, async logout() { sessionStorage.removeItem('biolearn_session'); if (supabase) await supabase.auth.signOut(); window.location.href = 'index.html'; } };
+        var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+        var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        var API_BASE = '/api';
+        var pageCache = { siteSections: null };
+        function getCachedSession() { var c = sessionStorage.getItem('biolearn_session'); if (c) { try { var p = JSON.parse(c); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} } return null; }
+        function setCachedSession(s) { if (s) sessionStorage.setItem('biolearn_session', JSON.stringify({session:s, timestamp:Date.now()})); else sessionStorage.removeItem('biolearn_session'); }
+        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') { sessionStorage.removeItem('biolearn_session'); } });
+        function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
+
+        async function loadSiteSections() { if (pageCache.siteSections) return pageCache.siteSections; var r = await fetch(API_BASE + '/data?action=site-sections'); if (!r.ok) throw new Error('HTTP ' + r.status); var d = await r.json(); pageCache.siteSections = d; return d; }
+        function loadFooter(data) { var fr = data.find(function(r){return r.section==='footer';}); if (fr&&fr.data&&fr.data.columns) { document.getElementById('footer-inner').innerHTML = fr.data.columns.map(function(col){ var h=escapeHtml(col.heading); var items=(col.items||[]).map(function(item){ var href=item.href?item.href.trim():'#'; var icon=item.icon?'<i class="'+escapeHtml(item.icon)+'"></i> ':''; return '<li><a href="'+escapeHtml(href)+'">'+icon+escapeHtml(item.label)+'</a></li>'; }).join(''); return '<div class="footer-links"><h4>'+h+'</h4><ul>'+items+'</ul></div>'; }).join(''); } }
 
         async function loadAboutContent() {
-            const container = document.getElementById('about-content');
+            var container = document.getElementById('about-content');
             try {
-                const res = await fetch('/api/data?action=site-sections');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if (!Array.isArray(data)) throw new Error('Invalid response');
-
-                // Footer
-                const footerRow = data.find(r => r.section === 'footer');
-                if (footerRow?.data?.columns) {
-                    document.getElementById('footer-inner').innerHTML = footerRow.data.columns.map(col => {
-                        const heading = escapeHtml(col.heading);
-                        const items = (col.items || []).map(item => {
-                            let href = item.href ? item.href.trim() : '#';
-                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                        }).join('');
-                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-                    }).join('');
-                }
-
-                // About content
-                const aboutRow = data.find(r => r.section === 'about');
-                if (!aboutRow?.data) {
-                    container.innerHTML = '<p style="text-align:center;padding:3rem;">About section not configured yet.</p>';
-                    return;
-                }
-                const d = aboutRow.data;
-
-                let html = `<div class="hero-mini"><h1>${escapeHtml(d.title)}</h1><p>${escapeHtml(d.subtitle)}</p></div>`;
-                html += `<div class="grid-2">`;
-                if (d.mission) html += `<div class="card"><h3>${escapeHtml(d.mission.heading)}</h3><p>${escapeHtml(d.mission.body)}</p>${d.mission.extra?`<p style="margin-top:1rem;">${escapeHtml(d.mission.extra)}</p>`:''}</div>`;
-                if (d.vision) html += `<div class="card"><h3>${escapeHtml(d.vision.heading)}</h3><p>${escapeHtml(d.vision.body)}</p>${d.vision.values?`<ul class="val-list">${d.vision.values.map(v=>`<li><i class="fa-solid fa-check-circle"></i> ${escapeHtml(v)}</li>`).join('')}</ul>`:''}</div>`;
-                html += `</div>`;
-                if (d.story) html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.story.heading)}</h3><p>${escapeHtml(d.story.body)}</p>${d.story.extra?`<p style="margin-top:1rem;">${escapeHtml(d.story.extra)}</p>`:''}</div>`;
-                if (d.team) html += `<div class="card" style="margin-bottom:2rem;"><h3>${escapeHtml(d.team.heading)}</h3><div class="team-grid">${(d.team.members||[]).map(m=>`<div class="team-card"><i class="${escapeHtml(m.icon)}"></i><h4>${escapeHtml(m.name)}</h4><p>${escapeHtml(m.role)}</p></div>`).join('')}</div></div>`;
-                if (d.cta) html += `<div class="cta-section"><h2>${escapeHtml(d.cta.heading)}</h2><p style="margin-bottom:1.5rem;font-size:1.1rem;">${escapeHtml(d.cta.body)}</p><a href="${escapeHtml(d.cta.button_link||'#')}" class="btn-outline-white"><i class="fa-solid fa-upload"></i> ${escapeHtml(d.cta.button_text)}</a></div>`;
-
+                var data = await loadSiteSections();
+                loadFooter(data);
+                var aboutData = data.find(function(r){return r.section==='about';});
+                if (!aboutData || !aboutData.data) { container.innerHTML = '<p style="text-align:center; padding:3rem; color:var(--color-text-muted);">About section not configured yet.</p>'; return; }
+                var d = aboutData.data;
+                var html = '';
+                html += '<div class="hero-mini"><h1>' + escapeHtml(d.title) + '</h1><p>' + escapeHtml(d.subtitle) + '</p></div>';
+                html += '<div class="grid-2">';
+                if (d.mission) html += '<div class="card"><h3>' + escapeHtml(d.mission.heading) + '</h3><p>' + escapeHtml(d.mission.body) + '</p>' + (d.mission.extra ? '<p style="margin-top:1rem;">' + escapeHtml(d.mission.extra) + '</p>' : '') + '</div>';
+                if (d.vision) html += '<div class="card"><h3>' + escapeHtml(d.vision.heading) + '</h3><p>' + escapeHtml(d.vision.body) + '</p>' + (d.vision.values ? '<ul class="val-list">' + d.vision.values.map(function(v){ return '<li><i class="fa-solid fa-check-circle"></i> ' + escapeHtml(v) + '</li>'; }).join('') + '</ul>' : '') + '</div>';
+                html += '</div>';
+                if (d.story) html += '<div class="card" style="margin-bottom:2rem;"><h3>' + escapeHtml(d.story.heading) + '</h3><p>' + escapeHtml(d.story.body) + '</p>' + (d.story.extra ? '<p style="margin-top:1rem;">' + escapeHtml(d.story.extra) + '</p>' : '') + '</div>';
+                if (d.team) html += '<div class="card" style="margin-bottom:2rem;"><h3>' + escapeHtml(d.team.heading) + '</h3><div class="team-grid">' + (d.team.members || []).map(function(m){ return '<div class="team-card"><i class="' + escapeHtml(m.icon) + '"></i><h4>' + escapeHtml(m.name) + '</h4><p>' + escapeHtml(m.role) + '</p></div>'; }).join('') + '</div></div>';
+                if (d.cta) html += '<div class="cta-section"><h2>' + escapeHtml(d.cta.heading) + '</h2><p style="margin-bottom:1.5rem; font-size:1.1rem;">' + escapeHtml(d.cta.body) + '</p><a href="' + escapeHtml(d.cta.button_link || '#') + '" class="btn-outline-white"><i class="fa-solid fa-upload"></i> ' + escapeHtml(d.cta.button_text) + '</a></div>';
                 container.innerHTML = html;
-            } catch (err) {
-                container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed: ${escapeHtml(err.message)}</p>`;
-            }
+            } catch(err) { container.innerHTML = '<p style="text-align:center; padding:3rem; color:red;">Failed to load about content: ' + escapeHtml(err.message) + '</p>'; }
         }
 
-        function initMobileNav() {
-            const h = document.getElementById('hamburger-action');
-            const p = document.getElementById('mobile-nav-panel');
-            const o = document.getElementById('mobile-nav-overlay');
-            function open() { p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
-            function close() { p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
-            h.addEventListener('click', () => p.classList.contains('active') ? close() : open());
-            o.addEventListener('click', close);
-            p.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-        }
+        function initMobileNav() { var h=document.getElementById('hamburger-action'), p=document.getElementById('mobile-nav-panel'), o=document.getElementById('mobile-nav-overlay'); function open(){ p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; } function close(){ p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; } h.addEventListener('click',function(){ p.classList.contains('active')?close():open(); }); o.addEventListener('click',close); p.querySelectorAll('a').forEach(function(a){ a.addEventListener('click',close); }); }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            initMobileNav();
-            window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
-            loadAboutContent();
-        });
+        document.addEventListener('DOMContentLoaded', function(){ document.getElementById('current-year').textContent = new Date().getFullYear(); initMobileNav(); window.addEventListener('scroll',function(){ document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10); },{passive:true}); loadAboutContent(); });
     </script>
 </body>
 </html>

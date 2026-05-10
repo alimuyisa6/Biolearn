@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
@@ -117,99 +117,77 @@
     </footer>
 
     <script>
-        let blogData = null;
+        // ═══════════════════════════════════════════
+        // CENTRALIZED AUTH GUARD — BioLearn v2
+        // ═══════════════════════════════════════════
+        var AUTH = {
+            async getValidSession() {
+                if (!supabase) return null;
+                var cached = getCachedSession();
+                if (cached) { var exp = cached.expires_at || 0; var now = Math.floor(Date.now() / 1000); if (exp > now + 60) return cached; }
+                try { var _a = await supabase.auth.getSession(); var session = _a.data.session; if (session) { setCachedSession(session); return session; } } catch(e) {}
+                return null;
+            },
+            async logout() { sessionStorage.removeItem('biolearn_session'); if (supabase) await supabase.auth.signOut(); window.location.href = 'index.html'; }
+        };
 
-        function escapeHtml(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text).replace(/[&<>"']/g, m => map[m]);
-        }
+        // ── Config ──
+        var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
+        var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
+        var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
+        var API_BASE = '/api';
+        var pageCache = { siteSections: null };
+        var blogData = null;
 
-        async function loadBlog() {
-            const container = document.getElementById('blog-content');
-            try {
-                const res = await fetch('/api/data?action=site-sections');
-                if (!res.ok) throw new Error(`HTTP ${res.status}`);
-                const data = await res.json();
-                if (!Array.isArray(data)) throw new Error('Invalid response');
+        // ── Session caching ──
+        function getCachedSession() { var c = sessionStorage.getItem('biolearn_session'); if (c) { try { var p = JSON.parse(c); if (p.timestamp && Date.now() - p.timestamp < 300000) return p.session; } catch(e) {} } return null; }
+        function setCachedSession(s) { if (s) sessionStorage.setItem('biolearn_session', JSON.stringify({session:s, timestamp:Date.now()})); else sessionStorage.removeItem('biolearn_session'); }
+        supabase && supabase.auth.onAuthStateChange(function(e) { if (e === 'SIGNED_OUT') { sessionStorage.removeItem('biolearn_session'); } });
 
-                // Footer
-                const footerRow = data.find(r => r.section === 'footer');
-                if (footerRow?.data?.columns) {
-                    document.getElementById('footer-inner').innerHTML = footerRow.data.columns.map(col => {
-                        const heading = escapeHtml(col.heading);
-                        const items = (col.items || []).map(item => {
-                            let href = item.href ? item.href.trim() : '#';
-                            let iconHtml = item.icon ? `<i class="${escapeHtml(item.icon)}"></i> ` : '';
-                            return `<li><a href="${escapeHtml(href)}">${iconHtml}${escapeHtml(item.label)}</a></li>`;
-                        }).join('');
-                        return `<div class="footer-links"><h4>${heading}</h4><ul>${items}</ul></div>`;
-                    }).join('');
-                }
+        function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
 
-                // Blog content
-                const blogRow = data.find(r => r.section === 'blog');
-                if (!blogRow?.data?.tabs?.length) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
-                blogData = blogRow.data;
-                const tabs = blogData.tabs;
+        async function loadSiteSections() { if (pageCache.siteSections) return pageCache.siteSections; var r = await fetch(API_BASE + '/data?action=site-sections'); if (!r.ok) throw new Error('HTTP ' + r.status); var d = await r.json(); pageCache.siteSections = d; return d; }
 
-                let html = `<div class="hero-mini"><h1>${escapeHtml(blogData.title||'Articles & Blog')}</h1><p>${escapeHtml(blogData.subtitle||'')}</p></div>`;
-                html += '<div class="tab-bar">';
-                tabs.forEach((tab, i) => { html += `<button class="tab-btn${i===0?' active':''}" data-tab="${escapeHtml(tab.id)}"><i class="fa-solid ${escapeHtml(tab.icon||'fa-newspaper')}"></i> ${escapeHtml(tab.label)}</button>`; });
-                html += '</div><div class="posts-grid" id="posts-grid"></div>';
-                html += '<div class="newsletter-card"><h3>Stay Updated</h3><p>Get the latest articles and study tips.</p><form class="newsletter-form"><input type="email" placeholder="Your email" required><button type="submit">Subscribe</button></form></div>';
-                container.innerHTML = html;
+        function loadFooter(data) { var fr = data.find(function(r){return r.section==='footer';}); if (fr&&fr.data&&fr.data.columns) { document.getElementById('footer-inner').innerHTML = fr.data.columns.map(function(col){ var h=escapeHtml(col.heading); var items=(col.items||[]).map(function(item){ var href=item.href?item.href.trim():'#'; var icon=item.icon?'<i class="'+escapeHtml(item.icon)+'"></i> ':''; return '<li><a href="'+escapeHtml(href)+'">'+icon+escapeHtml(item.label)+'</a></li>'; }).join(''); return '<div class="footer-links"><h4>'+h+'</h4><ul>'+items+'</ul></div>'; }).join(''); } }
 
-                renderPosts(tabs[0].posts);
-
-                document.querySelectorAll('.tab-btn').forEach(btn => {
-                    btn.addEventListener('click', () => {
-                        document.querySelectorAll('.tab-btn').forEach(b => b.classList.remove('active'));
-                        btn.classList.add('active');
-                        const tab = tabs.find(t => t.id === btn.dataset.tab);
-                        if (tab) renderPosts(tab.posts);
-                    });
+        function renderPage(data) {
+            var container = document.getElementById('blog-content');
+            var blogRow = data.find(function(r) { return r.section === 'blog'; });
+            if (!blogRow || !blogRow.data) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>Blog section not configured yet.</p></div>'; return; }
+            blogData = blogRow.data;
+            var tabs = blogData.tabs || [];
+            if (!tabs.length) { container.innerHTML = '<div class="empty-state"><i class="fa-solid fa-newspaper"></i><p>No posts available yet.</p></div>'; return; }
+            var html = '';
+            html += '<div class="hero-mini"><h1>' + escapeHtml(blogData.title || 'Articles & Blog') + '</h1><p>' + escapeHtml(blogData.subtitle || '') + '</p></div>';
+            html += '<div class="tab-bar">';
+            tabs.forEach(function(tab, i) { html += '<button class="tab-btn' + (i === 0 ? ' active' : '') + '" data-tab="' + escapeHtml(tab.id) + '"><i class="fa-solid ' + escapeHtml(tab.icon || 'fa-newspaper') + '"></i> ' + escapeHtml(tab.label) + '</button>'; });
+            html += '</div><div class="posts-grid" id="posts-grid"></div>';
+            html += '<div class="newsletter-card"><h3>Stay Updated</h3><p>Get the latest articles and study tips delivered to your inbox.</p><form class="newsletter-form" id="newsletter-form"><input type="email" placeholder="Your email address" required><button type="submit">Subscribe</button></form></div>';
+            container.innerHTML = html;
+            renderPosts(tabs[0].posts);
+            document.querySelectorAll('.tab-btn').forEach(function(btn) {
+                btn.addEventListener('click', function() {
+                    document.querySelectorAll('.tab-btn').forEach(function(b) { b.classList.remove('active'); });
+                    btn.classList.add('active');
+                    var tab = tabs.find(function(t) { return t.id === btn.dataset.tab; });
+                    if (tab) renderPosts(tab.posts);
                 });
-
-                document.querySelector('.newsletter-form').addEventListener('submit', (e) => {
-                    e.preventDefault(); alert('Thanks for subscribing!'); e.target.reset();
-                });
-            } catch (err) {
-                container.innerHTML = `<p style="text-align:center;padding:3rem;color:red;">Failed: ${escapeHtml(err.message)}</p>`;
-            }
+            });
+            document.getElementById('newsletter-form').addEventListener('submit', function(e) { e.preventDefault(); alert('Thank you for subscribing! (Newsletter feature coming soon)'); e.target.reset(); });
         }
 
         function renderPosts(posts) {
-            const grid = document.getElementById('posts-grid');
-            if (!posts?.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts yet.</p></div>'; return; }
-            grid.innerHTML = posts.map(post => `
-                <div class="post-card">
-                    <div class="post-image" style="background-image:url('${escapeHtml(post.image||'')}');"><span class="post-category">${escapeHtml(post.category||'General')}</span></div>
-                    <div class="post-body">
-                        <a href="${escapeHtml(post.link||'#')}" class="post-title">${escapeHtml(post.title)}</a>
-                        <p class="post-excerpt">${escapeHtml(post.excerpt||'')}</p>
-                        <div class="post-meta"><span><i class="fa-regular fa-user"></i> ${escapeHtml(post.author)}</span><span><i class="fa-regular fa-calendar"></i> ${escapeHtml(post.date)}</span><span><i class="fa-regular fa-clock"></i> ${escapeHtml(post.read_time)}</span></div>
-                        <a href="${escapeHtml(post.link||'#')}" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a>
-                    </div>
-                </div>`).join('');
+            var grid = document.getElementById('posts-grid');
+            if (!grid) return;
+            if (!posts || !posts.length) { grid.innerHTML = '<div class="empty-state" style="grid-column:1/-1;"><i class="fa-solid fa-newspaper"></i><p>No posts in this section yet.</p></div>'; return; }
+            grid.innerHTML = posts.map(function(post) {
+                return '<div class="post-card"><div class="post-image" style="background-image: url(\'' + escapeHtml(post.image || '') + '\');"><span class="post-category">' + escapeHtml(post.category || 'General') + '</span></div><div class="post-body"><a href="' + escapeHtml(post.link || '#') + '" class="post-title">' + escapeHtml(post.title) + '</a><p class="post-excerpt">' + escapeHtml(post.excerpt || '') + '</p><div class="post-meta"><span><i class="fa-regular fa-user"></i> ' + escapeHtml(post.author || 'Unknown') + '</span><span><i class="fa-regular fa-calendar"></i> ' + escapeHtml(post.date || '') + '</span><span><i class="fa-regular fa-clock"></i> ' + escapeHtml(post.read_time || '') + '</span></div><a href="' + escapeHtml(post.link || '#') + '" class="btn-read">Read More <i class="fa-solid fa-arrow-right"></i></a></div></div>';
+            }).join('');
         }
 
-        function initMobileNav() {
-            const h = document.getElementById('hamburger-action');
-            const p = document.getElementById('mobile-nav-panel');
-            const o = document.getElementById('mobile-nav-overlay');
-            function open() { p.classList.add('active'); o.classList.add('active'); h.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
-            function close() { p.classList.remove('active'); o.classList.remove('active'); h.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
-            h.addEventListener('click', () => p.classList.contains('active') ? close() : open());
-            o.addEventListener('click', close);
-            p.querySelectorAll('a').forEach(a => a.addEventListener('click', close));
-        }
+        function initMobileNav() { var ha=document.getElementById('hamburger-action'), panel=document.getElementById('mobile-nav-panel'), overlay=document.getElementById('mobile-nav-overlay'); function open(){ panel.classList.add('active'); overlay.classList.add('active'); ha.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; } function close(){ panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow=''; } ha.addEventListener('click',function(){ panel.classList.contains('active')?close():open(); }); overlay.addEventListener('click',close); panel.querySelectorAll('a').forEach(function(l){ l.addEventListener('click',close); }); }
 
-        document.addEventListener('DOMContentLoaded', () => {
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            initMobileNav();
-            window.addEventListener('scroll', () => { document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 10); }, { passive: true });
-            loadBlog();
-        });
+        document.addEventListener('DOMContentLoaded', async function(){ document.getElementById('current-year').textContent = new Date().getFullYear(); window.addEventListener('scroll',function(){ document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10); },{passive:true}); initMobileNav(); try { var data = await loadSiteSections(); loadFooter(data); renderPage(data); } catch(err) { document.getElementById('blog-content').innerHTML = '<p style="text-align:center;padding:3rem;color:red;">Failed to load: ' + escapeHtml(err.message) + '</p>'; } });
     </script>
 </body>
 </html>
