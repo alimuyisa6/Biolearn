@@ -1,10 +1,10 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Donate – Support BioLearn</title>
-    <meta name="description" content="Support BioLearn with crypto or mobile money. Help us keep biology education free for everyone.">
+    <meta name="description" content="Support BioLearn with crypto or mobile money.">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400..700&family=Merriweather:wght@400;700&display=swap" rel="stylesheet">
@@ -13,105 +13,101 @@
     <style>
         :root {
             --color-primary: #1a365d; --color-primary-light: #2a4a7f; --color-secondary: #3b82f6;
-            --color-accent: #60a5fa; --color-gold: #f59e0b; --color-gold-light: #fcd34d;
-            --color-surface: #f0f4f8; --color-bg-white: #ffffff; --color-text: #111827;
-            --color-text-muted: #6b7280; --color-border: #d1d5db; --color-success: #10b981;
-            --color-danger: #ef4444; --radius-sm: 0.5rem; --radius-md: 0.75rem;
-            --radius-lg: 1.25rem; --shadow-sm: 0 1px 2px rgba(0,0,0,0.04);
-            --shadow-md: 0 6px 18px rgba(0,0,0,0.06); --shadow-lg: 0 14px 32px rgba(0,0,0,0.08);
-            --transition-fast: 180ms ease; --max-width: 1200px; --header-height: 4.5rem;
+            --color-accent: #60a5fa; --color-gold: #f59e0b; --color-surface: #f0f4f8;
+            --color-bg-white: #ffffff; --color-text: #111827; --color-text-muted: #6b7280;
+            --color-border: #d1d5db; --color-success: #10b981; --color-danger: #ef4444;
+            --radius-sm: 0.5rem; --radius-md: 0.75rem; --radius-lg: 1rem;
+            --shadow-sm: 0 1px 2px rgba(0,0,0,0.04); --shadow-md: 0 6px 18px rgba(0,0,0,0.06);
+            --transition-fast: 180ms ease; --max-width: 900px; --header-height: 4.5rem;
         }
         * { box-sizing: border-box; margin: 0; padding: 0; }
-        html { scroll-behavior: smooth; font-size: 16px; -webkit-font-smoothing: antialiased; }
-        body { font-family: 'Inter', system-ui, -apple-system, sans-serif; background: var(--color-surface); color: var(--color-text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
+        html { scroll-behavior: smooth; font-size: 16px; }
+        body { font-family: 'Inter', system-ui, sans-serif; background: var(--color-surface); color: var(--color-text); line-height: 1.6; min-height: 100vh; display: flex; flex-direction: column; }
         .site-header { position: sticky; top: 0; z-index: 100; background: rgba(255,255,255,0.92); backdrop-filter: blur(16px); -webkit-backdrop-filter: blur(16px); border-bottom: 1px solid var(--color-border); height: var(--header-height); display: flex; align-items: center; }
         .site-header.scrolled { box-shadow: var(--shadow-md); }
-        .header-inner { width: 100%; max-width: var(--max-width); margin: 0 auto; padding: 0 1.8rem; display: flex; align-items: center; justify-content: space-between; gap: 1.2rem; }
-        .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 700; font-size: 1.3rem; font-family: 'Merriweather', serif; letter-spacing: -0.02em; color: var(--color-primary); background: linear-gradient(135deg, #1a365d, #3b82f6); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
-        .logo i { font-size: 1.4rem; color: var(--color-secondary); -webkit-text-fill-color: initial; background: none; }
-        .home-btn { background: var(--color-secondary); color: white; padding: 0.5rem 1.2rem; border-radius: 30px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: background var(--transition-fast); }
+        .header-inner { width: 100%; max-width: 1100px; margin: 0 auto; padding: 0 1.5rem; display: flex; align-items: center; justify-content: space-between; gap: 1rem; }
+        .logo { display: flex; align-items: center; gap: 0.5rem; text-decoration: none; font-weight: 700; font-size: 1.3rem; font-family: 'Merriweather', serif; color: var(--color-primary); }
+        .logo i { font-size: 1.4rem; color: var(--color-secondary); }
+        .home-btn { background: var(--color-secondary); color: white; padding: 0.45rem 1.1rem; border-radius: 30px; font-weight: 600; text-decoration: none; display: inline-flex; align-items: center; gap: 0.4rem; transition: background var(--transition-fast); font-size: 0.85rem; }
         .home-btn:hover { background: var(--color-primary); }
-        .hamburger-action { background: white; border: 2px solid var(--color-border); color: var(--color-primary); font-size: 1.3rem; padding: 0.7rem 1.6rem; border-radius: 30px; display: none; cursor: pointer; }
+        .hamburger-action { background: white; border: 2px solid var(--color-border); color: var(--color-primary); font-size: 1.2rem; padding: 0.6rem 1.2rem; border-radius: 30px; display: none; cursor: pointer; }
         .hamburger-action:hover { background: #e5e7eb; }
         @media (max-width: 768px) { .hamburger-action { display: inline-flex; } }
-        .main-content { max-width: 900px; margin: 0 auto; padding: 2rem 1.8rem; width: 100%; }
-        .hero-mini { text-align: center; padding: 2rem 0 2rem; }
-        .hero-mini h1 { font-family: 'Merriweather', serif; font-size: 2.6rem; color: var(--color-primary); margin-bottom: 0.8rem; }
-        .hero-mini p { font-size: 1rem; color: var(--color-text-muted); max-width: 500px; margin: 0 auto; }
-        .impact-bar { display: grid; grid-template-columns: repeat(3, 1fr); gap: 1.5rem; margin-bottom: 2rem; }
-        @media (max-width: 600px) { .impact-bar { grid-template-columns: 1fr; } }
-        .impact-item { background: var(--color-bg-white); border-radius: var(--radius-lg); padding: 1.5rem; text-align: center; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); }
-        .impact-item .num { font-size: 2.2rem; font-weight: 700; color: var(--color-primary); font-family: 'Merriweather', serif; }
-        .impact-item .label { font-size: 0.85rem; color: var(--color-text-muted); margin-top: 0.3rem; }
-        .goal-bar-wrap { background: var(--color-bg-white); border-radius: var(--radius-lg); padding: 1.5rem; box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); margin-bottom: 2rem; }
-        .goal-bar-wrap .goal-label { display: flex; justify-content: space-between; margin-bottom: 0.8rem; font-size: 0.9rem; color: var(--color-text-muted); }
-        .goal-bar-wrap .goal-label strong { color: var(--color-primary); }
-        .goal-bar { height: 12px; background: var(--color-surface); border-radius: 6px; overflow: hidden; }
-        .goal-fill { height: 100%; background: linear-gradient(90deg, var(--color-secondary), var(--color-accent)); border-radius: 6px; transition: width 0.6s ease; }
-        .tab-bar { display: flex; gap: 0.5rem; margin-bottom: 2rem; border-bottom: 2px solid var(--color-border); flex-wrap: wrap; justify-content: center; }
-        .tab-btn { padding: 0.7rem 2rem; border: none; background: transparent; font-weight: 600; font-size: 1rem; color: var(--color-text-muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: inherit; transition: all var(--transition-fast); display: inline-flex; align-items: center; gap: 0.5rem; }
+        .main-content { max-width: var(--max-width); margin: 0 auto; padding: 2rem 1.5rem; width: 100%; flex: 1; }
+        .hero-mini { text-align: center; padding: 1.5rem 0 1rem; }
+        .hero-mini h1 { font-family: 'Merriweather', serif; font-size: 2.2rem; color: var(--color-primary); margin-bottom: 0.4rem; }
+        .hero-mini p { font-size: 0.95rem; color: var(--color-text-muted); max-width: 450px; margin: 0 auto; }
+        .goal-bar-wrap { margin-bottom: 2rem; }
+        .goal-bar-wrap .goal-label { display: flex; justify-content: space-between; margin-bottom: 0.5rem; font-size: 0.85rem; color: var(--color-text-muted); }
+        .goal-bar { height: 10px; background: var(--color-border); border-radius: 5px; overflow: hidden; }
+        .goal-fill { height: 100%; background: linear-gradient(90deg, var(--color-secondary), var(--color-accent)); border-radius: 5px; transition: width 0.6s ease; }
+        .tab-bar { display: flex; gap: 0.3rem; margin-bottom: 1.5rem; border-bottom: 2px solid var(--color-border); justify-content: center; }
+        .tab-btn { padding: 0.6rem 1.8rem; border: none; background: transparent; font-weight: 600; font-size: 0.9rem; color: var(--color-text-muted); cursor: pointer; border-bottom: 3px solid transparent; margin-bottom: -2px; font-family: inherit; transition: all var(--transition-fast); display: inline-flex; align-items: center; gap: 0.4rem; }
         .tab-btn:hover { color: var(--color-primary); }
         .tab-btn.active { color: var(--color-primary); border-bottom-color: var(--color-secondary); }
-        .card { background: var(--color-bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); padding: 2rem; margin-bottom: 2rem; }
-        .crypto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 2rem; }
-        @media (max-width: 700px) { .crypto-grid { grid-template-columns: 1fr; } }
-        .coin-selector { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1.5rem; }
-        .coin-chip { padding: 0.5rem 1.2rem; border: 2px solid var(--color-border); border-radius: 2rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; background: transparent; transition: all var(--transition-fast); font-family: inherit; display: inline-flex; align-items: center; gap: 0.4rem; }
+        .card { background: var(--color-bg-white); border-radius: var(--radius-lg); box-shadow: var(--shadow-sm); border: 1px solid var(--color-border); padding: 1.5rem; margin-bottom: 1.5rem; }
+        .card h3 { font-family: 'Merriweather', serif; font-size: 1.2rem; color: var(--color-primary); margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
+        .crypto-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; }
+        @media (max-width: 650px) { .crypto-grid { grid-template-columns: 1fr; } }
+        .coin-selector { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 1rem; }
+        .coin-chip { padding: 0.45rem 1rem; border: 2px solid var(--color-border); border-radius: 2rem; font-weight: 600; font-size: 0.8rem; cursor: pointer; background: transparent; transition: all var(--transition-fast); font-family: inherit; display: inline-flex; align-items: center; gap: 0.3rem; }
         .coin-chip:hover { border-color: var(--color-secondary); }
         .coin-chip.active { background: var(--color-secondary); color: white; border-color: var(--color-secondary); }
-        .amount-buttons { display: flex; flex-wrap: wrap; gap: 0.5rem; margin-bottom: 1rem; }
-        .amount-btn { padding: 0.6rem 1.4rem; border: 2px solid var(--color-border); border-radius: 2rem; font-weight: 600; font-size: 0.9rem; cursor: pointer; background: transparent; transition: all var(--transition-fast); font-family: inherit; }
+        .amount-buttons { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-bottom: 0.8rem; }
+        .amount-btn { padding: 0.5rem 1.1rem; border: 2px solid var(--color-border); border-radius: 2rem; font-weight: 600; font-size: 0.85rem; cursor: pointer; background: transparent; transition: all var(--transition-fast); font-family: inherit; }
         .amount-btn:hover { border-color: var(--color-secondary); }
         .amount-btn.active { background: var(--color-primary); color: white; border-color: var(--color-primary); }
-        .amount-input { width: 120px; padding: 0.6rem 1rem; border: 2px solid var(--color-border); border-radius: 2rem; font-size: 0.9rem; font-family: inherit; text-align: center; }
+        .amount-input { width: 110px; padding: 0.5rem 0.8rem; border: 2px solid var(--color-border); border-radius: 2rem; font-size: 0.85rem; font-family: inherit; text-align: center; }
         .amount-input:focus { border-color: var(--color-secondary); outline: none; }
-        .btn-donate { display: inline-flex; align-items: center; gap: 0.5rem; background: var(--color-gold); color: white; padding: 0.85rem 2.5rem; border-radius: 30px; font-weight: 700; font-size: 1rem; border: none; cursor: pointer; transition: background var(--transition-fast); font-family: inherit; }
+        .btn-donate { display: inline-flex; align-items: center; gap: 0.4rem; background: var(--color-gold); color: white; padding: 0.7rem 1.8rem; border-radius: 30px; font-weight: 700; font-size: 0.9rem; border: none; cursor: pointer; font-family: inherit; transition: background var(--transition-fast); }
         .btn-donate:hover { background: #d97706; }
         .btn-donate:disabled { opacity: 0.5; cursor: not-allowed; }
         .qr-container { text-align: center; }
-        .qr-box { background: white; border: 2px solid var(--color-border); border-radius: var(--radius-md); padding: 1rem; display: inline-block; margin-bottom: 1rem; }
-        .wallet-address { background: var(--color-surface); padding: 0.8rem 1rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.8rem; word-break: break-all; color: var(--color-text); margin-bottom: 0.5rem; text-align: center; }
-        .btn-copy { background: var(--color-surface); border: 1px solid var(--color-border); padding: 0.5rem 1.2rem; border-radius: 2rem; font-size: 0.8rem; cursor: pointer; font-family: inherit; transition: all var(--transition-fast); }
-        .btn-copy:hover { background: var(--color-border); }
-        .payment-status { text-align: center; padding: 1rem; font-size: 0.9rem; margin-top: 1rem; }
-        .momo-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 1.5rem; margin-bottom: 1.5rem; }
+        .qr-box { display: inline-block; margin-bottom: 0.8rem; }
+        .wallet-address { background: var(--color-surface); padding: 0.6rem 0.8rem; border-radius: var(--radius-sm); font-family: monospace; font-size: 0.75rem; word-break: break-all; color: var(--color-text); margin-bottom: 0.4rem; }
+        .btn-copy { background: transparent; border: 1px solid var(--color-border); padding: 0.4rem 1rem; border-radius: 2rem; font-size: 0.78rem; cursor: pointer; font-family: inherit; transition: all var(--transition-fast); }
+        .btn-copy:hover { background: var(--color-surface); }
+        .payment-status { text-align: center; padding: 0.8rem 0 0; font-size: 0.85rem; }
+        .momo-numbers { display: grid; grid-template-columns: 1fr 1fr; gap: 1rem; margin-bottom: 1.5rem; }
         @media (max-width: 500px) { .momo-numbers { grid-template-columns: 1fr; } }
-        .momo-card { background: var(--color-surface); border-radius: var(--radius-md); padding: 1.5rem; text-align: center; }
-        .momo-card h4 { font-size: 1rem; color: var(--color-primary); margin-bottom: 0.5rem; }
-        .momo-card .number { font-size: 1.3rem; font-weight: 700; color: var(--color-primary); font-family: monospace; margin-bottom: 0.3rem; }
-        .momo-card .name { font-size: 0.85rem; color: var(--color-text-muted); margin-bottom: 1rem; }
-        .form-group { margin-bottom: 1rem; }
-        .form-group label { display: block; margin-bottom: 0.3rem; font-weight: 600; font-size: 0.9rem; }
-        .form-group input { width: 100%; padding: 0.7rem 1rem; border: 1px solid var(--color-border); border-radius: var(--radius-md); font-family: inherit; font-size: 0.9rem; }
+        .momo-card { background: var(--color-surface); border-radius: var(--radius-md); padding: 1.2rem; text-align: center; }
+        .momo-card h4 { font-size: 0.9rem; color: var(--color-primary); margin-bottom: 0.3rem; }
+        .momo-card .number { font-size: 1.2rem; font-weight: 700; color: var(--color-primary); font-family: monospace; }
+        .momo-card .name { font-size: 0.8rem; color: var(--color-text-muted); margin: 0.3rem 0 0.8rem; }
+        .form-inline { display: flex; flex-wrap: wrap; gap: 0.8rem; align-items: flex-end; }
+        .form-group { flex: 1; min-width: 140px; }
+        .form-group label { display: block; margin-bottom: 0.2rem; font-weight: 600; font-size: 0.8rem; }
+        .form-group input { width: 100%; padding: 0.55rem 0.8rem; border: 1px solid var(--color-border); border-radius: var(--radius-sm); font-family: inherit; font-size: 0.85rem; }
         .form-group input:focus { border-color: var(--color-secondary); outline: none; }
-        .btn-submit { background: linear-gradient(135deg, #1a365d, #3b82f6); color: white; border: none; padding: 0.75rem 2rem; border-radius: 30px; font-weight: 600; font-size: 1rem; cursor: pointer; display: inline-flex; align-items: center; gap: 0.5rem; font-family: inherit; transition: background var(--transition-fast); }
-        .btn-submit:hover { background: linear-gradient(135deg, #2a4a7f, #60a5fa); }
+        .btn-submit { background: var(--color-primary); color: white; border: none; padding: 0.6rem 1.4rem; border-radius: 30px; font-weight: 600; font-size: 0.85rem; cursor: pointer; font-family: inherit; white-space: nowrap; transition: background var(--transition-fast); }
+        .btn-submit:hover { background: var(--color-primary-light); }
         .btn-submit:disabled { opacity: 0.5; cursor: not-allowed; }
-        .donor-item { display: flex; align-items: center; gap: 1rem; padding: 1rem; border-bottom: 1px solid var(--color-border); }
+        .status-text { font-size: 0.85rem; margin-top: 0.5rem; }
+        .donor-item { display: flex; align-items: center; gap: 0.8rem; padding: 0.7rem 0; border-bottom: 1px solid var(--color-border); }
         .donor-item:last-child { border-bottom: none; }
-        .donor-avatar { width: 44px; height: 44px; border-radius: 50%; background: var(--color-secondary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 1rem; flex-shrink: 0; }
-        .donor-info { flex: 1; } .donor-info strong { display: block; color: var(--color-primary); } .donor-info span { font-size: 0.8rem; color: var(--color-text-muted); }
-        .donor-amount { font-weight: 700; color: var(--color-success); font-size: 1rem; }
-        .spinner-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1rem; text-align: center; }
-        .spinner-icon { font-size: 3rem; color: var(--color-secondary); animation: spin 1.2s linear infinite; margin-bottom: 0.8rem; }
+        .donor-avatar { width: 38px; height: 38px; border-radius: 50%; background: var(--color-secondary); color: white; display: flex; align-items: center; justify-content: center; font-weight: 700; font-size: 0.9rem; flex-shrink: 0; }
+        .donor-info { flex: 1; } .donor-info strong { display: block; font-size: 0.9rem; color: var(--color-primary); } .donor-info span { font-size: 0.75rem; color: var(--color-text-muted); }
+        .donor-amount { font-weight: 700; color: var(--color-success); font-size: 0.9rem; }
+        .spinner-wrapper { display: flex; flex-direction: column; align-items: center; justify-content: center; padding: 3rem 1rem; }
+        .spinner-icon { font-size: 2.5rem; color: var(--color-secondary); animation: spin 1.2s linear infinite; margin-bottom: 0.6rem; }
         @keyframes spin { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
         @keyframes fadePulse { 0%, 100% { opacity: 0.4; } 50% { opacity: 1; } }
-        .spinner-message { font-size: 0.95rem; color: var(--color-text-muted); animation: fadePulse 2s ease-in-out infinite; }
-        .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; max-height: 100vh; overflow-y: auto; background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s ease, opacity 0.35s ease; }
+        .spinner-message { font-size: 0.9rem; color: var(--color-text-muted); animation: fadePulse 2s ease-in-out infinite; }
+        .mobile-nav-panel { position: fixed; top: 0; right: -280px; width: 260px; max-height: 100vh; overflow-y: auto; background: white; box-shadow: -8px 0 30px rgba(0,0,0,0.12); z-index: 200; padding: 4rem 1.5rem 2rem; display: flex; flex-direction: column; gap: 0.6rem; opacity: 0; transition: right 0.3s ease, opacity 0.3s ease; }
         .mobile-nav-panel.active { right: 0; opacity: 1; }
-        .mobile-nav-panel a { display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--color-text); font-weight: 500; border-radius: 30px; transition: background var(--transition-fast); }
+        .mobile-nav-panel a { display: block; padding: 0.7rem 1rem; text-decoration: none; color: var(--color-text); font-weight: 500; border-radius: 30px; transition: background var(--transition-fast); }
         .mobile-nav-panel a:hover { background: var(--color-surface); }
-        .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
+        .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.35); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.3s ease; }
         .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
-        .site-footer { background: #0f172a; color: #cbd5e1; padding: 3rem 1.5rem 2rem; margin-top: auto; }
-        .footer-intro { max-width: var(--max-width); margin: 0 auto 2rem; text-align: center; padding-bottom: 1.5rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
-        .footer-intro .logo { color: #f0f9ff; background: none; -webkit-text-fill-color: #f0f9ff; margin-bottom: 0.6rem; }
-        .footer-inner { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2.5rem; }
-        .footer-links h4 { font-weight: 700; font-size: 0.85rem; text-transform: uppercase; letter-spacing: 0.06em; color: #f0f9ff; margin-bottom: 1rem; }
-        .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.9rem; transition: color var(--transition-fast); }
+        .site-footer { background: #0f172a; color: #cbd5e1; padding: 2rem 1.5rem; margin-top: auto; }
+        .footer-intro { max-width: 900px; margin: 0 auto 1.5rem; text-align: center; padding-bottom: 1rem; border-bottom: 1px solid rgba(255,255,255,0.08); }
+        .footer-intro .logo { color: #f0f9ff; background: none; -webkit-text-fill-color: #f0f9ff; }
+        .footer-inner { max-width: 900px; margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(180px, 1fr)); gap: 2rem; }
+        .footer-links h4 { font-weight: 700; font-size: 0.8rem; text-transform: uppercase; letter-spacing: 0.05em; color: #f0f9ff; margin-bottom: 0.8rem; }
+        .footer-links ul { list-style: none; display: flex; flex-direction: column; gap: 0.4rem; }
+        .footer-links a { color: #94a3b8; text-decoration: none; font-size: 0.85rem; transition: color var(--transition-fast); }
         .footer-links a:hover { color: var(--color-gold-light); }
-        .footer-bottom { max-width: var(--max-width); margin: 2.5rem auto 0; padding-top: 1.5rem; border-top: 1px solid rgba(255,255,255,0.08); text-align: center; font-size: 0.82rem; color: #64748b; }
+        .footer-bottom { text-align: center; font-size: 0.78rem; color: #64748b; padding-top: 1rem; border-top: 1px solid rgba(255,255,255,0.08); max-width: 900px; margin: 1.5rem auto 0; }
     </style>
 </head>
 <body>
@@ -119,14 +115,14 @@
         <div class="header-inner">
             <a href="index.html" class="logo"><i class="fa-solid fa-dna"></i> BioLearn</a>
             <a href="index.html" class="home-btn"><i class="fa-solid fa-home"></i> Home</a>
-            <button class="hamburger-action" id="hamburger-action" aria-label="Open menu"><i class="fa-solid fa-bars"></i></button>
+            <button class="hamburger-action" id="hamburger-action" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
         </div>
     </header>
 
     <main class="main-content" id="donate-content">
         <div class="spinner-wrapper" id="loading-spinner">
             <i class="fa-solid fa-dna spinner-icon"></i>
-            <p class="spinner-message">Loading donate page...</p>
+            <p class="spinner-message">Loading...</p>
         </div>
     </main>
 
@@ -145,7 +141,7 @@
     <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
 
     <footer class="site-footer" id="site-footer">
-        <div class="footer-intro"><a href="index.html" class="logo"><i class="fa-solid fa-dna"></i> BioLearn</a><p>Free biology notes for O‑ and A‑Level learners.</p></div>
+        <div class="footer-intro"><a href="index.html" class="logo"><i class="fa-solid fa-dna"></i> BioLearn</a><p style="color:#cbd5e1;font-size:0.9rem;">Free biology notes for O‑ and A‑Level learners.</p></div>
         <div class="footer-inner" id="footer-inner"></div>
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> BioLearn. All rights reserved.</p></div>
     </footer>
@@ -157,11 +153,7 @@
         var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
         var API_BASE = '/api';
         var pageCache = { siteSections: null };
-        var currentTab = 'crypto';
-        var selectedCoin = 'usdt';
-        var selectedAmount = 10;
-        var paymentId = null;
-        var paymentPoll = null;
+        var currentTab = 'crypto', selectedCoin = '', selectedAmount = 10, paymentId = null, paymentPoll = null, availableCoins = [];
 
         // ── Session ──
         function getCachedSession() { var c = sessionStorage.getItem('bl_sess'); if (c) { try { var p = JSON.parse(c); if (p.t && Date.now() - p.t < 300000) return p.s; } catch(e) {} } return null; }
@@ -171,47 +163,55 @@
 
         function escapeHtml(t) { var m = {'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#039;'}; return String(t).replace(/[&<>"']/g, function(c){return m[c];}); }
         function removeSpinner() { var s = document.getElementById('loading-spinner'); if (s) s.remove(); }
-        function clearPayment() { paymentId = null; if (paymentPoll) { clearInterval(paymentPoll); paymentPoll = null; } resetQr(); resetStatus('crypto-status'); }
-        function resetQr() { var qp = document.getElementById('qr-panel'); if (qp) qp.innerHTML = '<p style="color:var(--color-text-muted);">Select coin and amount, then click Pay.</p>'; }
-        function resetStatus(id) { var el = document.getElementById(id); if (el) el.innerHTML = ''; }
+        function clearPayment() { paymentId = null; if (paymentPoll) { clearInterval(paymentPoll); paymentPoll = null; } var qp = document.getElementById('qr-panel'); if (qp) qp.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;">Choose coin and amount, then tap Pay.</p>'; var st = document.getElementById('crypto-status'); if (st) st.innerHTML = ''; }
 
         // ── Site sections ──
         async function loadSiteSections() { if (pageCache.siteSections) return pageCache.siteSections; var r = await fetch(API_BASE + '/data?action=site-sections'); if (!r.ok) throw new Error('HTTP ' + r.status); var d = await r.json(); pageCache.siteSections = d; return d; }
         function loadFooter(data) { var fr = data.find(function(r){return r.section==='footer';}); if (fr&&fr.data&&fr.data.columns) { document.getElementById('footer-inner').innerHTML = fr.data.columns.map(function(col){ var h=escapeHtml(col.heading); var items=(col.items||[]).map(function(item){ var href=item.href?item.href.trim():'#'; var icon=item.icon?'<i class="'+escapeHtml(item.icon)+'"></i> ':''; return '<li><a href="'+escapeHtml(href)+'">'+icon+escapeHtml(item.label)+'</a></li>'; }).join(''); return '<div class="footer-links"><h4>'+h+'</h4><ul>'+items+'</ul></div>'; }).join(''); } }
 
+        // ── Fetch available coins ──
+        async function fetchAvailableCoins() {
+            try { var r = await fetch(API_BASE + '/donate?action=currencies'); if (!r.ok) return ['usdttrc20','btc','eth']; var d = await r.json(); var popular = ['btc','eth','usdttrc20','usdterc20','usdt','bnbmainnet','trx','ltc','doge','usdc']; return (d.currencies||[]).filter(function(c){return popular.indexOf(c)!==-1;}); }
+            catch(e) { return ['usdttrc20','btc','eth']; }
+        }
+
         // ── Render ──
-        function renderPage(data) {
+        async function renderPage(data) {
             var c = document.getElementById('donate-content');
             var dr = data.find(function(r){return r.section==='donate';});
             if (!dr||!dr.data) { removeSpinner(); c.innerHTML = '<div class="hero-mini"><h1>Donate</h1><p>Page being set up.</p></div>'; return; }
             var d = dr.data;
+            availableCoins = await fetchAvailableCoins();
+            selectedCoin = availableCoins[0] || 'usdttrc20';
+
             var html = '';
-            html += '<div class="hero-mini"><h1>' + escapeHtml(d.title||'Support BioLearn') + '</h1><p>' + escapeHtml(d.subtitle||'') + '</p></div>';
-            if (d.impact_items&&d.impact_items.length) { html += '<div class="impact-bar">'; d.impact_items.forEach(function(i){ html += '<div class="impact-item"><div class="num">'+escapeHtml(i.value)+'</div><div class="label">'+escapeHtml(i.label)+'</div></div>'; }); html += '</div>'; }
+            html += '<div class="hero-mini"><h1>' + escapeHtml(d.title||'Support BioLearn') + '</h1><p>' + escapeHtml(d.subtitle||'Help keep biology education free.') + '</p></div>';
             var goal = d.goal_amount||500000, raised = d.raised_amount||0, pct = Math.min(Math.round((raised/goal)*100),100);
-            html += '<div class="goal-bar-wrap"><div class="goal-label"><span>Monthly Goal</span><strong>'+pct+'%</strong></div><div class="goal-bar"><div class="goal-fill" style="width:'+pct+'%;"></div></div><div class="goal-label" style="margin-top:0.5rem;"><span>UGX '+raised.toLocaleString()+'</span><span>UGX '+goal.toLocaleString()+'</span></div></div>';
+            html += '<div class="goal-bar-wrap"><div class="goal-label"><span>Monthly Goal</span><strong>'+pct+'%</strong></div><div class="goal-bar"><div class="goal-fill" style="width:'+pct+'%;"></div></div><div class="goal-label" style="margin-top:0.3rem;"><span>UGX '+raised.toLocaleString()+'</span><span>UGX '+goal.toLocaleString()+'</span></div></div>';
             html += '<div class="tab-bar"><button class="tab-btn active" data-tab="crypto"><i class="fa-brands fa-bitcoin"></i> Crypto</button><button class="tab-btn" data-tab="momo"><i class="fa-solid fa-mobile-screen"></i> Mobile Money</button></div>';
-            // Crypto panel
-            html += '<div id="crypto-panel" class="card crypto-grid"><div><h3 style="color:var(--color-primary);margin-bottom:1rem;">Donate with Crypto</h3>';
+
+            // Crypto card
+            var coinLabels = { btc:'BTC', eth:'ETH', usdttrc20:'USDT', usdterc20:'USDT', usdt:'USDT', bnbmainnet:'BNB', trx:'TRX', ltc:'LTC', doge:'DOGE', usdc:'USDC' };
+            var coinIcons = { btc:'fa-brands fa-bitcoin', eth:'fa-brands fa-ethereum', usdttrc20:'fa-dollar-sign', usdterc20:'fa-dollar-sign', usdt:'fa-dollar-sign', bnbmainnet:'fa-brands fa-bootstrap', trx:'fa-brands fa-tron', ltc:'fa-brands fa-litecoin', doge:'fa-brands fa-dog', usdc:'fa-dollar-sign' };
+            html += '<div class="card crypto-grid" id="crypto-panel"><div><h3><i class="fa-brands fa-bitcoin" style="color:var(--color-gold);"></i> Crypto Donation</h3>';
             html += '<div class="coin-selector">';
-            [{id:'usdt',label:'USDT',icon:'fa-dollar-sign'},{id:'btc',label:'BTC',icon:'fa-brands fa-bitcoin'},{id:'eth',label:'ETH',icon:'fa-brands fa-ethereum'},{id:'bnb',label:'BNB',icon:'fa-brands fa-bootstrap'}].forEach(function(cc){ html += '<button class="coin-chip'+(cc.id===selectedCoin?' active':'')+'" data-coin="'+cc.id+'"><i class="fa-solid '+cc.icon+'"></i> '+cc.label+'</button>'; });
-            html += '</div>';
-            html += '<p style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:0.5rem;">Amount (USD)</p><div class="amount-buttons">';
+            availableCoins.forEach(function(cc){ html += '<button class="coin-chip'+(cc===selectedCoin?' active':'')+'" data-coin="'+cc+'"><i class="fa-solid '+(coinIcons[cc]||'fa-coins')+'"></i> '+(coinLabels[cc]||cc.toUpperCase())+'</button>'; });
+            html += '</div><p style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:0.4rem;">Amount (USD)</p><div class="amount-buttons">';
             (d.suggested_amounts||[5,10,25,50,100]).forEach(function(a){ html += '<button class="amount-btn'+(a===selectedAmount?' active':'')+'" data-amount="'+a+'">$'+a+'</button>'; });
             html += '<input type="number" class="amount-input" id="custom-amount" placeholder="Custom" min="1" value="'+selectedAmount+'"></div>';
             html += '<button class="btn-donate" id="crypto-donate-btn"><i class="fa-brands fa-bitcoin"></i> Pay with Crypto</button>';
-            html += '<div class="payment-status" id="crypto-status"></div></div>';
-            html += '<div class="qr-container" id="qr-panel"><p style="color:var(--color-text-muted);">Select coin and amount, then click Pay.</p></div></div>';
-            // MoMo panel
+            html += '<div class="payment-status" id="crypto-status"></div></div><div class="qr-container" id="qr-panel"><p style="color:var(--color-text-muted);text-align:center;">Choose coin and amount, then tap Pay.</p></div></div>';
+
+            // MoMo
             var momo = d.momo||{};
-            html += '<div id="momo-panel" class="card" style="display:none;"><h3 style="color:var(--color-primary);margin-bottom:1rem;">Donate via Mobile Money</h3><div class="momo-numbers">';
-            if (momo.mtn) html += '<div class="momo-card"><h4><i class="fa-solid fa-mobile-screen"></i> MTN MoMo</h4><div class="number">'+escapeHtml(momo.mtn.number||'')+'</div><div class="name">'+escapeHtml(momo.mtn.name||'')+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(momo.mtn.number||'')+'\',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>';
-            if (momo.airtel) html += '<div class="momo-card"><h4><i class="fa-solid fa-mobile-screen"></i> Airtel</h4><div class="number">'+escapeHtml(momo.airtel.number||'')+'</div><div class="name">'+escapeHtml(momo.airtel.name||'')+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(momo.airtel.number||'')+'\',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>';
-            html += '</div><p style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:1rem;">After sending, confirm your donation:</p>';
-            html += '<form id="momo-form"><div class="form-group"><label>Name (optional)</label><input type="text" id="momo-name" placeholder="Your name"></div><div class="form-group"><label>Amount (UGX) *</label><input type="number" id="momo-amount" placeholder="e.g. 10000" required></div><div class="form-group"><label>Transaction ID *</label><input type="text" id="momo-txid" placeholder="From MoMo SMS" required></div><button type="submit" class="btn-submit" id="momo-submit-btn"><i class="fa-solid fa-paper-plane"></i> Confirm Donation</button></form>';
-            html += '<div class="payment-status" id="momo-status"></div></div>';
+            html += '<div id="momo-panel" style="display:none;"><h3 style="font-family:Merriweather,serif;font-size:1.2rem;color:var(--color-primary);margin-bottom:1rem;"><i class="fa-solid fa-mobile-screen" style="color:var(--color-gold);"></i> Mobile Money</h3><div class="momo-numbers">';
+            if (momo.mtn) html += '<div class="momo-card"><h4>MTN MoMo</h4><div class="number">'+escapeHtml(momo.mtn.number||'')+'</div><div class="name">'+escapeHtml(momo.mtn.name||'')+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(momo.mtn.number||'')+'\',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>';
+            if (momo.airtel) html += '<div class="momo-card"><h4>Airtel Money</h4><div class="number">'+escapeHtml(momo.airtel.number||'')+'</div><div class="name">'+escapeHtml(momo.airtel.name||'')+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(momo.airtel.number||'')+'\',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>';
+            html += '</div><p style="font-size:0.85rem;color:var(--color-text-muted);margin-bottom:0.8rem;">After sending, fill in your transaction details:</p><div class="form-inline"><div class="form-group"><label>Name (optional)</label><input type="text" id="momo-name" placeholder="Your name"></div><div class="form-group"><label>Amount (UGX) *</label><input type="number" id="momo-amount" placeholder="e.g. 10000" required></div><div class="form-group"><label>Transaction ID *</label><input type="text" id="momo-txid" placeholder="From MoMo SMS" required></div><button type="submit" class="btn-submit" id="momo-submit-btn"><i class="fa-solid fa-paper-plane"></i> Confirm</button></div><div class="status-text" id="momo-status"></div></div>';
+
             // Donor wall
-            html += '<div class="card"><h3 style="color:var(--color-primary);margin-bottom:1rem;"><i class="fa-solid fa-heart" style="color:var(--color-gold);"></i> Recent Supporters</h3><div id="donor-list"><p style="color:var(--color-text-muted);">Loading...</p></div></div>';
+            html += '<div class="card"><h3><i class="fa-solid fa-heart" style="color:var(--color-gold);"></i> Recent Supporters</h3><div id="donor-list"><p style="color:var(--color-text-muted);">Loading...</p></div></div>';
+
             removeSpinner(); c.innerHTML = html;
             bindEvents();
             loadDonors();
@@ -219,45 +219,41 @@
 
         function bindEvents() {
             document.querySelectorAll('.tab-btn').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.tab-btn').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); currentTab=b.dataset.tab; document.getElementById('crypto-panel').style.display=currentTab==='crypto'?'':'none'; document.getElementById('momo-panel').style.display=currentTab==='momo'?'':'none'; }); });
-            document.querySelectorAll('.coin-chip').forEach(function(c){ c.addEventListener('click',function(){ document.querySelectorAll('.coin-chip').forEach(function(x){x.classList.remove('active');}); c.classList.add('active'); selectedCoin=c.dataset.coin; clearPayment(); }); });
+            document.querySelectorAll('.coin-chip').forEach(function(ch){ ch.addEventListener('click',function(){ document.querySelectorAll('.coin-chip').forEach(function(x){x.classList.remove('active');}); ch.classList.add('active'); selectedCoin=ch.dataset.coin; clearPayment(); }); });
             document.querySelectorAll('.amount-btn').forEach(function(b){ b.addEventListener('click',function(){ document.querySelectorAll('.amount-btn').forEach(function(x){x.classList.remove('active');}); b.classList.add('active'); selectedAmount=parseInt(b.dataset.amount); document.getElementById('custom-amount').value=selectedAmount; clearPayment(); }); });
             var ci = document.getElementById('custom-amount'); if (ci) ci.addEventListener('change',function(){ selectedAmount=parseFloat(this.value)||10; document.querySelectorAll('.amount-btn').forEach(function(x){x.classList.remove('active');}); clearPayment(); });
             var cdb = document.getElementById('crypto-donate-btn'); if (cdb) cdb.addEventListener('click', handleCryptoDonate);
-            var mf = document.getElementById('momo-form'); if (mf) mf.addEventListener('submit', function(e){ e.preventDefault(); handleMomoSubmit(); });
+            var msb = document.getElementById('momo-submit-btn'); if (msb) msb.addEventListener('click', function(e){ e.preventDefault(); handleMomoSubmit(); });
         }
 
         // ── Crypto ──
         async function handleCryptoDonate() {
             var btn = document.getElementById('crypto-donate-btn'), st = document.getElementById('crypto-status');
-            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating invoice...'; st.innerHTML = '';
+            btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...'; st.innerHTML = '';
             try {
-                var res = await fetch(API_BASE + '/donate', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: selectedAmount, pay_currency: selectedCoin }) });
+                var res = await fetch(API_BASE + '/donate?action=create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: selectedAmount, pay_currency: selectedCoin }) });
                 if (!res.ok) { var e = await res.json(); throw new Error(e.error||'Failed'); }
                 var inv = await res.json();
                 var qp = document.getElementById('qr-panel');
-                qp.innerHTML = '<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=180x180&data='+encodeURIComponent(inv.pay_address)+'" alt="QR" width="180" height="180"></div><div class="wallet-address">'+escapeHtml(inv.pay_address)+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(inv.pay_address)+'\',this)"><i class="fa-regular fa-copy"></i> Copy Address</button><p style="font-size:0.8rem;color:var(--color-text-muted);margin-top:0.5rem;">Send <strong>'+inv.pay_amount+' '+inv.pay_currency.toUpperCase()+'</strong></p>';
-                st.innerHTML = '<span class="pending"><i class="fa-solid fa-clock"></i> Waiting for payment...</span>';
+                qp.innerHTML = '<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data='+encodeURIComponent(inv.pay_address)+'" alt="QR" width="170" height="170"></div><div class="wallet-address">'+escapeHtml(inv.pay_address)+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(inv.pay_address)+'\',this)"><i class="fa-regular fa-copy"></i> Copy Address</button><p style="font-size:0.78rem;color:var(--color-text-muted);margin-top:0.4rem;">Send <strong>'+inv.pay_amount+' '+inv.pay_currency.toUpperCase()+'</strong></p>';
+                st.innerHTML = '<span style="color:var(--color-gold);"><i class="fa-solid fa-clock"></i> Waiting for payment...</span>';
                 btn.innerHTML = '<i class="fa-solid fa-clock"></i> Awaiting payment...';
                 paymentId = inv.invoice_id;
                 if (paymentPoll) clearInterval(paymentPoll);
                 paymentPoll = setInterval(async function() {
                     try {
-                        var cr = await fetch(API_BASE + '/donate-status?id=' + paymentId);
+                        var cr = await fetch(API_BASE + '/donate?action=status&id=' + paymentId);
                         if (!cr.ok) return;
                         var cd = await cr.json();
                         if (cd.status === 'finished' || cd.status === 'confirmed') {
                             clearInterval(paymentPoll); paymentPoll = null;
-                            st.innerHTML = '<span class="success"><i class="fa-solid fa-circle-check"></i> Confirmed! Thank you!</span>';
+                            st.innerHTML = '<span style="color:var(--color-success);"><i class="fa-solid fa-circle-check"></i> Confirmed! Thank you!</span>';
                             btn.innerHTML = '<i class="fa-solid fa-check"></i> Received!'; btn.disabled = true;
-                            qp.innerHTML = '<div style="text-align:center;font-size:4rem;">🎉</div><p style="text-align:center;color:var(--color-success);">Thank you for your support!</p>';
+                            qp.innerHTML = '<div style="text-align:center;font-size:3rem;">🎉</div><p style="text-align:center;color:var(--color-success);">Thank you!</p>';
                             loadDonors();
-                        } else if (cd.status === 'expired') {
-                            clearInterval(paymentPoll); paymentPoll = null;
-                            st.innerHTML = '<span style="color:var(--color-danger);">Invoice expired. Please try again.</span>';
-                            btn.disabled = false; btn.innerHTML = '<i class="fa-brands fa-bitcoin"></i> Pay with Crypto';
                         }
                     } catch(e) {}
-                }, 10000);
+                }, 15000);
             } catch(err) {
                 st.innerHTML = '<span style="color:var(--color-danger);">'+escapeHtml(err.message)+'</span>';
                 btn.disabled = false; btn.innerHTML = '<i class="fa-brands fa-bitcoin"></i> Pay with Crypto';
@@ -270,20 +266,19 @@
             var name = document.getElementById('momo-name').value.trim();
             var amount = document.getElementById('momo-amount').value.trim();
             var txid = document.getElementById('momo-txid').value.trim();
-            if (!amount || !txid) { st.innerHTML = '<span style="color:var(--color-danger);">Fill amount and transaction ID.</span>'; return; }
+            if (!amount || !txid) { st.innerHTML = '<span style="color:var(--color-danger);">Amount and Transaction ID required.</span>'; return; }
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
             try {
-                var res = await fetch(API_BASE + '/actions?action=submit-resource', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title: 'Donation: '+(name||'Anonymous')+' - UGX '+amount, description: 'MoMo donation. TxID: '+txid+'. Amount: UGX '+amount, author: name||'Anonymous', level: 'Donation', category: 'Donation', tag: 'momo-donation', file_url: '', file_size: amount+' UGX' }) });
+                var res = await fetch(API_BASE + '/actions?action=submit-resource', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ title: 'Donation: '+(name||'Anonymous')+' - UGX '+amount, description: 'MoMo TxID: '+txid+' | Amount: UGX '+amount, author: name||'Anonymous', level: 'Donation', category: 'Donation', tag: 'momo-donation', file_url: '', file_size: amount+' UGX' }) });
                 if (!res.ok) throw new Error('Submission failed');
-                st.innerHTML = '<span class="success"><i class="fa-solid fa-circle-check"></i> Thank you! Your donation will be confirmed shortly.</span>';
-                document.getElementById('momo-form').reset();
+                st.innerHTML = '<span style="color:var(--color-success);"><i class="fa-solid fa-circle-check"></i> Thank you! Donation will be confirmed shortly.</span>';
+                document.getElementById('momo-name').value = ''; document.getElementById('momo-amount').value = ''; document.getElementById('momo-txid').value = '';
                 loadDonors();
-            } catch(err) {
-                st.innerHTML = '<span style="color:var(--color-danger);">'+escapeHtml(err.message)+'</span>';
-            } finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Confirm Donation'; }
+            } catch(err) { st.innerHTML = '<span style="color:var(--color-danger);">'+escapeHtml(err.message)+'</span>'; }
+            finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Confirm'; }
         }
 
-        // ── Donors ──
+        // ── Donor wall ──
         async function loadDonors() {
             var list = document.getElementById('donor-list'); if (!list) return;
             try {
@@ -291,11 +286,12 @@
                 var d = await r.json();
                 var dr = d.find(function(x){return x.section==='donors';});
                 var donors = (dr&&dr.data&&dr.data.donors) ? dr.data.donors : [];
-                if (!donors.length) { list.innerHTML = '<p style="color:var(--color-text-muted);">No donors yet. Be the first!</p>'; return; }
+                if (!donors.length) { list.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;">Be the first supporter!</p>'; return; }
                 list.innerHTML = donors.map(function(dn){ return '<div class="donor-item"><div class="donor-avatar">'+(dn.name||'A').charAt(0).toUpperCase()+'</div><div class="donor-info"><strong>'+escapeHtml(dn.name||'Anonymous')+'</strong><span>'+escapeHtml(dn.date||'')+'</span></div><div class="donor-amount">'+escapeHtml(dn.amount||'')+'</div></div>'; }).join('');
-            } catch(e) { list.innerHTML = '<p style="color:var(--color-text-muted);">Unable to load donors.</p>'; }
+            } catch(e) { list.innerHTML = '<p style="color:var(--color-text-muted);">Unable to load.</p>'; }
         }
 
+        // ── Utils ──
         window.copyText = function(text, btn) {
             if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); }); }
             else { var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed';ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); }
@@ -314,7 +310,7 @@
             document.getElementById('current-year').textContent = new Date().getFullYear();
             window.addEventListener('scroll',function(){ document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10); },{passive:true});
             initMobileNav();
-            try { var data = await loadSiteSections(); loadFooter(data); renderPage(data); }
+            try { var data = await loadSiteSections(); loadFooter(data); await renderPage(data); }
             catch(err) { removeSpinner(); document.getElementById('donate-content').innerHTML = '<div class="hero-mini"><h1>Donate</h1><p>Unable to load page.</p></div>'; }
         });
     </script>
