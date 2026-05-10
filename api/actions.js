@@ -1,96 +1,126 @@
- import { createClient } from '@supabase/supabase-js';
+ process.noDeprecation = true;
+import { createClient } from '@supabase/supabase-js';
 
-async function getUser(req) {
-  const authHeader = req.headers.authorization;
-  if (!authHeader?.startsWith('Bearer ')) return null;
-  const token = authHeader.split('Bearer ')[1];
-  const supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
-  const { data: { user }, error } = await supabase.auth.getUser(token);
-  if (error || !user) return null;
-  return { user, supabase };
+// Rate limiter
+var rateMap = new Map();
+function rateLimit(req, res, max) {
+  max = max || 10;
+  var ip = req.headers['x-forwarded-for'] || req.socket?.remoteAddress || 'unknown';
+  var now = Date.now();
+  var entry = rateMap.get(ip) || { count: 0, reset: now + 60000 };
+  if (now > entry.reset) { entry = { count: 0, reset: now + 60000 }; }
+  entry.count++;
+  rateMap.set(ip, entry);
+  res.setHeader('X-RateLimit-Remaining', Math.max(0, max - entry.count));
+  if (entry.count > max) { res.status(429).json({ error: 'Too many requests. Try again in a minute.' }); return false; }
+  return true;
+}
+
+var ALLOWED_ORIGIN = process.env.VERCEL_URL ? 'https://' + process.env.VERCEL_URL : '*';
+
+// Authenticate user from Bearer token
+async function authenticate(req, res) {
+  var auth = req.headers.authorization;
+  if (!auth || !auth.startsWith('Bearer ')) { res.status(401).json({ error: 'Authentication required' }); return null; }
+  var token = auth.split('Bearer ')[1];
+  if (!token || token.length > 2000) { res.status(401).json({ error: 'Invalid token' }); return null; }
+  var supabase = createClient(process.env.SUPABASE_URL, process.env.SUPABASE_SERVICE_ROLE_KEY);
+  var { data: { user }, error } = await supabase.auth.getUser(token);
+  if (error || !user) { res.status(401).json({ error: 'Invalid or expired token' }); return null; }
+  return { user: user, supabase: supabase };
+}
+
+// Sanitize string input
+function sanitize(str, maxLen) {
+  if (typeof str !== 'string') return '';
+  str = str.replace(/<[^>]*>/g, '').trim();
+  return str.substring(0, maxLen || 2000);
 }
 
 export default async function handler(req, res) {
-  const action = req.query.action;
+  res.setHeader('Access-Control-Allow-Origin', ALLOWED_ORIGIN);
+  res.setHeader('Access-Control-Allow-Methods', 'GET, POST, OPTIONS');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization');
+  if (req.method === 'OPTIONS') return res.status(204).end();
 
-  // POST /api/actions?action=send-message
+  var action = req.query.action;
+
+  // POST send-message — rate limited: 1 per IP per 24h
   if (req.method === 'POST' && action === 'send-message') {
-    const auth = await getUser(req);
-    if (!auth) return res.status(401).json({ error: 'Invalid token' });
-    const { user, supabase } = auth;
+    if (!rateLimit(req, res, 1)) return; // 1 per window
+    var auth = await authenticate(req, res);
+    if (!auth) return;
 
-    const { message } = req.body;
-    if (!message?.trim()) return res.status(400).json({ error: 'Message required' });
-    if (message.length > 2000) return res.status(400).json({ error: 'Message too long' });
+    var message = sanitize(req.body?.message, 2000);
+    if (!message) return res.status(400).json({ error: 'Message required' });
 
-    // Rate limit (24h)
-    const { data: recent } = await supabase
+    // Check 24h limit per user
+    var { data: recent } = await auth.supabase
       .from('site_sections')
-      .select('data')
+      .select('created_at')
       .eq('section', 'message')
-      .eq('data->>user_id', user.id)
+      .eq('data->>user_id', auth.user.id)
       .order('created_at', { ascending: false })
       .limit(1);
-    if (recent?.length) {
-      const diff = (Date.now() - new Date(recent[0].data.created_at)) / 36e5;
-      if (diff < 24) return res.status(429).json({ error: 'Rate limited' });
+    if (recent && recent.length) {
+      var diff = (Date.now() - new Date(recent[0].created_at).getTime()) / 36e5;
+      if (diff < 24) return res.status(429).json({ error: 'One message per 24 hours. Please wait ' + Math.ceil(24 - diff) + ' hours.' });
     }
 
-    const { error } = await supabase.from('site_sections').insert({
+    var { error } = await auth.supabase.from('site_sections').insert({
       section: 'message',
-      data: { user_id: user.id, message: message.trim(), created_at: new Date().toISOString() }
+      data: { user_id: auth.user.id, message: message, created_at: new Date().toISOString() }
     });
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: 'Failed to send message' });
     return res.status(201).json({ success: true });
   }
 
-  // POST /api/actions?action=submit-resource
+  // POST submit-resource — rate limited: 5 per IP per minute
   if (req.method === 'POST' && action === 'submit-resource') {
-    const auth = await getUser(req);
-    if (!auth) return res.status(401).json({ error: 'Invalid token' });
-    const { user, supabase } = auth;
+    if (!rateLimit(req, res, 5)) return;
+    var auth = await authenticate(req, res);
+    if (!auth) return;
 
-    const { title, description, author, level, category, tag, file_url, file_size } = req.body;
-    if (!title?.trim() || !description?.trim()) return res.status(400).json({ error: 'Title and description required' });
-    if (file_url && !/^https?:\/\//.test(file_url)) return res.status(400).json({ error: 'Invalid file URL' });
+    var title = sanitize(req.body?.title, 200);
+    var description = sanitize(req.body?.description, 2000);
+    if (!title || !description) return res.status(400).json({ error: 'Title and description required' });
 
-    const { error } = await supabase.from('resource_submissions').insert({
-      title: title.trim(), description: description.trim(), author: author?.trim() || null,
-      level: level || null, category: category || null, tag: tag || null,
-      file_url: file_url || null, file_size: file_size || null,
-      submitted_by: user.id, status: 'pending'
+    var author = sanitize(req.body?.author, 100);
+    var level = ['O-Level', 'A-Level'].indexOf(req.body?.level) !== -1 ? req.body.level : null;
+    var category = sanitize(req.body?.category, 100);
+    var tag = sanitize(req.body?.tag, 200);
+    var fileUrl = sanitize(req.body?.file_url, 500);
+    var fileSize = sanitize(req.body?.file_size, 50);
+
+    // Validate URL if provided
+    if (fileUrl && !/^https?:\/\//.test(fileUrl)) return res.status(400).json({ error: 'Invalid file URL' });
+
+    var { error } = await auth.supabase.from('resource_submissions').insert({
+      title: title, description: description, author: author || null,
+      level: level, category: category || null, tag: tag || null,
+      file_url: fileUrl || null, file_size: fileSize || null,
+      submitted_by: auth.user.id, status: 'pending'
     });
-    if (error) return res.status(500).json({ error: error.message });
+    if (error) return res.status(500).json({ error: 'Submission failed' });
     return res.status(201).json({ success: true });
   }
 
-  // GET /api/actions?action=get-messages
+  // GET get-messages
   if (req.method === 'GET' && action === 'get-messages') {
-    const auth = await getUser(req);
-    if (!auth) return res.status(401).json({ error: 'Invalid token' });
-    const { user, supabase } = auth;
+    var auth = await authenticate(req, res);
+    if (!auth) return;
 
-    const { data: adminRow } = await supabase
-      .from('admin_users')
-      .select('user_id')
-      .eq('user_id', user.id)
-      .maybeSingle();
-    const isAdmin = !!adminRow;
+    var isAdmin = false;
+    var { data: adminRow } = await auth.supabase.from('admin_users').select('user_id').eq('user_id', auth.user.id).maybeSingle();
+    if (adminRow) isAdmin = true;
 
-    let query = supabase
-      .from('site_sections')
-      .select('data, created_at')
-      .eq('section', 'message')
-      .order('created_at', { ascending: false });
-
-    if (!isAdmin) query = query.eq('data->>user_id', user.id);
-
-    const { data, error } = await query;
-    if (error) return res.status(500).json({ error: error.message });
-
-    const messages = (data || []).map(row => ({ ...row.data, created_at: row.created_at }));
-    return res.status(200).json({ messages, isAdmin });
+    var query = auth.supabase.from('site_sections').select('data, created_at').eq('section', 'message').order('created_at', { ascending: false });
+    if (!isAdmin) query = query.eq('data->>user_id', auth.user.id);
+    var { data, error } = await query;
+    if (error) return res.status(500).json({ error: 'Failed to fetch messages' });
+    var messages = (data || []).map(function(row) { return Object.assign({}, row.data, { created_at: row.created_at }); });
+    return res.status(200).json({ messages: messages, isAdmin: isAdmin });
   }
 
   return res.status(400).json({ error: 'Unknown action' });
-}
+     }
