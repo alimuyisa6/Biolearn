@@ -169,10 +169,16 @@
         async function loadSiteSections() { if (pageCache.siteSections) return pageCache.siteSections; var r = await fetch(API_BASE + '/data?action=site-sections'); if (!r.ok) throw new Error('HTTP ' + r.status); var d = await r.json(); pageCache.siteSections = d; return d; }
         function loadFooter(data) { var fr = data.find(function(r){return r.section==='footer';}); if (fr&&fr.data&&fr.data.columns) { document.getElementById('footer-inner').innerHTML = fr.data.columns.map(function(col){ var h=escapeHtml(col.heading); var items=(col.items||[]).map(function(item){ var href=item.href?item.href.trim():'#'; var icon=item.icon?'<i class="'+escapeHtml(item.icon)+'"></i> ':''; return '<li><a href="'+escapeHtml(href)+'">'+icon+escapeHtml(item.label)+'</a></li>'; }).join(''); return '<div class="footer-links"><h4>'+h+'</h4><ul>'+items+'</ul></div>'; }).join(''); } }
 
-        // Fetch available coins from API
+        // Fetch available coins — handles object format [{currency: "btc", min_amount: ...}]
         async function fetchAvailableCoins() {
-            try { var r = await fetch(API_BASE + '/donate?action=currencies'); if (!r.ok) return ['usdttrc20','btc','eth']; var d = await r.json(); var popular = ['btc','eth','usdttrc20','usdterc20','usdt','bnbmainnet','trx','ltc','doge','usdc']; return (d.currencies||[]).filter(function(c){return popular.indexOf(c)!==-1;}); }
-            catch(e) { return ['usdttrc20','btc','eth']; }
+            try {
+                var r = await fetch(API_BASE + '/donate?action=currencies');
+                if (!r.ok) return [{currency:'usdttrc20'},{currency:'btc'},{currency:'eth'}];
+                var d = await r.json();
+                var all = d.currencies || [];
+                var popular = ['btc','eth','ltc','doge','trx','usdttrc20','usdterc20','usdt','bnbmainnet','usdc','dash','xmr','sol','ada','xrp','bch','maticmainnet','link','avax','atom'];
+                return all.filter(function(c) { return popular.indexOf(c.currency) !== -1; });
+            } catch(e) { return [{currency:'usdttrc20'},{currency:'btc'},{currency:'eth'}]; }
         }
 
         // Render
@@ -182,7 +188,7 @@
             if (!dr||!dr.data) { removeSpinner(); c.innerHTML = '<div class="hero-mini"><h1>Donate</h1><p>Page being set up.</p></div>'; return; }
             var d = dr.data;
             availableCoins = await fetchAvailableCoins();
-            selectedCoin = availableCoins[0] || 'usdttrc20';
+            selectedCoin = (availableCoins[0] && availableCoins[0].currency) || 'usdttrc20';
 
             var html = '';
             html += '<div class="hero-mini"><h1>' + escapeHtml(d.title||'Support BioLearn') + '</h1><p>' + escapeHtml(d.subtitle||'Help keep biology education free.') + '</p></div>';
@@ -191,11 +197,14 @@
             html += '<div class="tab-bar"><button class="tab-btn active" data-tab="crypto"><i class="fa-brands fa-bitcoin"></i> Crypto</button><button class="tab-btn" data-tab="momo"><i class="fa-solid fa-mobile-screen"></i> Mobile Money</button></div>';
 
             // Crypto card
-            var coinLabels = { btc:'BTC', eth:'ETH', usdttrc20:'USDT', usdterc20:'USDT', usdt:'USDT', bnbmainnet:'BNB', trx:'TRX', ltc:'LTC', doge:'DOGE', usdc:'USDC' };
-            var coinIcons = { btc:'fa-brands fa-bitcoin', eth:'fa-brands fa-ethereum', usdttrc20:'fa-dollar-sign', usdterc20:'fa-dollar-sign', usdt:'fa-dollar-sign', bnbmainnet:'fa-brands fa-bootstrap', trx:'fa-brands fa-tron', ltc:'fa-brands fa-litecoin', doge:'fa-brands fa-dog', usdc:'fa-dollar-sign' };
+            var coinLabels = { btc:'BTC', eth:'ETH', ltc:'LTC', doge:'DOGE', trx:'TRX', usdttrc20:'USDT', usdterc20:'USDT', usdt:'USDT', bnbmainnet:'BNB', usdc:'USDC', dash:'DASH', xmr:'XMR', sol:'SOL', ada:'ADA', xrp:'XRP', bch:'BCH', maticmainnet:'MATIC', link:'LINK', avax:'AVAX', atom:'ATOM' };
+            var coinIcons = { btc:'fa-brands fa-bitcoin', eth:'fa-brands fa-ethereum', ltc:'fa-brands fa-litecoin', doge:'fa-brands fa-dog', trx:'fa-brands fa-tron', usdttrc20:'fa-dollar-sign', usdterc20:'fa-dollar-sign', usdt:'fa-dollar-sign', bnbmainnet:'fa-brands fa-bootstrap', usdc:'fa-dollar-sign', dash:'fa-brands fa-dash', xmr:'fa-brands fa-monero', sol:'fa-solid fa-sun', ada:'fa-brands fa-ada', xrp:'fa-brands fa-xrp', bch:'fa-brands fa-bitcoin', maticmainnet:'fa-solid fa-polygon', link:'fa-brands fa-chainlink', avax:'fa-brands fa-avalanche', atom:'fa-brands fa-atom' };
             html += '<div class="card crypto-grid" id="crypto-panel"><div><h3><i class="fa-brands fa-bitcoin" style="color:var(--color-gold);"></i> Crypto Donation</h3>';
             html += '<div class="coin-selector">';
-            availableCoins.forEach(function(cc){ html += '<button class="coin-chip'+(cc===selectedCoin?' active':'')+'" data-coin="'+cc+'"><i class="fa-solid '+(coinIcons[cc]||'fa-coins')+'"></i> '+(coinLabels[cc]||cc.toUpperCase())+'</button>'; });
+            availableCoins.forEach(function(cc){
+                var code = cc.currency;
+                html += '<button class="coin-chip'+(code===selectedCoin?' active':'')+'" data-coin="'+code+'"><i class="fa-solid '+(coinIcons[code]||'fa-coins')+'"></i> '+(coinLabels[code]||code.toUpperCase())+'</button>';
+            });
             html += '</div><p style="font-size:0.8rem;color:var(--color-text-muted);margin-bottom:0.4rem;">Amount (USD)</p><div class="amount-buttons">';
             (d.suggested_amounts||[5,10,25,50,100]).forEach(function(a){ html += '<button class="amount-btn'+(a===selectedAmount?' active':'')+'" data-amount="'+a+'">$'+a+'</button>'; });
             html += '<input type="number" class="amount-input" id="custom-amount" placeholder="Custom" min="1" value="'+selectedAmount+'"></div>';
@@ -226,7 +235,7 @@
             var msb = document.getElementById('momo-submit-btn'); if (msb) msb.addEventListener('click', function(e){ e.preventDefault(); handleMomoSubmit(); });
         }
 
-        // Crypto — uses Payment API (not Invoice)
+        // Crypto — Payment API
         async function handleCryptoDonate() {
             var btn = document.getElementById('crypto-donate-btn'), st = document.getElementById('crypto-status');
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...'; st.innerHTML = '';
