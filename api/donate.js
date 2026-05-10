@@ -10,7 +10,7 @@ function sortObj(o) { if (o === null || typeof o !== 'object') return o; return 
 export default async function handler(req, res) {
   var action = req.query.action;
 
-  // GET /api/donate?action=currencies
+  // GET /api/donate?action=currencies — returns all available coins with min/max
   if (req.method === 'GET' && action === 'currencies') {
     try {
       var r = await fetch('https://api.nowpayments.io/v1/currencies?fixed_rate=true', { headers: { 'x-api-key': KEY } });
@@ -38,28 +38,14 @@ export default async function handler(req, res) {
       var { amount, pay_currency } = req.body;
       if (!amount || isNaN(amount) || amount <= 0) return res.status(400).json({ error: 'Valid amount required.' });
       if (!pay_currency) return res.status(400).json({ error: 'Select a coin.' });
-
       var pr = await fetch('https://api.nowpayments.io/v1/payment', {
         method: 'POST',
         headers: { 'Content-Type': 'application/json', 'x-api-key': KEY },
-        body: JSON.stringify({
-          price_amount: Number(amount),
-          price_currency: 'usd',
-          pay_currency: pay_currency,
-          order_id: 'BL-' + Date.now(),
-          order_description: 'BioLearn Donation',
-          ipn_callback_url: 'https://' + req.headers.host + '/api/donate?action=webhook'
-        })
+        body: JSON.stringify({ price_amount: Number(amount), price_currency: 'usd', pay_currency: pay_currency, order_id: 'BL-' + Date.now(), order_description: 'BioLearn Donation', ipn_callback_url: 'https://' + req.headers.host + '/api/donate?action=webhook' })
       });
-
       if (!pr.ok) { var e = await pr.json().catch(function(){return{};}); return res.status(pr.status).json({ error: e.message || 'Failed' }); }
       var payment = await pr.json();
-      return res.status(200).json({
-        payment_id: payment.payment_id,
-        pay_address: payment.pay_address,
-        pay_amount: payment.pay_amount,
-        pay_currency: payment.pay_currency
-      });
+      return res.status(200).json({ payment_id: payment.payment_id, pay_address: payment.pay_address, pay_amount: payment.pay_amount, pay_currency: payment.pay_currency });
     } catch (e) { return res.status(500).json({ error: e.message }); }
   }
 
@@ -83,4 +69,4 @@ export default async function handler(req, res) {
   }
 
   return res.status(400).json({ error: 'Use ?action=currencies | status | create | webhook' });
-   }
+        }
