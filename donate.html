@@ -147,7 +147,7 @@
     </footer>
 
     <script>
-        // ── Config ──
+        // Config
         var SUPABASE_URL = 'https://bhhndmcqjibodbfmbrpj.supabase.co';
         var SUPABASE_ANON_KEY = 'eyJhbGciOiJIUzI1NiIsInR5cCI6IkpXVCJ9.eyJpc3MiOiJzdXBhYmFzZSIsInJlZiI6ImJoaG5kbWNxamlib2RiZm1icnBqIiwicm9sZSI6ImFub24iLCJpYXQiOjE3NzY0ODI3MzIsImV4cCI6MjA5MjA1ODczMn0.aXTyrqWOECUHccOLcrwERPWTWu46fsGxYwkt-5xbrl8';
         var supabase = window.supabase && window.supabase.createClient ? window.supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY) : null;
@@ -155,7 +155,7 @@
         var pageCache = { siteSections: null };
         var currentTab = 'crypto', selectedCoin = '', selectedAmount = 10, paymentId = null, paymentPoll = null, availableCoins = [];
 
-        // ── Session ──
+        // Session
         function getCachedSession() { var c = sessionStorage.getItem('bl_sess'); if (c) { try { var p = JSON.parse(c); if (p.t && Date.now() - p.t < 300000) return p.s; } catch(e) {} } return null; }
         function setCachedSession(s) { if (s) sessionStorage.setItem('bl_sess', JSON.stringify({s:s, t:Date.now()})); else sessionStorage.removeItem('bl_sess'); }
         async function getSession() { var c = getCachedSession(); if (c) return c; if (!supabase) return null; var _a = await supabase.auth.getSession(), s = _a.data.session; setCachedSession(s); return s; }
@@ -165,17 +165,17 @@
         function removeSpinner() { var s = document.getElementById('loading-spinner'); if (s) s.remove(); }
         function clearPayment() { paymentId = null; if (paymentPoll) { clearInterval(paymentPoll); paymentPoll = null; } var qp = document.getElementById('qr-panel'); if (qp) qp.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;">Choose coin and amount, then tap Pay.</p>'; var st = document.getElementById('crypto-status'); if (st) st.innerHTML = ''; }
 
-        // ── Site sections ──
+        // Site sections
         async function loadSiteSections() { if (pageCache.siteSections) return pageCache.siteSections; var r = await fetch(API_BASE + '/data?action=site-sections'); if (!r.ok) throw new Error('HTTP ' + r.status); var d = await r.json(); pageCache.siteSections = d; return d; }
         function loadFooter(data) { var fr = data.find(function(r){return r.section==='footer';}); if (fr&&fr.data&&fr.data.columns) { document.getElementById('footer-inner').innerHTML = fr.data.columns.map(function(col){ var h=escapeHtml(col.heading); var items=(col.items||[]).map(function(item){ var href=item.href?item.href.trim():'#'; var icon=item.icon?'<i class="'+escapeHtml(item.icon)+'"></i> ':''; return '<li><a href="'+escapeHtml(href)+'">'+icon+escapeHtml(item.label)+'</a></li>'; }).join(''); return '<div class="footer-links"><h4>'+h+'</h4><ul>'+items+'</ul></div>'; }).join(''); } }
 
-        // ── Fetch available coins ──
+        // Fetch available coins from API
         async function fetchAvailableCoins() {
             try { var r = await fetch(API_BASE + '/donate?action=currencies'); if (!r.ok) return ['usdttrc20','btc','eth']; var d = await r.json(); var popular = ['btc','eth','usdttrc20','usdterc20','usdt','bnbmainnet','trx','ltc','doge','usdc']; return (d.currencies||[]).filter(function(c){return popular.indexOf(c)!==-1;}); }
             catch(e) { return ['usdttrc20','btc','eth']; }
         }
 
-        // ── Render ──
+        // Render
         async function renderPage(data) {
             var c = document.getElementById('donate-content');
             var dr = data.find(function(r){return r.section==='donate';});
@@ -226,19 +226,19 @@
             var msb = document.getElementById('momo-submit-btn'); if (msb) msb.addEventListener('click', function(e){ e.preventDefault(); handleMomoSubmit(); });
         }
 
-        // ── Crypto ──
+        // Crypto — uses Payment API (not Invoice)
         async function handleCryptoDonate() {
             var btn = document.getElementById('crypto-donate-btn'), st = document.getElementById('crypto-status');
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Creating...'; st.innerHTML = '';
             try {
                 var res = await fetch(API_BASE + '/donate?action=create', { method:'POST', headers:{'Content-Type':'application/json'}, body: JSON.stringify({ amount: selectedAmount, pay_currency: selectedCoin }) });
                 if (!res.ok) { var e = await res.json(); throw new Error(e.error||'Failed'); }
-                var inv = await res.json();
+                var pay = await res.json();
+                paymentId = pay.payment_id;
                 var qp = document.getElementById('qr-panel');
-                qp.innerHTML = '<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data='+encodeURIComponent(inv.pay_address)+'" alt="QR" width="170" height="170"></div><div class="wallet-address">'+escapeHtml(inv.pay_address)+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(inv.pay_address)+'\',this)"><i class="fa-regular fa-copy"></i> Copy Address</button><p style="font-size:0.78rem;color:var(--color-text-muted);margin-top:0.4rem;">Send <strong>'+inv.pay_amount+' '+inv.pay_currency.toUpperCase()+'</strong></p>';
+                qp.innerHTML = '<div class="qr-box"><img src="https://api.qrserver.com/v1/create-qr-code/?size=170x170&data='+encodeURIComponent(pay.pay_address)+'" alt="QR" width="170" height="170"></div><div class="wallet-address">'+escapeHtml(pay.pay_address)+'</div><button class="btn-copy" onclick="copyText(\''+escapeHtml(pay.pay_address)+'\',this)"><i class="fa-regular fa-copy"></i> Copy Address</button><p style="font-size:0.78rem;color:var(--color-text-muted);margin-top:0.4rem;">Send <strong>'+pay.pay_amount+' '+pay.pay_currency.toUpperCase()+'</strong></p>';
                 st.innerHTML = '<span style="color:var(--color-gold);"><i class="fa-solid fa-clock"></i> Waiting for payment...</span>';
                 btn.innerHTML = '<i class="fa-solid fa-clock"></i> Awaiting payment...';
-                paymentId = inv.invoice_id;
                 if (paymentPoll) clearInterval(paymentPoll);
                 paymentPoll = setInterval(async function() {
                     try {
@@ -249,7 +249,7 @@
                             clearInterval(paymentPoll); paymentPoll = null;
                             st.innerHTML = '<span style="color:var(--color-success);"><i class="fa-solid fa-circle-check"></i> Confirmed! Thank you!</span>';
                             btn.innerHTML = '<i class="fa-solid fa-check"></i> Received!'; btn.disabled = true;
-                            qp.innerHTML = '<div style="text-align:center;font-size:3rem;">🎉</div><p style="text-align:center;color:var(--color-success);">Thank you!</p>';
+                            qp.innerHTML = '<div style="text-align:center;font-size:3rem;">🎉</div><p style="text-align:center;color:var(--color-success);">Thank you for your support!</p>';
                             loadDonors();
                         }
                     } catch(e) {}
@@ -260,12 +260,10 @@
             }
         }
 
-        // ── MoMo ──
+        // MoMo
         async function handleMomoSubmit() {
             var btn = document.getElementById('momo-submit-btn'), st = document.getElementById('momo-status');
-            var name = document.getElementById('momo-name').value.trim();
-            var amount = document.getElementById('momo-amount').value.trim();
-            var txid = document.getElementById('momo-txid').value.trim();
+            var name = document.getElementById('momo-name').value.trim(), amount = document.getElementById('momo-amount').value.trim(), txid = document.getElementById('momo-txid').value.trim();
             if (!amount || !txid) { st.innerHTML = '<span style="color:var(--color-danger);">Amount and Transaction ID required.</span>'; return; }
             btn.disabled = true; btn.innerHTML = '<i class="fa-solid fa-spinner fa-spin"></i> Submitting...';
             try {
@@ -278,41 +276,18 @@
             finally { btn.disabled = false; btn.innerHTML = '<i class="fa-solid fa-paper-plane"></i> Confirm'; }
         }
 
-        // ── Donor wall ──
+        // Donor wall
         async function loadDonors() {
             var list = document.getElementById('donor-list'); if (!list) return;
-            try {
-                var r = await fetch(API_BASE + '/data?action=site-sections');
-                var d = await r.json();
-                var dr = d.find(function(x){return x.section==='donors';});
-                var donors = (dr&&dr.data&&dr.data.donors) ? dr.data.donors : [];
-                if (!donors.length) { list.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;">Be the first supporter!</p>'; return; }
-                list.innerHTML = donors.map(function(dn){ return '<div class="donor-item"><div class="donor-avatar">'+(dn.name||'A').charAt(0).toUpperCase()+'</div><div class="donor-info"><strong>'+escapeHtml(dn.name||'Anonymous')+'</strong><span>'+escapeHtml(dn.date||'')+'</span></div><div class="donor-amount">'+escapeHtml(dn.amount||'')+'</div></div>'; }).join('');
-            } catch(e) { list.innerHTML = '<p style="color:var(--color-text-muted);">Unable to load.</p>'; }
+            try { var r = await fetch(API_BASE + '/data?action=site-sections'); var d = await r.json(); var dr = d.find(function(x){return x.section==='donors';}); var donors = (dr&&dr.data&&dr.data.donors)?dr.data.donors:[]; if (!donors.length) { list.innerHTML = '<p style="color:var(--color-text-muted);text-align:center;">Be the first supporter!</p>'; return; } list.innerHTML = donors.map(function(dn){ return '<div class="donor-item"><div class="donor-avatar">'+(dn.name||'A').charAt(0).toUpperCase()+'</div><div class="donor-info"><strong>'+escapeHtml(dn.name||'Anonymous')+'</strong><span>'+escapeHtml(dn.date||'')+'</span></div><div class="donor-amount">'+escapeHtml(dn.amount||'')+'</div></div>'; }).join(''); } catch(e) { list.innerHTML = '<p style="color:var(--color-text-muted);">Unable to load.</p>'; }
         }
 
-        // ── Utils ──
-        window.copyText = function(text, btn) {
-            if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); }); }
-            else { var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed';ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); }
-        };
+        // Utils
+        window.copyText = function(text, btn) { if (navigator.clipboard) { navigator.clipboard.writeText(text).then(function(){ btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); }); } else { var ta=document.createElement('textarea'); ta.value=text; ta.style.position='fixed';ta.style.opacity='0'; document.body.appendChild(ta); ta.select(); document.execCommand('copy'); document.body.removeChild(ta); btn.innerHTML='<i class="fa-solid fa-check"></i> Copied!'; setTimeout(function(){ btn.innerHTML='<i class="fa-regular fa-copy"></i> Copy'; },2000); } };
 
-        function initMobileNav() {
-            var ha=document.getElementById('hamburger-action'), panel=document.getElementById('mobile-nav-panel'), overlay=document.getElementById('mobile-nav-overlay');
-            function open(){ panel.classList.add('active'); overlay.classList.add('active'); ha.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; }
-            function close(){ panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow=''; }
-            ha.addEventListener('click',function(){ panel.classList.contains('active')?close():open(); });
-            overlay.addEventListener('click',close);
-            panel.querySelectorAll('a').forEach(function(l){ l.addEventListener('click',close); });
-        }
+        function initMobileNav() { var ha=document.getElementById('hamburger-action'), panel=document.getElementById('mobile-nav-panel'), overlay=document.getElementById('mobile-nav-overlay'); function open(){ panel.classList.add('active'); overlay.classList.add('active'); ha.setAttribute('aria-expanded','true'); document.body.style.overflow='hidden'; } function close(){ panel.classList.remove('active'); overlay.classList.remove('active'); ha.setAttribute('aria-expanded','false'); document.body.style.overflow=''; } ha.addEventListener('click',function(){ panel.classList.contains('active')?close():open(); }); overlay.addEventListener('click',close); panel.querySelectorAll('a').forEach(function(l){ l.addEventListener('click',close); }); }
 
-        document.addEventListener('DOMContentLoaded', async function(){
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            window.addEventListener('scroll',function(){ document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10); },{passive:true});
-            initMobileNav();
-            try { var data = await loadSiteSections(); loadFooter(data); await renderPage(data); }
-            catch(err) { removeSpinner(); document.getElementById('donate-content').innerHTML = '<div class="hero-mini"><h1>Donate</h1><p>Unable to load page.</p></div>'; }
-        });
+        document.addEventListener('DOMContentLoaded', async function(){ document.getElementById('current-year').textContent = new Date().getFullYear(); window.addEventListener('scroll',function(){ document.getElementById('site-header').classList.toggle('scrolled',window.scrollY>10); },{passive:true}); initMobileNav(); try { var data = await loadSiteSections(); loadFooter(data); await renderPage(data); } catch(err) { removeSpinner(); document.getElementById('donate-content').innerHTML = '<div class="hero-mini"><h1>Donate</h1><p>Unable to load page.</p></div>'; } });
     </script>
 </body>
 </html>
