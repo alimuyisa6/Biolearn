@@ -46,7 +46,8 @@
         .main-nav { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center; }
         .main-nav a { color: var(--clr-text-dim); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.4rem 0; border-bottom: 2px solid transparent; transition: all var(--transition-fast); }
         .main-nav a:hover, .main-nav a.active { color: var(--clr-magenta); border-bottom-color: var(--clr-magenta); }
-        .nav-actions { display: flex; gap: 0.8rem; align-items: center; }
+      .nav-actions { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
+.nav-actions > * { flex-shrink: 0; }
         .theme-toggle, .mobile-toggle { background: transparent; border: 1px solid var(--clr-cyan); color: var(--clr-cyan); font-size: 1.1rem; padding: 0.5rem 0.9rem; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
         .theme-toggle:hover { background: var(--clr-cyan); color: #0b0b1a; }
         .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; }
@@ -323,18 +324,20 @@
     }
 
     // ============ AUTH ============
-    function updateAuthUI() {
-        const token = localStorage.getItem('sb-token');
-        const userEl = document.getElementById('auth-status');
-        if (!userEl) return;
-        
-        if (token) {
-            const email = localStorage.getItem('sb-email') || 'User';
-            userEl.innerHTML = `<span style="color:var(--clr-text-dim);font-size:0.9rem;">${esc(email)}</span> <button onclick="signOut()" class="theme-toggle" style="font-size:0.85rem;padding:0.3rem 0.8rem;">Sign Out</button>`;
-        } else {
-            userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.85rem;padding:0.3rem 0.8rem;">Sign In</button>`;
-        }
+     function updateAuthUI() {
+    const token = localStorage.getItem('sb-token');
+    const userEl = document.getElementById('auth-status');
+    if (!userEl) return;
+    
+    if (token) {
+        const email = localStorage.getItem('sb-email') || 'User';
+        // Show only first part of email
+        const shortEmail = email.split('@')[0];
+        userEl.innerHTML = `<button onclick="signOut()" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(email)}"><i class="fa-solid fa-user"></i> ${esc(shortEmail)}</button>`;
+    } else {
+        userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>`;
     }
+}
 
     window.signOut = async function() {
         try { await apiCall('signout'); } catch (e) {}
@@ -711,12 +714,15 @@
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('current-year').textContent = new Date().getFullYear();
         
-        // Add auth button to nav
-        const navActions = document.querySelector('.nav-actions');
-        const authSpan = document.createElement('span');
-        authSpan.id = 'auth-status';
-        navActions.insertBefore(authSpan, navActions.firstChild);
-        updateAuthUI();
+       // Add auth button to nav — insert AFTER theme toggle, BEFORE mobile toggle
+const navActions = document.querySelector('.nav-actions');
+const authSpan = document.createElement('span');
+authSpan.id = 'auth-status';
+authSpan.style.cssText = 'order:1;';
+// Insert before the last element (mobile toggle)
+const mobileToggle = document.getElementById('mobile-toggle');
+navActions.insertBefore(authSpan, mobileToggle);
+updateAuthUI();
 
         // Init UI
         initUI();
