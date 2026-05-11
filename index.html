@@ -52,10 +52,68 @@
         .theme-toggle:hover { background: var(--clr-cyan); color: #0b0b1a; }
         .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; margin-left: 0.3rem; }
         .mobile-toggle:hover { background: var(--clr-magenta); color: white; }
-        .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; height: 100vh; background: var(--clr-navy-card); box-shadow: -8px 0 30px rgba(0,0,0,0.5); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s ease, opacity 0.35s ease; }
+
+        /* Hamburger Panel - Beautiful Design */
+        .mobile-nav-panel {
+            position: fixed; top: 0; right: -100%; width: 100%; max-width: 360px; height: 100vh;
+            background: linear-gradient(180deg, #0d0d24 0%, #13132e 40%, #1a1a3e 100%);
+            box-shadow: -10px 0 40px rgba(0,0,0,0.6); z-index: 200;
+            display: flex; flex-direction: column;
+            opacity: 0; transition: right 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+            overflow-y: auto;
+        }
         .mobile-nav-panel.active { right: 0; opacity: 1; }
-        .mobile-nav-panel a { display: block; padding: 0.8rem 1rem; text-decoration: none; color: var(--clr-white); font-weight: 500; border-radius: var(--radius-md); }
-        .mobile-nav-panel a:hover { background: var(--clr-magenta); color: white; }
+        .mobile-nav-panel-inner { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
+        .mobile-nav-header {
+            display: flex; align-items: center; justify-content: space-between;
+            padding-bottom: 1.2rem; border-bottom: 1px solid var(--clr-border-glow); margin-bottom: 1rem;
+        }
+        .mobile-nav-header .logo-link { font-size: 1.3rem; margin-bottom: 0; }
+        .mobile-nav-header .logo-link i { font-size: 1.5rem; }
+        .mobile-close-btn {
+            background: rgba(255,0,170,0.1); border: 1px solid var(--clr-magenta); color: var(--clr-magenta);
+            width: 36px; height: 36px; border-radius: 50%; display: flex; align-items: center;
+            justify-content: center; cursor: pointer; font-size: 1rem; transition: all var(--transition-fast);
+        }
+        .mobile-close-btn:hover { background: var(--clr-magenta); color: white; }
+        .mobile-nav-panel .nav-links { flex: 1; display: flex; flex-direction: column; gap: 0.2rem; }
+        .mobile-nav-panel .nav-links a {
+            display: flex; align-items: center; gap: 0.8rem; padding: 0.9rem 1rem;
+            text-decoration: none; color: var(--clr-text-dim); font-weight: 500;
+            border-radius: var(--radius-md); transition: all var(--transition-fast);
+            font-size: 0.95rem;
+        }
+        .mobile-nav-panel .nav-links a:hover {
+            background: rgba(255,0,170,0.1); color: var(--clr-magenta);
+            transform: translateX(4px);
+        }
+        .mobile-nav-panel .nav-links a i { width: 20px; text-align: center; font-size: 0.9rem; color: var(--clr-cyan); }
+        .mobile-nav-panel .nav-links a:hover i { color: var(--clr-magenta); }
+        .mobile-nav-divider { border-top: 1px solid var(--clr-border-glow); margin: 0.5rem 0; }
+        .mobile-nav-footer { padding-top: 1rem; border-top: 1px solid var(--clr-border-glow); }
+        .mobile-nav-footer a, .mobile-nav-footer button {
+            display: flex; align-items: center; gap: 0.8rem; width: 100%;
+            padding: 0.9rem 1rem; text-decoration: none; font-weight: 600;
+            border-radius: var(--radius-md); transition: all var(--transition-fast);
+            font-size: 0.95rem; cursor: pointer; font-family: var(--font-body);
+            background: transparent; border: none;
+        }
+        .mobile-signin-btn { color: var(--clr-cyan); }
+        .mobile-signin-btn:hover { background: rgba(0,217,255,0.1); }
+        .mobile-signup-btn {
+            background: var(--gradient-magenta); color: white !important;
+            justify-content: center; margin-top: 0.5rem;
+            box-shadow: var(--shadow-magenta);
+        }
+        .mobile-signup-btn:hover { transform: translateY(-2px); box-shadow: 0 0 25px rgba(255,0,170,0.4); }
+        .mobile-signout-btn { color: var(--clr-magenta); }
+        .mobile-signout-btn:hover { background: rgba(255,0,170,0.1); }
+        .mobile-user-info {
+            display: flex; align-items: center; gap: 0.8rem; padding: 0.5rem 0.5rem 1rem;
+            color: var(--clr-text-dim); font-size: 0.85rem;
+        }
+        .mobile-user-info i { font-size: 1.5rem; color: var(--clr-cyan); }
+
         .mobile-nav-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.6); z-index: 150; opacity: 0; pointer-events: none; transition: opacity 0.35s ease; }
         .mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
         .hero-carousel { position: relative; width: 100%; height: 70vh; min-height: 500px; overflow: hidden; }
@@ -177,6 +235,7 @@
             .resource-card { padding: 1.2rem; }
             .testimonial-slider { padding: 2rem 1.5rem; }
             .testimonial-quote { font-size: 1rem; }
+            .mobile-nav-panel { max-width: 100%; }
         }
         @media (max-width: 480px) {
             .section { margin: 2rem auto; }
@@ -206,14 +265,23 @@
             <a href="#" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions">
-                <span id="auth-status"></span>
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
                 <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
             </div>
         </div>
     </header>
 
-    <div class="mobile-nav-panel" id="mobile-nav-panel"></div>
+    <div class="mobile-nav-panel" id="mobile-nav-panel">
+        <div class="mobile-nav-panel-inner">
+            <div class="mobile-nav-header">
+                <a href="#" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
+                <button class="mobile-close-btn" id="mobile-close-btn"><i class="fa-solid fa-xmark"></i></button>
+            </div>
+            <div class="nav-links" id="mobile-nav-links"></div>
+            <div class="mobile-nav-divider"></div>
+            <div class="mobile-nav-footer" id="mobile-nav-footer"></div>
+        </div>
+    </div>
     <div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
 
     <main id="main-content">
@@ -291,24 +359,46 @@
         return t && !/^(javascript|data|vbscript):/i.test(t) ? t : '#';
     }
 
-    function updateAuthUI() {
+    const icons = {
+        'Home': 'fa-solid fa-house', 'Resources': 'fa-solid fa-book', 'Study Notes': 'fa-solid fa-book-open',
+        'Blog': 'fa-solid fa-newspaper', 'Study Tips': 'fa-solid fa-lightbulb', 'Submit': 'fa-solid fa-upload',
+        'Guidelines': 'fa-solid fa-check-circle', 'Donate': 'fa-solid fa-heart', 'About': 'fa-solid fa-circle-info',
+        'Contact': 'fa-solid fa-envelope'
+    };
+
+    function updateMobilePanel(links) {
+        const navLinks = document.getElementById('mobile-nav-links');
+        const footer = document.getElementById('mobile-nav-footer');
+        if (!navLinks || !footer) return;
+
+        navLinks.innerHTML = (links || []).map(l =>
+            `<a href="${esc(l.href)}"><i class="${icons[l.label] || 'fa-solid fa-chevron-right'}"></i> ${esc(l.label)}</a>`
+        ).join('');
+
         const token = localStorage.getItem('sb-token');
-        const userEl = document.getElementById('auth-status');
-        if (!userEl) return;
         if (token) {
             const email = localStorage.getItem('sb-email') || 'User';
-            const shortEmail = email.split('@')[0];
-            userEl.innerHTML = `<button onclick="signOut()" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(email)}"><i class="fa-solid fa-user"></i> ${esc(shortEmail)}</button>`;
+            footer.innerHTML = `
+                <div class="mobile-user-info"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div>
+                <button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
         } else {
-            userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>`;
+            footer.innerHTML = `
+                <a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a>
+                <a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
         }
+    }
+
+    async function buildNavigation(d) {
+        const links = d?.links || [];
+        document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
+        updateMobilePanel(links);
     }
 
     window.signOut = async function() {
         try { await apiCall('signout'); } catch (e) {}
         localStorage.removeItem('sb-token');
         localStorage.removeItem('sb-email');
-        updateAuthUI();
+        updateMobilePanel([]);
         location.reload();
     };
 
@@ -353,7 +443,7 @@
                     localStorage.setItem('sb-token', data.session.access_token);
                     localStorage.setItem('sb-email', data.user.email);
                     modal.remove();
-                    updateAuthUI();
+                    updateMobilePanel([]);
                     location.reload();
                 } else if (mode === 'signup') {
                     errEl.textContent = 'Check your email to confirm signup.';
@@ -365,12 +455,6 @@
             }
         };
     };
-
-    async function buildNavigation(d) {
-        const links = d?.links || [];
-        document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
-        document.getElementById('mobile-nav-panel').innerHTML = links.map(l => `<a href="${esc(l.href)}">${esc(l.label)}</a>`).join('');
-    }
 
     async function buildFooter(d) {
         if (!d) return;
@@ -407,7 +491,7 @@
         g.innerHTML = m.map(p => `
             <div class="card team-card">
                 <div class="team-avatar">
-                    ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.name)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">` : '<i class="fa-solid fa-user-tie"></i>'}
+                    ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">` : '<i class="fa-solid fa-user-tie"></i>'}
                 </div>
                 <h3>${esc(p.name)}${p.title ? ', ' + esc(p.title) : ''}</h3>
                 <p>${esc(p.bio || '')}</p>
@@ -447,7 +531,7 @@
         if (!posts.length) { g.innerHTML = '<p style="text-align:center;">Articles coming soon.</p>'; return; }
         g.innerHTML = posts.map(p => `
             <div class="card">
-                ${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">` : ''}
+                ${p.image_url ? `<img src="${esc(p.image_url)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">` : ''}
                 <div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date || '')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author || '')}</span></div>
                 <h3>${esc(p.title)}</h3><p>${esc(p.excerpt || '')}</p>
                 <a href="#" style="color:var(--clr-magenta);text-decoration:none;font-weight:600;">Read Article <i class="fa-solid fa-arrow-right"></i></a>
@@ -480,8 +564,7 @@
             if (entries[0].isIntersecting) {
                 grid.querySelectorAll('.stat-number').forEach(el => {
                     const t = +el.dataset.target, sf = el.dataset.suffix;
-                    let c = 0;
-                    const inc = Math.ceil(t / 50);
+                    let c = 0; const inc = Math.ceil(t / 50);
                     const ti = setInterval(() => { c += inc; if (c >= t) { c = t; clearInterval(ti); } el.textContent = c + sf; }, 40);
                 });
                 obs.disconnect();
@@ -494,44 +577,29 @@
         document.getElementById('resources-container').innerHTML = '<div class="spinner"><i class="fa-solid fa-dna"></i><p>Loading...</p></div>';
         try {
             const data = await apiCall('get_resources', { filters });
-            if (!data.length) {
-                document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>';
-                return;
-            }
+            if (!data.length) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; return; }
             const groups = {};
-            data.forEach(item => {
-                const s = (item.section_type || 'Resources').trim();
-                if (!groups[s]) groups[s] = [];
-                groups[s].push(item);
-            });
+            data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); });
             document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `
                 <div style="margin-bottom:3rem;">
                     <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:0.5rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2>
-                    <div class="resources-grid">
-                        ${items.map(item => `
-                            <div class="resource-card">
-                                <div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div>
-                                <a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a>
-                                <p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p>
-                                <div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);">
-                                    <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
-                                    <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
-                                    <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
-                                </div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);">
-                                    <a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
-                                    <div style="display:flex;gap:0.4rem;">
-                                        <a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a>
-                                        <a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a>
-                                        <a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a>
-                                    </div>
-                                </div>
-                            </div>`).join('')}
-                    </div>
-                </div>`).join('');
-        } catch (err) {
-            document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>';
-        }
+                    <div class="resources-grid">${items.map(item => `
+                        <div class="resource-card">
+                            <div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div>
+                            <a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a>
+                            <p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p>
+                            <div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);">
+                                <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
+                                <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
+                                <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div>
+                            <div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);">
+                                <a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
+                                <div style="display:flex;gap:0.4rem;">
+                                    <a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                                    <a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                                    <a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div>
+                            </div></div>`).join('')}</div></div>`).join('');
+        } catch (err) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; }
     }
 
     async function loadFilters() {
@@ -540,21 +608,16 @@
             ['filter-level', 'filter-category', 'filter-tag'].forEach((id, i) => {
                 const opts = [levels, categories, tags][i];
                 const sel = document.getElementById(id);
-                if (sel) {
-                    sel.innerHTML = '<option value="">All</option>';
-                    opts.forEach(o => { const el = document.createElement('option'); el.value = o; el.textContent = o; sel.appendChild(el); });
-                }
+                if (sel) { sel.innerHTML = '<option value="">All</option>'; opts.forEach(o => { const el = document.createElement('option'); el.value = o; el.textContent = o; sel.appendChild(el); }); }
             });
         } catch (err) {}
     }
 
     function initCarousel(count) {
-        const slides = document.querySelectorAll('.carousel-slide');
-        const dots = document.querySelectorAll('.carousel-dot');
+        const slides = document.querySelectorAll('.carousel-slide'), dots = document.querySelectorAll('.carousel-dot');
         let current = 0, interval;
         function go(i) { slides[current].classList.remove('active'); dots[current]?.classList.remove('active'); current = i; slides[current].classList.add('active'); dots[current]?.classList.add('active'); }
-        function nxt() { go((current + 1) % count); }
-        function prv() { go((current - 1 + count) % count); }
+        function nxt() { go((current + 1) % count); } function prv() { go((current - 1 + count) % count); }
         function reset() { clearInterval(interval); interval = setInterval(nxt, 5000); }
         document.querySelector('.carousel-prev')?.addEventListener('click', () => { prv(); reset(); });
         document.querySelector('.carousel-next')?.addEventListener('click', () => { nxt(); reset(); });
@@ -567,13 +630,14 @@
         if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
         tt.onclick = () => { document.body.classList.toggle('light-mode'); const l = document.body.classList.contains('light-mode'); icon.classList.replace(l ? 'fa-moon' : 'fa-sun', l ? 'fa-sun' : 'fa-moon'); localStorage.setItem('theme', l ? 'light' : 'dark'); };
 
-        const mt = document.getElementById('mobile-toggle'), mn = document.getElementById('main-nav'),
-              mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay');
-        function open() { mn.classList.add('active'); mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
-        function close() { mn.classList.remove('active'); mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
+        const mt = document.getElementById('mobile-toggle'), mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay');
+        const closeBtn = document.getElementById('mobile-close-btn');
+        function open() { mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function close() { mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
         mt.onclick = () => mp.classList.contains('active') ? close() : open();
         mo.onclick = close;
-        mp.addEventListener('click', e => { if (e.target.tagName === 'A') close(); });
+        closeBtn.onclick = close;
+        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
 
         const bb = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => { bb.classList.toggle('visible', window.scrollY > 500); document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
@@ -589,19 +653,13 @@
             const fd = { name: document.getElementById('contact-name').value.trim(), email: document.getElementById('contact-email').value.trim(), subject: document.getElementById('contact-subject').value.trim(), message: document.getElementById('contact-message').value.trim() };
             if (!fd.name || !fd.email || !fd.subject || !fd.message) return alert('Please fill all fields.');
             if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) return alert('Please enter a valid email.');
-            try {
-                await apiCall('submit_contact', { formData: fd });
-                const s = document.getElementById('form-success'); s.textContent = '✓ Message sent! We will respond within 24 hours.'; s.style.display = 'block';
-                this.reset(); setTimeout(() => s.style.display = 'none', 5000);
-            } catch (err) { alert('Failed to send message: ' + err.message); }
+            try { await apiCall('submit_contact', { formData: fd }); const s = document.getElementById('form-success'); s.textContent = '✓ Message sent!'; s.style.display = 'block'; this.reset(); setTimeout(() => s.style.display = 'none', 5000); } catch (err) { alert('Failed: ' + err.message); }
         };
 
         document.getElementById('newsletter-form').onsubmit = async function(e) {
-            e.preventDefault();
-            const email = this.querySelector('input').value.trim();
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Please enter a valid email.');
-            try { await apiCall('subscribe_newsletter', { formData: { email } }); alert('✓ Subscribed successfully!'); this.reset(); }
-            catch (err) { alert('Subscription successful!'); this.reset(); }
+            e.preventDefault(); const email = this.querySelector('input').value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Valid email required.');
+            try { await apiCall('subscribe_newsletter', { formData: { email } }); alert('✓ Subscribed!'); this.reset(); } catch (err) { alert('Subscribed!'); this.reset(); }
         };
 
         document.getElementById('filter-submit').onclick = () => buildResources({ level: document.getElementById('filter-level').value, category: document.getElementById('filter-category').value, tag: document.getElementById('filter-tag').value });
@@ -609,7 +667,6 @@
 
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('current-year').textContent = new Date().getFullYear();
-        updateAuthUI();
         initUI();
         try {
             const sections = await apiCall('get_all_site_sections');
