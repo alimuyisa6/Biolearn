@@ -53,16 +53,15 @@
         .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; margin-left: 0.3rem; }
         .mobile-toggle:hover { background: var(--clr-magenta); color: white; }
 
-        /* Hamburger Panel - Beautiful Design */
-        .mobile-nav-panel {
-             .mobile-nav-panel {
+ /* Hamburger Panel */
+.mobile-nav-panel {
     position: fixed; top: 0; right: -100%; width: 40%; min-width: 280px; max-width: 400px; height: 100vh;
-            background: linear-gradient(180deg, #0d0d24 0%, #13132e 40%, #1a1a3e 100%);
-            box-shadow: -10px 0 40px rgba(0,0,0,0.6); z-index: 200;
-            display: flex; flex-direction: column;
-            opacity: 0; transition: right 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
-            overflow-y: auto;
-        }
+    background: linear-gradient(180deg, #0d0d24 0%, #13132e 40%, #1a1a3e 100%);
+    box-shadow: -10px 0 40px rgba(0,0,0,0.6); z-index: 200;
+    display: flex; flex-direction: column;
+    opacity: 0; transition: right 0.4s cubic-bezier(0.4,0,0.2,1), opacity 0.3s ease;
+    overflow-y: auto;
+}
         .mobile-nav-panel.active { right: 0; opacity: 1; }
         .mobile-nav-panel-inner { padding: 1.5rem; flex: 1; display: flex; flex-direction: column; }
         .mobile-nav-header {
@@ -235,7 +234,9 @@
             .faq-question { font-size: 0.9rem; padding: 1rem 0; }
             .resource-card { padding: 1.2rem; }
             .testimonial-slider { padding: 2rem 1.5rem; }
-            .testimonial-quote { font-size: 1rem; }
+             .testimonial-quote { font-size: 1rem; }
+             .mobile-nav-panel { width: 70%; }
+}
             .mobile-nav-panel { max-width: 100%; }
         }
         @media (max-width: 480px) {
