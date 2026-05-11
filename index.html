@@ -46,11 +46,11 @@
         .main-nav { display: flex; gap: 2rem; list-style: none; flex-wrap: wrap; justify-content: center; }
         .main-nav a { color: var(--clr-text-dim); text-decoration: none; font-weight: 500; font-size: 0.95rem; padding: 0.4rem 0; border-bottom: 2px solid transparent; transition: all var(--transition-fast); }
         .main-nav a:hover, .main-nav a.active { color: var(--clr-magenta); border-bottom-color: var(--clr-magenta); }
-      .nav-actions { display: flex; gap: 0.8rem; align-items: center; flex-wrap: wrap; }
-.nav-actions > * { flex-shrink: 0; }
+        .nav-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; }
+        .nav-actions > * { flex-shrink: 0; }
         .theme-toggle, .mobile-toggle { background: transparent; border: 1px solid var(--clr-cyan); color: var(--clr-cyan); font-size: 1.1rem; padding: 0.5rem 0.9rem; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
         .theme-toggle:hover { background: var(--clr-cyan); color: #0b0b1a; }
-        .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; }
+        .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; margin-left: 0.3rem; }
         .mobile-toggle:hover { background: var(--clr-magenta); color: white; }
         .mobile-nav-panel { position: fixed; top: 0; right: -320px; width: 280px; height: 100vh; background: var(--clr-navy-card); box-shadow: -8px 0 30px rgba(0,0,0,0.5); z-index: 200; padding: 5rem 1.8rem 2rem; display: flex; flex-direction: column; gap: 0.8rem; opacity: 0; transition: right 0.35s ease, opacity 0.35s ease; }
         .mobile-nav-panel.active { right: 0; opacity: 1; }
@@ -137,88 +137,65 @@
         .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
         .map-container { border-radius: var(--radius-lg); overflow: hidden; border: 2px solid var(--clr-border-glow); min-height: 350px; }
         .map-container iframe { width: 100%; height: 100%; min-height: 350px; border: 0; }
-      @media (max-width: 1024px) { 
-    .contact-grid { grid-template-columns: 1fr; }
-    .main-nav { gap: 1rem; }
-    .main-nav a { font-size: 0.85rem; }
-}
-@media (max-width: 768px) {
-    .main-nav { display: none; }
-    .main-nav.active { 
-        display: flex; 
-        flex-direction: column; 
-        position: absolute; 
-        top: 100%; 
-        left: 0; 
-        right: 0; 
-        background: var(--clr-navy-card); 
-        padding: 1rem; 
-        border-bottom: 2px solid var(--clr-cyan); 
-        z-index: 99; 
-    }
-    .main-nav.active a { padding: 0.6rem 0; font-size: 0.9rem; }
-    .mobile-toggle { display: flex; }
-    .header-container { flex-direction: row; justify-content: space-between; align-items: center; }
-    .logo-link { margin-bottom: 0; font-size: 1.4rem; }
-    .logo-link i { font-size: 1.5rem; }
-    .hero-carousel { height: 60vh; min-height: 350px; }
-    .slide-overlay h2 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
-    .slide-overlay p { font-size: 0.95rem; padding: 0 1rem; }
-    .btn-primary { padding: 0.7rem 1.5rem; font-size: 0.9rem; }
-    .card-grid, .resources-grid { grid-template-columns: 1fr; }
-    .stats-grid { grid-template-columns: repeat(2, 1fr); }
-    .carousel-arrow { display: none; }
-    .pricing-card.featured { transform: scale(1); }
-    .section { margin: 3rem auto; padding: 0 1rem; }
-    .section-title { font-size: 1.6rem; }
-    .section-subtitle { font-size: 0.95rem; padding: 0 1rem; }
-    .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
-    .footer-col h4 { font-size: 0.85rem; }
-    .sticky-cta { 
-        bottom: 5rem; 
-        left: 1rem; 
-        padding: 0.6rem 1.2rem; 
-        font-size: 0.85rem; 
-        z-index: 89;
-    }
-    .back-to-top { 
-        bottom: 1rem; 
-        right: 1rem; 
-        width: 40px; 
-        height: 40px; 
-        font-size: 1rem; 
-    }
-    .contact-grid { gap: 1.5rem; }
-    .form-input, .form-textarea { padding: 0.7rem 1rem; font-size: 0.9rem; }
-    .newsletter-box { max-width: 100%; }
-    .newsletter-box input { padding: 0.7rem 1rem; }
-    .newsletter-box button { padding: 0.7rem 1.2rem; font-size: 0.85rem; }
-    .card { padding: 1.5rem; }
-    .price { font-size: 2.2rem; }
-    .stat-number { font-size: 2rem; }
-    .faq-question { font-size: 0.9rem; padding: 1rem 0; }
-    .resource-card { padding: 1.2rem; }
-    .testimonial-slider { padding: 2rem 1.5rem; }
-    .testimonial-quote { font-size: 1rem; }
-}
-@media (max-width: 480px) {
-    .section { margin: 2rem auto; }
-    .stats-grid, .footer-grid { grid-template-columns: 1fr; }
-    .hero-carousel { height: 50vh; min-height: 300px; }
-    .slide-overlay h2 { font-size: 1.4rem; }
-    .slide-overlay p { font-size: 0.85rem; }
-    .btn-primary { padding: 0.6rem 1.2rem; font-size: 0.85rem; width: 100%; justify-content: center; }
-    .logo-link { font-size: 1.2rem; }
-    .logo-link i { font-size: 1.3rem; }
-    .section-title { font-size: 1.4rem; }
-    .card h3 { font-size: 1.1rem; }
-    .price { font-size: 1.8rem; }
-    .sticky-cta { bottom: 4.5rem; left: 0.5rem; padding: 0.5rem 1rem; font-size: 0.75rem; }
-    .back-to-top { bottom: 0.8rem; right: 0.8rem; width: 36px; height: 36px; }
-    .nav-actions { gap: 0.4rem; }
-    .theme-toggle, .mobile-toggle { padding: 0.4rem 0.7rem; font-size: 1rem; }
-    .footer-fat { padding: 2rem 1rem 1.5rem; }
-}
+        @media (max-width: 1024px) { 
+            .contact-grid { grid-template-columns: 1fr; }
+            .main-nav { gap: 1rem; }
+            .main-nav a { font-size: 0.85rem; }
+        }
+        @media (max-width: 768px) {
+            .main-nav { display: none; }
+            .main-nav.active { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--clr-navy-card); padding: 1rem; border-bottom: 2px solid var(--clr-cyan); z-index: 99; }
+            .main-nav.active a { padding: 0.6rem 0; font-size: 0.9rem; }
+            .mobile-toggle { display: flex; }
+            .header-container { flex-direction: row; justify-content: space-between; align-items: center; }
+            .logo-link { margin-bottom: 0; font-size: 1.4rem; }
+            .logo-link i { font-size: 1.5rem; }
+            .hero-carousel { height: 60vh; min-height: 350px; }
+            .slide-overlay h2 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+            .slide-overlay p { font-size: 0.95rem; padding: 0 1rem; }
+            .btn-primary { padding: 0.7rem 1.5rem; font-size: 0.9rem; }
+            .card-grid, .resources-grid { grid-template-columns: 1fr; }
+            .stats-grid { grid-template-columns: repeat(2, 1fr); }
+            .carousel-arrow { display: none; }
+            .pricing-card.featured { transform: scale(1); }
+            .section { margin: 3rem auto; padding: 0 1rem; }
+            .section-title { font-size: 1.6rem; }
+            .section-subtitle { font-size: 0.95rem; padding: 0 1rem; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+            .footer-col h4 { font-size: 0.85rem; }
+            .sticky-cta { bottom: 5rem; left: 1rem; padding: 0.6rem 1.2rem; font-size: 0.85rem; z-index: 89; }
+            .back-to-top { bottom: 1rem; right: 1rem; width: 40px; height: 40px; font-size: 1rem; }
+            .contact-grid { gap: 1.5rem; }
+            .form-input, .form-textarea { padding: 0.7rem 1rem; font-size: 0.9rem; }
+            .newsletter-box { max-width: 100%; }
+            .newsletter-box input { padding: 0.7rem 1rem; }
+            .newsletter-box button { padding: 0.7rem 1.2rem; font-size: 0.85rem; }
+            .card { padding: 1.5rem; }
+            .price { font-size: 2.2rem; }
+            .stat-number { font-size: 2rem; }
+            .faq-question { font-size: 0.9rem; padding: 1rem 0; }
+            .resource-card { padding: 1.2rem; }
+            .testimonial-slider { padding: 2rem 1.5rem; }
+            .testimonial-quote { font-size: 1rem; }
+        }
+        @media (max-width: 480px) {
+            .section { margin: 2rem auto; }
+            .stats-grid, .footer-grid { grid-template-columns: 1fr; }
+            .hero-carousel { height: 50vh; min-height: 300px; }
+            .slide-overlay h2 { font-size: 1.4rem; }
+            .slide-overlay p { font-size: 0.85rem; }
+            .btn-primary { padding: 0.6rem 1.2rem; font-size: 0.85rem; width: 100%; justify-content: center; }
+            .logo-link { font-size: 1.2rem; }
+            .logo-link i { font-size: 1.3rem; }
+            .section-title { font-size: 1.4rem; }
+            .card h3 { font-size: 1.1rem; }
+            .price { font-size: 1.8rem; }
+            .sticky-cta { bottom: 4.5rem; left: 0.5rem; padding: 0.5rem 1rem; font-size: 0.75rem; }
+            .back-to-top { bottom: 0.8rem; right: 0.8rem; width: 36px; height: 36px; }
+            .nav-actions { gap: 0.3rem; }
+            .theme-toggle, .mobile-toggle { padding: 0.4rem 0.6rem; font-size: 0.95rem; }
+            .footer-fat { padding: 2rem 1rem 1.5rem; }
+        }
     </style>
 </head>
 <body>
@@ -229,6 +206,7 @@
             <a href="#" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions">
+                <span id="auth-status"></span>
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
                 <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
             </div>
@@ -289,30 +267,20 @@
     <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
     <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
-  <script>
-    // ============================================
-    // ALIVERBIOPHARM - Vercel API + Supabase Auth
-    // ============================================
+    <script>
     const API_BASE = '/api/query';
     const cache = {};
 
-    // API caller with optional auth token
     async function apiCall(action, params = {}) {
         const headers = { 'Content-Type': 'application/json' };
         const token = localStorage.getItem('sb-token');
         if (token) headers['Authorization'] = `Bearer ${token}`;
-        
-        const res = await fetch(API_BASE, {
-            method: 'POST',
-            headers,
-            body: JSON.stringify({ action, ...params })
-        });
+        const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }) });
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
         return json.data;
     }
 
-    // Helper functions
     function esc(t) {
         const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
         return String(t || '').replace(/[&<>"']/g, c => m[c]);
@@ -323,21 +291,18 @@
         return t && !/^(javascript|data|vbscript):/i.test(t) ? t : '#';
     }
 
-    // ============ AUTH ============
-     function updateAuthUI() {
-    const token = localStorage.getItem('sb-token');
-    const userEl = document.getElementById('auth-status');
-    if (!userEl) return;
-    
-    if (token) {
-        const email = localStorage.getItem('sb-email') || 'User';
-        // Show only first part of email
-        const shortEmail = email.split('@')[0];
-        userEl.innerHTML = `<button onclick="signOut()" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(email)}"><i class="fa-solid fa-user"></i> ${esc(shortEmail)}</button>`;
-    } else {
-        userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>`;
+    function updateAuthUI() {
+        const token = localStorage.getItem('sb-token');
+        const userEl = document.getElementById('auth-status');
+        if (!userEl) return;
+        if (token) {
+            const email = localStorage.getItem('sb-email') || 'User';
+            const shortEmail = email.split('@')[0];
+            userEl.innerHTML = `<button onclick="signOut()" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;max-width:120px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="${esc(email)}"><i class="fa-solid fa-user"></i> ${esc(shortEmail)}</button>`;
+        } else {
+            userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.8rem;padding:0.3rem 0.7rem;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>`;
+        }
     }
-}
 
     window.signOut = async function() {
         try { await apiCall('signout'); } catch (e) {}
@@ -350,12 +315,12 @@
     window.showAuthForm = function(mode) {
         const existing = document.getElementById('auth-modal');
         if (existing) existing.remove();
-        
         const modal = document.createElement('div');
         modal.id = 'auth-modal';
         modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
         modal.innerHTML = `
-            <div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;">
+            <div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;">
+                <button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button>
                 <h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
                 <form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;">
                     <input type="email" id="auth-email" class="form-input" placeholder="Email" required>
@@ -363,29 +328,24 @@
                     <button type="submit" class="btn-primary" style="justify-content:center;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
                 </form>
                 <p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">
-                    ${mode === 'signin' ? "No account? <a href='#' id='switch-signup' style='color:var(--clr-magenta);'>Sign up</a>" : "Have account? <a href='#' id='switch-signin' style='color:var(--clr-magenta);'>Sign in</a>"}
+                    ${mode === 'signin' ? "No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>" : "Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>"}
                 </p>
-                <button id="close-auth" style="background:none;border:none;color:var(--clr-text-dim);cursor:pointer;position:absolute;top:0.5rem;right:0.5rem;font-size:1.2rem;">✕</button>
                 <p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p>
             </div>`;
         document.body.appendChild(modal);
-        
         document.getElementById('close-auth').onclick = () => modal.remove();
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-        
-        document.getElementById(mode === 'signin' ? 'switch-signup' : 'switch-signin').onclick = (e) => {
+        document.getElementById('switch-mode').onclick = (e) => {
             e.preventDefault();
             modal.remove();
             showAuthForm(mode === 'signin' ? 'signup' : 'signin');
         };
-        
         document.getElementById('auth-form').onsubmit = async (e) => {
             e.preventDefault();
             const email = document.getElementById('auth-email').value.trim();
             const password = document.getElementById('auth-password').value;
             const errEl = document.getElementById('auth-error');
             errEl.style.display = 'none';
-            
             try {
                 const action = mode === 'signin' ? 'signin' : 'signup';
                 const data = await apiCall(action, { email, password });
@@ -406,7 +366,6 @@
         };
     };
 
-    // ============ BUILD FUNCTIONS ============
     async function buildNavigation(d) {
         const links = d?.links || [];
         document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
@@ -491,7 +450,7 @@
                 ${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">` : ''}
                 <div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date || '')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author || '')}</span></div>
                 <h3>${esc(p.title)}</h3><p>${esc(p.excerpt || '')}</p>
-                <a href="${esc(p.slug ? '/blog/' + p.slug : '#')}" style="color:var(--clr-magenta);text-decoration:none;font-weight:600;">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+                <a href="#" style="color:var(--clr-magenta);text-decoration:none;font-weight:600;">Read Article <i class="fa-solid fa-arrow-right"></i></a>
             </div>`).join('');
     }
 
@@ -593,13 +552,7 @@
         const slides = document.querySelectorAll('.carousel-slide');
         const dots = document.querySelectorAll('.carousel-dot');
         let current = 0, interval;
-        function go(i) {
-            slides[current].classList.remove('active');
-            dots[current]?.classList.remove('active');
-            current = i;
-            slides[current].classList.add('active');
-            dots[current]?.classList.add('active');
-        }
+        function go(i) { slides[current].classList.remove('active'); dots[current]?.classList.remove('active'); current = i; slides[current].classList.add('active'); dots[current]?.classList.add('active'); }
         function nxt() { go((current + 1) % count); }
         function prv() { go((current - 1 + count) % count); }
         function reset() { clearInterval(interval); interval = setInterval(nxt, 5000); }
@@ -610,18 +563,10 @@
     }
 
     function initUI() {
-        // Theme toggle
-        const tt = document.getElementById('theme-toggle');
-        const icon = tt.querySelector('i');
+        const tt = document.getElementById('theme-toggle'), icon = tt.querySelector('i');
         if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
-        tt.onclick = () => {
-            document.body.classList.toggle('light-mode');
-            const l = document.body.classList.contains('light-mode');
-            icon.classList.replace(l ? 'fa-moon' : 'fa-sun', l ? 'fa-sun' : 'fa-moon');
-            localStorage.setItem('theme', l ? 'light' : 'dark');
-        };
+        tt.onclick = () => { document.body.classList.toggle('light-mode'); const l = document.body.classList.contains('light-mode'); icon.classList.replace(l ? 'fa-moon' : 'fa-sun', l ? 'fa-sun' : 'fa-moon'); localStorage.setItem('theme', l ? 'light' : 'dark'); };
 
-        // Mobile nav
         const mt = document.getElementById('mobile-toggle'), mn = document.getElementById('main-nav'),
               mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay');
         function open() { mn.classList.add('active'); mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
@@ -630,127 +575,51 @@
         mo.onclick = close;
         mp.addEventListener('click', e => { if (e.target.tagName === 'A') close(); });
 
-        // Back to top
         const bb = document.getElementById('back-to-top');
-        window.addEventListener('scroll', () => {
-            bb.classList.toggle('visible', window.scrollY > 500);
-            document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50);
-        }, { passive: true });
+        window.addEventListener('scroll', () => { bb.classList.toggle('visible', window.scrollY > 500); document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
         bb.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
 
-        // Smooth scroll
-        document.querySelectorAll('a[href^="#"]').forEach(a => {
-            a.addEventListener('click', function(e) {
-                if (this.getAttribute('href') === '#') return;
-                e.preventDefault();
-                document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
-            });
-        });
+        document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) { if (this.getAttribute('href') === '#') return; e.preventDefault(); document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' }); }));
 
-        // Scroll animations
-        const obs = new IntersectionObserver(entries => {
-            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
-        }, { threshold: 0.1 });
+        const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
         document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
 
-        // Contact form - REAL submission
         document.getElementById('contact-form').onsubmit = async function(e) {
             e.preventDefault();
-            const fd = {
-                name: document.getElementById('contact-name').value.trim(),
-                email: document.getElementById('contact-email').value.trim(),
-                subject: document.getElementById('contact-subject').value.trim(),
-                message: document.getElementById('contact-message').value.trim()
-            };
-            if (!fd.name || !fd.email || !fd.subject || !fd.message) {
-                alert('Please fill all fields.');
-                return;
-            }
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) {
-                alert('Please enter a valid email.');
-                return;
-            }
+            const fd = { name: document.getElementById('contact-name').value.trim(), email: document.getElementById('contact-email').value.trim(), subject: document.getElementById('contact-subject').value.trim(), message: document.getElementById('contact-message').value.trim() };
+            if (!fd.name || !fd.email || !fd.subject || !fd.message) return alert('Please fill all fields.');
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) return alert('Please enter a valid email.');
             try {
                 await apiCall('submit_contact', { formData: fd });
-                const success = document.getElementById('form-success');
-                success.textContent = '✓ Message sent! We will respond within 24 hours.';
-                success.style.display = 'block';
-                this.reset();
-                setTimeout(() => success.style.display = 'none', 5000);
-            } catch (err) {
-                alert('Failed to send message: ' + err.message);
-            }
+                const s = document.getElementById('form-success'); s.textContent = '✓ Message sent! We will respond within 24 hours.'; s.style.display = 'block';
+                this.reset(); setTimeout(() => s.style.display = 'none', 5000);
+            } catch (err) { alert('Failed to send message: ' + err.message); }
         };
 
-        // Newsletter form - REAL submission
         document.getElementById('newsletter-form').onsubmit = async function(e) {
             e.preventDefault();
             const email = this.querySelector('input').value.trim();
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-                alert('Please enter a valid email.');
-                return;
-            }
-            try {
-                await apiCall('subscribe_newsletter', { formData: { email } });
-                alert('✓ Subscribed successfully!');
-                this.reset();
-            } catch (err) {
-                alert('Subscription successful!');
-                this.reset();
-            }
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Please enter a valid email.');
+            try { await apiCall('subscribe_newsletter', { formData: { email } }); alert('✓ Subscribed successfully!'); this.reset(); }
+            catch (err) { alert('Subscription successful!'); this.reset(); }
         };
 
-        // Filter button
-        document.getElementById('filter-submit').onclick = () => {
-            buildResources({
-                level: document.getElementById('filter-level').value,
-                category: document.getElementById('filter-category').value,
-                tag: document.getElementById('filter-tag').value
-            });
-        };
+        document.getElementById('filter-submit').onclick = () => buildResources({ level: document.getElementById('filter-level').value, category: document.getElementById('filter-category').value, tag: document.getElementById('filter-tag').value });
     }
 
-    // ============ MAIN INIT ============
     document.addEventListener('DOMContentLoaded', async () => {
         document.getElementById('current-year').textContent = new Date().getFullYear();
-        
-       // Add auth button to nav — insert AFTER theme toggle, BEFORE mobile toggle
-const navActions = document.querySelector('.nav-actions');
-const authSpan = document.createElement('span');
-authSpan.id = 'auth-status';
-authSpan.style.cssText = 'order:1;';
-// Insert before the last element (mobile toggle)
-const mobileToggle = document.getElementById('mobile-toggle');
-navActions.insertBefore(authSpan, mobileToggle);
-updateAuthUI();
-
-        // Init UI
+        updateAuthUI();
         initUI();
-
-        // Load all sections
         try {
             const sections = await apiCall('get_all_site_sections');
             if (sections) {
-                await Promise.all([
-                    buildNavigation(sections.navigation),
-                    buildFooter(sections.footer),
-                    buildHero(sections.hero),
-                    buildTeam(sections.team),
-                    buildTestimonials(sections.testimonials),
-                    buildPricing(sections.pricing),
-                    buildBlog(sections.blog),
-                    buildFAQ(sections.faq),
-                    buildStatistics(sections.statistics)
-                ]);
+                await Promise.all([buildNavigation(sections.navigation), buildFooter(sections.footer), buildHero(sections.hero), buildTeam(sections.team), buildTestimonials(sections.testimonials), buildPricing(sections.pricing), buildBlog(sections.blog), buildFAQ(sections.faq), buildStatistics(sections.statistics)]);
             }
-        } catch (err) {
-            console.error('Failed to load sections:', err);
-        }
-
+        } catch (err) { console.error('Failed to load sections:', err); }
         await loadFilters();
         await buildResources();
-        console.log('🚀 AliverBiopharm ready');
     });
-</script>
+    </script>
 </body>
 </html>
