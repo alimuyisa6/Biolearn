@@ -136,23 +136,88 @@
         .contact-grid { display: grid; grid-template-columns: 1fr 1fr; gap: 3rem; }
         .map-container { border-radius: var(--radius-lg); overflow: hidden; border: 2px solid var(--clr-border-glow); min-height: 350px; }
         .map-container iframe { width: 100%; height: 100%; min-height: 350px; border: 0; }
-        @media (max-width: 1024px) { .contact-grid { grid-template-columns: 1fr; } }
-        @media (max-width: 768px) {
-            .main-nav { display: none; }
-            .main-nav.active { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--clr-navy-card); padding: 1rem; border-bottom: 2px solid var(--clr-cyan); z-index: 99; }
-            .mobile-toggle { display: flex; }
-            .header-container { flex-direction: row; justify-content: space-between; align-items: center; }
-            .logo-link { margin-bottom: 0; font-size: 1.4rem; }
-            .hero-carousel { height: 60vh; min-height: 400px; }
-            .card-grid, .resources-grid { grid-template-columns: 1fr; }
-            .stats-grid { grid-template-columns: repeat(2, 1fr); }
-            .carousel-arrow { display: none; }
-            .pricing-card.featured { transform: scale(1); }
-        }
-        @media (max-width: 480px) {
-            .section { margin: 3rem auto; }
-            .stats-grid, .footer-grid { grid-template-columns: 1fr; }
-        }
+      @media (max-width: 1024px) { 
+    .contact-grid { grid-template-columns: 1fr; }
+    .main-nav { gap: 1rem; }
+    .main-nav a { font-size: 0.85rem; }
+}
+@media (max-width: 768px) {
+    .main-nav { display: none; }
+    .main-nav.active { 
+        display: flex; 
+        flex-direction: column; 
+        position: absolute; 
+        top: 100%; 
+        left: 0; 
+        right: 0; 
+        background: var(--clr-navy-card); 
+        padding: 1rem; 
+        border-bottom: 2px solid var(--clr-cyan); 
+        z-index: 99; 
+    }
+    .main-nav.active a { padding: 0.6rem 0; font-size: 0.9rem; }
+    .mobile-toggle { display: flex; }
+    .header-container { flex-direction: row; justify-content: space-between; align-items: center; }
+    .logo-link { margin-bottom: 0; font-size: 1.4rem; }
+    .logo-link i { font-size: 1.5rem; }
+    .hero-carousel { height: 60vh; min-height: 350px; }
+    .slide-overlay h2 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
+    .slide-overlay p { font-size: 0.95rem; padding: 0 1rem; }
+    .btn-primary { padding: 0.7rem 1.5rem; font-size: 0.9rem; }
+    .card-grid, .resources-grid { grid-template-columns: 1fr; }
+    .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    .carousel-arrow { display: none; }
+    .pricing-card.featured { transform: scale(1); }
+    .section { margin: 3rem auto; padding: 0 1rem; }
+    .section-title { font-size: 1.6rem; }
+    .section-subtitle { font-size: 0.95rem; padding: 0 1rem; }
+    .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 1.5rem; }
+    .footer-col h4 { font-size: 0.85rem; }
+    .sticky-cta { 
+        bottom: 5rem; 
+        left: 1rem; 
+        padding: 0.6rem 1.2rem; 
+        font-size: 0.85rem; 
+        z-index: 89;
+    }
+    .back-to-top { 
+        bottom: 1rem; 
+        right: 1rem; 
+        width: 40px; 
+        height: 40px; 
+        font-size: 1rem; 
+    }
+    .contact-grid { gap: 1.5rem; }
+    .form-input, .form-textarea { padding: 0.7rem 1rem; font-size: 0.9rem; }
+    .newsletter-box { max-width: 100%; }
+    .newsletter-box input { padding: 0.7rem 1rem; }
+    .newsletter-box button { padding: 0.7rem 1.2rem; font-size: 0.85rem; }
+    .card { padding: 1.5rem; }
+    .price { font-size: 2.2rem; }
+    .stat-number { font-size: 2rem; }
+    .faq-question { font-size: 0.9rem; padding: 1rem 0; }
+    .resource-card { padding: 1.2rem; }
+    .testimonial-slider { padding: 2rem 1.5rem; }
+    .testimonial-quote { font-size: 1rem; }
+}
+@media (max-width: 480px) {
+    .section { margin: 2rem auto; }
+    .stats-grid, .footer-grid { grid-template-columns: 1fr; }
+    .hero-carousel { height: 50vh; min-height: 300px; }
+    .slide-overlay h2 { font-size: 1.4rem; }
+    .slide-overlay p { font-size: 0.85rem; }
+    .btn-primary { padding: 0.6rem 1.2rem; font-size: 0.85rem; width: 100%; justify-content: center; }
+    .logo-link { font-size: 1.2rem; }
+    .logo-link i { font-size: 1.3rem; }
+    .section-title { font-size: 1.4rem; }
+    .card h3 { font-size: 1.1rem; }
+    .price { font-size: 1.8rem; }
+    .sticky-cta { bottom: 4.5rem; left: 0.5rem; padding: 0.5rem 1rem; font-size: 0.75rem; }
+    .back-to-top { bottom: 0.8rem; right: 0.8rem; width: 36px; height: 36px; }
+    .nav-actions { gap: 0.4rem; }
+    .theme-toggle, .mobile-toggle { padding: 0.4rem 0.7rem; font-size: 1rem; }
+    .footer-fat { padding: 2rem 1rem 1.5rem; }
+}
     </style>
 </head>
 <body>
@@ -223,11 +288,14 @@
     <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
     <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
- <script>
+  <script>
+    // ============================================
+    // ALIVERBIOPHARM - Vercel API + Supabase Auth
+    // ============================================
     const API_BASE = '/api/query';
     const cache = {};
 
-    // API caller 
+    // API caller with optional auth token
     async function apiCall(action, params = {}) {
         const headers = { 'Content-Type': 'application/json' };
         const token = localStorage.getItem('sb-token');
@@ -611,7 +679,7 @@
             }
         };
 
-        // Newsletter form 
+        // Newsletter form - REAL submission
         document.getElementById('newsletter-form').onsubmit = async function(e) {
             e.preventDefault();
             const email = this.querySelector('input').value.trim();
