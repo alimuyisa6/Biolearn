@@ -223,222 +223,460 @@
     <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
     <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
-    <script>
-        // ============================================
-        // ALIVERBIOPHARM - Calls YOUR Vercel API
-        // Zero keys exposed to browser
-        // ============================================
+ <script>
+    const API_BASE = '/api/query';
+    const cache = {};
 
-        const API_BASE = '/api/query';  // Your Vercel serverless function
-
-        async function apiCall(action, params = {}) {
-            const res = await fetch(API_BASE, {
-                method: 'POST',
-                headers: { 'Content-Type': 'application/json' },
-                body: JSON.stringify({ action, ...params })
-            });
-            if (!res.ok) {
-                const err = await res.json().catch(() => ({}));
-                throw new Error(err.error || `HTTP ${res.status}`);
-            }
-            const json = await res.json();
-            return json.data;
-        }
-
-        const cache = {};
-
-        async function getSiteSection(name) {
-            if (cache[name]) return cache[name];
-            const data = await apiCall('get_site_section', { section: name });
-            cache[name] = data;
-            return data;
-        }
-
-        async function getAllSections() {
-            if (cache.__all) return cache.__all;
-            const data = await apiCall('get_all_site_sections');
-            cache.__all = data;
-            Object.entries(data).forEach(([k, v]) => cache[k] = v);
-            return data;
-        }
-
-        function esc(text) {
-            const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-            return String(text || '').replace(/[&<>"']/g, m => map[m]);
-        }
-
-        function safeUrl(url) {
-            if (!url || typeof url !== 'string') return '#';
-            const t = url.trim();
-            return t && !/^(javascript|data|vbscript):/i.test(t) ? t : '#';
-        }
-
-        // Build functions
-        async function buildNavigation(d) {
-            const links = d?.links || [];
-            document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
-            document.getElementById('mobile-nav-panel').innerHTML = links.map(l => `<a href="${esc(l.href)}">${esc(l.label)}</a>`).join('');
-        }
-
-        async function buildFooter(d) {
-            if (!d) return;
-            const fg = document.getElementById('footer-grid');
-            const fs = document.getElementById('footer-social');
-            const logo = fg.querySelector('.footer-col');
-            const cols = (d.columns || []).map(c => `<div class="footer-col"><h4>${esc(c.heading)}</h4><ul>${(c.items || []).map(i => `<li><a href="${esc(i.href || '#')}">${i.icon ? `<i class="${esc(i.icon)}" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>` : ''}${esc(i.label)}</a></li>`).join('')}</ul></div>`).join('');
-            fg.innerHTML = logo.outerHTML + cols;
-            fs.innerHTML = (d.social_links || []).map(s => `<a href="${esc(s.url)}" aria-label="${esc(s.platform)}"><i class="${esc(s.icon)}"></i></a>`).join('');
-        }
-
-        async function buildHero(d) {
-            const slides = d?.slides || [];
-            if (!slides.length) return;
-            const carousel = document.querySelector('.hero-carousel');
-            carousel.innerHTML = slides.map((s, i) => `
-                <div class="carousel-slide${i === 0 ? ' active' : ''}" style="background-image:url('${esc(s.background_image)}');">
-                    <div class="slide-overlay"><h2>${esc(s.title)}</h2><p>${esc(s.subtitle)}</p><a href="${esc(s.cta_link)}" class="btn-primary"><i class="${esc(s.icon || 'fa-solid fa-arrow-right')}"></i> ${esc(s.cta_text)}</a></div>
-                </div>`).join('') + `
-                <button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
-                <button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
-                <div class="carousel-controls">${slides.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}"></span>`).join('')}</div>`;
-            initCarousel(slides.length);
-        }
-
-        async function buildTeam(d) {
-            const m = d?.members || [];
-            const g = document.getElementById('team-grid');
-            if (!m.length) { g.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Team coming soon.</p>'; return; }
-            g.innerHTML = m.map(p => `<div class="card team-card"><div class="team-avatar">${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.name)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;">` : '<i class="fa-solid fa-user-tie"></i>'}</div><h3>${esc(p.name)}${p.title ? ', ' + esc(p.title) : ''}</h3><p>${esc(p.bio || '')}</p></div>`).join('');
-        }
-
-        async function buildTestimonials(d) {
-            const q = d?.quotes || [];
-            const s = document.getElementById('testimonial-slider');
-            if (!q.length) { s.innerHTML = '<p style="text-align:center;">No testimonials yet.</p>'; return; }
-            let c = 0;
-            function show(i) { c = i; s.innerHTML = `<p class="testimonial-quote">"${esc(q[i].text)}"</p><p class="testimonial-author">— ${esc(q[i].author)}</p><div class="testimonial-nav">${q.map((_, j) => `<span class="testimonial-dot${j === i ? ' active' : ''}" data-index="${j}"></span>`).join('')}</div>`; s.querySelectorAll('.testimonial-dot').forEach(d => d.addEventListener('click', () => show(+d.dataset.index))); }
-            show(0); setInterval(() => show((c + 1) % q.length), 5000);
-        }
-
-        async function buildPricing(d) {
-            const p = d?.plans || [];
-            const g = document.getElementById('pricing-grid');
-            if (!p.length) { g.innerHTML = '<p style="text-align:center;">Plans coming soon.</p>'; return; }
-            g.innerHTML = p.map(pl => `<div class="card pricing-card${pl.featured ? ' featured' : ''}"><h3>${esc(pl.name)}</h3><p>${esc(pl.description || '')}</p><div class="price">${esc(pl.price)}<span style="font-size:1rem;color:var(--clr-text-dim);">${esc(pl.period || '')}</span></div><ul class="pricing-features">${(pl.features || []).map(f => `<li><i class="fa-solid fa-check"></i> ${esc(f)}</li>`).join('')}</ul><button class="btn-primary" style="width:100%;justify-content:center;">${esc(pl.cta_text || 'Subscribe')}</button></div>`).join('');
-        }
-
-        async function buildBlog(d) {
-            const posts = d?.posts || [];
-            const g = document.getElementById('blog-grid');
-            if (!posts.length) { g.innerHTML = '<p style="text-align:center;">Articles coming soon.</p>'; return; }
-            g.innerHTML = posts.map(p => `<div class="card">${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">` : ''}<div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date || '')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author || '')}</span></div><h3>${esc(p.title)}</h3><p>${esc(p.excerpt || '')}</p><a href="${esc(p.slug ? '/blog/' + p.slug : '#')}" style="color:var(--clr-magenta);text-decoration:none;font-weight:600;">Read Article <i class="fa-solid fa-arrow-right"></i></a></div>`).join('');
-        }
-
-        async function buildFAQ(d) {
-            const items = d?.items || [];
-            const list = document.getElementById('faq-list');
-            if (!items.length) { list.innerHTML = '<p style="text-align:center;">FAQ coming soon.</p>'; return; }
-            list.innerHTML = items.map(i => `<div class="faq-item"><div class="faq-question"><span>${esc(i.question)}</span><i class="fa-solid fa-chevron-down"></i></div><div class="faq-answer"><p>${esc(i.answer)}</p></div></div>`).join('');
-            list.querySelectorAll('.faq-item').forEach(el => el.querySelector('.faq-question').addEventListener('click', () => { list.querySelectorAll('.faq-item').forEach(o => { if (o !== el) o.classList.remove('active'); }); el.classList.toggle('active'); }));
-        }
-
-        async function buildStatistics(d) {
-            const stats = d?.stats || [];
-            const grid = document.getElementById('stats-grid');
-            if (!stats.length) { grid.innerHTML = '<p style="text-align:center;">Stats coming soon.</p>'; return; }
-            grid.innerHTML = stats.map(s => `<div><div class="stat-number" data-target="${s.value}" data-suffix="${esc(s.suffix || '')}">0</div><div style="color:var(--clr-text-dim);margin-top:0.3rem;">${esc(s.label)}</div></div>`).join('');
-            const obs = new IntersectionObserver((entries) => { if (entries[0].isIntersecting) { grid.querySelectorAll('.stat-number').forEach(el => { const t = +el.dataset.target; const sf = el.dataset.suffix; let c = 0; const inc = Math.ceil(t / 50); const ti = setInterval(() => { c += inc; if (c >= t) { c = t; clearInterval(ti); } el.textContent = c + sf; }, 40); }); obs.disconnect(); } }, { threshold: 0.5 });
-            obs.observe(grid);
-        }
-
-        async function buildResources(filters = {}) {
-            document.getElementById('resources-container').innerHTML = '<div class="spinner"><i class="fa-solid fa-dna"></i><p>Loading...</p></div>';
-            try {
-                const data = await apiCall('get_resources', { filters });
-                if (!data.length) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; return; }
-                const groups = {};
-                data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); });
-                document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `
-                    <div style="margin-bottom:3rem;"><h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:0.5rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2>
-                    <div class="resources-grid">${items.map(item => `<div class="resource-card"><div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a><p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p><div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span><span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span><span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);"><a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div style="display:flex;gap:0.4rem;"><a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>`).join('')}</div></div>`).join('');
-            } catch (err) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; }
-        }
-
-        async function loadFilters() {
-            try {
-                const { levels, categories, tags } = await apiCall('get_filter_options');
-                ['filter-level', 'filter-category', 'filter-tag'].forEach((id, i) => {
-                    const opts = [levels, categories, tags][i];
-                    const sel = document.getElementById(id);
-                    if (sel) { sel.innerHTML = '<option value="">All</option>'; opts.forEach(o => { const el = document.createElement('option'); el.value = o; el.textContent = o; sel.appendChild(el); }); }
-                });
-            } catch (err) { /* */ }
-        }
-
-        function initCarousel(count) {
-            const slides = document.querySelectorAll('.carousel-slide');
-            const dots = document.querySelectorAll('.carousel-dot');
-            let current = 0, interval;
-            function go(i) { slides[current].classList.remove('active'); dots[current]?.classList.remove('active'); current = i; slides[current].classList.add('active'); dots[current]?.classList.add('active'); }
-            function nxt() { go((current + 1) % count); }
-            function prv() { go((current - 1 + count) % count); }
-            function reset() { clearInterval(interval); interval = setInterval(nxt, 5000); }
-            document.querySelector('.carousel-prev')?.addEventListener('click', () => { prv(); reset(); });
-            document.querySelector('.carousel-next')?.addEventListener('click', () => { nxt(); reset(); });
-            dots.forEach(d => d.addEventListener('click', () => { go(+d.dataset.index); reset(); }));
-            reset();
-        }
-
-        function initUI() {
-            const themeToggle = document.getElementById('theme-toggle');
-            const icon = themeToggle.querySelector('i');
-            if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
-            themeToggle.addEventListener('click', () => { document.body.classList.toggle('light-mode'); const l = document.body.classList.contains('light-mode'); icon.classList.replace(l ? 'fa-moon' : 'fa-sun', l ? 'fa-sun' : 'fa-moon'); localStorage.setItem('theme', l ? 'light' : 'dark'); });
-
-            const mt = document.getElementById('mobile-toggle'), mn = document.getElementById('main-nav'), mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay');
-            function open() { mn.classList.add('active'); mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
-            function close() { mn.classList.remove('active'); mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
-            mt.addEventListener('click', () => mp.classList.contains('active') ? close() : open());
-            mo.addEventListener('click', close);
-            mp.addEventListener('click', e => { if (e.target.tagName === 'A') close(); });
-
-            const bb = document.getElementById('back-to-top');
-            window.addEventListener('scroll', () => { bb.classList.toggle('visible', window.scrollY > 500); document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
-            bb.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
-
-            document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) { if (this.getAttribute('href') === '#') return; e.preventDefault(); document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' }); }));
-
-            const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
-            document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
-
-            document.getElementById('contact-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const fd = { name: document.getElementById('contact-name').value.trim(), email: document.getElementById('contact-email').value.trim(), subject: document.getElementById('contact-subject').value.trim(), message: document.getElementById('contact-message').value.trim() };
-                if (!fd.name || !fd.email || !fd.subject || !fd.message) return alert('Fill all fields.');
-                try { await apiCall('submit_contact', { formData: fd }); document.getElementById('form-success').textContent = '✓ Sent!'; document.getElementById('form-success').style.display = 'block'; e.target.reset(); setTimeout(() => document.getElementById('form-success').style.display = 'none', 5000); } catch (err) { alert('Failed.'); }
-            });
-
-            document.getElementById('newsletter-form').addEventListener('submit', async (e) => {
-                e.preventDefault();
-                const email = e.target.querySelector('input').value.trim();
-                if (!email) return;
-                try { await apiCall('subscribe_newsletter', { formData: { email } }); alert('✓ Subscribed!'); e.target.reset(); } catch (err) { alert('Subscribed!'); e.target.reset(); }
-            });
-
-            document.getElementById('filter-submit').addEventListener('click', () => buildResources({ level: document.getElementById('filter-level').value, category: document.getElementById('filter-category').value, tag: document.getElementById('filter-tag').value }));
-        }
-
-        document.addEventListener('DOMContentLoaded', async () => {
-            document.getElementById('current-year').textContent = new Date().getFullYear();
-            initUI();
-            try {
-                const sections = await getAllSections();
-                await Promise.all([buildNavigation(sections.navigation), buildFooter(sections.footer), buildHero(sections.hero), buildTeam(sections.team), buildTestimonials(sections.testimonials), buildPricing(sections.pricing), buildBlog(sections.blog), buildFAQ(sections.faq), buildStatistics(sections.statistics)]);
-            } catch (err) { console.error('Failed to load sections:', err); }
-            await loadFilters();
-            await buildResources();
-            console.log('🚀 AliverBiopharm — Vercel API active, zero keys exposed');
+    // API caller 
+    async function apiCall(action, params = {}) {
+        const headers = { 'Content-Type': 'application/json' };
+        const token = localStorage.getItem('sb-token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        
+        const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ action, ...params })
         });
-    </script>
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+        return json.data;
+    }
+
+    // Helper functions
+    function esc(t) {
+        const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+        return String(t || '').replace(/[&<>"']/g, c => m[c]);
+    }
+    function safeUrl(u) {
+        if (!u || typeof u !== 'string') return '#';
+        const t = u.trim();
+        return t && !/^(javascript|data|vbscript):/i.test(t) ? t : '#';
+    }
+
+    // ============ AUTH ============
+    function updateAuthUI() {
+        const token = localStorage.getItem('sb-token');
+        const userEl = document.getElementById('auth-status');
+        if (!userEl) return;
+        
+        if (token) {
+            const email = localStorage.getItem('sb-email') || 'User';
+            userEl.innerHTML = `<span style="color:var(--clr-text-dim);font-size:0.9rem;">${esc(email)}</span> <button onclick="signOut()" class="theme-toggle" style="font-size:0.85rem;padding:0.3rem 0.8rem;">Sign Out</button>`;
+        } else {
+            userEl.innerHTML = `<button onclick="showAuthForm('signin')" class="theme-toggle" style="font-size:0.85rem;padding:0.3rem 0.8rem;">Sign In</button>`;
+        }
+    }
+
+    window.signOut = async function() {
+        try { await apiCall('signout'); } catch (e) {}
+        localStorage.removeItem('sb-token');
+        localStorage.removeItem('sb-email');
+        updateAuthUI();
+        location.reload();
+    };
+
+    window.showAuthForm = function(mode) {
+        const existing = document.getElementById('auth-modal');
+        if (existing) existing.remove();
+        
+        const modal = document.createElement('div');
+        modal.id = 'auth-modal';
+        modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
+        modal.innerHTML = `
+            <div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;">
+                <h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
+                <form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;">
+                    <input type="email" id="auth-email" class="form-input" placeholder="Email" required>
+                    <input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required>
+                    <button type="submit" class="btn-primary" style="justify-content:center;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
+                </form>
+                <p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">
+                    ${mode === 'signin' ? "No account? <a href='#' id='switch-signup' style='color:var(--clr-magenta);'>Sign up</a>" : "Have account? <a href='#' id='switch-signin' style='color:var(--clr-magenta);'>Sign in</a>"}
+                </p>
+                <button id="close-auth" style="background:none;border:none;color:var(--clr-text-dim);cursor:pointer;position:absolute;top:0.5rem;right:0.5rem;font-size:1.2rem;">✕</button>
+                <p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p>
+            </div>`;
+        document.body.appendChild(modal);
+        
+        document.getElementById('close-auth').onclick = () => modal.remove();
+        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+        
+        document.getElementById(mode === 'signin' ? 'switch-signup' : 'switch-signin').onclick = (e) => {
+            e.preventDefault();
+            modal.remove();
+            showAuthForm(mode === 'signin' ? 'signup' : 'signin');
+        };
+        
+        document.getElementById('auth-form').onsubmit = async (e) => {
+            e.preventDefault();
+            const email = document.getElementById('auth-email').value.trim();
+            const password = document.getElementById('auth-password').value;
+            const errEl = document.getElementById('auth-error');
+            errEl.style.display = 'none';
+            
+            try {
+                const action = mode === 'signin' ? 'signin' : 'signup';
+                const data = await apiCall(action, { email, password });
+                if (data.session) {
+                    localStorage.setItem('sb-token', data.session.access_token);
+                    localStorage.setItem('sb-email', data.user.email);
+                    modal.remove();
+                    updateAuthUI();
+                    location.reload();
+                } else if (mode === 'signup') {
+                    errEl.textContent = 'Check your email to confirm signup.';
+                    errEl.style.display = 'block';
+                }
+            } catch (err) {
+                errEl.textContent = err.message;
+                errEl.style.display = 'block';
+            }
+        };
+    };
+
+    // ============ BUILD FUNCTIONS ============
+    async function buildNavigation(d) {
+        const links = d?.links || [];
+        document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
+        document.getElementById('mobile-nav-panel').innerHTML = links.map(l => `<a href="${esc(l.href)}">${esc(l.label)}</a>`).join('');
+    }
+
+    async function buildFooter(d) {
+        if (!d) return;
+        const fg = document.getElementById('footer-grid');
+        const fs = document.getElementById('footer-social');
+        const logo = fg.querySelector('.footer-col');
+        const cols = (d.columns || []).map(c => `
+            <div class="footer-col">
+                <h4>${esc(c.heading)}</h4>
+                <ul>${(c.items || []).map(i => `<li><a href="${esc(i.href || '#')}">${i.icon ? `<i class="${esc(i.icon)}" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>` : ''}${esc(i.label)}</a></li>`).join('')}</ul>
+            </div>`).join('');
+        fg.innerHTML = logo.outerHTML + cols;
+        fs.innerHTML = (d.social_links || []).map(s => `<a href="${esc(s.url)}" aria-label="${esc(s.platform)}"><i class="${esc(s.icon)}"></i></a>`).join('');
+    }
+
+    async function buildHero(d) {
+        const slides = d?.slides || [];
+        if (!slides.length) return;
+        const carousel = document.querySelector('.hero-carousel');
+        carousel.innerHTML = slides.map((s, i) => `
+            <div class="carousel-slide${i === 0 ? ' active' : ''}" style="background-image:url('${esc(s.background_image)}');">
+                <div class="slide-overlay"><h2>${esc(s.title)}</h2><p>${esc(s.subtitle)}</p><a href="${esc(s.cta_link)}" class="btn-primary"><i class="${esc(s.icon || 'fa-solid fa-arrow-right')}"></i> ${esc(s.cta_text)}</a></div>
+            </div>`).join('') + `
+            <button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button>
+            <button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button>
+            <div class="carousel-controls">${slides.map((_, i) => `<span class="carousel-dot${i === 0 ? ' active' : ''}" data-index="${i}"></span>`).join('')}</div>`;
+        initCarousel(slides.length);
+    }
+
+    async function buildTeam(d) {
+        const m = d?.members || [];
+        const g = document.getElementById('team-grid');
+        if (!m.length) { g.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Team coming soon.</p>'; return; }
+        g.innerHTML = m.map(p => `
+            <div class="card team-card">
+                <div class="team-avatar">
+                    ${p.avatar_url ? `<img src="${esc(p.avatar_url)}" alt="${esc(p.name)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">` : '<i class="fa-solid fa-user-tie"></i>'}
+                </div>
+                <h3>${esc(p.name)}${p.title ? ', ' + esc(p.title) : ''}</h3>
+                <p>${esc(p.bio || '')}</p>
+            </div>`).join('');
+    }
+
+    async function buildTestimonials(d) {
+        const q = d?.quotes || [];
+        const s = document.getElementById('testimonial-slider');
+        if (!q.length) { s.innerHTML = '<p style="text-align:center;">No testimonials yet.</p>'; return; }
+        let c = 0;
+        function show(i) {
+            c = i;
+            s.innerHTML = `<p class="testimonial-quote">"${esc(q[i].text)}"</p><p class="testimonial-author">— ${esc(q[i].author)}</p><div class="testimonial-nav">${q.map((_, j) => `<span class="testimonial-dot${j === i ? ' active' : ''}" data-index="${j}"></span>`).join('')}</div>`;
+            s.querySelectorAll('.testimonial-dot').forEach(d => d.onclick = () => show(+d.dataset.index));
+        }
+        show(0);
+        setInterval(() => show((c + 1) % q.length), 5000);
+    }
+
+    async function buildPricing(d) {
+        const p = d?.plans || [];
+        const g = document.getElementById('pricing-grid');
+        if (!p.length) { g.innerHTML = '<p style="text-align:center;">Plans coming soon.</p>'; return; }
+        g.innerHTML = p.map(pl => `
+            <div class="card pricing-card${pl.featured ? ' featured' : ''}">
+                <h3>${esc(pl.name)}</h3><p>${esc(pl.description || '')}</p>
+                <div class="price">${esc(pl.price)}<span style="font-size:1rem;color:var(--clr-text-dim);">${esc(pl.period || '')}</span></div>
+                <ul class="pricing-features">${(pl.features || []).map(f => `<li><i class="fa-solid fa-check"></i> ${esc(f)}</li>`).join('')}</ul>
+                <button class="btn-primary" style="width:100%;justify-content:center;">${esc(pl.cta_text || 'Subscribe')}</button>
+            </div>`).join('');
+    }
+
+    async function buildBlog(d) {
+        const posts = d?.posts || [];
+        const g = document.getElementById('blog-grid');
+        if (!posts.length) { g.innerHTML = '<p style="text-align:center;">Articles coming soon.</p>'; return; }
+        g.innerHTML = posts.map(p => `
+            <div class="card">
+                ${p.image_url ? `<img src="${esc(p.image_url)}" alt="${esc(p.title)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">` : ''}
+                <div style="display:flex;gap:1rem;font-size:0.85rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date || '')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author || '')}</span></div>
+                <h3>${esc(p.title)}</h3><p>${esc(p.excerpt || '')}</p>
+                <a href="${esc(p.slug ? '/blog/' + p.slug : '#')}" style="color:var(--clr-magenta);text-decoration:none;font-weight:600;">Read Article <i class="fa-solid fa-arrow-right"></i></a>
+            </div>`).join('');
+    }
+
+    async function buildFAQ(d) {
+        const items = d?.items || [];
+        const list = document.getElementById('faq-list');
+        if (!items.length) { list.innerHTML = '<p style="text-align:center;">FAQ coming soon.</p>'; return; }
+        list.innerHTML = items.map(i => `
+            <div class="faq-item">
+                <div class="faq-question"><span>${esc(i.question)}</span><i class="fa-solid fa-chevron-down"></i></div>
+                <div class="faq-answer"><p>${esc(i.answer)}</p></div>
+            </div>`).join('');
+        list.querySelectorAll('.faq-item').forEach(el => {
+            el.querySelector('.faq-question').onclick = () => {
+                list.querySelectorAll('.faq-item').forEach(o => { if (o !== el) o.classList.remove('active'); });
+                el.classList.toggle('active');
+            };
+        });
+    }
+
+    async function buildStatistics(d) {
+        const stats = d?.stats || [];
+        const grid = document.getElementById('stats-grid');
+        if (!stats.length) { grid.innerHTML = '<p style="text-align:center;">Stats coming soon.</p>'; return; }
+        grid.innerHTML = stats.map(s => `<div><div class="stat-number" data-target="${s.value}" data-suffix="${esc(s.suffix || '')}">0</div><div style="color:var(--clr-text-dim);margin-top:0.3rem;">${esc(s.label)}</div></div>`).join('');
+        const obs = new IntersectionObserver((entries) => {
+            if (entries[0].isIntersecting) {
+                grid.querySelectorAll('.stat-number').forEach(el => {
+                    const t = +el.dataset.target, sf = el.dataset.suffix;
+                    let c = 0;
+                    const inc = Math.ceil(t / 50);
+                    const ti = setInterval(() => { c += inc; if (c >= t) { c = t; clearInterval(ti); } el.textContent = c + sf; }, 40);
+                });
+                obs.disconnect();
+            }
+        }, { threshold: 0.5 });
+        obs.observe(grid);
+    }
+
+    async function buildResources(filters = {}) {
+        document.getElementById('resources-container').innerHTML = '<div class="spinner"><i class="fa-solid fa-dna"></i><p>Loading...</p></div>';
+        try {
+            const data = await apiCall('get_resources', { filters });
+            if (!data.length) {
+                document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>';
+                return;
+            }
+            const groups = {};
+            data.forEach(item => {
+                const s = (item.section_type || 'Resources').trim();
+                if (!groups[s]) groups[s] = [];
+                groups[s].push(item);
+            });
+            document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `
+                <div style="margin-bottom:3rem;">
+                    <h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:0.5rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2>
+                    <div class="resources-grid">
+                        ${items.map(item => `
+                            <div class="resource-card">
+                                <div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div>
+                                <a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a>
+                                <p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p>
+                                <div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);">
+                                    <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
+                                    <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
+                                    <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
+                                </div>
+                                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);">
+                                    <a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a>
+                                    <div style="display:flex;gap:0.4rem;">
+                                        <a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a>
+                                        <a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a>
+                                        <a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a>
+                                    </div>
+                                </div>
+                            </div>`).join('')}
+                    </div>
+                </div>`).join('');
+        } catch (err) {
+            document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>';
+        }
+    }
+
+    async function loadFilters() {
+        try {
+            const { levels, categories, tags } = await apiCall('get_filter_options');
+            ['filter-level', 'filter-category', 'filter-tag'].forEach((id, i) => {
+                const opts = [levels, categories, tags][i];
+                const sel = document.getElementById(id);
+                if (sel) {
+                    sel.innerHTML = '<option value="">All</option>';
+                    opts.forEach(o => { const el = document.createElement('option'); el.value = o; el.textContent = o; sel.appendChild(el); });
+                }
+            });
+        } catch (err) {}
+    }
+
+    function initCarousel(count) {
+        const slides = document.querySelectorAll('.carousel-slide');
+        const dots = document.querySelectorAll('.carousel-dot');
+        let current = 0, interval;
+        function go(i) {
+            slides[current].classList.remove('active');
+            dots[current]?.classList.remove('active');
+            current = i;
+            slides[current].classList.add('active');
+            dots[current]?.classList.add('active');
+        }
+        function nxt() { go((current + 1) % count); }
+        function prv() { go((current - 1 + count) % count); }
+        function reset() { clearInterval(interval); interval = setInterval(nxt, 5000); }
+        document.querySelector('.carousel-prev')?.addEventListener('click', () => { prv(); reset(); });
+        document.querySelector('.carousel-next')?.addEventListener('click', () => { nxt(); reset(); });
+        dots.forEach(d => d.addEventListener('click', () => { go(+d.dataset.index); reset(); }));
+        reset();
+    }
+
+    function initUI() {
+        // Theme toggle
+        const tt = document.getElementById('theme-toggle');
+        const icon = tt.querySelector('i');
+        if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
+        tt.onclick = () => {
+            document.body.classList.toggle('light-mode');
+            const l = document.body.classList.contains('light-mode');
+            icon.classList.replace(l ? 'fa-moon' : 'fa-sun', l ? 'fa-sun' : 'fa-moon');
+            localStorage.setItem('theme', l ? 'light' : 'dark');
+        };
+
+        // Mobile nav
+        const mt = document.getElementById('mobile-toggle'), mn = document.getElementById('main-nav'),
+              mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay');
+        function open() { mn.classList.add('active'); mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
+        function close() { mn.classList.remove('active'); mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
+        mt.onclick = () => mp.classList.contains('active') ? close() : open();
+        mo.onclick = close;
+        mp.addEventListener('click', e => { if (e.target.tagName === 'A') close(); });
+
+        // Back to top
+        const bb = document.getElementById('back-to-top');
+        window.addEventListener('scroll', () => {
+            bb.classList.toggle('visible', window.scrollY > 500);
+            document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50);
+        }, { passive: true });
+        bb.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
+
+        // Smooth scroll
+        document.querySelectorAll('a[href^="#"]').forEach(a => {
+            a.addEventListener('click', function(e) {
+                if (this.getAttribute('href') === '#') return;
+                e.preventDefault();
+                document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' });
+            });
+        });
+
+        // Scroll animations
+        const obs = new IntersectionObserver(entries => {
+            entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } });
+        }, { threshold: 0.1 });
+        document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
+
+        // Contact form - REAL submission
+        document.getElementById('contact-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const fd = {
+                name: document.getElementById('contact-name').value.trim(),
+                email: document.getElementById('contact-email').value.trim(),
+                subject: document.getElementById('contact-subject').value.trim(),
+                message: document.getElementById('contact-message').value.trim()
+            };
+            if (!fd.name || !fd.email || !fd.subject || !fd.message) {
+                alert('Please fill all fields.');
+                return;
+            }
+            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) {
+                alert('Please enter a valid email.');
+                return;
+            }
+            try {
+                await apiCall('submit_contact', { formData: fd });
+                const success = document.getElementById('form-success');
+                success.textContent = '✓ Message sent! We will respond within 24 hours.';
+                success.style.display = 'block';
+                this.reset();
+                setTimeout(() => success.style.display = 'none', 5000);
+            } catch (err) {
+                alert('Failed to send message: ' + err.message);
+            }
+        };
+
+        // Newsletter form 
+        document.getElementById('newsletter-form').onsubmit = async function(e) {
+            e.preventDefault();
+            const email = this.querySelector('input').value.trim();
+            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+                alert('Please enter a valid email.');
+                return;
+            }
+            try {
+                await apiCall('subscribe_newsletter', { formData: { email } });
+                alert('✓ Subscribed successfully!');
+                this.reset();
+            } catch (err) {
+                alert('Subscription successful!');
+                this.reset();
+            }
+        };
+
+        // Filter button
+        document.getElementById('filter-submit').onclick = () => {
+            buildResources({
+                level: document.getElementById('filter-level').value,
+                category: document.getElementById('filter-category').value,
+                tag: document.getElementById('filter-tag').value
+            });
+        };
+    }
+
+    // ============ MAIN INIT ============
+    document.addEventListener('DOMContentLoaded', async () => {
+        document.getElementById('current-year').textContent = new Date().getFullYear();
+        
+        // Add auth button to nav
+        const navActions = document.querySelector('.nav-actions');
+        const authSpan = document.createElement('span');
+        authSpan.id = 'auth-status';
+        navActions.insertBefore(authSpan, navActions.firstChild);
+        updateAuthUI();
+
+        // Init UI
+        initUI();
+
+        // Load all sections
+        try {
+            const sections = await apiCall('get_all_site_sections');
+            if (sections) {
+                await Promise.all([
+                    buildNavigation(sections.navigation),
+                    buildFooter(sections.footer),
+                    buildHero(sections.hero),
+                    buildTeam(sections.team),
+                    buildTestimonials(sections.testimonials),
+                    buildPricing(sections.pricing),
+                    buildBlog(sections.blog),
+                    buildFAQ(sections.faq),
+                    buildStatistics(sections.statistics)
+                ]);
+            }
+        } catch (err) {
+            console.error('Failed to load sections:', err);
+        }
+
+        await loadFilters();
+        await buildResources();
+        console.log('🚀 AliverBiopharm ready');
+    });
+</script>
 </body>
 </html>
