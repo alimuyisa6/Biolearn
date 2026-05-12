@@ -306,25 +306,70 @@
     const API_BASE = '/api/query';
     const cache = {};
 
-    async function apiCall(action, params = {}) {
-        const headers = { 'Content-Type': 'application/json' };
-        const token = localStorage.getItem('sb-token');
-        if (token) headers['Authorization'] = `Bearer ${token}`;
-        const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }) });
-        const json = await res.json();
-        if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
-        return json.data;
+     async function apiCall(action, params = {}, retries = 2) {
+    const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+    const token = localStorage.getItem('sb-token');
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    for (let i = 0; i <= retries; i++) {
+        try {
+            const res = await fetch(API_BASE, {
+                method: 'POST', headers,
+                body: JSON.stringify({ action, ...params }),
+                signal: controller.signal
+            });
+            clearTimeout(timeout);
+            if (res.status === 429) throw new Error('Too many requests. Please wait.');
+            if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); updateMobilePanel([]); }
+            const json = await res.json();
+            if (!res.ok) throw new Error(json.error || 'Request failed');
+            return json.data !== undefined ? json.data : json;
+        } catch (err) {
+            clearTimeout(timeout);
+            if (i === retries) throw err;
+            await new Promise(r => setTimeout(r, 1000 * (i + 1)));
+        }
     }
+}
 
     function esc(t) {
         const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
         return String(t || '').replace(/[&<>"']/g, c => m[c]);
     }
-    function safeUrl(u) {
-        if (!u || typeof u !== 'string') return '#';
-        const t = u.trim();
-        return t && !/^(javascript|data|vbscript):/i.test(t) ? t : '#';
-    }
+ 
+ function isTokenExpired() {
+    const token = localStorage.getItem('sb-token');
+    if (!token) return true;
+    try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return (payload.exp * 1000) < Date.now();
+    } catch (e) { return true; }
+}
+
+function safeUrl(u, fallback = '#') {
+    if (!u || typeof u !== 'string') return fallback;
+    const t = u.trim();
+    if (!t) return fallback;
+    const dangerous = /^(javascript:|data:|vbscript:|file:)/i;
+    if (dangerous.test(t)) return fallback;
+    if (t.includes('\\') || t.includes('\n') || t.includes('\r')) return fallback;
+    return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/') || t.startsWith('#') || t.startsWith('mailto:') ? t : fallback;
+}
+
+function createEl(tag, attrs = {}, children = []) {
+    const el = document.createElement(tag);
+    Object.entries(attrs).forEach(([k, v]) => {
+        if (k === 'className') el.className = v;
+        else if (k === 'textContent') el.textContent = v;
+        else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
+        else el.setAttribute(k, v);
+    });
+    children.forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
+    return el;
+}
 
     const icons = {
         'Home': 'fa-solid fa-house', 'Resources': 'fa-solid fa-book', 'Study Notes': 'fa-solid fa-book-open',
@@ -333,19 +378,23 @@
         'Contact': 'fa-solid fa-envelope'
     };
 
-    function updateMobilePanel(links) {
-        const navLinks = document.getElementById('mobile-nav-links');
-        const footer = document.getElementById('mobile-nav-footer');
-        if (!navLinks || !footer) return;
-        navLinks.innerHTML = (links || []).map(l => `<a href="${esc(l.href)}"><i class="${icons[l.label] || 'fa-solid fa-chevron-right'}"></i> ${esc(l.label)}</a>`).join('');
-        const token = localStorage.getItem('sb-token');
-        if (token) {
-            const email = localStorage.getItem('sb-email') || 'User';
-            footer.innerHTML = `<div class="mobile-user-info"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
-        } else {
-            footer.innerHTML = `<a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
-        }
+     function updateMobilePanel(links) {
+    if (isTokenExpired()) {
+        localStorage.removeItem('sb-token');
+        localStorage.removeItem('sb-email');
     }
+    const navLinks = document.getElementById('mobile-nav-links');
+    const footer = document.getElementById('mobile-nav-footer');
+    if (!navLinks || !footer) return;
+    navLinks.innerHTML = (links || []).map(l => `<a href="${esc(l.href)}"><i class="${icons[l.label] || 'fa-solid fa-chevron-right'}"></i> ${esc(l.label)}</a>`).join('');
+    const token = localStorage.getItem('sb-token');
+    if (token) {
+        const email = localStorage.getItem('sb-email') || 'User';
+        footer.innerHTML = `<div class="mobile-user-info"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
+    } else {
+        footer.innerHTML = `<a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
+    }
+}
 
     async function buildNavigation(d) {
         const links = d?.links || [];
@@ -353,11 +402,14 @@
         updateMobilePanel(links);
     }
 
-    window.signOut = async function() {
-        try { await apiCall('signout'); } catch (e) {}
-        localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email');
-        updateMobilePanel([]); location.reload();
-    };
+     window.signOut = async function() {
+    try { await apiCall('signout'); } catch (e) {}
+    localStorage.removeItem('sb-token');
+    localStorage.removeItem('sb-email');
+    sessionStorage.clear();
+    updateMobilePanel([]);
+    location.href = '/';
+};
 
     window.showAuthForm = function(mode) {
         const existing = document.getElementById('auth-modal');
