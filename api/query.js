@@ -12,7 +12,7 @@ const ACTION_WHITELIST = new Set([
   'signup', 'signin', 'signout', 'get_user',
   'stats', 'submissions', 'approve', 'messages',
   'create_payment', 'send_message', 'currencies', 'status',
-  'ai_query'
+  'ai_query', 'get_donate_page_config', 'submit_momo_donation'
 ]);
 
 const RATE_LIMITS = new Map();
@@ -62,6 +62,11 @@ const VALIDATORS = {
   },
   ai_query: (body) => {
     if (!body.prompt || typeof body.prompt !== 'string' || body.prompt.length > 2000) return 'Invalid prompt';
+    return null;
+  },
+  submit_momo_donation: (body) => {
+    if (!body.amount || typeof body.amount !== 'string') return 'Amount required';
+    if (!body.txid || typeof body.txid !== 'string') return 'Transaction ID required';
     return null;
   }
 };
@@ -153,7 +158,7 @@ async function handlePost(req, res) {
 
   try {
     let result;
-    const { section, filters, formData, email, password, payload, submissionId, prompt, mode } = req.body;
+    const { section, filters, formData, email, password, payload, submissionId, prompt, mode, name, amount, txid } = req.body;
 
     switch (action) {
       case 'get_site_section': {
@@ -294,6 +299,20 @@ async function handlePost(req, res) {
         result = { answer: geminiData.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.' };
         break;
       }
+      case 'get_donate_page_config': {
+        result = { nowpayments_api_key: process.env.NOWPAYMENTS_API_KEY || '' };
+        break;
+      }
+      case 'submit_momo_donation': {
+        const { error } = await supabase.from('momo_donations').insert({
+          name: (name || 'Anonymous').slice(0, 100),
+          amount: amount.slice(0, 50),
+          txid: txid.slice(0, 100)
+        });
+        if (error) throw error;
+        result = { success: true };
+        break;
+      }
       default: throw new Error('Unknown action');
     }
 
@@ -302,4 +321,4 @@ async function handlePost(req, res) {
     console.error('POST Error:', error.message);
     return res.status(500).json({ error: 'Internal server error' });
   }
-                                         }
+     }
