@@ -229,7 +229,7 @@
 
     <header class="site-header" id="site-header">
         <div class="header-container">
-            <a href="#" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
+           <a href="#" class="logo-link" id="site-logo"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions">
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
@@ -396,11 +396,22 @@ function createEl(tag, attrs = {}, children = []) {
     }
 }
 
-    async function buildNavigation(d) {
-        const links = d?.links || [];
-        document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
-        updateMobilePanel(links);
-    }
+     async function buildNavigation(d) {
+    const links = d?.links || [];
+    document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
+    updateMobilePanel(links);
+    loadSiteLogo();
+}
+
+async function loadSiteLogo() {
+    try {
+        const config = await apiCall('get_site_section', { section: 'site_config' });
+        if (config && config.logo_url) {
+            const logoEl = document.getElementById('site-logo');
+            if (logoEl) logoEl.innerHTML = `<img src="${esc(config.logo_url)}" alt="AliverBiopharm" style="height:2.5rem;width:auto;vertical-align:middle;">`;
+        }
+    } catch(e) {}
+}
 
      window.signOut = async function() {
     try { await apiCall('signout'); } catch (e) {}
