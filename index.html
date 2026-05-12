@@ -35,21 +35,21 @@
         body { font-family: var(--font-body); background: var(--clr-deep-space); color: var(--clr-white); line-height: 1.6; overflow-x: hidden; min-height: 100vh; display: flex; flex-direction: column; transition: background 0.3s, color 0.3s; max-width: 100vw; }
         .skip-link { position: absolute; top: -100%; left: 1rem; z-index: 1000; background: var(--clr-cyan); color: #0b0b1a; padding: 0.6rem 1.2rem; border-radius: var(--radius-sm); font-weight: 700; text-decoration: none; transition: top var(--transition-fast); }
         .skip-link:focus { top: 0.75rem; }
-        .site-header { position: sticky; top: 0; z-index: 100; background: rgba(11,11,26,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--clr-border-glow); padding: 0.8rem 0; transition: box-shadow var(--transition-smooth); }
+        .site-header { position: sticky; top: 0; z-index: 100; background: rgba(11,11,26,0.9); backdrop-filter: blur(20px); border-bottom: 1px solid var(--clr-border-glow); padding: 0.5rem 0; transition: box-shadow var(--transition-smooth); }
         body.light-mode .site-header { background: rgba(240,244,248,0.9); }
         .site-header.scrolled { box-shadow: var(--shadow-glow); }
-        .header-container { max-width: var(--max-width); margin: 0 auto; display: flex; flex-direction: column; align-items: center; padding: 0 1.5rem; }
-    .logo-link { font-family: var(--font-display); font-size: 1.8rem; font-weight: 700; color: var(--clr-cyan); text-decoration: none; display: flex; align-items: center; gap: 0.6rem; text-shadow: 0 0 15px rgba(0,217,255,0.5); margin-bottom: 0.5rem; }
- .logo-link img { height: auto; width: 200px; max-width: 250px; object-fit: contain; }
-        .logo-link i { font-size: 2rem; color: var(--clr-magenta); }
-        .main-nav { display: flex; gap: 1.2rem; list-style: none; flex-wrap: wrap; justify-content: center; }
-        .main-nav a { color: var(--clr-text-dim); text-decoration: none; font-weight: 500; font-size: 0.9rem; padding: 0.3rem 0; border-bottom: 2px solid transparent; transition: all var(--transition-fast); }
+        .header-container { max-width: var(--max-width); margin: 0 auto; display: flex; align-items: center; justify-content: space-between; padding: 0 1.5rem; }
+        .logo-link { font-family: var(--font-display); font-size: 1.5rem; font-weight: 700; color: var(--clr-cyan); text-decoration: none; display: flex; align-items: center; gap: 0.4rem; text-shadow: 0 0 15px rgba(0,217,255,0.5); flex-shrink: 0; }
+        .logo-link img { height: 38px; width: auto; object-fit: contain; }
+        .logo-link i { font-size: 1.5rem; color: var(--clr-magenta); }
+        .main-nav { display: flex; gap: 1rem; list-style: none; flex-wrap: wrap; justify-content: center; }
+        .main-nav a { color: var(--clr-text-dim); text-decoration: none; font-weight: 500; font-size: 0.85rem; padding: 0.3rem 0; border-bottom: 2px solid transparent; transition: all var(--transition-fast); white-space: nowrap; }
         .main-nav a:hover, .main-nav a.active { color: var(--clr-magenta); border-bottom-color: var(--clr-magenta); }
-        .nav-actions { display: flex; gap: 0.5rem; align-items: center; flex-wrap: nowrap; }
+        .nav-actions { display: flex; gap: 0.4rem; align-items: center; flex-wrap: nowrap; flex-shrink: 0; }
         .nav-actions > * { flex-shrink: 0; }
-        .theme-toggle, .mobile-toggle { background: transparent; border: 1px solid var(--clr-cyan); color: var(--clr-cyan); font-size: 1.1rem; padding: 0.5rem 0.9rem; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
+        .theme-toggle, .mobile-toggle { background: transparent; border: 1px solid var(--clr-cyan); color: var(--clr-cyan); font-size: 1rem; padding: 0.4rem 0.7rem; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); }
         .theme-toggle:hover { background: var(--clr-cyan); color: #0b0b1a; }
-        .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); font-size: 1.3rem; margin-left: 0.3rem; }
+        .mobile-toggle { display: none; border-color: var(--clr-magenta); color: var(--clr-magenta); }
         .mobile-toggle:hover { background: var(--clr-magenta); color: white; }
 
         .mobile-nav-panel {
@@ -165,17 +165,15 @@
         .map-container iframe { width: 100%; height: 100%; min-height: 350px; border: 0; }
         @media (max-width: 1024px) { 
             .contact-grid { grid-template-columns: 1fr; }
-            .main-nav { gap: 1rem; }
-            .main-nav a { font-size: 0.85rem; }
+            .main-nav { gap: 0.8rem; }
+            .main-nav a { font-size: 0.8rem; }
         }
         @media (max-width: 768px) {
             .main-nav { display: none; }
-            .main-nav.active { display: flex; flex-direction: column; position: absolute; top: 100%; left: 0; right: 0; background: var(--clr-navy-card); padding: 1rem; border-bottom: 2px solid var(--clr-cyan); z-index: 99; }
-            .main-nav.active a { padding: 0.6rem 0; font-size: 0.9rem; }
-            .mobile-toggle { display: flex; }
             .header-container { flex-direction: row; justify-content: space-between; align-items: center; }
-            .logo-link { margin-bottom: 0; font-size: 1.4rem; }
-            .logo-link i { font-size: 1.5rem; }
+            .logo-link { font-size: 1.3rem; }
+            .logo-link img { height: 30px; }
+            .mobile-toggle { display: flex; }
             .hero-carousel { height: 60vh; min-height: 350px; }
             .slide-overlay h2 { font-size: clamp(1.5rem, 6vw, 2.5rem); }
             .slide-overlay p { font-size: 0.95rem; padding: 0 1rem; }
@@ -212,15 +210,15 @@
             .slide-overlay h2 { font-size: 1.4rem; }
             .slide-overlay p { font-size: 0.85rem; }
             .btn-primary { padding: 0.6rem 1.2rem; font-size: 0.85rem; width: 100%; justify-content: center; }
-            .logo-link { font-size: 1.2rem; }
-            .logo-link i { font-size: 1.3rem; }
+            .logo-link { font-size: 1.1rem; }
+            .logo-link img { height: 26px; }
             .section-title { font-size: 1.4rem; }
             .card h3 { font-size: 1.1rem; }
             .price { font-size: 1.8rem; }
             .sticky-cta { bottom: 4.5rem; left: 0.5rem; padding: 0.5rem 1rem; font-size: 0.75rem; }
             .back-to-top { bottom: 0.8rem; right: 0.8rem; width: 36px; height: 36px; }
             .nav-actions { gap: 0.3rem; }
-            .theme-toggle, .mobile-toggle { padding: 0.4rem 0.6rem; font-size: 0.95rem; }
+            .theme-toggle, .mobile-toggle { padding: 0.35rem 0.55rem; font-size: 0.9rem; }
             .footer-fat { padding: 2rem 1rem 1.5rem; }
         }
     </style>
@@ -230,7 +228,7 @@
 
     <header class="site-header" id="site-header">
         <div class="header-container">
-           <a href="#" class="logo-link" id="site-logo"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
+            <a href="#" class="logo-link" id="site-logo"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions">
                 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
@@ -295,7 +293,7 @@
 
     <footer class="footer-fat">
         <div class="footer-grid" id="footer-grid">
-            <div class="footer-col"><a href="#" class="logo-link" style="font-size:1.3rem;"><i class="fa-solid fa-dna"></i> AliverBiopharm</a><p style="color:var(--clr-text-dim);margin-top:0.8rem;">Advancing biology and pharmacy education.</p><div class="footer-social" id="footer-social"></div></div>
+            <div class="footer-col"><a href="#" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a><p style="color:var(--clr-text-dim);margin-top:0.8rem;">Advancing biology and pharmacy education.</p><div class="footer-social" id="footer-social"></div></div>
         </div>
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p></div>
     </footer>
@@ -307,154 +305,76 @@
     const API_BASE = '/api/query';
     const cache = {};
 
-     async function apiCall(action, params = {}, retries = 2) {
-    const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
-    const token = localStorage.getItem('sb-token');
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+    async function apiCall(action, params = {}, retries = 2) {
+        const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+        const token = localStorage.getItem('sb-token');
+        if (token) headers['Authorization'] = `Bearer ${token}`;
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 15000);
+        for (let i = 0; i <= retries; i++) {
+            try {
+                const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }), signal: controller.signal });
+                clearTimeout(timeout);
+                if (res.status === 429) throw new Error('Too many requests. Please wait.');
+                if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); updateMobilePanel([]); }
+                const json = await res.json();
+                if (!res.ok) throw new Error(json.error || 'Request failed');
+                return json.data !== undefined ? json.data : json;
+            } catch (err) { clearTimeout(timeout); if (i === retries) throw err; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+        }
+    }
 
-    const controller = new AbortController();
-    const timeout = setTimeout(() => controller.abort(), 15000);
+    function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t || '').replace(/[&<>"']/g, c => m[c]); }
 
-    for (let i = 0; i <= retries; i++) {
+    function isTokenExpired() { const token = localStorage.getItem('sb-token'); if (!token) return true; try { const payload = JSON.parse(atob(token.split('.')[1])); return (payload.exp * 1000) < Date.now(); } catch (e) { return true; } }
+
+    function safeUrl(u, fallback = '#') { if (!u || typeof u !== 'string') return fallback; const t = u.trim(); if (!t) return fallback; const dangerous = /^(javascript:|data:|vbscript:|file:)/i; if (dangerous.test(t)) return fallback; if (t.includes('\\') || t.includes('\n') || t.includes('\r')) return fallback; return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/') || t.startsWith('#') || t.startsWith('mailto:') ? t : fallback; }
+
+    function createEl(tag, attrs = {}, children = []) { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') el.className = v; else if (k === 'textContent') el.textContent = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v); else el.setAttribute(k, v); }); children.forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)); return el; }
+
+    const icons = { 'Home': 'fa-solid fa-house', 'Resources': 'fa-solid fa-book', 'Study Notes': 'fa-solid fa-book-open', 'Blog': 'fa-solid fa-newspaper', 'Study Tips': 'fa-solid fa-lightbulb', 'Submit': 'fa-solid fa-upload', 'Guidelines': 'fa-solid fa-check-circle', 'Donate': 'fa-solid fa-heart', 'About': 'fa-solid fa-circle-info', 'Contact': 'fa-solid fa-envelope' };
+
+    function updateMobilePanel(links) {
+        if (isTokenExpired()) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); }
+        const navLinks = document.getElementById('mobile-nav-links'), footer = document.getElementById('mobile-nav-footer');
+        if (!navLinks || !footer) return;
+        navLinks.innerHTML = (links || []).map(l => `<a href="${esc(l.href)}"><i class="${icons[l.label] || 'fa-solid fa-chevron-right'}"></i> ${esc(l.label)}</a>`).join('');
+        const token = localStorage.getItem('sb-token');
+        if (token) {
+            const email = localStorage.getItem('sb-email') || 'User';
+            footer.innerHTML = `<div class="mobile-user-info"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
+        } else {
+            footer.innerHTML = `<a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
+        }
+    }
+
+    async function buildNavigation(d) { const links = d?.links || []; document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join(''); updateMobilePanel(links); loadSiteLogo(); }
+
+    async function loadSiteLogo() {
         try {
-            const res = await fetch(API_BASE, {
-                method: 'POST', headers,
-                body: JSON.stringify({ action, ...params }),
-                signal: controller.signal
-            });
-            clearTimeout(timeout);
-            if (res.status === 429) throw new Error('Too many requests. Please wait.');
-            if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); updateMobilePanel([]); }
-            const json = await res.json();
-            if (!res.ok) throw new Error(json.error || 'Request failed');
-            return json.data !== undefined ? json.data : json;
-        } catch (err) {
-            clearTimeout(timeout);
-            if (i === retries) throw err;
-            await new Promise(r => setTimeout(r, 1000 * (i + 1)));
-        }
+            const config = await apiCall('get_site_section', { section: 'site_config' });
+            if (config && config.logo_url) {
+                const logoEl = document.getElementById('site-logo');
+                if (logoEl) logoEl.innerHTML = `<img src="${esc(config.logo_url)}" alt="AliverBiopharm">`;
+            }
+        } catch(e) {}
     }
-}
 
-    function esc(t) {
-        const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
-        return String(t || '').replace(/[&<>"']/g, c => m[c]);
-    }
- 
- function isTokenExpired() {
-    const token = localStorage.getItem('sb-token');
-    if (!token) return true;
-    try {
-        const payload = JSON.parse(atob(token.split('.')[1]));
-        return (payload.exp * 1000) < Date.now();
-    } catch (e) { return true; }
-}
-
-function safeUrl(u, fallback = '#') {
-    if (!u || typeof u !== 'string') return fallback;
-    const t = u.trim();
-    if (!t) return fallback;
-    const dangerous = /^(javascript:|data:|vbscript:|file:)/i;
-    if (dangerous.test(t)) return fallback;
-    if (t.includes('\\') || t.includes('\n') || t.includes('\r')) return fallback;
-    return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/') || t.startsWith('#') || t.startsWith('mailto:') ? t : fallback;
-}
-
-function createEl(tag, attrs = {}, children = []) {
-    const el = document.createElement(tag);
-    Object.entries(attrs).forEach(([k, v]) => {
-        if (k === 'className') el.className = v;
-        else if (k === 'textContent') el.textContent = v;
-        else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v);
-        else el.setAttribute(k, v);
-    });
-    children.forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c));
-    return el;
-}
-
-    const icons = {
-        'Home': 'fa-solid fa-house', 'Resources': 'fa-solid fa-book', 'Study Notes': 'fa-solid fa-book-open',
-        'Blog': 'fa-solid fa-newspaper', 'Study Tips': 'fa-solid fa-lightbulb', 'Submit': 'fa-solid fa-upload',
-        'Guidelines': 'fa-solid fa-check-circle', 'Donate': 'fa-solid fa-heart', 'About': 'fa-solid fa-circle-info',
-        'Contact': 'fa-solid fa-envelope'
-    };
-
-     function updateMobilePanel(links) {
-    if (isTokenExpired()) {
-        localStorage.removeItem('sb-token');
-        localStorage.removeItem('sb-email');
-    }
-    const navLinks = document.getElementById('mobile-nav-links');
-    const footer = document.getElementById('mobile-nav-footer');
-    if (!navLinks || !footer) return;
-    navLinks.innerHTML = (links || []).map(l => `<a href="${esc(l.href)}"><i class="${icons[l.label] || 'fa-solid fa-chevron-right'}"></i> ${esc(l.label)}</a>`).join('');
-    const token = localStorage.getItem('sb-token');
-    if (token) {
-        const email = localStorage.getItem('sb-email') || 'User';
-        footer.innerHTML = `<div class="mobile-user-info"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
-    } else {
-        footer.innerHTML = `<a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
-    }
-}
-
-     async function buildNavigation(d) {
-    const links = d?.links || [];
-    document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
-    updateMobilePanel(links);
-    loadSiteLogo();
-}
-
-async function loadSiteLogo() {
-    try {
-        const config = await apiCall('get_site_section', { section: 'site_config' });
-        if (config && config.logo_url) {
-            const logoEl = document.getElementById('site-logo');
-              if (logoEl) logoEl.innerHTML = `<img src="${esc(config.logo_url)}" alt="AliverBiopharm" style="width:200px;max-width:250px;height:auto;object-fit:contain;">`;
-        }
-    } catch(e) {}
-}
-
-     window.signOut = async function() {
-    try { await apiCall('signout'); } catch (e) {}
-    localStorage.removeItem('sb-token');
-    localStorage.removeItem('sb-email');
-    sessionStorage.clear();
-    updateMobilePanel([]);
-    location.href = '/';
-};
+    window.signOut = async function() { try { await apiCall('signout'); } catch (e) {} localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); sessionStorage.clear(); updateMobilePanel([]); location.href = '/'; };
 
     window.showAuthForm = function(mode) {
-        const existing = document.getElementById('auth-modal');
-        if (existing) existing.remove();
-        const modal = document.createElement('div');
-        modal.id = 'auth-modal';
+        const existing = document.getElementById('auth-modal'); if (existing) existing.remove();
+        const modal = document.createElement('div'); modal.id = 'auth-modal';
         modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
         modal.innerHTML = `<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;"><button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode==='signin'?'Sign In':'Create Account'}</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" class="form-input" placeholder="Email" required><input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required><button type="submit" class="btn-primary" style="justify-content:center;">${mode==='signin'?'Sign In':'Create Account'}</button></form><p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">${mode==='signin'?"No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>":"Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>"}</p><p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p></div>`;
         document.body.appendChild(modal);
         document.getElementById('close-auth').onclick = () => modal.remove();
         modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
         document.getElementById('switch-mode').onclick = (e) => { e.preventDefault(); modal.remove(); showAuthForm(mode==='signin'?'signup':'signin'); };
-        document.getElementById('auth-form').onsubmit = async (e) => {
-            e.preventDefault();
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-            const errEl = document.getElementById('auth-error'); errEl.style.display = 'none';
-            try {
-                const action = mode === 'signin' ? 'signin' : 'signup';
-                const data = await apiCall(action, { email, password });
-                if (data.session) { localStorage.setItem('sb-token', data.session.access_token); localStorage.setItem('sb-email', data.user.email); modal.remove(); updateMobilePanel([]); location.reload(); }
-                else if (mode === 'signup') { errEl.textContent = 'Check your email to confirm signup.'; errEl.style.display = 'block'; }
-            } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; }
-        };
+        document.getElementById('auth-form').onsubmit = async (e) => { e.preventDefault(); const email = document.getElementById('auth-email').value.trim(), password = document.getElementById('auth-password').value, errEl = document.getElementById('auth-error'); errEl.style.display = 'none'; try { const action = mode === 'signin' ? 'signin' : 'signup'; const data = await apiCall(action, { email, password }); if (data.session) { localStorage.setItem('sb-token', data.session.access_token); localStorage.setItem('sb-email', data.user.email); modal.remove(); updateMobilePanel([]); location.reload(); } else if (mode === 'signup') { errEl.textContent = 'Check your email to confirm signup.'; errEl.style.display = 'block'; } } catch (err) { errEl.textContent = err.message; errEl.style.display = 'block'; } };
     };
 
-    async function buildFooter(d) {
-        if (!d) return;
-        const fg = document.getElementById('footer-grid'), fs = document.getElementById('footer-social'), logo = fg.querySelector('.footer-col');
-        const cols = (d.columns || []).map(c => `<div class="footer-col"><h4>${esc(c.heading)}</h4><ul>${(c.items||[]).map(i => `<li><a href="${esc(i.href||'#')}">${i.icon?`<i class="${esc(i.icon)}" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>`:''}${esc(i.label)}</a></li>`).join('')}</ul></div>`).join('');
-        fg.innerHTML = logo.outerHTML + cols;
-        fs.innerHTML = (d.social_links||[]).map(s => `<a href="${esc(s.url)}" aria-label="${esc(s.platform)}"><i class="${esc(s.icon)}"></i></a>`).join('');
-    }
+    async function buildFooter(d) { if (!d) return; const fg = document.getElementById('footer-grid'), fs = document.getElementById('footer-social'), logo = fg.querySelector('.footer-col'); const cols = (d.columns || []).map(c => `<div class="footer-col"><h4>${esc(c.heading)}</h4><ul>${(c.items||[]).map(i => `<li><a href="${esc(i.href||'#')}">${i.icon?`<i class="${esc(i.icon)}" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>`:''}${esc(i.label)}</a></li>`).join('')}</ul></div>`).join(''); fg.innerHTML = logo.outerHTML + cols; fs.innerHTML = (d.social_links||[]).map(s => `<a href="${esc(s.url)}" aria-label="${esc(s.platform)}"><i class="${esc(s.icon)}"></i></a>`).join(''); }
 
     async function buildHero(d) { const slides=d?.slides||[]; if(!slides.length)return; const carousel=document.querySelector('.hero-carousel'); carousel.innerHTML=slides.map((s,i)=>`<div class="carousel-slide${i===0?' active':''}" style="background-image:url('${esc(s.background_image)}');"><div class="slide-overlay"><h2>${esc(s.title)}</h2><p>${esc(s.subtitle)}</p><a href="${esc(s.cta_link)}" class="btn-primary"><i class="${esc(s.icon||'fa-solid fa-arrow-right')}"></i> ${esc(s.cta_text)}</a></div></div>`).join('')+`<button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button><button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button><div class="carousel-controls">${slides.map((_,i)=>`<span class="carousel-dot${i===0?' active':''}" data-index="${i}"></span>`).join('')}</div>`; initCarousel(slides.length); }
     async function buildTeam(d) { const m=d?.members||[]; const g=document.getElementById('team-grid'); if(!m.length){g.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">Team coming soon.</p>';return} g.innerHTML=m.map(p=>`<div class="card team-card"><div class="team-avatar">${p.avatar_url?`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">`:'<i class="fa-solid fa-user-tie"></i>'}</div><h3>${esc(p.name)}${p.title?', '+esc(p.title):''}</h3><p>${esc(p.bio||'')}</p></div>`).join(''); }
@@ -466,12 +386,7 @@ async function loadSiteLogo() {
 
     async function buildResources(filters = {}) {
         document.getElementById('resources-container').innerHTML = '<div class="spinner"><i class="fa-solid fa-dna"></i><p>Loading...</p></div>';
-        try {
-            const data = await apiCall('get_resources', { filters });
-            if (!data.length) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; return; }
-            const groups = {}; data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); });
-            document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `<div style="margin-bottom:3rem;"><h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:0.5rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2><div class="resources-grid">${items.map(item => `<div class="resource-card"><div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a><p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p><div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span><span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span><span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);"><a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div style="display:flex;gap:0.4rem;"><a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>`).join('')}</div></div>`).join('');
-        } catch (err) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; }
+        try { const data = await apiCall('get_resources', { filters }); if (!data.length) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; return; } const groups = {}; data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); }); document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `<div style="margin-bottom:3rem;"><h2 style="font-family:'Space Grotesk',sans-serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:0.5rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2><div class="resources-grid">${items.map(item => `<div class="resource-card"><div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a><p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p><div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span><span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span><span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);"><a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div style="display:flex;gap:0.4rem;"><a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>`).join('')}</div></div>`).join(''); } catch (err) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; }
     }
 
     async function loadFilters() { try { const { levels, categories, tags } = await apiCall('get_filter_options'); ['filter-level','filter-category','filter-tag'].forEach((id,i)=>{ const opts=[levels,categories,tags][i]; const sel=document.getElementById(id); if(sel){sel.innerHTML='<option value="">All</option>';opts.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=o;sel.appendChild(el)})}}) } catch (err) {} }
@@ -482,22 +397,18 @@ async function loadSiteLogo() {
         const tt = document.getElementById('theme-toggle'), icon = tt.querySelector('i');
         if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
         tt.onclick = () => { document.body.classList.toggle('light-mode'); const l = document.body.classList.contains('light-mode'); icon.classList.replace(l?'fa-moon':'fa-sun', l?'fa-sun':'fa-moon'); localStorage.setItem('theme', l?'light':'dark'); };
-
         const mt = document.getElementById('mobile-toggle'), mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay'), closeBtn = document.getElementById('mobile-close-btn');
         function open() { mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
         function close() { mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
         mt.onclick = () => mp.classList.contains('active') ? close() : open();
         mo.onclick = close; closeBtn.onclick = close;
         document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-
         const bb = document.getElementById('back-to-top');
         window.addEventListener('scroll', () => { bb.classList.toggle('visible', window.scrollY > 500); document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50); }, { passive: true });
         bb.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-
         document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) { if (this.getAttribute('href') === '#') return; e.preventDefault(); document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' }); }));
         const obs = new IntersectionObserver(entries => { entries.forEach(e => { if (e.isIntersecting) { e.target.classList.add('visible'); obs.unobserve(e.target); } }); }, { threshold: 0.1 });
         document.querySelectorAll('.fade-in').forEach(el => obs.observe(el));
-
         document.getElementById('contact-form').onsubmit = async function(e) { e.preventDefault(); const fd = { name: document.getElementById('contact-name').value.trim(), email: document.getElementById('contact-email').value.trim(), subject: document.getElementById('contact-subject').value.trim(), message: document.getElementById('contact-message').value.trim() }; if (!fd.name || !fd.email || !fd.subject || !fd.message) return alert('Please fill all fields.'); if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) return alert('Please enter a valid email.'); try { await apiCall('submit_contact', { formData: fd }); const s = document.getElementById('form-success'); s.textContent = '✓ Message sent!'; s.style.display = 'block'; this.reset(); setTimeout(() => s.style.display = 'none', 5000); } catch (err) { alert('Failed: ' + err.message); } };
         document.getElementById('newsletter-form').onsubmit = async function(e) { e.preventDefault(); const email = this.querySelector('input').value.trim(); if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Valid email required.'); try { await apiCall('subscribe_newsletter', { formData: { email } }); alert('✓ Subscribed!'); this.reset(); } catch (err) { alert('Subscribed!'); this.reset(); } };
         document.getElementById('filter-submit').onclick = () => buildResources({ level: document.getElementById('filter-level').value, category: document.getElementById('filter-category').value, tag: document.getElementById('filter-tag').value });
