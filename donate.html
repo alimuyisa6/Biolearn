@@ -147,9 +147,12 @@
         const d = sectionData || {};
         const goal = d.goal_amount || 500000, raised = d.raised_amount || 0, pct = Math.min(Math.round((raised/goal)*100), 100);
 
-        let html = `
-            <h1 class="section-title">${esc(d.title||'Support Our Mission')}</h1>
-            <p class="section-subtitle">${esc(d.subtitle||'Help keep biology and pharmacy education free and accessible.')}</p>
+       const bgImage = d.background_image || '';
+let html = `
+    <div style="${bgImage ? `background:linear-gradient(rgba(11,11,26,0.85),rgba(11,11,26,0.85)),url('${esc(bgImage)}');background-size:cover;background-position:center;` : ''}border-radius:var(--radius-lg);padding:4rem 2rem;margin-bottom:2rem;text-align:center;border:1px solid var(--clr-border-glow);box-shadow:var(--shadow-card);">
+        <h1 class="section-title" style="margin-bottom:0.5rem;">${esc(d.title||'Support Our Mission')}</h1>
+        <p class="section-subtitle" style="margin-bottom:0;">${esc(d.subtitle||'Help keep biology and pharmacy education free and accessible.')}</p>
+    </div>
             <div class="goal-bar-wrap">
                 <div class="goal-label"><span>Monthly Goal</span><strong>${pct}%</strong></div>
                 <div class="goal-bar"><div class="goal-fill" style="width:${pct}%"></div></div>
@@ -169,7 +172,7 @@
                 <h3 style="font-family:var(--font-display);font-size:1.2rem;color:var(--clr-cyan);margin-bottom:1rem"><i class="fa-solid fa-mobile-screen" style="color:var(--gold)"></i> Mobile Money</h3>
                 <div class="momo-numbers">
                 ${momoConfig.mtn ? `<div class="momo-card"><div class="momo-logo"><span style="font-size:1.8rem;font-weight:800;color:#fdc100;font-family:var(--font-display);">MTN</span></div><div class="number">${esc(momoConfig.mtn.number||'')}</div><div class="name">${esc(momoConfig.mtn.name||'')}</div><button class="btn-copy" onclick="copyText('${esc(momoConfig.mtn.number||'')}',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>` : ''}
-  ${momoConfig.airtel ? `<div class="momo-card"><div class="momo-logo"><span style="font-size:1.8rem;font-weight:800;color:#ff0000;font-family:var(--font-display);">airtel</span></div><div class="number">${esc(momoConfig.airtel.number||'')}</div><div class="name">${esc(momoConfig.airtel.name||'')}</div><button class="btn-copy" onclick="copyText('${esc(momoConfig.airtel.number||'')}',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>` : ''}
+               ${momoConfig.airtel ? `<div class="momo-card"><div class="momo-logo"><span style="font-size:1.8rem;font-weight:800;color:#ff0000;font-family:var(--font-display);">airtel</span></div><div class="number">${esc(momoConfig.airtel.number||'')}</div><div class="name">${esc(momoConfig.airtel.name||'')}</div><button class="btn-copy" onclick="copyText('${esc(momoConfig.airtel.number||'')}',this)"><i class="fa-regular fa-copy"></i> Copy</button></div>` : ''}
                 </div>
                 <p style="font-size:0.85rem;color:var(--clr-text-dim);margin-bottom:0.8rem">After sending, fill in your transaction details:</p>
                 <div class="form-inline">
