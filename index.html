@@ -4,19 +4,76 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>AliverBiopharm — Biology & Pharmacy Learning</title>
+
     <meta name="description" content="Master biology and pharmacy with AliverBiopharm. Expert-led courses, interactive resources, and a professional learning community.">
+
     <meta name="theme-color" content="#0b0b1a">
-    
-    <!-- Security: Content Security Policy - Fixed for Font Awesome -->
-    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; style-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://fonts.googleapis.com; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data: blob:; img-src 'self' data: https: blob:; frame-src https://www.google.com; connect-src 'self' https://cdnjs.cloudflare.com;">
-    
+
+    <!-- SEO -->
+    <meta name="robots" content="index, follow">
+    <meta name="author" content="AliverBiopharm">
+
+    <!-- Open Graph -->
+    <meta property="og:title" content="AliverBiopharm — Biology & Pharmacy Learning">
+    <meta property="og:description" content="Professional biology and pharmacy learning platform with modern educational resources.">
+    <meta property="og:type" content="website">
+    <meta property="og:image" content="/logo.png">
+
+    <!-- Twitter -->
+    <meta name="twitter:card" content="summary_large_image">
+    <meta name="twitter:title" content="AliverBiopharm">
+    <meta name="twitter:description" content="Home Of Science Education">
+
+    <!-- Security Headers -->
+    <meta http-equiv="X-Content-Type-Options" content="nosniff">
+    <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+
+    <!-- Corrected Content Security Policy -->
+    <meta http-equiv="Content-Security-Policy" content="
+        default-src 'self';
+        script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com;
+        style-src 'self' 'unsafe-inline' 'unsafe-hashes' https://cdnjs.cloudflare.com https://fonts.googleapis.com;
+        font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:;
+        img-src 'self' https: data: blob:;
+        connect-src 'self';
+        frame-src https://www.google.com;
+        object-src 'none';
+        base-uri 'self';
+        form-action 'self';
+        frame-ancestors 'none';
+        upgrade-insecure-requests;
+    ">
+
+    <!-- Preconnect -->
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
-    
+
+    <!-- Google Fonts -->
+    <link
+        href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
+        rel="stylesheet"
+    >
+
+    <!-- Font Awesome -->
+    <link
+        rel="stylesheet"
+        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
+        crossorigin="anonymous"
+        referrerpolicy="no-referrer"
+    >
+
+    <!-- Favicon -->
+    <link rel="icon" type="image/png" href="/favicon.png">
+
+    <!-- Apple Touch -->
+    <link rel="apple-touch-icon" href="/favicon.png">
+
+    <!-- Performance -->
+    <meta http-equiv="X-UA-Compatible" content="IE=edge">
+
     <style>
-        :root {
+         :root {
             --clr-deep-space: #0b0b1a; 
             --clr-cyan: #00d9ff;        /* PRIMARY - preserved */
             --clr-magenta: #ff00aa;      /* SECONDARY - preserved */
