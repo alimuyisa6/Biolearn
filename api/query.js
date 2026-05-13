@@ -1,9 +1,16 @@
- const { createClient } = require('@supabase/supabase-js');
+ const crypto = require('crypto');
+const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
 );
+
+const REQUIRED_ENV_VARS = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'];
+const MISSING_VARS = REQUIRED_ENV_VARS.filter(varName => !process.env[varName]);
+if (MISSING_VARS.length > 0) {
+  console.error(`Missing required environment variables: ${MISSING_VARS.join(', ')}`);
+}
 
 const ACTION_WHITELIST = new Set([
   'get_site_section', 'get_all_site_sections', 'get_all_sections',
@@ -15,28 +22,114 @@ const ACTION_WHITELIST = new Set([
   'ai_query', 'get_donate_page_config', 'submit_momo_donation'
 ]);
 
+const CSRF_PROTECTED_ACTIONS = new Set([
+  'submit_contact', 'subscribe_newsletter', 'submit_resource',
+  'signup', 'signin', 'submit_momo_donation'
+]);
+
 const RATE_LIMITS = new Map();
+const FAILED_ATTEMPTS = new Map();
+const BANNED_IPS = new Set();
+const BANNED_UNTIL = new Map();
 const MAX_REQUESTS = 30;
 const WINDOW_MS = 60000;
-const BANNED_IPS = new Set();
 
-function rateLimit(ip) {
+function sanitizeInput(input, maxLength = null) {
+  if (typeof input !== 'string') return input;
+  let cleaned = input.replace(/\0/g, '').replace(/[\x00-\x1F\x7F]/g, '');
+  cleaned = cleaned.replace(/<script\b[^<]*(?:(?!<\/script>)<[^<]*)*<\/script>/gi, '');
+  cleaned = cleaned.replace(/javascript:/gi, '');
+  cleaned = cleaned.replace(/on\w+\s*=/gi, '');
+  cleaned = cleaned.replace(/<iframe/gi, '');
+  cleaned = cleaned.replace(/<object/gi, '');
+  cleaned = cleaned.replace(/<embed/gi, '');
+  if (maxLength && cleaned.length > maxLength) {
+    cleaned = cleaned.substring(0, maxLength);
+  }
+  return cleaned.trim();
+}
+
+function rateLimit(ip, action = null) {
   if (BANNED_IPS.has(ip)) return false;
+  
+  const banUntil = BANNED_UNTIL.get(ip);
+  if (banUntil && banUntil > Date.now()) {
+    return false;
+  } else if (banUntil) {
+    BANNED_UNTIL.delete(ip);
+  }
+  
   const now = Date.now();
   const record = RATE_LIMITS.get(ip) || { count: 0, reset: now + WINDOW_MS };
-  if (now > record.reset) { record.count = 0; record.reset = now + WINDOW_MS; }
+  
+  if (now > record.reset) {
+    record.count = 0;
+    record.reset = now + WINDOW_MS;
+  }
+  
   record.count++;
   RATE_LIMITS.set(ip, record);
-  if (record.count > MAX_REQUESTS * 2) { BANNED_IPS.add(ip); return false; }
-  return record.count <= MAX_REQUESTS;
+  
+  const isAuthAction = action === 'signin' || action === 'signup';
+  const maxAllowed = isAuthAction ? 5 : MAX_REQUESTS;
+  
+  if (record.count > maxAllowed * 2) {
+    BANNED_IPS.add(ip);
+    BANNED_UNTIL.set(ip, now + 15 * 60 * 1000);
+    setTimeout(() => {
+      BANNED_IPS.delete(ip);
+      BANNED_UNTIL.delete(ip);
+    }, 15 * 60 * 1000);
+    return false;
+  }
+  
+  return record.count <= maxAllowed;
+}
+
+function trackFailedAuth(ip, email) {
+  const key = `${ip}:${email}`;
+  const attempts = FAILED_ATTEMPTS.get(key) || { count: 0, firstAttempt: Date.now() };
+  attempts.count++;
+  FAILED_ATTEMPTS.set(key, attempts);
+  
+  if (attempts.count >= 5) {
+    BANNED_UNTIL.set(ip, Date.now() + 30 * 60 * 1000);
+    setTimeout(() => {
+      BANNED_UNTIL.delete(ip);
+      FAILED_ATTEMPTS.delete(key);
+    }, 30 * 60 * 1000);
+    return true;
+  }
+  return false;
+}
+
+function resetFailedAuth(ip, email) {
+  FAILED_ATTEMPTS.delete(`${ip}:${email}`);
+}
+
+function logSecurityEvent(event, details, req) {
+  console.log(JSON.stringify({
+    timestamp: new Date().toISOString(),
+    requestId: req.requestId,
+    event,
+    ip: req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown',
+    userAgent: req.headers['user-agent'],
+    details
+  }));
 }
 
 const VALIDATORS = {
   submit_contact: (body) => {
     const { name, email, subject, message } = body.formData || {};
-    if (!name || typeof name !== 'string' || name.length > 100) return 'Invalid name';
+    const sanitizedName = sanitizeInput(name, 100);
+    const sanitizedSubject = sanitizeInput(subject, 200);
+    const sanitizedMessage = sanitizeInput(message, 5000);
+    if (!sanitizedName || sanitizedName.length < 2) return 'Invalid name';
     if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return 'Invalid email';
-    if (!message || typeof message !== 'string' || message.length > 5000) return 'Invalid message';
+    if (!sanitizedMessage || sanitizedMessage.length < 10) return 'Message too short';
+    body.formData.name = sanitizedName;
+    body.formData.subject = sanitizedSubject;
+    body.formData.message = sanitizedMessage;
     return null;
   },
   subscribe_newsletter: (body) => {
@@ -72,37 +165,55 @@ const VALIDATORS = {
 };
 
 module.exports = async (req, res) => {
+  const requestId = crypto.randomBytes(8).toString('hex');
+  req.requestId = requestId;
+  
   res.setHeader('Access-Control-Allow-Origin', '*');
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
-  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With');
+  res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, X-Request-ID');
   res.setHeader('Access-Control-Max-Age', '86400');
   res.setHeader('X-Content-Type-Options', 'nosniff');
   res.setHeader('X-Frame-Options', 'DENY');
+  res.setHeader('X-Request-ID', requestId);
 
   if (req.method === 'OPTIONS') return res.status(200).end();
 
   const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
-  if (!rateLimit(ip)) return res.status(429).json({ error: 'Too many requests' });
-
-  try {
-    if (req.method === 'GET') return await handleGet(req, res);
-    if (req.method === 'POST') return await handlePost(req, res);
-    return res.status(405).json({ error: 'Method not allowed' });
-  } catch (error) {
-    console.error('API Error:', error.message);
-    return res.status(500).json({ error: 'Internal server error' });
+  
+  if (req.method === 'GET') {
+    if (!rateLimit(ip)) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { method: 'GET' }, req);
+      return res.status(429).json({ error: 'Too many requests' });
+    }
+    return await handleGet(req, res);
   }
+  
+  if (req.method === 'POST') {
+    const action = req.body?.action;
+    if (!rateLimit(ip, action)) {
+      logSecurityEvent('RATE_LIMIT_EXCEEDED', { method: 'POST', action }, req);
+      return res.status(429).json({ error: 'Too many requests' });
+    }
+    return await handlePost(req, res);
+  }
+  
+  return res.status(405).json({ error: 'Method not allowed' });
 };
 
 async function handleGet(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const action = url.searchParams.get('action');
-  if (!action || !ACTION_WHITELIST.has(action)) return res.status(400).json({ error: 'Invalid action' });
+  
+  if (!action || !ACTION_WHITELIST.has(action)) {
+    return res.status(400).json({ error: 'Invalid action' });
+  }
 
   try {
     let result;
+    
     switch (action) {
-      case 'get_all_site_sections': case 'get_all_sections': {
+      case 'get_all_site_sections':
+      case 'get_all_sections': {
         const { data, error } = await supabase.from('site_sections').select('section, data');
         if (error) throw error;
         result = {};
@@ -135,25 +246,46 @@ async function handleGet(req, res) {
         };
         break;
       }
-      case 'currencies': result = { currencies: [{ currency: 'btc' }, { currency: 'eth' }, { currency: 'usdttrc20' }] }; break;
-      case 'status': result = { status: 'finished' }; break;
-      default: result = null;
+      case 'currencies':
+        result = { currencies: [{ currency: 'btc' }, { currency: 'eth' }, { currency: 'usdttrc20' }] };
+        break;
+      case 'status':
+        result = { status: 'finished' };
+        break;
+      default:
+        result = null;
     }
+    
     return res.status(200).json(result);
   } catch (error) {
     console.error('GET Error:', error.message);
+    logSecurityEvent('GET_ERROR', { action, error: error.message }, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
 }
 
 async function handlePost(req, res) {
   const { action } = req.body;
-  if (!action || !ACTION_WHITELIST.has(action)) return res.status(400).json({ error: 'Invalid action' });
-
+  const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
+  
+  if (!action || !ACTION_WHITELIST.has(action)) {
+    return res.status(400).json({ error: 'Invalid action' });
+  }
+  
+  if (CSRF_PROTECTED_ACTIONS.has(action)) {
+    const clientToken = req.headers['x-csrf-token'];
+    if (!clientToken) {
+      logSecurityEvent('MISSING_CSRF_TOKEN', { action }, req);
+    }
+  }
+  
   const validator = VALIDATORS[action];
   if (validator) {
     const validationError = validator(req.body);
-    if (validationError) return res.status(400).json({ error: validationError });
+    if (validationError) {
+      logSecurityEvent('VALIDATION_FAILED', { action, error: validationError }, req);
+      return res.status(400).json({ error: validationError });
+    }
   }
 
   try {
@@ -167,7 +299,8 @@ async function handlePost(req, res) {
         result = data?.data || null;
         break;
       }
-      case 'get_all_site_sections': case 'get_all_sections': {
+      case 'get_all_site_sections':
+      case 'get_all_sections': {
         const { data, error } = await supabase.from('site_sections').select('section, data');
         if (error) throw error;
         result = {};
@@ -190,7 +323,11 @@ async function handlePost(req, res) {
           supabase.from('biology_notes').select('category').limit(500),
           supabase.from('biology_notes').select('tag').limit(500)
         ]);
-        result = { levels: [...new Set((l.data || []).map(x => x.level).filter(Boolean))], categories: [...new Set((c.data || []).map(x => x.category).filter(Boolean))], tags: [...new Set((t.data || []).map(x => x.tag).filter(Boolean))] };
+        result = {
+          levels: [...new Set((l.data || []).map(x => x.level).filter(Boolean))],
+          categories: [...new Set((c.data || []).map(x => x.category).filter(Boolean))],
+          tags: [...new Set((t.data || []).map(x => x.tag).filter(Boolean))]
+        };
         break;
       }
       case 'submit_contact': {
@@ -227,19 +364,51 @@ async function handlePost(req, res) {
         break;
       }
       case 'signup': {
+        if (BANNED_IPS.has(ip)) {
+          return res.status(429).json({ error: 'Too many attempts. Please try again later.' });
+        }
+        if (!rateLimit(ip, 'signup')) {
+          return res.status(429).json({ error: 'Too many signup attempts. Please wait.' });
+        }
         const { data, error } = await supabase.auth.signUp({
           email: email.trim().toLowerCase(),
           password,
           options: { emailRedirectTo: `${req.headers['x-forwarded-proto'] || 'https'}://${req.headers.host}` }
         });
-        if (error) throw error;
-        result = { user: data.user ? { id: data.user.id, email: data.user.email } : null, session: data.session ? { access_token: data.session.access_token } : null };
+        if (error) {
+          trackFailedAuth(ip, email);
+          throw error;
+        }
+        resetFailedAuth(ip, email);
+        result = {
+          user: data.user ? { id: data.user.id, email: data.user.email } : null,
+          session: data.session ? { access_token: data.session.access_token } : null
+        };
         break;
       }
       case 'signin': {
-        const { data, error } = await supabase.auth.signInWithPassword({ email: email.trim().toLowerCase(), password });
-        if (error) throw error;
-        result = { user: data.user ? { id: data.user.id, email: data.user.email } : null, session: data.session ? { access_token: data.session.access_token } : null };
+        if (BANNED_IPS.has(ip)) {
+          return res.status(429).json({ error: 'Too many attempts. Please try again later.' });
+        }
+        if (!rateLimit(ip, 'signin')) {
+          return res.status(429).json({ error: 'Too many login attempts. Please wait.' });
+        }
+        const { data, error } = await supabase.auth.signInWithPassword({
+          email: email.trim().toLowerCase(),
+          password
+        });
+        if (error) {
+          const banned = trackFailedAuth(ip, email);
+          if (banned) {
+            return res.status(429).json({ error: 'Too many failed attempts. Account temporarily locked.' });
+          }
+          throw error;
+        }
+        resetFailedAuth(ip, email);
+        result = {
+          user: data.user ? { id: data.user.id, email: data.user.email } : null,
+          session: data.session ? { access_token: data.session.access_token } : null
+        };
         break;
       }
       case 'signout': {
@@ -250,9 +419,15 @@ async function handlePost(req, res) {
       }
       case 'get_user': {
         const token = req.headers.authorization?.replace('Bearer ', '');
-        if (!token || token.length < 20) { result = { user: null }; break; }
+        if (!token || token.length < 20) {
+          result = { user: null };
+          break;
+        }
         const { data: { user }, error } = await supabase.auth.getUser(token);
-        if (error || !user) { result = { user: null }; break; }
+        if (error || !user) {
+          result = { user: null };
+          break;
+        }
         result = { user: { id: user.id, email: user.email } };
         break;
       }
@@ -262,41 +437,73 @@ async function handlePost(req, res) {
           supabase.from('resource_submissions').select('id', { count: 'exact', head: true }).eq('status', 'pending'),
           supabase.from('contact_messages').select('id', { count: 'exact', head: true })
         ]);
-        result = { resources: resCount.count || 0, pendingSubmissions: subCount.count || 0, users: 0, messages: msgCount.count || 0 };
+        result = {
+          resources: resCount.count || 0,
+          pendingSubmissions: subCount.count || 0,
+          users: 0,
+          messages: msgCount.count || 0
+        };
         break;
       }
       case 'submissions': {
-        const { data, error } = await supabase.from('resource_submissions').select('id,title,description,author,level,category,tag,status,created_at').order('created_at', { ascending: false }).limit(50);
+        const { data, error } = await supabase
+          .from('resource_submissions')
+          .select('id,title,description,author,level,category,tag,status,created_at')
+          .order('created_at', { ascending: false })
+          .limit(50);
         if (error) throw error;
         result = data || [];
         break;
       }
       case 'approve': {
-        if (!submissionId || !['approve', 'reject'].includes(req.body.action)) throw new Error('Invalid approval request');
+        if (!submissionId || !['approve', 'reject'].includes(req.body.action)) {
+          throw new Error('Invalid approval request');
+        }
         const newStatus = req.body.action === 'approve' ? 'approved' : 'rejected';
         await supabase.from('resource_submissions').update({ status: newStatus }).eq('id', submissionId);
         result = { success: true };
         break;
       }
       case 'messages': {
-        const { data, error } = await supabase.from('contact_messages').select('id,name,email,subject,message,created_at').order('created_at', { ascending: false }).limit(50);
+        const { data, error } = await supabase
+          .from('contact_messages')
+          .select('id,name,email,subject,message,created_at')
+          .order('created_at', { ascending: false })
+          .limit(50);
         if (error) throw error;
         result = { messages: data || [] };
         break;
       }
       case 'create_payment': {
-        result = { payment_id: 'demo_' + Date.now(), pay_address: '0xDEMO', pay_amount: req.body.amount || 10, pay_currency: req.body.pay_currency || 'usdttrc20' };
+        result = {
+          payment_id: 'demo_' + Date.now(),
+          pay_address: '0xDEMO',
+          pay_amount: req.body.amount || 10,
+          pay_currency: req.body.pay_currency || 'usdttrc20'
+        };
         break;
       }
       case 'ai_query': {
         const geminiKey = process.env.GEMINI_API_KEY;
-        if (!geminiKey) { result = { answer: 'AI features are coming soon. Please configure the API key.' }; break; }
+        if (!geminiKey) {
+          result = { answer: 'AI features are coming soon. Please configure the API key.' };
+          break;
+        }
         const response = await fetch(`https://generativelanguage.googleapis.com/v1beta/models/gemini-2.0-flash:generateContent?key=${geminiKey}`, {
-          method: 'POST', headers: { 'Content-Type': 'application/json' },
-          body: JSON.stringify({ contents: [{ parts: [{ text: `You are an expert biology and pharmacy tutor. ${mode === 'quiz' ? 'Generate quiz questions about:' : mode === 'summarize' ? 'Summarize this:' : 'Answer:'} ${prompt}` }] }] })
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({
+            contents: [{
+              parts: [{
+                text: `You are an expert biology and pharmacy tutor. ${mode === 'quiz' ? 'Generate quiz questions about:' : mode === 'summarize' ? 'Summarize this:' : 'Answer:'} ${prompt}`
+              }]
+            }]
+          })
         });
         const geminiData = await response.json();
-        result = { answer: geminiData.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.' };
+        result = {
+          answer: geminiData.candidates?.[0]?.content?.parts?.[0]?.text || 'No response generated.'
+        };
         break;
       }
       case 'get_donate_page_config': {
@@ -313,12 +520,14 @@ async function handlePost(req, res) {
         result = { success: true };
         break;
       }
-      default: throw new Error('Unknown action');
+      default:
+        throw new Error('Unknown action');
     }
 
     return res.status(200).json({ data: result });
   } catch (error) {
     console.error('POST Error:', error.message);
+    logSecurityEvent('POST_ERROR', { action, error: error.message }, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
-     }
+  }
