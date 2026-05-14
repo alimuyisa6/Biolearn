@@ -19,12 +19,13 @@ const ACTION_WHITELIST = new Set([
   'signup', 'signin', 'signout', 'get_user',
   'stats', 'submissions', 'approve', 'messages',
   'create_payment', 'send_message', 'currencies', 'status',
-  'ai_query', 'get_donate_page_config', 'submit_momo_donation'
+  'ai_query', 'get_donate_page_config', 'submit_momo_donation',
+  'get_quizzes', 'get_quiz', 'complete_quiz', 'add_reaction', 'get_user_progress'
 ]);
 
 const CSRF_PROTECTED_ACTIONS = new Set([
   'submit_contact', 'subscribe_newsletter', 'submit_resource',
-  'signup', 'signin', 'submit_momo_donation'
+  'signup', 'signin', 'submit_momo_donation', 'complete_quiz', 'add_reaction'
 ]);
 
 const RATE_LIMITS = new Map();
@@ -161,6 +162,17 @@ const VALIDATORS = {
     if (!body.amount || typeof body.amount !== 'string') return 'Amount required';
     if (!body.txid || typeof body.txid !== 'string') return 'Transaction ID required';
     return null;
+  },
+  complete_quiz: (body) => {
+    if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
+    if (typeof body.score !== 'number') return 'Invalid score';
+    if (typeof body.total !== 'number') return 'Invalid total';
+    return null;
+  },
+  add_reaction: (body) => {
+    if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
+    if (!body.reaction_type || !['like', 'love', 'helpful'].includes(body.reaction_type)) return 'Invalid reaction type';
+    return null;
   }
 };
 
@@ -199,13 +211,21 @@ module.exports = async (req, res) => {
   
   return res.status(405).json({ error: 'Method not allowed' });
 };
-
 async function handleGet(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const action = url.searchParams.get('action');
   
   if (!action || !ACTION_WHITELIST.has(action)) {
     return res.status(400).json({ error: 'Invalid action' });
+  }
+
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  let userId = null;
+  if (token) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) userId = user.id;
+    } catch(e) {}
   }
 
   try {
@@ -244,6 +264,61 @@ async function handleGet(req, res) {
           categories: [...new Set((c.data || []).map(x => x.category).filter(Boolean))],
           tags: [...new Set((t.data || []).map(x => x.tag).filter(Boolean))]
         };
+        break;
+      }
+      case 'get_quizzes': {
+        const category = url.searchParams.get('category');
+        let query = supabase.from('quizzes').select('*').eq('is_active', true);
+        if (category && category !== 'all') {
+          query = query.eq('category', category);
+        }
+        const { data, error } = await query.order('id');
+        if (error) throw error;
+        
+        if (userId && data.length) {
+          const { data: progress } = await supabase
+            .from('user_quiz_activity')
+            .select('quiz_id, score, percentage, passed, completed_at')
+            .eq('user_id', userId)
+            .in('quiz_id', data.map(q => q.id));
+          
+          const progressMap = new Map();
+          if (progress) progress.forEach(p => progressMap.set(p.quiz_id, p));
+          
+          result = data.map(quiz => ({
+            ...quiz,
+            user_progress: progressMap.get(quiz.id) || null
+          }));
+        } else {
+          result = data;
+        }
+        break;
+      }
+      case 'get_quiz': {
+        const quizId = parseInt(url.searchParams.get('id'));
+        if (!quizId) return res.status(400).json({ error: 'Quiz ID required' });
+        
+        const { data, error } = await supabase
+          .from('quizzes')
+          .select('*')
+          .eq('id', quizId)
+          .single();
+        if (error) throw error;
+        result = data;
+        break;
+      }
+      case 'get_user_progress': {
+        if (!userId) {
+          result = [];
+          break;
+        }
+        const { data, error } = await supabase
+          .from('user_quiz_activity')
+          .select('*, quizzes(id, title, category, total_points)')
+          .eq('user_id', userId)
+          .order('completed_at', { ascending: false });
+        if (error) throw error;
+        result = data || [];
         break;
       }
       case 'currencies':
@@ -286,6 +361,15 @@ async function handlePost(req, res) {
       logSecurityEvent('VALIDATION_FAILED', { action, error: validationError }, req);
       return res.status(400).json({ error: validationError });
     }
+  }
+
+  const token = req.headers.authorization?.replace('Bearer ', '');
+  let userId = null;
+  if (token) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) userId = user.id;
+    } catch(e) {}
   }
 
   try {
@@ -412,23 +496,81 @@ async function handlePost(req, res) {
         break;
       }
       case 'signout': {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        if (token) await supabase.auth.signOut(token);
+        const t = req.headers.authorization?.replace('Bearer ', '');
+        if (t) await supabase.auth.signOut(t);
         result = { success: true };
         break;
       }
       case 'get_user': {
-        const token = req.headers.authorization?.replace('Bearer ', '');
-        if (!token || token.length < 20) {
+        const t = req.headers.authorization?.replace('Bearer ', '');
+        if (!t || t.length < 20) {
           result = { user: null };
           break;
         }
-        const { data: { user }, error } = await supabase.auth.getUser(token);
+        const { data: { user }, error } = await supabase.auth.getUser(t);
         if (error || !user) {
           result = { user: null };
           break;
         }
         result = { user: { id: user.id, email: user.email } };
+        break;
+      }
+      case 'complete_quiz': {
+        if (!userId) {
+          return res.status(401).json({ error: 'Authentication required' });
+        }
+        
+        const { quiz_id, score, total, percentage, passed, answers, time_taken } = req.body;
+        
+        const { data: existing } = await supabase
+          .from('user_quiz_activity')
+          .select('id')
+          .eq('user_id', userId)
+          .eq('quiz_id', quiz_id)
+          .maybeSingle();
+        
+        if (existing) {
+          const { error } = await supabase
+            .from('user_quiz_activity')
+            .update({
+              score, total_possible: total, percentage, passed,
+              answers, time_taken, completed_at: new Date().toISOString()
+            })
+            .eq('id', existing.id);
+          if (error) throw error;
+        } else {
+          const { error } = await supabase
+            .from('user_quiz_activity')
+            .insert({
+              user_id: userId, quiz_id, score, total_possible: total,
+              percentage, passed, answers, time_taken, completed_at: new Date().toISOString()
+            });
+          if (error) throw error;
+        }
+        
+        try {
+          await supabase.rpc('update_quiz_stats', { quiz_id_input: quiz_id });
+        } catch(e) {}
+        
+        result = { success: true, passed, percentage };
+        break;
+      }
+      case 'add_reaction': {
+        if (!userId) {
+          return res.status(401).json({ error: 'Authentication required' });
+        }
+        
+        const { quiz_id, reaction_type } = req.body;
+        
+        const { error } = await supabase
+          .from('user_quiz_activity')
+          .update({ reaction: reaction_type })
+          .eq('user_id', userId)
+          .eq('quiz_id', quiz_id);
+        
+        if (error && error.code !== 'PGRST116') throw error;
+        
+        result = { success: true };
         break;
       }
       case 'stats': {
@@ -530,4 +672,4 @@ async function handlePost(req, res) {
     logSecurityEvent('POST_ERROR', { action, error: error.message }, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
-  }
+     }
