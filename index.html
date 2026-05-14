@@ -171,7 +171,7 @@
         .mobile-toggle { 
             border-color: var(--clr-magenta); 
             color: var(--clr-magenta);
-            display: flex; /* FIXED: Ensure mobile toggle is visible */
+            display: flex;
         }
         .mobile-toggle:hover { background: var(--clr-magenta); color: white; }
 
@@ -620,10 +620,10 @@
         /* Responsive Adjustments */
         @media (max-width: 768px) {
             .main-nav { display: none; }
-            .mobile-toggle { display: flex !important; } /* FIXED: Force display on mobile */
+            .mobile-toggle { display: flex !important; }
         }
         @media (min-width: 769px) {
-            .mobile-toggle { display: none; } /* Hide on desktop */
+            .mobile-toggle { display: none; }
         }
         
         /* Section spacing */
@@ -659,7 +659,9 @@
             <a href="#" class="logo-link" id="site-logo"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions flex gap-2 items-center flex-nowrap shrink-0">
-                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+                <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme">
+                    <i class="fa-solid fa-moon"></i>
+                </button>
                 <button class="mobile-toggle" id="mobile-toggle" aria-label="Menu"><i class="fa-solid fa-bars"></i></button>
             </div>
         </div>
@@ -824,7 +826,7 @@
     <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
     <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
-    <!-- JavaScript Logic - COMPLETELY UNTOUCHED, preserved exactly as original -->
+    <!-- JavaScript Logic - COMPLETELY PRESERVED WITH FIXED THEME TOGGLE -->
     <script>
     const API_BASE = '/api/query';
     const cache = {};
@@ -918,9 +920,32 @@
     function initCarousel(count) { const slides=document.querySelectorAll('.carousel-slide'),dots=document.querySelectorAll('.carousel-dot'); let current=0,interval; function go(i){slides[current].classList.remove('active');dots[current]?.classList.remove('active');current=i;slides[current].classList.add('active');dots[current]?.classList.add('active')} function nxt(){go((current+1)%count)} function prv(){go((current-1+count)%count)} function reset(){clearInterval(interval);interval=setInterval(nxt,5000)} document.querySelector('.carousel-prev')?.addEventListener('click',()=>{prv();reset()}); document.querySelector('.carousel-next')?.addEventListener('click',()=>{nxt();reset()}); dots.forEach(d=>d.addEventListener('click',()=>{go(+d.dataset.index);reset()})); reset(); }
 
     function initUI() {
-        const tt = document.getElementById('theme-toggle'), icon = tt.querySelector('i');
-        if (localStorage.getItem('theme') === 'light') { document.body.classList.add('light-mode'); icon.classList.replace('fa-moon', 'fa-sun'); }
-        tt.onclick = () => { document.body.classList.toggle('light-mode'); const l = document.body.classList.contains('light-mode'); icon.classList.replace(l?'fa-moon':'fa-sun', l?'fa-sun':'fa-moon'); localStorage.setItem('theme', l?'light':'dark'); };
+        const tt = document.getElementById('theme-toggle');
+        const icon = tt.querySelector('i');
+        
+        // Check for saved theme preference
+        if (localStorage.getItem('theme') === 'light') { 
+            document.body.classList.add('light-mode'); 
+            icon.classList.remove('fa-moon');
+            icon.classList.add('fa-sun');
+        }
+        
+        // Theme toggle functionality
+        tt.onclick = () => { 
+            document.body.classList.toggle('light-mode'); 
+            const isLight = document.body.classList.contains('light-mode'); 
+            
+            if (isLight) {
+                icon.classList.remove('fa-moon');
+                icon.classList.add('fa-sun');
+                localStorage.setItem('theme', 'light');
+            } else {
+                icon.classList.remove('fa-sun');
+                icon.classList.add('fa-moon');
+                localStorage.setItem('theme', 'dark');
+            }
+        };
+        
         const mt = document.getElementById('mobile-toggle'), mp = document.getElementById('mobile-nav-panel'), mo = document.getElementById('mobile-nav-overlay'), closeBtn = document.getElementById('mobile-close-btn');
         function open() { mp.classList.add('active'); mo.classList.add('active'); document.body.style.overflow = 'hidden'; }
         function close() { mp.classList.remove('active'); mo.classList.remove('active'); document.body.style.overflow = ''; }
