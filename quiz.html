@@ -13,7 +13,7 @@
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     
-    <!-- Security Headers (identical to index.html) -->
+    <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
@@ -32,6 +32,7 @@
             --clr-text-dim: #9aa9c1; --clr-text-muted: #6b7a94;
             --clr-border-glow: rgba(0,217,255,0.18); --shadow-glow: 0 0 28px rgba(0,217,255,0.22);
             --shadow-magenta: 0 0 22px rgba(255,0,170,0.32); --shadow-card: 0 10px 40px rgba(0,0,0,0.35);
+            --shadow-violet: 0 0 22px rgba(124,77,255,0.35);
             --transition-fast: 180ms ease; --transition-smooth: 320ms cubic-bezier(0.4,0,0.2,1);
             --max-width: 1280px; --font-body: 'Inter', system-ui, sans-serif;
             --font-display: 'Space Grotesk', 'Inter', sans-serif;
@@ -93,8 +94,10 @@
         .mobile-nav-header .logo-link { font-size: 1.2rem; }
         .mobile-close-btn { background: rgba(255,0,170,0.1); border: 1.5px solid var(--clr-magenta); color: var(--clr-magenta); width: 34px; height: 34px; border-radius: 50%; display: flex; align-items: center; justify-content: center; cursor: pointer; transition: all var(--transition-fast); }
         .mobile-close-btn:hover { background: var(--clr-magenta); color: white; transform: rotate(90deg); }
+        .mobile-nav-links { display: flex; flex-direction: column; gap: 0.25rem; }
         .mobile-nav-links a { display: flex; align-items: center; gap: 0.8rem; padding: 0.8rem; text-decoration: none; color: var(--clr-text-dim); font-weight: 500; border-radius: var(--radius-md); transition: all var(--transition-fast); font-size: 0.9rem; }
         .mobile-nav-links a:hover { background: rgba(255,0,170,0.15); color: var(--clr-magenta); transform: translateX(4px); }
+        .mobile-nav-links a i { width: 24px; }
         .mobile-nav-divider { border-top: 1px solid var(--clr-border-glow); margin: 0.5rem 0; }
         .mobile-nav-footer { padding-top: 0.8rem; border-top: 1px solid var(--clr-border-glow); }
         .mobile-signin-btn, .mobile-signout-btn { display: flex; align-items: center; gap: 0.8rem; width: 100%; padding: 0.8rem; text-decoration: none; font-weight: 600; border-radius: var(--radius-md); transition: all var(--transition-fast); font-size: 0.9rem; cursor: pointer; background: transparent; border: none; }
@@ -111,7 +114,6 @@
         .quiz-hero p { color: var(--clr-text-dim); max-width: 600px; margin: 0 auto; font-size: 0.95rem; }
 
         .section { max-width: var(--max-width); margin: 2.5rem auto; padding: 0 1.5rem; }
-        .section-title { font-family: var(--font-display); font-size: clamp(1.4rem, 4vw, 1.8rem); font-weight: 700; background: var(--gradient-cyan); -webkit-background-clip: text; background-clip: text; color: transparent; margin-bottom: 1rem; display: flex; align-items: center; gap: 0.5rem; }
         .category-tabs { display: flex; gap: 0.5rem; flex-wrap: wrap; margin-bottom: 2rem; border-bottom: 1px solid var(--clr-border-glow); padding-bottom: 1rem; }
         .category-tab { background: transparent; border: 1.5px solid var(--clr-border-glow); color: var(--clr-text-dim); padding: 0.5rem 1.2rem; border-radius: 30px; cursor: pointer; transition: all var(--transition-fast); font-size: 0.85rem; font-weight: 500; }
         .category-tab:hover { border-color: var(--clr-cyan); color: var(--clr-cyan); }
@@ -174,28 +176,14 @@
         .spinner { text-align: center; padding: 3rem; color: var(--clr-cyan); }
         .spinner i { font-size: 2.5rem; animation: spin 1.2s linear infinite; }
 
-        /* Auth Modal - IDENTICAL to index.html */
-        #auth-modal {
-            position: fixed; inset: 0; z-index: 300;
-            display: flex; align-items: center; justify-content: center;
-            background: rgba(0,0,0,0.8);
-        }
-        .form-input, .form-textarea {
-            width: 100%; padding: 0.8rem 1.2rem;
-            background: var(--clr-navy-card);
-            border: 1.5px solid var(--clr-border-glow);
-            border-radius: 30px; color: var(--clr-white);
-            font-family: var(--font-body); font-size: 0.9rem;
-            transition: all var(--transition-fast);
-        }
-        .form-input:focus, .form-textarea:focus {
-            outline: none; border-color: var(--clr-cyan);
-            box-shadow: 0 0 18px rgba(0,217,255,0.18);
-        }
+        #auth-modal { position: fixed; inset: 0; z-index: 300; display: flex; align-items: center; justify-content: center; background: rgba(0,0,0,0.8); backdrop-filter: blur(4px); }
+        .form-input, .form-textarea { width: 100%; padding: 0.8rem 1.2rem; background: var(--clr-navy-card); border: 1.5px solid var(--clr-border-glow); border-radius: 30px; color: var(--clr-white); font-family: var(--font-body); font-size: 0.9rem; transition: all var(--transition-fast); }
+        .form-input:focus, .form-textarea:focus { outline: none; border-color: var(--clr-cyan); box-shadow: 0 0 18px rgba(0,217,255,0.18); }
 
         .footer-fat { background: #060615; border-top: 2px solid rgba(0,217,255,0.3); padding: 2.5rem 1.5rem 1.5rem; margin-top: auto; }
         .footer-grid { max-width: var(--max-width); margin: 0 auto; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 2rem; }
         .footer-col h4 { font-family: var(--font-display); color: var(--clr-cyan); font-weight: 600; margin-bottom: 0.8rem; text-transform: uppercase; font-size: 0.75rem; letter-spacing: 0.1em; }
+        .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
         .footer-col a { color: var(--clr-text-dim); text-decoration: none; font-size: 0.8rem; transition: color var(--transition-fast); }
         .footer-col a:hover { color: var(--clr-magenta); }
         .footer-social { display: flex; gap: 0.8rem; margin-top: 0.8rem; }
@@ -212,10 +200,12 @@
             .section { margin: 1.5rem auto; padding: 0 1rem; }
             .quiz-grid { grid-template-columns: 1fr; }
             .quiz-modal-content { max-width: 95%; }
+            .footer-grid { grid-template-columns: repeat(2, 1fr); gap: 1rem; }
         }
         @media (max-width: 480px) {
             .quiz-hero { padding: 2rem 1rem; }
             .category-tab { padding: 0.3rem 0.8rem; font-size: 0.75rem; }
+            .footer-grid { grid-template-columns: 1fr; }
         }
     </style>
 </head>
@@ -224,7 +214,7 @@
 
     <header class="site-header" id="site-header">
         <div class="header-container">
-            <a href="/" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
+            <a href="/" class="logo-link" id="site-logo"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
             <nav><ul class="main-nav" id="main-nav"></ul></nav>
             <div class="nav-actions">
                 <button class="theme-toggle" id="theme-toggle"><i class="fa-solid fa-moon"></i></button>
@@ -268,13 +258,7 @@
     </main>
 
     <footer class="footer-fat">
-        <div class="footer-grid" id="footer-grid">
-            <div class="footer-col">
-                <a href="/" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
-                <p style="color:var(--clr-text-dim);margin-top:0.5rem;font-size:0.75rem;">Advancing biology and pharmacy education.</p>
-                <div class="footer-social" id="footer-social"></div>
-            </div>
-        </div>
+        <div class="footer-grid" id="footer-grid"></div>
         <div class="footer-bottom"><p>&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p></div>
     </footer>
 
@@ -282,7 +266,6 @@
 
     <script>
     const API_BASE = '/api/query';
-    const QUIZ_API_BASE = '/api/quiz';
     let currentQuiz = null;
     let currentAnswers = [];
     let quizStartTime = null;
@@ -299,14 +282,13 @@
     }
     function isLoggedIn() { return !!getToken() && !isTokenExpired(); }
 
-    async function apiCall(endpoint, action, params = {}) {
+    async function apiCall(action, params = {}) {
         const token = getToken();
         const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
         
         try {
-            const url = endpoint === 'quiz' ? QUIZ_API_BASE : API_BASE;
-            const res = await fetch(url, {
+            const res = await fetch(API_BASE, {
                 method: 'POST',
                 headers,
                 body: JSON.stringify({ action, ...params })
@@ -314,25 +296,47 @@
             if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); updateMobileNav(); return null; }
             const json = await res.json();
             if (!res.ok) throw new Error(json.error || 'Request failed');
-            return json.data;
+            return json.data !== undefined ? json.data : json;
         } catch (err) { console.error('API Error:', err); return null; }
     }
 
     function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t || '').replace(/[&<>"']/g, c => m[c]); }
 
-    function updateMobileNav() {
-        const navLinks = document.getElementById('mobile-nav-links');
-        const footer = document.getElementById('mobile-nav-footer');
-        if (!navLinks) return;
+    async function loadNavigationAndFooter() {
+        const navContainer = document.getElementById('main-nav');
+        const mobileNavContainer = document.getElementById('mobile-nav-links');
         
-        navLinks.innerHTML = `
-            <a href="/"><i class="fa-solid fa-house"></i> Home</a>
-            <a href="/#courses"><i class="fa-solid fa-book"></i> Resources</a>
-            <a href="/quiz.html"><i class="fa-solid fa-brain"></i> Quiz</a>
-            <a href="/#blog"><i class="fa-solid fa-newspaper"></i> Blog</a>
-            <a href="/#about"><i class="fa-solid fa-circle-info"></i> About</a>
-            <a href="/#contact"><i class="fa-solid fa-envelope"></i> Contact</a>
-        `;
+        if (navContainer) {
+            navContainer.innerHTML = '<li><a href="/">Home</a></li><li><a href="/#courses">Resources</a></li><li><a href="/quiz.html" class="active">Quiz</a></li><li><a href="/#blog">Blog</a></li><li><a href="/#about">About</a></li><li><a href="/#contact">Contact</a></li>';
+        }
+        
+        if (mobileNavContainer) {
+            mobileNavContainer.innerHTML = '<a href="/"><i class="fa-solid fa-house"></i> Home</a><a href="/#courses"><i class="fa-solid fa-book"></i> Resources</a><a href="/quiz.html"><i class="fa-solid fa-brain"></i> Quiz</a><a href="/#blog"><i class="fa-solid fa-newspaper"></i> Blog</a><a href="/#about"><i class="fa-solid fa-circle-info"></i> About</a><a href="/#contact"><i class="fa-solid fa-envelope"></i> Contact</a>';
+        }
+        
+        const footerGrid = document.getElementById('footer-grid');
+        if (footerGrid && footerGrid.children.length === 0) {
+            footerGrid.innerHTML = `
+                <div class="footer-col">
+                    <a href="/" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
+                    <p style="color:var(--clr-text-dim);margin-top:0.5rem;font-size:0.75rem;">Advancing biology and pharmacy education.</p>
+                    <div class="footer-social">
+                        <a href="https://twitter.com/aliverbiopharm" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-x-twitter"></i></a>
+                        <a href="https://linkedin.com/company/aliverbiopharm" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-linkedin-in"></i></a>
+                        <a href="https://github.com/aliverbiopharm" target="_blank" rel="noopener noreferrer"><i class="fa-brands fa-github"></i></a>
+                        <a href="mailto:info@aliverbiopharm.com"><i class="fa-solid fa-envelope"></i></a>
+                    </div>
+                </div>
+                <div class="footer-col"><h4>Quick Links</h4><ul><li><a href="/">Home</a></li><li><a href="/#courses">Resources</a></li><li><a href="/quiz.html">Quiz</a></li><li><a href="/#blog">Blog</a></li></ul></div>
+                <div class="footer-col"><h4>Support</h4><ul><li><a href="/#faq">FAQ</a></li><li><a href="/#contact">Contact</a></li><li><a href="/privacy">Privacy Policy</a></li><li><a href="/terms">Terms of Service</a></li></ul></div>
+                <div class="footer-col"><h4>Connect</h4><ul><li><a href="https://twitter.com/aliverbiopharm">Twitter</a></li><li><a href="https://linkedin.com/company/aliverbiopharm">LinkedIn</a></li><li><a href="https://github.com/aliverbiopharm">GitHub</a></li><li><a href="mailto:info@aliverbiopharm.com">Email</a></li></ul></div>
+            `;
+        }
+    }
+
+    function updateMobileNav() {
+        const footer = document.getElementById('mobile-nav-footer');
+        if (!footer) return;
         
         const token = getToken();
         if (token && !isTokenExpired()) {
@@ -349,7 +353,6 @@
         location.reload();
     };
 
-    // Auth Form - IDENTICAL to index.html
     window.showAuthForm = function(mode) {
         const existing = document.getElementById('auth-modal');
         if (existing) existing.remove();
@@ -395,7 +398,7 @@
             
             try {
                 const action = mode === 'signin' ? 'signin' : 'signup';
-                const data = await apiCall('main', action, { email, password });
+                const data = await apiCall(action, { email, password });
                 if (data?.session) {
                     localStorage.setItem('sb-token', data.session.access_token);
                     localStorage.setItem('sb-email', data.user.email);
@@ -421,7 +424,7 @@
                 container.innerHTML = `<div style="text-align:center;padding:3rem;"><i class="fa-solid fa-lock" style="font-size:3rem;color:var(--clr-magenta);"></i><p style="margin-top:1rem;">Please sign in to view your progress</p><button class="btn-primary" onclick="showAuthForm('signin')" style="margin-top:1rem;">Sign In</button></div>`;
                 return;
             }
-            const progress = await apiCall('main', 'get_user_progress');
+            const progress = await apiCall('get_user_progress');
             if (!progress || progress.length === 0) {
                 container.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">You haven\'t taken any quizzes yet. Start learning!</p>';
                 return;
@@ -438,7 +441,7 @@
             return;
         }
         
-        const quizzes = await apiCall('quiz', 'get_quizzes', { category: category === 'all' ? undefined : category });
+        const quizzes = await apiCall('get_quizzes', { category: category === 'all' ? undefined : category });
         if (!quizzes || quizzes.length === 0) {
             container.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No quizzes available in this category yet.</p>';
             return;
@@ -462,7 +465,7 @@
             return;
         }
         
-        const quiz = await apiCall('quiz', 'get_quiz', { id: quizId });
+        const quiz = await apiCall('get_quiz', { id: quizId });
         if (!quiz) return;
         
         currentQuiz = quiz;
@@ -548,7 +551,7 @@
         const passed = percentage >= (currentQuiz.passing_score || 60);
         const timeTaken = Math.floor((Date.now() - quizStartTime) / 1000);
         
-        await apiCall('quiz', 'complete_quiz', {
+        await apiCall('complete_quiz', {
             quiz_id: currentQuiz.id,
             score, total, percentage, passed,
             answers: JSON.stringify(answers),
@@ -580,7 +583,7 @@
     }
     
     window.addReaction = async function(quizId, type) {
-        await apiCall('quiz', 'add_reaction', { quiz_id: quizId, reaction_type: type });
+        await apiCall('add_reaction', { quiz_id: quizId, reaction_type: type });
         const modal = document.getElementById('result-modal');
         if (modal) {
             const btn = modal.querySelector(`.reaction-btn.${type}`);
@@ -618,6 +621,7 @@
             };
         });
         
+        loadNavigationAndFooter();
         updateMobileNav();
         loadQuizzes('all');
     }
