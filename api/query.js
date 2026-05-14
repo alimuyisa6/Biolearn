@@ -163,7 +163,7 @@ const VALIDATORS = {
     if (!body.txid || typeof body.txid !== 'string') return 'Transaction ID required';
     return null;
   },
-  complete_quiz: (body) => {
+ complete_quiz: (body) => {
     if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
     if (typeof body.score !== 'number') return 'Invalid score';
     if (typeof body.total !== 'number') return 'Invalid total';
@@ -211,6 +211,7 @@ module.exports = async (req, res) => {
   
   return res.status(405).json({ error: 'Method not allowed' });
 };
+
 async function handleGet(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const action = url.searchParams.get('action');
@@ -275,7 +276,7 @@ async function handleGet(req, res) {
         const { data, error } = await query.order('id');
         if (error) throw error;
         
-        if (userId && data.length) {
+        if (userId && data && data.length) {
           const { data: progress } = await supabase
             .from('user_quiz_activity')
             .select('quiz_id, score, percentage, passed, completed_at')
@@ -290,7 +291,7 @@ async function handleGet(req, res) {
             user_progress: progressMap.get(quiz.id) || null
           }));
         } else {
-          result = data;
+          result = data || [];
         }
         break;
       }
@@ -352,9 +353,9 @@ async function handlePost(req, res) {
     if (!clientToken) {
       logSecurityEvent('MISSING_CSRF_TOKEN', { action }, req);
     }
-  }
-  
-  const validator = VALIDATORS[action];
+        }
+
+const validator = VALIDATORS[action];
   if (validator) {
     const validationError = validator(req.body);
     if (validationError) {
@@ -672,4 +673,4 @@ async function handlePost(req, res) {
     logSecurityEvent('POST_ERROR', { action, error: error.message }, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
-     }
+       }
