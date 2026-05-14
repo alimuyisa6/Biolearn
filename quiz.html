@@ -13,7 +13,6 @@
     <meta property="og:type" content="website">
     <meta name="twitter:card" content="summary_large_image">
     
-    <!-- Security Headers -->
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
     <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
@@ -307,7 +306,6 @@
             const sections = await apiCall('get_all_site_sections');
             if (!sections) return;
             
-            // Build navigation
             if (sections.navigation && sections.navigation.links) {
                 const navContainer = document.getElementById('main-nav');
                 if (navContainer) {
@@ -324,19 +322,16 @@
                 }
             }
             
-            // Build footer
             if (sections.footer) {
                 const footerGrid = document.getElementById('footer-grid');
-                if (footerGrid) {
+                if (footerGrid && footerGrid.children.length === 0) {
                     let footerHtml = '';
                     
                     if (sections.footer.columns) {
                         footerHtml += sections.footer.columns.map(col => `
                             <div class="footer-col">
                                 <h4>${esc(col.heading)}</h4>
-                                <ul>
-                                    ${(col.items || []).map(item => `<li><a href="${esc(item.href)}">${item.icon ? `<i class="${esc(item.icon)}" style="margin-right:0.5rem;"></i>` : ''}${esc(item.label)}</a></li>`).join('')}
-                                </ul>
+                                <ul>${(col.items || []).map(item => `<li><a href="${esc(item.href)}">${item.icon ? `<i class="${esc(item.icon)}" style="margin-right:0.5rem;"></i>` : ''}${esc(item.label)}</a></li>`).join('')}</ul>
                             </div>
                         `).join('');
                     } else {
@@ -344,19 +339,15 @@
                             <div class="footer-col">
                                 <a href="/" class="logo-link"><i class="fa-solid fa-dna"></i> AliverBiopharm</a>
                                 <p style="color:var(--clr-text-dim);margin-top:0.5rem;font-size:0.75rem;">Advancing biology and pharmacy education.</p>
-                                <div class="footer-social">
-                                    ${(sections.footer.social_links || []).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer"><i class="${esc(s.icon)}"></i></a>`).join('')}
-                                </div>
+                                <div class="footer-social">${(sections.footer.social_links || []).map(s => `<a href="${esc(s.url)}" target="_blank" rel="noopener noreferrer"><i class="${esc(s.icon)}"></i></a>`).join('')}</div>
                             </div>
                         `;
                     }
-                    
                     footerGrid.innerHTML = footerHtml;
                 }
             }
         } catch (err) {
             console.error('Failed to load navigation:', err);
-            // Fallback navigation
             const navContainer = document.getElementById('main-nav');
             if (navContainer && navContainer.children.length === 0) {
                 navContainer.innerHTML = '<li><a href="/">Home</a></li><li><a href="/#courses">Resources</a></li><li><a href="/quiz.html" class="active">Quiz</a></li><li><a href="/#blog">Blog</a></li><li><a href="/#about">About</a></li><li><a href="/#contact">Contact</a></li>';
