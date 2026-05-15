@@ -1,104 +1,29 @@
  <!DOCTYPE html>
 <html lang="en">
- <head>
+<head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
-
     <title>AliverBiopharm — Interactive Quizzes</title>
-
     <meta name="description" content="Test your knowledge with interactive biology and pharmacy quizzes. Track your progress and earn certificates.">
-
     <meta name="theme-color" content="#0b0b1a">
     <meta name="robots" content="index, follow">
     <meta name="author" content="AliverBiopharm">
-
-    <!-- Open Graph -->
     <meta property="og:title" content="AliverBiopharm — Interactive Quizzes">
     <meta property="og:description" content="Test your knowledge with interactive biology and pharmacy quizzes.">
     <meta property="og:type" content="website">
-
-    <!-- Twitter -->
     <meta name="twitter:card" content="summary_large_image">
-
-    <!-- Security -->
+    
     <meta http-equiv="X-Content-Type-Options" content="nosniff">
     <meta http-equiv="Referrer-Policy" content="strict-origin-when-cross-origin">
-
-    <!-- Permissions -->
-    <meta http-equiv="Permissions-Policy"
-        content="camera=(), microphone=(), geolocation=()">
-
-    <!-- Content Security Policy -->
-    <meta http-equiv="Content-Security-Policy"
-        content="
-        default-src 'self';
-
-        script-src
-            'self'
-            'unsafe-inline'
-            https://cdnjs.cloudflare.com
-            https://cdn.jsdelivr.net;
-
-        style-src
-            'self'
-            'unsafe-inline'
-            https://fonts.googleapis.com
-            https://cdnjs.cloudflare.com
-            https://cdn.jsdelivr.net;
-
-        font-src
-            'self'
-            https://fonts.gstatic.com
-            https://cdnjs.cloudflare.com
-            data:;
-
-        img-src
-            'self'
-            https:
-            data:
-            blob:;
-
-        connect-src
-            'self'
-            https://*.supabase.co
-            https://*.supabase.in
-            https://api.nowpayments.io
-            https://cdn.jsdelivr.net
-            https://cdnjs.cloudflare.com;
-
-        frame-src
-            'self'
-            https://www.google.com;
-
-        object-src 'none';
-
-        base-uri 'self';
-
-        form-action 'self';
-
-        frame-ancestors 'none';
-
-        upgrade-insecure-requests;
-    ">
-
-    <!-- DNS Prefetch -->
+    <meta http-equiv="Permissions-Policy" content="camera=(), microphone=(), geolocation=()">
+    <meta http-equiv="Content-Security-Policy" content="default-src 'self'; script-src 'self' 'unsafe-inline' https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; style-src 'self' 'unsafe-inline' https://fonts.googleapis.com https://cdnjs.cloudflare.com https://cdn.jsdelivr.net; font-src 'self' https://fonts.gstatic.com https://cdnjs.cloudflare.com data:; img-src 'self' https: data: blob:; connect-src 'self' https://*.supabase.co https://*.supabase.in https://api.nowpayments.io; frame-src 'self' https://www.google.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests;">
+    
     <link rel="preconnect" href="https://fonts.googleapis.com">
-
-    <link rel="preconnect"
-        href="https://fonts.gstatic.com"
-        crossorigin>
-
-    <!-- Fonts -->
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap"
-        rel="stylesheet">
-
-    <!-- Font Awesome -->
-    <link rel="stylesheet"
-        href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css"
-        crossorigin="anonymous"
-        referrerpolicy="no-referrer">
-
-        <style>
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" crossorigin="anonymous" referrerpolicy="no-referrer">
+    
+    <style>
         :root {
             --clr-deep-space: #0b0b1a; --clr-cyan: #00d9ff; --clr-magenta: #ff00aa;
             --clr-emerald: #00c896; --clr-violet: #7c4dff;
@@ -362,17 +287,43 @@
         const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
         if (token) headers['Authorization'] = `Bearer ${token}`;
         
+        const quizActions = ['get_quizzes', 'get_quiz', 'complete_quiz', 'add_reaction', 'get_user_progress'];
+        const getActions = ['get_quizzes', 'get_quiz', 'get_user_progress', 'get_all_site_sections', 'get_site_section', 'get_resources', 'get_filter_options'];
+        
+        const endpoint = quizActions.includes(action) ? QUIZ_API : MAIN_API;
+        const isGet = getActions.includes(action);
+        
+        let url = endpoint;
+        const fetchOptions = { method: isGet ? 'GET' : 'POST', headers };
+        
+        if (isGet) {
+            const query = new URLSearchParams({ action, ...params });
+            url += `?${query.toString()}`;
+        } else {
+            fetchOptions.body = JSON.stringify({ action, ...params });
+        }
+        
         try {
-            const res = await fetch(API_BASE, {
-                method: 'POST',
-                headers,
-                body: JSON.stringify({ action, ...params })
-            });
-            if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); updateMobileNav(); return null; }
-            const json = await res.json();
+            const res = await fetch(url, fetchOptions);
+            if (res.status === 401) {
+                localStorage.removeItem('sb-token');
+                localStorage.removeItem('sb-email');
+                updateMobileNav();
+                return null;
+            }
+            let json;
+            try { json = await res.json(); } catch { throw new Error('Invalid JSON response'); }
             if (!res.ok) throw new Error(json.error || 'Request failed');
-            return json.data !== undefined ? json.data : json;
-        } catch (err) { console.error('API Error:', err); return null; }
+            if (json && typeof json === 'object') {
+                if ('data' in json) return json.data;
+                if (json.success === true && 'data' in json) return json.data;
+                return json;
+            }
+            return null;
+        } catch (err) {
+            console.error(`API Error [${action}]`, err);
+            return null;
+        }
     }
 
     function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t || '').replace(/[&<>"']/g, c => m[c]); }
@@ -402,7 +353,6 @@
                 const footerGrid = document.getElementById('footer-grid');
                 if (footerGrid && footerGrid.children.length === 0) {
                     let footerHtml = '';
-                    
                     if (sections.footer.columns) {
                         footerHtml += sections.footer.columns.map(col => `
                             <div class="footer-col">
@@ -549,7 +499,7 @@
                 <div class="quiz-card-header"><span class="quiz-badge ${q.category}">${q.category === 'pharmacy' ? 'Pharmacy' : q.category === 'olevel' ? 'O-Level' : 'A-Level'}</span><span class="quiz-difficulty"><i class="fa-solid fa-chart-line"></i> ${q.difficulty || 'medium'}</span></div>
                 <h3>${esc(q.title)}</h3>
                 <p>${esc(q.description || 'Test your knowledge')}</p>
-                <div class="quiz-meta"><span><i class="fa-regular fa-clock"></i> ${Math.floor(q.time_limit / 60)} min</span><span><i class="fa-regular fa-question-circle"></i> ${q.total_points || 0} questions</span><span><i class="fa-regular fa-star"></i> Pass: ${q.passing_score}%</span></div>
+                <div class="quiz-meta"><span><i class="fa-regular fa-clock"></i> ${q.time_limit ? Math.floor(q.time_limit / 60) : 0} min</span><span><i class="fa-regular fa-question-circle"></i> ${q.total_points || 0} questions</span><span><i class="fa-regular fa-star"></i> Pass: ${q.passing_score}%</span></div>
                 ${q.user_progress ? `<div class="quiz-progress"><div class="quiz-progress-bar" style="width:${q.user_progress.percentage || 0}%"></div></div><div class="quiz-status"><i class="fa-solid ${q.user_progress.passed ? 'fa-check-circle' : 'fa-clock'}"></i> ${q.user_progress.passed ? `Score: ${q.user_progress.percentage}%` : 'In Progress'}</div>` : ''}
                 <button class="btn-start">${q.user_progress ? (q.user_progress.completed_at ? 'Retake Quiz' : 'Continue') : 'Start Quiz'}</button>
             </div>
@@ -612,11 +562,12 @@
     
     window.selectOption = function(questionIdx, optionIdx) {
         currentAnswers[questionIdx] = optionIdx;
-        const options = document.querySelectorAll('#quiz-modal .option');
-        options.forEach((opt, idx) => {
-            if (idx === optionIdx) opt.classList.add('selected');
-            else opt.classList.remove('selected');
-        });
+        const questionBlock = document.querySelector('.quiz-question');
+        if (questionBlock) {
+            questionBlock.querySelectorAll('.option').forEach((opt, idx) => {
+                opt.classList.toggle('selected', idx === optionIdx);
+            });
+        }
     };
     
     window.nextQuestion = function() {
