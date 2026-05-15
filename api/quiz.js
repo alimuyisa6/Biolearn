@@ -1,5 +1,4 @@
-// api/quiz.js
-const { createClient } = require('@supabase/supabase-js');
+ const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
   process.env.SUPABASE_URL,
@@ -7,8 +6,8 @@ const supabase = createClient(
 );
 
 const ACTION_WHITELIST = new Set([
-  'get_quizzes', 'get_quiz', 'submit_answer', 'complete_quiz',
-  'get_progress', 'add_reaction', 'report_issue', 'get_stats'
+  'get_quizzes', 'get_quiz', 'complete_quiz',
+  'get_user_progress', 'add_reaction', 'get_stats'
 ]);
 
 const RATE_LIMITS = new Map();
@@ -75,7 +74,7 @@ async function handleGet(req, res) {
       case 'get_quizzes': {
         const category = url.searchParams.get('category');
         let query = supabase.from('quizzes').select('*').eq('is_active', true);
-        if (category && ['pharmacy', 'olevel', 'alevel'].includes(category)) {
+        if (category && category !== 'all') {
           query = query.eq('category', category);
         }
         const { data, error } = await query.order('id');
@@ -85,7 +84,7 @@ async function handleGet(req, res) {
           const quizIds = data.map(q => q.id);
           const { data: activity } = await supabase
             .from('user_quiz_activity')
-            .select('quiz_id, score, percentage, passed, completed_at, reaction')
+            .select('quiz_id, score, percentage, passed, completed_at')
             .in('quiz_id', quizIds)
             .eq('user_id', userId);
           
@@ -93,17 +92,7 @@ async function handleGet(req, res) {
           if (activity) activity.forEach(a => activityMap.set(a.quiz_id, a));
           
           result = data.map(quiz => ({
-            id: quiz.id,
-            title: quiz.title,
-            description: quiz.description,
-            category: quiz.category,
-            subject: quiz.subject,
-            difficulty: quiz.difficulty,
-            time_limit: quiz.time_limit,
-            passing_score: quiz.passing_score,
-            total_points: quiz.total_points,
-            attempt_count: quiz.attempt_count,
-            avg_score: quiz.avg_score,
+            ...quiz,
             user_progress: activityMap.get(quiz.id) || null
           }));
         } else {
@@ -127,15 +116,14 @@ async function handleGet(req, res) {
         break;
       }
 
-      case 'get_progress': {
+      case 'get_user_progress': {
         if (!userId) return res.status(401).json({ error: 'Authentication required' });
         
         const { data, error } = await supabase
           .from('user_quiz_activity')
-          .select('*, quizzes(title, category, total_points)')
+          .select('*, quizzes(id, title, category, total_points)')
           .eq('user_id', userId)
-          .order('completed_at', { ascending: false })
-          .limit(20);
+          .order('completed_at', { ascending: false });
         if (error) throw error;
         
         result = data;
@@ -148,22 +136,15 @@ async function handleGet(req, res) {
         
         const { data: activity } = await supabase
           .from('user_quiz_activity')
-          .select('percentage, reaction')
+          .select('percentage')
           .eq('quiz_id', quizId);
         
         const totalAttempts = activity?.length || 0;
         const avgScore = totalAttempts > 0 
           ? Math.round(activity.reduce((sum, a) => sum + (a.percentage || 0), 0) / totalAttempts) 
           : 0;
-        const passedCount = activity?.filter(a => a.percentage >= 60).length || 0;
-        const passRate = totalAttempts > 0 ? Math.round((passedCount / totalAttempts) * 100) : 0;
         
-        const reactions = { like: 0, love: 0, helpful: 0 };
-        activity?.forEach(a => {
-          if (a.reaction && reactions[a.reaction] !== undefined) reactions[a.reaction]++;
-        });
-        
-        result = { totalAttempts, avgScore, passRate, reactions };
+        result = { totalAttempts, avgScore };
         break;
       }
 
@@ -191,41 +172,17 @@ async function handlePost(req, res) {
     let result;
 
     switch (action) {
-      case 'submit_answer': {
-        const { quiz_id, question_index, selected_option } = req.body;
-        
-        const { data: quiz, error } = await supabase
-          .from('quizzes')
-          .select('questions')
-          .eq('id', quiz_id)
-          .single();
-        if (error) throw error;
-        
-        const question = quiz.questions[question_index];
-        const isCorrect = selected_option === question.correct;
-        
-        result = {
-          is_correct: isCorrect,
-          correct_answer: question.options[question.correct],
-          explanation: question.explanation,
-          points_earned: isCorrect ? question.points : 0
-        };
-        break;
-      }
-
       case 'complete_quiz': {
         if (!userId) return res.status(401).json({ error: 'Authentication required' });
         
-        const { quiz_id, score, total, percentage, answers, time_taken } = req.body;
+        const { quiz_id, score, total, percentage, passed, answers, time_taken } = req.body;
         
         const { data: existing } = await supabase
           .from('user_quiz_activity')
           .select('id')
           .eq('user_id', userId)
           .eq('quiz_id', quiz_id)
-          .single();
-        
-        const passed = percentage >= 60;
+          .maybeSingle();
         
         if (existing) {
           const { error } = await supabase
@@ -246,7 +203,9 @@ async function handlePost(req, res) {
           if (error) throw error;
         }
         
-        await supabase.rpc('update_quiz_stats', { quiz_id_input: quiz_id });
+        try {
+          await supabase.rpc('update_quiz_stats', { quiz_id_input: quiz_id });
+        } catch(e) {}
         
         result = { success: true, passed, percentage };
         break;
@@ -269,30 +228,6 @@ async function handlePost(req, res) {
         break;
       }
 
-      case 'report_issue': {
-        if (!userId) return res.status(401).json({ error: 'Authentication required' });
-        
-        const { quiz_id, issue_type, description } = req.body;
-        
-        const { error } = await supabase
-          .from('user_quiz_activity')
-          .update({ report_type: issue_type, report_description: description })
-          .eq('user_id', userId)
-          .eq('quiz_id', quiz_id);
-        
-        if (error && error.code !== 'PGRST116') {
-          await supabase
-            .from('user_quiz_activity')
-            .insert({
-              user_id: userId, quiz_id, report_type: issue_type,
-              report_description: description, started_at: new Date()
-            });
-        }
-        
-        result = { success: true };
-        break;
-      }
-
       default:
         throw new Error('Unknown action');
     }
@@ -302,4 +237,4 @@ async function handlePost(req, res) {
     console.error('POST Error:', error.message);
     return res.status(500).json({ error: 'Internal server error' });
   }
-                                           }
+}
