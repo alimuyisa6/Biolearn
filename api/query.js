@@ -163,7 +163,7 @@ const VALIDATORS = {
     if (!body.txid || typeof body.txid !== 'string') return 'Transaction ID required';
     return null;
   },
- complete_quiz: (body) => {
+  complete_quiz: (body) => {
     if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
     if (typeof body.score !== 'number') return 'Invalid score';
     if (typeof body.total !== 'number') return 'Invalid total';
@@ -353,9 +353,9 @@ async function handlePost(req, res) {
     if (!clientToken) {
       logSecurityEvent('MISSING_CSRF_TOKEN', { action }, req);
     }
-        }
-
-const validator = VALIDATORS[action];
+  }
+  
+  const validator = VALIDATORS[action];
   if (validator) {
     const validationError = validator(req.body);
     if (validationError) {
@@ -673,4 +673,4 @@ const validator = VALIDATORS[action];
     logSecurityEvent('POST_ERROR', { action, error: error.message }, req);
     return res.status(500).json({ error: 'Internal server error' });
   }
-       }
+}
