@@ -6,7 +6,7 @@
   <title>Download Resources — AliverBiopharm</title>
   <meta name="description" content="Download biology and pharmacy learning resources from AliverBiopharm." />
   <meta name="theme-color" content="#0a4f4f" />
-  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: http: 'unsafe-inline'; img-src 'self' https: http: data:; font-src 'self' https: http: data:; connect-src 'self' https: http:;" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https:; script-src 'self' https: 'unsafe-inline'; style-src 'self' https: 'unsafe-inline'; img-src 'self' https: data:; font-src 'self' https: data:; connect-src 'self' https:;" />
   <link rel="preconnect" href="https://fonts.googleapis.com" />
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
   <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
@@ -357,139 +357,152 @@
 
     body.dark-mode .form-input:focus { background: rgba(2, 82, 82, 0.5); box-shadow: 0 0 18px rgba(10, 181, 181, 0.2); }
 
- /* ── Compact Filter System ── */
-.filter-wrapper { margin-bottom: 20px; }
+    /* ── Compact Filter System ── */
+    .filter-wrapper { margin-bottom: 20px; }
 
-.top-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
+    .top-controls { display: flex; align-items: center; gap: 8px; flex-wrap: wrap; }
 
-.search-box { flex: 1; display: flex; gap: 8px; min-width: 180px; }
+    .search-box { flex: 1; display: flex; gap: 8px; min-width: 180px; }
 
-.search-box input {
-  flex: 1;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid rgba(10,181,181,0.25);
-  background: rgba(255,255,255,0.75);
-  color: var(--clr-white);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-}
+    .search-box input {
+      flex: 1;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(10,181,181,0.25);
+      background: rgba(255,255,255,0.75);
+      color: var(--clr-white);
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+    }
 
-.search-box input:focus { outline: none; border-color: var(--clr-cyan); box-shadow: 0 0 0 3px rgba(10,181,181,0.14); }
-body.dark-mode .search-box input { background: rgba(2,82,82,0.35); }
-body.dark-mode .search-box input:focus { background: rgba(2,82,82,0.5); }
+    .search-box input:focus {
+      outline: none;
+      border-color: var(--clr-cyan);
+      box-shadow: 0 0 0 3px rgba(10,181,181,0.14);
+    }
 
-.filter-toggle-btn {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  padding: 10px 14px;
-  border-radius: 12px;
-  border: 1.5px solid rgba(10,181,181,0.22);
-  background: var(--clr-navy-card);
-  color: var(--clr-white);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.8rem;
-  cursor: pointer;
-  backdrop-filter: blur(12px);
-  transition: transform var(--transition-fast), border-color var(--transition-fast);
-  white-space: nowrap;
-}
+    .search-box input::placeholder {
+      color: var(--clr-text-muted);
+      opacity: 1;
+    }
 
-.filter-toggle-btn:hover { border-color: var(--clr-cyan); transform: translateY(-1px); }
-.filter-arrow { transition: transform 0.25s ease; font-size: 0.7rem; }
-.filter-toggle-btn.active .filter-arrow { transform: rotate(180deg); }
+    body.dark-mode .search-box input { background: rgba(2,82,82,0.35); }
+    body.dark-mode .search-box input:focus { background: rgba(2,82,82,0.5); }
 
-.filter-panel {
-  display: none;
-  flex-direction: column;
-  gap: 8px;
-  margin-top: 10px;
-  padding: 12px;
-  border-radius: var(--radius-lg);
-  background: var(--clr-navy-card);
-  border: 1px solid var(--clr-border-glow);
-  backdrop-filter: blur(14px);
-  box-shadow: var(--shadow-card);
-}
+    .filter-toggle-btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 10px 14px;
+      border-radius: 12px;
+      border: 1.5px solid rgba(10,181,181,0.22);
+      background: var(--clr-navy-card);
+      color: var(--clr-white);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      backdrop-filter: blur(12px);
+      transition: transform var(--transition-fast), border-color var(--transition-fast);
+      white-space: nowrap;
+    }
 
-.filter-panel.active { display: flex; animation: fadeUp 0.3s ease; }
+    .filter-toggle-btn:hover { border-color: var(--clr-cyan); transform: translateY(-1px); }
+    .filter-arrow { transition: transform 0.25s ease; font-size: 0.7rem; }
+    .filter-toggle-btn.active .filter-arrow { transform: rotate(180deg); }
 
-.filter-group {
-  border: 1px solid rgba(10,181,181,0.14);
-  border-radius: 10px;
-  overflow: hidden;
-}
+    .filter-panel {
+      display: none;
+      flex-direction: column;
+      gap: 8px;
+      margin-top: 10px;
+      padding: 12px;
+      border-radius: var(--radius-lg);
+      background: var(--clr-navy-card);
+      border: 1px solid var(--clr-border-glow);
+      backdrop-filter: blur(14px);
+      box-shadow: var(--shadow-card);
+    }
 
-.filter-group-btn {
-  width: 100%;
-  border: none;
-  background: transparent;
-  padding: 10px 14px;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  color: var(--clr-white);
-  font-family: var(--font-body);
-  font-weight: 600;
-  font-size: 0.8rem;
-  cursor: pointer;
-  transition: background var(--transition-fast);
-}
+    .filter-panel.active { display: flex; animation: fadeUp 0.3s ease; }
 
-.filter-group-btn:hover { background: rgba(10,181,181,0.06); }
-.filter-group-btn i { transition: transform 0.25s ease; font-size: 0.75rem; }
-.filter-group-btn.active i { transform: rotate(180deg); }
+    .filter-group {
+      border: 1px solid rgba(10,181,181,0.14);
+      border-radius: 10px;
+      overflow: hidden;
+    }
 
-.filter-content { display: none; padding: 0 14px 10px; }
-.filter-content.active { display: block; animation: fadeUp 0.2s ease; }
+    .filter-group-btn {
+      width: 100%;
+      border: none;
+      background: transparent;
+      padding: 10px 14px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      color: var(--clr-white);
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.8rem;
+      cursor: pointer;
+      transition: background var(--transition-fast);
+    }
 
-.filter-content select {
-  width: 100%;
-  padding: 8px 12px;
-  border-radius: 10px;
-  border: 1.5px solid rgba(10,181,181,0.22);
-  background: rgba(255,255,255,0.75);
-  color: var(--clr-white);
-  font-family: var(--font-body);
-  font-size: 0.8rem;
-  cursor: pointer;
-}
+    .filter-group-btn:hover { background: rgba(10,181,181,0.06); }
+    .filter-group-btn i { transition: transform 0.25s ease; font-size: 0.75rem; }
+    .filter-group-btn.active i { transform: rotate(180deg); }
 
-.filter-content select:focus { outline: none; border-color: var(--clr-cyan); box-shadow: 0 0 0 3px rgba(10,181,181,0.14); }
-.filter-content select option { background: #fff; color: #0d2e2e; }
-body.dark-mode .filter-content select { background: rgba(2,82,82,0.35); }
-body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5ee; }
+    .filter-content { display: none; padding: 0 14px 10px; }
+    .filter-content.active { display: block; animation: fadeUp 0.2s ease; }
 
-.apply-filter-btn { justify-content: center; width: 100%; margin-top: 4px; padding: 10px 20px !important; font-size: 0.8rem !important; }
+    .filter-content select {
+      width: 100%;
+      padding: 8px 12px;
+      border-radius: 10px;
+      border: 1.5px solid rgba(10,181,181,0.22);
+      background: rgba(255,255,255,0.75);
+      color: #0d2e2e;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      cursor: pointer;
+    }
 
-@keyframes fadeUp {
-  from { opacity: 0; transform: translateY(20px); }
-  to { opacity: 1; transform: translateY(0); }
-}
+    .filter-content select:focus { outline: none; border-color: var(--clr-cyan); box-shadow: 0 0 0 3px rgba(10,181,181,0.14); }
+    .filter-content select option { background: #fff; color: #0d2e2e; }
+    body.dark-mode .filter-content select {
+      background: rgba(2,82,82,0.35);
+      color: #f9f5ee;
+    }
+    body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5ee; }
 
-.animate-in { animation: fadeUp 0.6s ease forwards; }
+    .apply-filter-btn { justify-content: center; width: 100%; margin-top: 4px; padding: 10px 20px !important; font-size: 0.8rem !important; }
 
-@keyframes spin-slow {
-  from { transform: rotate(0deg); }
-  to { transform: rotate(360deg); }
-}
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
 
-.animate-spin-slow { animation: spin-slow 20s linear infinite; }
+    .animate-in { animation: fadeUp 0.6s ease forwards; }
 
-@media (max-width: 768px) {
-  .header-container { padding: 12px 16px; }
-  .main-content { padding: 24px 16px; }
-  .pdf-grid { grid-template-columns: 1fr; gap: 16px; }
-  .top-controls { flex-direction: column; align-items: stretch; }
-  .search-box { width: 100%; }
-  .filter-toggle-btn { width: 100%; justify-content: center; }
-}
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
 
-@media (max-width: 480px) {
-  .main-content { padding: 16px 12px; }
-}
+    .animate-spin-slow { animation: spin-slow 20s linear infinite; }
+
+    @media (max-width: 768px) {
+      .header-container { padding: 12px 16px; }
+      .main-content { padding: 24px 16px; }
+      .pdf-grid { grid-template-columns: 1fr; gap: 16px; }
+      .top-controls { flex-direction: column; align-items: stretch; }
+      .search-box { width: 100%; }
+      .filter-toggle-btn { width: 100%; justify-content: center; }
+    }
+
+    @media (max-width: 480px) {
+      .main-content { padding: 16px 12px; }
+    }
   </style>
 </head>
 <body>
@@ -509,7 +522,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
         </a>
         <div class="nav-actions">
           <a href="index.html" class="home-btn"><i class="fa-solid fa-home"></i> Home</a>
-          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+          <button type="button" class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
         </div>
       </div>
     </header>
@@ -521,8 +534,8 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
         <h2>Sign In to Download</h2>
         <p>Create a free account or sign in to access and download our complete library of biology and pharmacy resources.</p>
         <div class="auth-buttons">
-          <button class="btn-primary" onclick="showAuthForm('signin')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-          <button class="btn-outline" onclick="showAuthForm('signup')"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+          <button type="button" class="btn-primary" onclick="showAuthForm('signin')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+          <button type="button" class="btn-outline" onclick="showAuthForm('signup')"><i class="fa-solid fa-user-plus"></i> Create Account</button>
         </div>
       </div>
 
@@ -537,9 +550,9 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
           <div class="top-controls">
             <div class="search-box">
               <input type="text" id="search-input" placeholder="Search PDFs..." />
-              <button class="btn-primary" id="search-btn"><i class="fa-solid fa-search"></i></button>
+              <button type="button" class="btn-primary" id="search-btn" style="padding:10px 16px;font-size:0.8rem;"><i class="fa-solid fa-search"></i></button>
             </div>
-            <button class="filter-toggle-btn" id="filter-toggle">
+            <button type="button" class="filter-toggle-btn" id="filter-toggle">
               <i class="fa-solid fa-sliders"></i> Filter PDFs
               <i class="fa-solid fa-chevron-down filter-arrow"></i>
             </button>
@@ -547,7 +560,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
 
           <div class="filter-panel" id="filter-panel">
             <div class="filter-group">
-              <button class="filter-group-btn">
+              <button type="button" class="filter-group-btn">
                 Category
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
@@ -556,7 +569,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
               </div>
             </div>
             <div class="filter-group">
-              <button class="filter-group-btn">
+              <button type="button" class="filter-group-btn">
                 Level
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
@@ -565,7 +578,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
               </div>
             </div>
             <div class="filter-group">
-              <button class="filter-group-btn">
+              <button type="button" class="filter-group-btn">
                 Tags
                 <i class="fa-solid fa-chevron-down"></i>
               </button>
@@ -573,7 +586,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
                 <select id="filter-tag"><option value="">All Tags</option></select>
               </div>
             </div>
-            <button class="btn-primary apply-filter-btn" id="filter-submit">Apply Filters</button>
+            <button type="button" class="btn-primary apply-filter-btn" id="filter-submit">Apply Filters</button>
           </div>
         </div>
 
@@ -603,8 +616,18 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
       if (!token) return true;
       try {
         const payload = JSON.parse(atob(token.split('.')[1]));
+        if (!payload || !payload.exp) return true;
         return (payload.exp * 1000) < Date.now();
       } catch (e) { return true; }
+    }
+
+    function safeClearAuth() {
+      try { localStorage.removeItem('sb-token'); } catch(e) {}
+      try { localStorage.removeItem('sb-email'); } catch(e) {}
+      try {
+        sessionStorage.removeItem('sb-token');
+        sessionStorage.removeItem('sb-email');
+      } catch(e) {}
     }
 
     async function apiCall(action, params = {}, retries = 2) {
@@ -612,17 +635,22 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
       const token = localStorage.getItem('sb-token');
       if (token) headers['Authorization'] = `Bearer ${token}`;
       const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 15000);
       for (let i = 0; i <= retries; i++) {
         try {
-          const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }), signal: controller.signal });
+          const timeout = setTimeout(() => controller.abort(), 15000);
+          const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers,
+            body: JSON.stringify({ action, ...params }),
+            signal: controller.signal
+          });
           clearTimeout(timeout);
           if (res.status === 429) throw new Error('Too many requests. Please wait.');
-          if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); }
+          if (res.status === 401) { safeClearAuth(); }
           const json = await res.json();
           if (!res.ok) throw new Error(json.error || 'Request failed');
           return json.data !== undefined ? json.data : json;
-        } catch (err) { clearTimeout(timeout); if (i === retries) throw err; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+        } catch (err) { if (i === retries) throw err; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
       }
     }
 
@@ -631,7 +659,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
       if (existing) existing.remove();
       const modal = document.createElement('div');
       modal.id = 'auth-modal';
-      modal.innerHTML = `<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;backdrop-filter:blur(20px);"><button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode==='signin'?'Sign In':'Create Account'}</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" class="form-input" placeholder="Email" required><input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required><button type="submit" class="btn-primary" style="justify-content:center;">${mode==='signin'?'Sign In':'Create Account'}</button></form><p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">${mode==='signin'?"No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>":"Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>"}</p><p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p></div>`;
+      modal.innerHTML = `<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;backdrop-filter:blur(20px);"><button type="button" id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode==='signin'?'Sign In':'Create Account'}</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" class="form-input" placeholder="Email" required><input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required><button type="submit" class="btn-primary" style="justify-content:center;">${mode==='signin'?'Sign In':'Create Account'}</button></form><p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">${mode==='signin'?"No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>":"Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>"}</p><p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p></div>`;
       document.body.appendChild(modal);
       document.getElementById('close-auth').onclick = () => modal.remove();
       modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
@@ -665,30 +693,88 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
       const authSection = document.getElementById('auth-required-section');
       const pdfSection = document.getElementById('pdf-section');
       if (isTokenExpired()) {
-        localStorage.removeItem('sb-token');
-        localStorage.removeItem('sb-email');
-        authSection.style.display = 'block';
-        pdfSection.style.display = 'none';
-        pdfSection.classList.remove('active');
+        safeClearAuth();
+        if (authSection) authSection.style.display = 'block';
+        if (pdfSection) { pdfSection.style.display = 'none'; pdfSection.classList.remove('active'); }
       } else {
-        authSection.style.display = 'none';
-        pdfSection.style.display = 'block';
-        pdfSection.classList.add('active');
+        if (authSection) authSection.style.display = 'none';
+        if (pdfSection) { pdfSection.style.display = 'block'; pdfSection.classList.add('active'); }
         await loadPDFs();
       }
     }
 
+    function normalizeTags(tags) {
+      if (!tags) return '';
+      if (Array.isArray(tags)) return tags.join(', ');
+      if (typeof tags === 'string') return tags;
+      return '';
+    }
+
+    // ── File Size Helpers ──
+    const fileSizeCache = new Map();
+
+    function formatFileSize(bytes) {
+      if (bytes === null || bytes === undefined || isNaN(bytes)) return 'Unknown size';
+      if (bytes === 0) return '0 Bytes';
+      const units = ['Bytes', 'KB', 'MB', 'GB'];
+      const i = Math.floor(Math.log(bytes) / Math.log(1024));
+      const size = (bytes / Math.pow(1024, i)).toFixed(i === 0 ? 0 : 1);
+      return size + ' ' + units[i];
+    }
+
+    async function fetchFileSize(url) {
+      if (!url || typeof url !== 'string') return null;
+      if (fileSizeCache.has(url)) return fileSizeCache.get(url);
+      try {
+        const controller = new AbortController();
+        const timeout = setTimeout(() => controller.abort(), 5000);
+        const response = await fetch(url, {
+          method: 'HEAD',
+          signal: controller.signal,
+          mode: 'cors'
+        });
+        clearTimeout(timeout);
+        if (response.ok) {
+          const length = response.headers.get('Content-Length');
+          const size = length ? parseInt(length, 10) : null;
+          fileSizeCache.set(url, size);
+          return size;
+        }
+      } catch (e) {}
+      fileSizeCache.set(url, null);
+      return null;
+    }
+
+    async function updateFileSizes() {
+      const sizeElements = document.querySelectorAll('[data-file-url]');
+      if (!sizeElements.length) return;
+      const uniqueUrls = [...new Set(
+        Array.from(sizeElements).map(el => el.dataset.fileUrl).filter(Boolean)
+      )];
+      await Promise.all(uniqueUrls.map(url => fetchFileSize(url).catch(() => null)));
+      sizeElements.forEach(el => {
+        const url = el.dataset.fileUrl;
+        const size = fileSizeCache.get(url);
+        el.textContent = formatFileSize(size);
+      });
+    }
+
     function getFilters() {
+      const searchEl = document.getElementById('search-input');
+      const levelEl = document.getElementById('filter-level');
+      const catEl = document.getElementById('filter-category');
+      const tagEl = document.getElementById('filter-tag');
       return {
-        search: document.getElementById('search-input').value.trim(),
-        level: document.getElementById('filter-level').value,
-        category: document.getElementById('filter-category').value,
-        tag: document.getElementById('filter-tag').value
+        search: searchEl ? searchEl.value.trim() : '',
+        level: levelEl ? levelEl.value : '',
+        category: catEl ? catEl.value : '',
+        tag: tagEl ? tagEl.value : ''
       };
     }
 
     async function loadPDFs(filters = {}) {
       const grid = document.getElementById('pdf-grid');
+      if (!grid) return;
       grid.innerHTML = '<div class="loading-state"><i class="fa-solid fa-spinner animate-spin-slow"></i><p style="color:var(--clr-text-dim);">Searching resources...</p></div>';
       try {
         const data = await apiCall('get_resources', { filters });
@@ -698,9 +784,14 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
         }
         let filteredData = data;
         if (filters.search) {
-          const searchTerms = filters.search.toLowerCase().split(' ');
+          const searchTerms = filters.search
+            .toLowerCase()
+            .trim()
+            .split(/\s+/)
+            .filter(Boolean);
           filteredData = data.filter(item => {
-            const searchableText = [item.title, item.description, item.author, item.level, item.category, item.tags, item.section_type].filter(Boolean).join(' ').toLowerCase();
+            const tagsText = normalizeTags(item.tags);
+            const searchableText = [item.title, item.description, item.author, item.level, item.category, tagsText, item.section_type].filter(Boolean).join(' ').toLowerCase();
             return searchTerms.every(term => searchableText.includes(term));
           });
         }
@@ -708,14 +799,16 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
           grid.innerHTML = '<div class="error-state"><i class="fa-solid fa-search"></i><p style="color:var(--clr-text-dim);">No resources match "' + esc(filters.search) + '". Try different keywords.</p></div>';
           return;
         }
-        grid.innerHTML = filteredData.map(item => `
+        grid.innerHTML = filteredData.map(item => {
+          const fileUrl = item.file_url || '';
+          return `
           <div class="pdf-card animate-in">
             <div class="pdf-icon"><i class="fa-solid fa-file-pdf"></i></div>
             <h3>${esc(item.title || 'Untitled Resource')}</h3>
             <div class="pdf-meta">
               <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
               <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
-              <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
+              <span><i class="fa-regular fa-file"></i> <span data-file-url="${esc(fileUrl)}">Loading size...</span></span>
             </div>
             <p class="pdf-description">${esc(item.description || 'No description available.')}</p>
             <div style="display:flex;flex-wrap:wrap;gap:6px;">
@@ -723,27 +816,88 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
               ${item.category ? `<span class="pill pill-gold">${esc(item.category)}</span>` : ''}
             </div>
             <div class="pdf-footer">
-              <button class="btn-download" onclick="downloadPDF('${esc(String(item.id))}')"><i class="fa-solid fa-download"></i> Download</button>
+              <button type="button" class="btn-download" data-id="${esc(String(item.id))}">
+                <i class="fa-solid fa-download"></i> Download
+              </button>
             </div>
-          </div>
-        `).join('');
+          </div>`;
+        }).join('');
+        updateFileSizes();
+
+        document.querySelectorAll('.btn-download').forEach(btn => {
+          btn.addEventListener('click', () => {
+            const id = btn.dataset.id;
+            if (id) {
+              downloadPDF(id);
+            }
+          });
+        });
+
       } catch (err) {
         grid.innerHTML = `<div class="error-state"><i class="fa-solid fa-exclamation-triangle"></i><p style="color:var(--clr-magenta);">Failed to load resources. ${esc(err.message)}</p></div>`;
       }
     }
 
-    window.downloadPDF = async function(id) {
-      try {
-        const data = await apiCall('get_resource', { id });
-        if (data && data.file_url) {
-          window.open(data.file_url, '_blank');
-        } else {
-          alert('Download link not available for this resource.');
-        }
-      } catch (err) {
-        alert('Failed to fetch download: ' + err.message);
-      }
-    };
+    let activeDownload = false;
+
+     window.downloadPDF = async function(id) {
+  if (activeDownload) return;
+
+  activeDownload = true;
+
+  try {
+    const data = await apiCall('get_resource', { id });
+
+    if (!data || !data.file_url) {
+      alert('Download link not available for this resource.');
+      return;
+    }
+
+    const fileUrl = data.file_url;
+
+    // Force browser download correctly
+    const response = await fetch(fileUrl);
+
+    if (!response.ok) {
+      throw new Error('Unable to fetch file');
+    }
+
+    const blob = await response.blob();
+
+    const blobUrl = window.URL.createObjectURL(blob);
+
+    const a = document.createElement('a');
+
+    a.href = blobUrl;
+
+    // Safe filename
+    const filename =
+      (data.title || 'resource')
+        .replace(/[^a-z0-9]/gi, '_')
+        .toLowerCase() + '.pdf';
+
+    a.download = filename;
+
+    document.body.appendChild(a);
+
+    a.click();
+
+    document.body.removeChild(a);
+
+    window.URL.revokeObjectURL(blobUrl);
+
+  } catch (err) {
+
+    console.error(err);
+
+    alert('Download failed: ' + err.message);
+
+  } finally {
+
+    activeDownload = false;
+
+  }
+};
 
     async function loadFilters() {
       try {
@@ -768,7 +922,9 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
 
     function initTheme() {
       const tt = document.getElementById('theme-toggle');
+      if (!tt) return;
       const icon = tt.querySelector('i');
+      if (!icon) return;
       if (localStorage.getItem('theme') === 'dark') {
         document.body.classList.add('dark-mode');
         icon.classList.remove('fa-moon');
@@ -791,6 +947,7 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
 
     function initBackground() {
       const cv = document.getElementById('bg-canvas');
+      if (!cv) return;
       const cx = cv.getContext('2d');
       function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
       resize();
@@ -872,21 +1029,22 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
     }
 
     document.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('current-year').textContent = new Date().getFullYear();
+      const yearEl = document.getElementById('current-year');
+      if (yearEl) yearEl.textContent = new Date().getFullYear();
       initTheme();
       initBackground();
       await checkAuth();
       await loadFilters();
 
-      // Filter toggle
       const filterToggle = document.getElementById('filter-toggle');
       const filterPanel = document.getElementById('filter-panel');
-      filterToggle.addEventListener('click', () => {
-        filterPanel.classList.toggle('active');
-        filterToggle.classList.toggle('active');
-      });
+      if (filterToggle && filterPanel) {
+        filterToggle.addEventListener('click', () => {
+          filterPanel.classList.toggle('active');
+          filterToggle.classList.toggle('active');
+        });
+      }
 
-      // Accordion groups
       const groupBtns = document.querySelectorAll('.filter-group-btn');
       groupBtns.forEach(btn => {
         const content = btn.parentElement.querySelector('.filter-content');
@@ -894,12 +1052,13 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
         if (icon) icon.style.transition = 'transform 0.25s ease';
         btn.addEventListener('click', (e) => {
           e.stopPropagation();
+          if (!content) return;
           const isActive = content.classList.contains('active');
           groupBtns.forEach(otherBtn => {
             const otherContent = otherBtn.parentElement.querySelector('.filter-content');
             const otherIcon = otherBtn.querySelector('i');
             if (otherBtn !== btn) {
-              otherContent.classList.remove('active');
+              if (otherContent) otherContent.classList.remove('active');
               otherBtn.classList.remove('active');
               if (otherIcon) otherIcon.style.transform = 'rotate(0deg)';
             }
@@ -907,16 +1066,13 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
           if (!isActive) {
             content.classList.add('active');
             btn.classList.add('active');
-            if (icon) icon.style.transform = 'rotate(180deg)';
           } else {
             content.classList.remove('active');
             btn.classList.remove('active');
-            if (icon) icon.style.transform = 'rotate(0deg)';
           }
         });
       });
 
-      // Open first accordion by default
       setTimeout(() => {
         const firstBtn = document.querySelector('.filter-group-btn');
         if (firstBtn) {
@@ -925,23 +1081,39 @@ body.dark-mode .filter-content select option { background: #012c2c; color: #f9f5
           if (content) {
             content.classList.add('active');
             firstBtn.classList.add('active');
-            if (icon) icon.style.transform = 'rotate(180deg)';
           }
         }
       }, 600);
 
-      // Apply Filters
-      document.getElementById('filter-submit').addEventListener('click', () => {
-        loadPDFs(getFilters());
-        filterPanel.classList.remove('active');
-        filterToggle.classList.remove('active');
-      });
+      const applyBtn = document.getElementById('filter-submit');
+      if (applyBtn) {
+        applyBtn.addEventListener('click', () => {
+          loadPDFs(getFilters());
+          if (filterPanel && filterPanel.classList.contains('active')) {
+            filterPanel.classList.remove('active');
+            if (filterToggle) filterToggle.classList.remove('active');
+          }
+        });
+      }
 
-      // Search
-      document.getElementById('search-btn').onclick = () => loadPDFs(getFilters());
-      document.getElementById('search-input').addEventListener('keypress', (e) => {
-        if (e.key === 'Enter') loadPDFs(getFilters());
-      });
+      const searchBtn = document.getElementById('search-btn');
+      const searchInput = document.getElementById('search-input');
+      if (searchBtn) searchBtn.onclick = () => loadPDFs(getFilters());
+      if (searchInput) {
+        let debounceTimer;
+        searchInput.addEventListener('input', () => {
+          clearTimeout(debounceTimer);
+          debounceTimer = setTimeout(() => {
+            loadPDFs(getFilters());
+          }, 400);
+        });
+        searchInput.addEventListener('keypress', (e) => {
+          if (e.key === 'Enter') {
+            clearTimeout(debounceTimer);
+            loadPDFs(getFilters());
+          }
+        });
+      }
     });
   </script>
 </body>
