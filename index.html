@@ -1873,7 +1873,23 @@
     try { 
         const data = await apiCall('get_resources', { filters }); 
         if (!data.length) { 
-            document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; 
+      // DEBUG START - Remove after fixing
+if (data && data.length > 0) {
+    const item = data[0];
+    const debugDiv = document.createElement('div');
+    debugDiv.style.cssText = 'background:#fff3cd;border:2px solid #ffc107;padding:16px;border-radius:12px;margin-bottom:20px;font-size:0.8rem;word-break:break-all;';
+    debugDiv.innerHTML = `
+        <strong>DEBUG - First Resource:</strong><br>
+        <strong>file_url:</strong> "${item.file_url || 'EMPTY'}"<br>
+        <strong>All field names:</strong> ${Object.keys(item).join(', ')}<br>
+        <strong>Raw data:</strong> <pre style="font-size:0.65rem;">${JSON.stringify(item, null, 2)}</pre>
+    `;
+    document.getElementById('resources-container').innerHTML = '';
+    document.getElementById('resources-container').appendChild(debugDiv);
+}
+// DEBUG END    
+
+  document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; 
             return; 
         } 
         const groups = {}; 
