@@ -1,0 +1,961 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Download Resources — AliverBiopharm</title>
+  <meta name="description" content="Download biology and pharmacy learning resources from AliverBiopharm." />
+  <meta name="theme-color" content="#0a4f4f" />
+  <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; style-src 'self' https: http: 'unsafe-inline'; img-src 'self' https: http: data:; font-src 'self' https: http: data:; connect-src 'self' https: http:;" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --clr-deep-space: #eef7f7;
+      --clr-cyan: #0ab5b5;
+      --clr-magenta: #b8873a;
+      --clr-navy-card: rgba(255, 255, 255, 0.82);
+      --clr-navy-light: rgba(10, 181, 181, 0.1);
+      --clr-white: #0d2e2e;
+      --clr-text-dim: #2d5c5c;
+      --clr-text-muted: #4a7c7c;
+      --clr-border-glow: rgba(10, 181, 181, 0.22);
+      --shadow-glow: 0 4px 28px rgba(10, 181, 181, 0.07);
+      --shadow-magenta: 0 8px 28px rgba(184, 135, 58, 0.38);
+      --shadow-card: 0 4px 28px rgba(10, 181, 181, 0.07);
+      --transition-fast: 180ms ease;
+      --transition-smooth: 350ms cubic-bezier(0.4,0,0.2,1);
+      --max-width: 1100px;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --radius-sm: 0.5rem;
+      --radius-md: 0.85rem;
+      --radius-lg: 1.4rem;
+      --gradient-cyan: linear-gradient(135deg, #0ab5b5, #0e7070);
+      --gradient-magenta: linear-gradient(135deg, #b8873a, #e2c06a);
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    html { scroll-behavior: smooth; }
+
+    body {
+      background: var(--clr-deep-space);
+      color: var(--clr-white);
+      font-family: var(--font-body);
+      min-height: 100vh;
+      overflow-x: hidden;
+      max-width: 100vw;
+      transition: background 0.35s, color 0.35s;
+      position: relative;
+    }
+
+    body.dark-mode {
+      --clr-deep-space: #012c2c;
+      --clr-cyan: #0ab5b5;
+      --clr-magenta: #c9a84c;
+      --clr-navy-card: rgba(2, 82, 82, 0.45);
+      --clr-navy-light: rgba(2, 82, 82, 0.25);
+      --clr-white: #f9f5ee;
+      --clr-text-dim: rgba(249, 245, 238, 0.7);
+      --clr-text-muted: rgba(249, 245, 238, 0.45);
+      --clr-border-glow: rgba(10, 181, 181, 0.25);
+      --shadow-card: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background-image: radial-gradient(ellipse 80% 50% at 20% -10%, rgba(10,181,181,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    }
+
+    body.light-mode { background-image: none; }
+
+    /* ── Animated Background Canvas ── */
+    #bg-canvas {
+      position: fixed;
+      inset: 0;
+      z-index: 0;
+      pointer-events: none;
+      width: 100%;
+      height: 100%;
+    }
+
+    #bg-overlay {
+      position: fixed;
+      inset: 0;
+      z-index: 1;
+      pointer-events: none;
+      background: rgba(238, 247, 247, 0.7);
+      backdrop-filter: blur(20px);
+      -webkit-backdrop-filter: blur(20px);
+    }
+
+    body.dark-mode #bg-overlay {
+      background: rgba(1, 44, 44, 0.7);
+    }
+
+    /* ── Content Wrapper ── */
+    #content-wrapper {
+      position: relative;
+      z-index: 2;
+      min-height: 100vh;
+      display: flex;
+      flex-direction: column;
+    }
+
+    /* ── Header ── */
+    .site-header {
+      position: sticky;
+      top: 0;
+      z-index: 100;
+      background: rgba(238, 247, 247, 0.92);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
+      border-bottom: 1px solid var(--clr-border-glow);
+      transition: box-shadow var(--transition-smooth), background var(--transition-smooth);
+    }
+
+    body.dark-mode .site-header {
+      background: rgba(1, 44, 44, 0.85);
+    }
+
+    .header-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      width: 100%;
+    }
+
+    .logo-link {
+      font-family: var(--font-display);
+      font-size: 1.2rem;
+      font-weight: 700;
+      color: var(--clr-white);
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.5rem;
+      letter-spacing: -0.02em;
+      transition: opacity var(--transition-fast);
+    }
+
+    .logo-link:hover { opacity: 0.88; }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--gradient-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
+    }
+
+    .g-text {
+      background: linear-gradient(130deg, var(--clr-cyan) 0%, var(--clr-magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .nav-actions {
+      display: flex;
+      gap: 0.5rem;
+      align-items: center;
+      flex-shrink: 0;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1.5px solid var(--clr-cyan);
+      color: var(--clr-cyan);
+      font-size: 0.95rem;
+      padding: 0.42rem 0.75rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+
+    .theme-toggle:hover { background: var(--clr-cyan); color: #fff; }
+
+    .home-btn {
+      background: transparent;
+      border: 1.5px solid var(--clr-magenta);
+      color: var(--clr-magenta);
+      font-size: 0.95rem;
+      padding: 0.42rem 1rem;
+      border-radius: 30px;
+      cursor: pointer;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 0.4rem;
+      font-weight: 500;
+      transition: all var(--transition-fast);
+      font-family: var(--font-body);
+    }
+
+    .home-btn:hover { background: var(--clr-magenta); color: #fff; }
+
+    /* ── Buttons ── */
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: var(--gradient-magenta);
+      color: #fff;
+      padding: 14px 34px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-magenta);
+      letter-spacing: 0.01em;
+    }
+
+    .btn-primary:hover {
+      transform: scale(1.04);
+      box-shadow: 0 12px 38px rgba(184, 135, 58, 0.54);
+    }
+
+    .btn-outline {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: rgba(255, 255, 255, 0.75);
+      border: 1.5px solid rgba(10, 181, 181, 0.38);
+      color: var(--clr-white);
+      padding: 14px 34px;
+      border-radius: 50px;
+      font-weight: 600;
+      font-size: 0.875rem;
+      text-decoration: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      backdrop-filter: blur(8px);
+    }
+
+    .btn-outline:hover {
+      transform: scale(1.04);
+      background: rgba(10, 181, 181, 0.08);
+    }
+
+    /* ── Main Content ── */
+    .main-content {
+      flex: 1;
+      max-width: var(--max-width);
+      margin: 0 auto;
+      padding: 40px 24px;
+      width: 100%;
+    }
+
+    /* ── Auth Required Section ── */
+    .auth-required {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .auth-required .lock-icon {
+      font-size: 4rem;
+      color: var(--clr-magenta);
+      margin-bottom: 20px;
+    }
+
+    .auth-required h2 {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: clamp(1.8rem, 4vw, 2.5rem);
+      color: var(--clr-white);
+      margin-bottom: 12px;
+    }
+
+    .auth-required p {
+      color: var(--clr-text-dim);
+      max-width: 500px;
+      margin: 0 auto 28px;
+      line-height: 1.7;
+      font-size: 0.95rem;
+    }
+
+    .auth-required .auth-buttons {
+      display: flex;
+      gap: 14px;
+      justify-content: center;
+      flex-wrap: wrap;
+    }
+
+    /* ── PDF List Section ── */
+    .pdf-section {
+      display: none;
+    }
+
+    .pdf-section.active {
+      display: block;
+    }
+
+    .pdf-header {
+      text-align: center;
+      margin-bottom: 40px;
+    }
+
+    .sec-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--clr-cyan);
+      margin-bottom: 14px;
+      display: block;
+    }
+
+    .section-title {
+      font-family: var(--font-display);
+      font-size: clamp(2rem, 4vw, 2.8rem);
+      font-weight: 900;
+      color: var(--clr-white);
+      margin-bottom: 12px;
+    }
+
+    .section-subtitle {
+      color: var(--clr-text-dim);
+      font-size: 0.95rem;
+      max-width: 480px;
+      margin: 0 auto;
+      line-height: 1.6;
+    }
+
+    /* ── PDF Grid ── */
+    .pdf-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 24px;
+    }
+
+    .pdf-card {
+      background: var(--clr-navy-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--clr-border-glow);
+      border-radius: var(--radius-lg);
+      padding: 24px;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition-smooth), box-shadow var(--transition-smooth);
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
+
+    .pdf-card:hover {
+      transform: translateY(-6px);
+      box-shadow: 0 20px 56px rgba(10, 181, 181, 0.14);
+    }
+
+    .pdf-card .pdf-icon {
+      font-size: 2.5rem;
+      color: var(--clr-magenta);
+      text-align: center;
+    }
+
+    .pdf-card h3 {
+      font-family: var(--font-display);
+      font-weight: 700;
+      font-size: 1.1rem;
+      color: var(--clr-white);
+    }
+
+    .pdf-card .pdf-meta {
+      display: flex;
+      flex-wrap: wrap;
+      gap: 12px;
+      font-size: 0.8rem;
+      color: var(--clr-text-muted);
+    }
+
+    .pdf-card .pdf-meta span {
+      display: flex;
+      align-items: center;
+      gap: 4px;
+    }
+
+    .pdf-card .pdf-description {
+      font-size: 0.85rem;
+      color: var(--clr-text-dim);
+      line-height: 1.6;
+      flex: 1;
+    }
+
+    .pdf-card .pdf-footer {
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding-top: 12px;
+      border-top: 1px solid var(--clr-border-glow);
+    }
+
+    .btn-download {
+      background: var(--clr-cyan);
+      color: #fff;
+      padding: 8px 18px;
+      border-radius: 30px;
+      font-size: 0.8rem;
+      font-weight: 700;
+      text-decoration: none;
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      transition: all var(--transition-fast);
+      border: none;
+      cursor: pointer;
+    }
+
+    .btn-download:hover {
+      background: var(--clr-magenta);
+      color: #fff;
+    }
+
+    .pill {
+      display: inline-block;
+      padding: 3px 12px;
+      border-radius: 50px;
+      font-size: 0.7rem;
+      font-weight: 500;
+    }
+
+    .pill-teal {
+      background: rgba(10, 181, 181, 0.1);
+      border: 1px solid rgba(10, 181, 181, 0.28);
+      color: var(--clr-cyan);
+    }
+
+    .pill-gold {
+      background: rgba(184, 135, 58, 0.1);
+      border: 1px solid rgba(184, 135, 58, 0.28);
+      color: var(--clr-magenta);
+    }
+
+    /* ── Loading & Error ── */
+    .loading-state, .error-state {
+      text-align: center;
+      padding: 60px 20px;
+    }
+
+    .loading-state i, .error-state i {
+      font-size: 3rem;
+      color: var(--clr-cyan);
+      margin-bottom: 16px;
+    }
+
+    .error-state i { color: #ff4444; }
+
+    /* ── Footer ── */
+    .site-footer {
+      background: rgba(255, 255, 255, 0.92);
+      border-top: 1px solid var(--clr-border-glow);
+      padding: 24px 24px;
+      text-align: center;
+      z-index: 2;
+    }
+
+    body.dark-mode .site-footer {
+      background: #011f1f;
+      border-top: 2px solid rgba(10, 181, 181, 0.3);
+    }
+
+    .site-footer p {
+      font-size: 0.75rem;
+      color: var(--clr-text-muted);
+    }
+
+    /* ── Modal ── */
+    #auth-modal {
+      position: fixed;
+      inset: 0;
+      z-index: 300;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      background: rgba(0, 0, 0, 0.8);
+    }
+
+    /* ── Form Elements ── */
+    .form-input {
+      width: 100%;
+      padding: 13px 16px;
+      border-radius: 12px;
+      font-family: var(--font-body);
+      font-size: 0.875rem;
+      color: var(--clr-white);
+      background: rgba(236, 248, 248, 0.9);
+      border: 1.5px solid rgba(10, 181, 181, 0.3);
+      transition: border-color var(--transition-fast), box-shadow var(--transition-fast);
+    }
+
+    body.dark-mode .form-input { background: rgba(2, 82, 82, 0.35); }
+
+    .form-input:focus {
+      outline: none;
+      border-color: var(--clr-cyan);
+      background: #fff;
+      box-shadow: 0 0 0 3px rgba(10, 181, 181, 0.14);
+    }
+
+    body.dark-mode .form-input:focus {
+      background: rgba(2, 82, 82, 0.5);
+      box-shadow: 0 0 18px rgba(10, 181, 181, 0.2);
+    }
+
+    /* ── Filter Bar ── */
+    .filter-bar {
+      background: var(--clr-navy-card);
+      border: 1px solid var(--clr-border-glow);
+      border-radius: var(--radius-lg);
+      padding: 16px 20px;
+      margin-bottom: 24px;
+      backdrop-filter: blur(12px);
+      display: flex;
+      flex-wrap: wrap;
+      align-items: flex-end;
+      justify-content: space-between;
+      gap: 12px;
+    }
+
+    .filter-bar label {
+      font-size: 0.65rem;
+      font-weight: 600;
+      color: var(--clr-text-muted);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      display: block;
+      margin-bottom: 4px;
+    }
+
+    .filter-bar select {
+      padding: 8px 12px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      color: var(--clr-white);
+      background: rgba(236, 248, 248, 0.9);
+      border: 1.5px solid rgba(10, 181, 181, 0.3);
+      min-width: 140px;
+    }
+
+    body.dark-mode .filter-bar select { background: rgba(2, 82, 82, 0.35); }
+
+    /* ── Animations ── */
+    @keyframes fadeUp {
+      from { opacity: 0; transform: translateY(20px); }
+      to { opacity: 1; transform: translateY(0); }
+    }
+
+    .animate-in {
+      animation: fadeUp 0.6s ease forwards;
+    }
+
+    @keyframes spin-slow {
+      from { transform: rotate(0deg); }
+      to { transform: rotate(360deg); }
+    }
+
+    .animate-spin-slow {
+      animation: spin-slow 20s linear infinite;
+    }
+
+    /* ── Responsive ── */
+    @media (max-width: 768px) {
+      .header-container { padding: 12px 16px; }
+      .main-content { padding: 24px 16px; }
+      .pdf-grid { grid-template-columns: 1fr; gap: 16px; }
+      .filter-bar { flex-direction: column; align-items: stretch; }
+      .filter-bar select { width: 100%; }
+    }
+
+    @media (max-width: 480px) {
+      .main-content { padding: 16px 12px; }
+    }
+  </style>
+</head>
+<body>
+
+  <!-- Animated Background -->
+  <canvas id="bg-canvas"></canvas>
+  <div id="bg-overlay"></div>
+
+  <!-- Content -->
+  <div id="content-wrapper">
+
+    <!-- Header -->
+    <header class="site-header">
+      <div class="header-container">
+        <a href="index.html" class="logo-link">
+          <div class="logo-icon">
+            <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082"/></svg>
+          </div>
+          Aliver<span class="g-text">Biopharm</span>
+        </a>
+        <div class="nav-actions">
+          <a href="index.html" class="home-btn"><i class="fa-solid fa-home"></i> Home</a>
+          <button class="theme-toggle" id="theme-toggle" aria-label="Toggle theme"><i class="fa-solid fa-moon"></i></button>
+        </div>
+      </div>
+    </header>
+
+    <!-- Main Content -->
+    <main class="main-content">
+
+      <!-- Auth Required (shown when not logged in) -->
+      <div id="auth-required-section" class="auth-required animate-in" style="display:none;">
+        <div class="lock-icon"><i class="fa-solid fa-lock"></i></div>
+        <h2>Sign In to Download</h2>
+        <p>Create a free account or sign in to access and download our complete library of biology and pharmacy resources.</p>
+        <div class="auth-buttons">
+          <button class="btn-primary" onclick="showAuthForm('signin')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+          <button class="btn-outline" onclick="showAuthForm('signup')"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+        </div>
+      </div>
+
+      <!-- PDF Content (shown when logged in) -->
+      <div id="pdf-section" class="pdf-section" style="display:none;">
+        <div class="pdf-header animate-in">
+          <span class="sec-label">DOWNLOADS</span>
+          <h1 class="section-title">Learning Resources</h1>
+          <p class="section-subtitle">Browse and download our complete collection of biology and pharmacy study materials.</p>
+        </div>
+
+        <!-- Filter Bar -->
+        <div class="filter-bar" id="filter-bar">
+          <div>
+            <label>Level</label>
+            <select id="filter-level"><option value="">All Levels</option></select>
+          </div>
+          <div>
+            <label>Category</label>
+            <select id="filter-category"><option value="">All Categories</option></select>
+          </div>
+          <div>
+            <label>Tags</label>
+            <select id="filter-tag"><option value="">All Tags</option></select>
+          </div>
+          <button class="btn-primary" id="filter-submit" style="padding:10px 20px;font-size:0.8rem;">Apply Filters</button>
+        </div>
+
+        <!-- PDF Grid -->
+        <div id="pdf-grid" class="pdf-grid">
+          <div class="loading-state"><i class="fa-solid fa-dna animate-spin-slow"></i><p style="color:var(--clr-text-dim);">Loading resources...</p></div>
+        </div>
+      </div>
+
+    </main>
+
+    <!-- Footer -->
+    <footer class="site-footer">
+      <p>&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p>
+    </footer>
+
+  </div>
+
+  <script>
+    const API_BASE = '/api/query';
+
+    // ── Utility Functions ──
+    function esc(t) {
+      const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+      return String(t || '').replace(/[&<>"']/g, c => m[c]);
+    }
+
+    function isTokenExpired() {
+      const token = localStorage.getItem('sb-token');
+      if (!token) return true;
+      try {
+        const payload = JSON.parse(atob(token.split('.')[1]));
+        return (payload.exp * 1000) < Date.now();
+      } catch (e) { return true; }
+    }
+
+    async function apiCall(action, params = {}, retries = 2) {
+      const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+      const token = localStorage.getItem('sb-token');
+      if (token) headers['Authorization'] = `Bearer ${token}`;
+      const controller = new AbortController();
+      const timeout = setTimeout(() => controller.abort(), 15000);
+      for (let i = 0; i <= retries; i++) {
+        try {
+          const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }), signal: controller.signal });
+          clearTimeout(timeout);
+          if (res.status === 429) throw new Error('Too many requests. Please wait.');
+          if (res.status === 401) { localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); }
+          const json = await res.json();
+          if (!res.ok) throw new Error(json.error || 'Request failed');
+          return json.data !== undefined ? json.data : json;
+        } catch (err) { clearTimeout(timeout); if (i === retries) throw err; await new Promise(r => setTimeout(r, 1000 * (i + 1))); }
+      }
+    }
+
+    // ── Auth ──
+    window.showAuthForm = function(mode) {
+      const existing = document.getElementById('auth-modal');
+      if (existing) existing.remove();
+      const modal = document.createElement('div');
+      modal.id = 'auth-modal';
+      modal.innerHTML = `<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;backdrop-filter:blur(20px);"><button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">${mode==='signin'?'Sign In':'Create Account'}</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" class="form-input" placeholder="Email" required><input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required><button type="submit" class="btn-primary" style="justify-content:center;">${mode==='signin'?'Sign In':'Create Account'}</button></form><p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">${mode==='signin'?"No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>":"Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>"}</p><p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p></div>`;
+      document.body.appendChild(modal);
+      document.getElementById('close-auth').onclick = () => modal.remove();
+      modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
+      document.getElementById('switch-mode').onclick = (e) => { e.preventDefault(); modal.remove(); showAuthForm(mode==='signin'?'signup':'signin'); };
+      document.getElementById('auth-form').onsubmit = async (e) => {
+        e.preventDefault();
+        const email = document.getElementById('auth-email').value.trim();
+        const password = document.getElementById('auth-password').value;
+        const errEl = document.getElementById('auth-error');
+        errEl.style.display = 'none';
+        try {
+          const action = mode === 'signin' ? 'signin' : 'signup';
+          const data = await apiCall(action, { email, password });
+          if (data.session) {
+            localStorage.setItem('sb-token', data.session.access_token);
+            localStorage.setItem('sb-email', data.user.email);
+            modal.remove();
+            checkAuth();
+          } else if (mode === 'signup') {
+            errEl.textContent = 'Check your email to confirm signup.';
+            errEl.style.display = 'block';
+          }
+        } catch (err) {
+          errEl.textContent = err.message;
+          errEl.style.display = 'block';
+        }
+      };
+    };
+
+    window.signOut = function() {
+      localStorage.removeItem('sb-token');
+      localStorage.removeItem('sb-email');
+      sessionStorage.clear();
+      checkAuth();
+    };
+
+    // ── Check Auth & Load Content ──
+    async function checkAuth() {
+      const authSection = document.getElementById('auth-required-section');
+      const pdfSection = document.getElementById('pdf-section');
+
+      if (isTokenExpired()) {
+        localStorage.removeItem('sb-token');
+        localStorage.removeItem('sb-email');
+        authSection.style.display = 'block';
+        pdfSection.style.display = 'none';
+        pdfSection.classList.remove('active');
+      } else {
+        authSection.style.display = 'none';
+        pdfSection.style.display = 'block';
+        pdfSection.classList.add('active');
+        await loadPDFs();
+      }
+    }
+
+    // ── Load PDFs ──
+    async function loadPDFs(filters = {}) {
+      const grid = document.getElementById('pdf-grid');
+      grid.innerHTML = '<div class="loading-state"><i class="fa-solid fa-dna animate-spin-slow"></i><p style="color:var(--clr-text-dim);">Loading resources...</p></div>';
+
+      try {
+        const data = await apiCall('get_resources', { filters });
+        if (!data || !data.length) {
+          grid.innerHTML = '<div class="error-state"><i class="fa-solid fa-folder-open"></i><p style="color:var(--clr-text-dim);">No resources found matching your criteria.</p></div>';
+          return;
+        }
+
+        grid.innerHTML = data.map(item => `
+          <div class="pdf-card animate-in">
+            <div class="pdf-icon"><i class="fa-solid fa-file-pdf"></i></div>
+            <h3>${esc(item.title || 'Untitled Resource')}</h3>
+            <div class="pdf-meta">
+              <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
+              <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
+              <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
+            </div>
+            <p class="pdf-description">${esc(item.description || 'No description available.')}</p>
+            <div style="display:flex;flex-wrap:wrap;gap:6px;">
+              ${item.level ? `<span class="pill pill-teal">${esc(item.level)}</span>` : ''}
+              ${item.category ? `<span class="pill pill-gold">${esc(item.category)}</span>` : ''}
+            </div>
+            <div class="pdf-footer">
+              <button class="btn-download" onclick="downloadPDF('${esc(String(item.id))}')">
+                <i class="fa-solid fa-download"></i> Download
+              </button>
+            </div>
+          </div>
+        `).join('');
+
+      } catch (err) {
+        grid.innerHTML = `<div class="error-state"><i class="fa-solid fa-exclamation-triangle"></i><p style="color:var(--clr-magenta);">Failed to load resources. ${esc(err.message)}</p></div>`;
+      }
+    }
+
+    // ── Download PDF ──
+    window.downloadPDF = async function(id) {
+      try {
+        const data = await apiCall('get_resource', { id });
+        if (data && data.file_url) {
+          window.open(data.file_url, '_blank');
+        } else {
+          alert('Download link not available for this resource.');
+        }
+      } catch (err) {
+        alert('Failed to fetch download: ' + err.message);
+      }
+    };
+
+    // ── Load Filters ──
+    async function loadFilters() {
+      try {
+        const { levels, categories, tags } = await apiCall('get_filter_options');
+        ['filter-level', 'filter-category', 'filter-tag'].forEach((id, i) => {
+          const opts = [levels, categories, tags][i];
+          const sel = document.getElementById(id);
+          if (sel) {
+            sel.innerHTML = '<option value="">All</option>';
+            opts.forEach(o => {
+              const el = document.createElement('option');
+              el.value = o;
+              el.textContent = o;
+              sel.appendChild(el);
+            });
+          }
+        });
+      } catch (err) {}
+    }
+
+    // ── Theme Toggle ──
+    function initTheme() {
+      const tt = document.getElementById('theme-toggle');
+      const icon = tt.querySelector('i');
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        icon.classList.remove('fa-moon');
+        icon.classList.add('fa-sun');
+      }
+      tt.onclick = () => {
+        document.body.classList.toggle('dark-mode');
+        const isDark = document.body.classList.contains('dark-mode');
+        if (isDark) {
+          icon.classList.remove('fa-moon');
+          icon.classList.add('fa-sun');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          icon.classList.remove('fa-sun');
+          icon.classList.add('fa-moon');
+          localStorage.setItem('theme', 'light');
+        }
+      };
+    }
+
+    // ── Animated Background ──
+    function initBackground() {
+      const cv = document.getElementById('bg-canvas');
+      const cx = cv.getContext('2d');
+      function resize() { cv.width = window.innerWidth; cv.height = window.innerHeight; }
+      resize();
+      window.addEventListener('resize', resize);
+
+      const T = 'rgba(10,181,181,';
+      const G = 'rgba(184,135,58,';
+
+      class Helix {
+        constructor() { this.init(true); }
+        init(fresh) {
+          this.x = 80 + Math.random() * (cv.width - 160);
+          this.y = fresh ? Math.random() * cv.height : cv.height + 60;
+          this.vy = -(0.09 + Math.random() * 0.14);
+          this.t = Math.random() * Math.PI * 2;
+          this.amp = 16 + Math.random() * 22;
+          this.len = 80 + Math.random() * 90;
+          this.a = 0.1 + Math.random() * 0.22;
+          this.c1 = Math.random() < 0.6 ? T : G;
+          this.c2 = this.c1 === T ? G : T;
+        }
+        tick() { this.y += this.vy; this.t += 0.011; if (this.y + this.len < 0) this.init(false); }
+        draw() {
+          cx.save(); cx.globalAlpha = this.a;
+          const S = 26;
+          cx.beginPath();
+          for (let i = 0; i <= S; i++) { const f = i / S, px = this.x + Math.sin(this.t + f * Math.PI * 2.6) * this.amp, py = this.y + f * this.len; i ? cx.lineTo(px, py) : cx.moveTo(px, py); }
+          cx.strokeStyle = this.c1 + '1)'; cx.lineWidth = 1.6; cx.stroke();
+          cx.beginPath();
+          for (let i = 0; i <= S; i++) { const f = i / S, px = this.x + Math.sin(this.t + f * Math.PI * 2.6 + Math.PI) * this.amp, py = this.y + f * this.len; i ? cx.lineTo(px, py) : cx.moveTo(px, py); }
+          cx.strokeStyle = this.c2 + '0.75)'; cx.lineWidth = 1.6; cx.stroke();
+          for (let i = 0; i <= S; i += 3) {
+            const f = i / S;
+            const ax = this.x + Math.sin(this.t + f * Math.PI * 2.6) * this.amp;
+            const bx = this.x + Math.sin(this.t + f * Math.PI * 2.6 + Math.PI) * this.amp;
+            const py = this.y + f * this.len;
+            cx.beginPath(); cx.moveTo(ax, py); cx.lineTo(bx, py);
+            cx.strokeStyle = 'rgba(10,181,181,0.22)'; cx.lineWidth = 1; cx.stroke();
+          }
+          cx.restore();
+        }
+      }
+
+      class Ring {
+        constructor() { this.init(true); }
+        init(fresh) {
+          this.x = Math.random() * cv.width;
+          this.y = fresh ? Math.random() * cv.height : (Math.random() < 0.5 ? -80 : cv.height + 80);
+          this.vy = (Math.random() < 0.5 ? 1 : -1) * (0.07 + Math.random() * 0.12);
+          this.vx = (Math.random() - 0.5) * 0.09;
+          this.r = 20 + Math.random() * 28;
+          this.rot = Math.random() * Math.PI * 2;
+          this.rs = (Math.random() - 0.5) * 0.004;
+          this.sides = Math.random() < 0.5 ? 5 : 6;
+          this.a = 0.07 + Math.random() * 0.18;
+          this.c = Math.random() < 0.6 ? T : G;
+          this.dbl = Math.random() < 0.5;
+        }
+        tick() {
+          this.y += this.vy; this.x += this.vx; this.rot += this.rs;
+          const oob = this.vy > 0 ? this.y > cv.height + 80 : this.y < -80;
+          if (oob) this.init(false);
+        }
+        draw() {
+          cx.save(); cx.globalAlpha = this.a; cx.translate(this.x, this.y); cx.rotate(this.rot);
+          const poly = (r) => { cx.beginPath(); for (let i = 0; i < this.sides; i++) { const a = (i / this.sides) * Math.PI * 2 - Math.PI / 2, px = Math.cos(a) * r, py = Math.sin(a) * r; i ? cx.lineTo(px, py) : cx.moveTo(px, py); } cx.closePath(); };
+          poly(this.r); cx.strokeStyle = this.c + '1)'; cx.lineWidth = 1.6; cx.stroke();
+          if (this.dbl) { poly(this.r * 0.68); cx.strokeStyle = this.c + '0.5)'; cx.lineWidth = 1; cx.stroke(); }
+          cx.beginPath(); cx.arc(0, 0, 3, 0, Math.PI * 2); cx.fillStyle = this.c + '0.7)'; cx.fill();
+          cx.restore();
+        }
+      }
+
+      const helices = Array.from({ length: 7 }, () => new Helix());
+      const rings = Array.from({ length: 16 }, () => new Ring());
+
+      function frame() {
+        cx.clearRect(0, 0, cv.width, cv.height);
+        helices.forEach(h => { h.tick(); h.draw(); });
+        rings.forEach(r => { r.tick(); r.draw(); });
+        requestAnimationFrame(frame);
+      }
+      frame();
+    }
+
+    // ── Init ──
+    document.addEventListener('DOMContentLoaded', async () => {
+      document.getElementById('current-year').textContent = new Date().getFullYear();
+      initTheme();
+      initBackground();
+      document.getElementById('filter-submit').onclick = () => {
+        loadPDFs({
+          level: document.getElementById('filter-level').value,
+          category: document.getElementById('filter-category').value,
+          tag: document.getElementById('filter-tag').value
+        });
+      };
+      await checkAuth();
+      await loadFilters();
+    });
+  </script>
+</body>
+</html>
