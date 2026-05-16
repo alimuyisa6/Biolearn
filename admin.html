@@ -1,707 +1,767 @@
-<!-- admin-dashboard.html -->
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Admin Dashboard - AliverBiopharm CMS</title>
-    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    <style>
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body { font-family: 'Inter', sans-serif; background: #0a0f1c; color: #e2e8f0; }
-        .sidebar { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
-        .stat-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(10, 181, 181, 0.2); }
-        .btn-primary { background: linear-gradient(135deg, #0ab5b5, #0e7070); }
-        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(10, 181, 181, 0.4); }
-        .resource-item:hover { background: rgba(10, 181, 181, 0.1); transform: translateX(5px); }
-        .tab-active { border-bottom: 2px solid #0ab5b5; color: #0ab5b5; }
-        .modal { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); }
-        .toast { animation: slideIn 0.3s ease; }
-        @keyframes slideIn {
-            from { transform: translateX(100%); opacity: 0; }
-            to { transform: translateX(0); opacity: 1; }
-        }
-        .upload-zone { border: 2px dashed #0ab5b5; transition: all 0.3s; }
-        .upload-zone.drag-over { background: rgba(10, 181, 181, 0.1); border-color: #e2c06a; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Admin Dashboard — AliverBiopharm</title>
+  <meta name="theme-color" content="#0a4f4f" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:wght@700;900&family=DM+Sans:wght@400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --bg: #f5f7fa;
+      --surface: #ffffff;
+      --text: #1a1a2e;
+      --text-dim: #555;
+      --text-muted: #888;
+      --cyan: #0ab5b5;
+      --magenta: #b8873a;
+      --danger: #e74c3c;
+      --success: #27ae60;
+      --warning: #f39c12;
+      --border: #e0e5ec;
+      --shadow: 0 2px 12px rgba(0,0,0,0.06);
+      --radius: 12px;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
+      --font-mono: 'DM Mono', monospace;
+    }
+
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+
+    body {
+      font-family: var(--font-body);
+      background: var(--bg);
+      color: var(--text);
+      min-height: 100vh;
+    }
+
+    .admin-layout { display: flex; min-height: 100vh; }
+
+    .sidebar {
+      width: 260px;
+      background: #1a1a2e;
+      color: #fff;
+      display: flex;
+      flex-direction: column;
+      flex-shrink: 0;
+      position: sticky;
+      top: 0;
+      height: 100vh;
+      overflow-y: auto;
+    }
+
+    .sidebar-header {
+      padding: 24px 20px;
+      border-bottom: 1px solid rgba(255,255,255,0.1);
+    }
+
+    .sidebar-logo {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.3rem;
+      color: var(--cyan);
+    }
+
+    .sidebar-nav { flex: 1; padding: 16px 0; list-style: none; }
+
+    .sidebar-nav li a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 12px 20px;
+      color: rgba(255,255,255,0.7);
+      text-decoration: none;
+      font-size: 0.875rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .sidebar-nav li a:hover,
+    .sidebar-nav li a.active {
+      background: rgba(10,181,181,0.15);
+      color: var(--cyan);
+    }
+
+    .sidebar-nav li a i { width: 20px; text-align: center; }
+
+    .sidebar-footer {
+      padding: 16px 20px;
+      border-top: 1px solid rgba(255,255,255,0.1);
+      font-size: 0.75rem;
+      color: rgba(255,255,255,0.4);
+    }
+
+    .main-content { flex: 1; padding: 32px; overflow-y: auto; }
+
+    .page-header { margin-bottom: 28px; }
+
+    .page-title {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.8rem;
+      color: var(--text);
+    }
+
+    .page-subtitle { color: var(--text-dim); font-size: 0.875rem; margin-top: 4px; }
+
+    .stats-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      gap: 16px;
+      margin-bottom: 32px;
+    }
+
+    .stat-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      padding: 20px;
+      box-shadow: var(--shadow);
+    }
+
+    .stat-card .stat-icon {
+      width: 42px;
+      height: 42px;
+      border-radius: 10px;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 1.1rem;
+      margin-bottom: 12px;
+    }
+
+    .stat-card .stat-value {
+      font-family: var(--font-display);
+      font-weight: 900;
+      font-size: 1.8rem;
+    }
+
+    .stat-card .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+
+    .panel {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: var(--radius);
+      box-shadow: var(--shadow);
+      margin-bottom: 20px;
+    }
+
+    .panel-header {
+      padding: 16px 20px;
+      border-bottom: 1px solid var(--border);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      font-weight: 600;
+      font-size: 0.9rem;
+    }
+
+    .panel-body { padding: 20px; }
+
+    .table-wrap { overflow-x: auto; }
+
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+
+    th {
+      text-align: left;
+      padding: 12px 16px;
+      background: #f8f9fb;
+      font-weight: 600;
+      color: var(--text-dim);
+      font-size: 0.72rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      border-bottom: 2px solid var(--border);
+    }
+
+    td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+    tr:hover td { background: #f8f9fb; }
+
+    .btn {
+      display: inline-flex;
+      align-items: center;
+      gap: 6px;
+      padding: 8px 16px;
+      border-radius: 8px;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      border: none;
+      transition: all 0.2s;
+      text-decoration: none;
+    }
+
+    .btn-sm { padding: 5px 10px; font-size: 0.72rem; border-radius: 6px; }
+    .btn-cyan { background: var(--cyan); color: #fff; }
+    .btn-cyan:hover { background: #099898; }
+    .btn-magenta { background: var(--magenta); color: #fff; }
+    .btn-magenta:hover { background: #a07632; }
+    .btn-danger { background: var(--danger); color: #fff; }
+    .btn-danger:hover { background: #c0392b; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--border); color: var(--text-dim); }
+    .btn-outline:hover { border-color: var(--cyan); color: var(--cyan); }
+
+    .form-group { margin-bottom: 14px; }
+
+    .form-label {
+      display: block;
+      font-size: 0.72rem;
+      font-weight: 700;
+      color: var(--text-dim);
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 6px;
+    }
+
+    .form-input, .form-select, .form-textarea {
+      width: 100%;
+      padding: 10px 14px;
+      border-radius: 8px;
+      border: 1.5px solid var(--border);
+      font-family: var(--font-body);
+      font-size: 0.85rem;
+      color: var(--text);
+      background: #fff;
+      transition: border-color 0.2s;
+    }
+
+    .form-textarea { min-height: 100px; resize: vertical; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus {
+      outline: none;
+      border-color: var(--cyan);
+      box-shadow: 0 0 0 3px rgba(10,181,181,0.1);
+    }
+
+    .badge {
+      display: inline-block;
+      padding: 3px 10px;
+      border-radius: 20px;
+      font-size: 0.68rem;
+      font-weight: 600;
+    }
+
+    .badge-success { background: #d4edda; color: #155724; }
+    .badge-danger { background: #f8d7da; color: #721c24; }
+    .badge-warning { background: #fff3cd; color: #856404; }
+    .badge-info { background: #d1ecf1; color: #0c5460; }
+
+    .modal-overlay {
+      position: fixed;
+      inset: 0;
+      background: rgba(0,0,0,0.6);
+      z-index: 999;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .modal {
+      background: #fff;
+      border-radius: var(--radius);
+      padding: 28px;
+      max-width: 600px;
+      width: 90%;
+      max-height: 80vh;
+      overflow-y: auto;
+      box-shadow: 0 20px 60px rgba(0,0,0,0.3);
+    }
+
+    .modal-header {
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+      margin-bottom: 20px;
+    }
+
+    .modal-title { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; }
+    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted); }
+
+    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+
+    .tab-btn {
+      padding: 12px 24px;
+      background: none;
+      border: none;
+      border-bottom: 2px solid transparent;
+      margin-bottom: -2px;
+      font-family: var(--font-body);
+      font-weight: 600;
+      font-size: 0.85rem;
+      color: var(--text-dim);
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .tab-btn.active { color: var(--cyan); border-bottom-color: var(--cyan); }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    @media (max-width: 768px) {
+      .admin-layout { flex-direction: column; }
+      .sidebar { width: 100%; height: auto; position: relative; }
+      .main-content { padding: 20px 16px; }
+      .stats-grid { grid-template-columns: repeat(2, 1fr); }
+    }
+  </style>
 </head>
-<body class="bg-gray-900">
-    <div class="flex h-screen">
-        <!-- Sidebar -->
-        <aside class="sidebar w-64 flex flex-col fixed h-full z-10">
-            <div class="p-6 border-b border-cyan-500/20">
-                <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-amber-400 bg-clip-text text-transparent">
-                    Aliver<span class="text-amber-400">Biopharm</span>
-                </h1>
-                <p class="text-xs text-gray-400 mt-1">Admin Control Panel</p>
-            </div>
-            <nav class="flex-1 p-4 space-y-2">
-                <a href="#" data-tab="dashboard" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-chart-line"></i> Dashboard
-                </a>
-                <a href="#" data-tab="resources" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-book"></i> Resources
-                </a>
-                <a href="#" data-tab="site-sections" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-laptop-code"></i> Site Sections
-                </a>
-                <a href="#" data-tab="users" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-users"></i> Users
-                </a>
-                <a href="#" data-tab="analytics" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-chart-bar"></i> Analytics
-                </a>
-                <a href="#" data-tab="settings" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
-                    <i class="fas fa-cog"></i> Settings
-                </a>
-            </nav>
-            <div class="p-4 border-t border-cyan-500/20">
-                <div class="flex items-center gap-3 mb-3">
-                    <div class="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
-                        <i class="fas fa-user text-white text-sm"></i>
-                    </div>
-                    <div class="flex-1">
-                        <p class="text-sm font-semibold" id="admin-email">Admin User</p>
-                        <p class="text-xs text-gray-400" id="admin-role">Loading...</p>
-                    </div>
-                </div>
-                <button onclick="logout()" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all">
-                    <i class="fas fa-sign-out-alt"></i> Logout
-                </button>
-            </div>
-        </aside>
+<body>
 
-        <!-- Main Content -->
-        <main class="flex-1 ml-64 overflow-y-auto">
-            <!-- Dashboard Tab -->
-            <div id="dashboard-tab" class="tab-content p-8">
-                <h2 class="text-3xl font-bold mb-6">Dashboard Overview</h2>
-                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" id="stats-grid">
-                    <div class="stat-card rounded-xl p-6"><div class="animate-pulse">Loading stats...</div></div>
-                </div>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
-                    <div class="stat-card rounded-xl p-6">
-                        <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
-                        <div id="recent-activity" class="space-y-3"></div>
-                    </div>
-                    <div class="stat-card rounded-xl p-6">
-                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
-                        <div class="space-y-3">
-                            <button onclick="showUploadModal()" class="w-full btn-primary px-4 py-3 rounded-lg text-white font-semibold">
-                                <i class="fas fa-upload"></i> Upload New Resource
-                            </button>
-                            <button onclick="showSiteSectionModal()" class="w-full bg-amber-500/20 text-amber-400 px-4 py-3 rounded-lg hover:bg-amber-500/30 transition-all">
-                                <i class="fas fa-edit"></i> Edit Homepage Content
-                            </button>
-                        </div>
-                    </div>
-                </div>
-            </div>
+<div class="admin-layout">
 
-            <!-- Resources Tab -->
-            <div id="resources-tab" class="tab-content hidden p-8">
-                <div class="flex justify-between items-center mb-6">
-                    <h2 class="text-3xl font-bold">Resource Management</h2>
-                    <button onclick="showUploadModal()" class="btn-primary px-6 py-2 rounded-lg">
-                        <i class="fas fa-plus"></i> Add Resource
-                    </button>
-                </div>
-                <div class="grid grid-cols-1 gap-4" id="resources-list"></div>
-            </div>
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">AliverBiopharm</div>
+      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-top:4px;">Admin Panel</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#dashboard" class="active" data-tab="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
+      <li><a href="#resources" data-tab="resources"><i class="fa-solid fa-file-pdf"></i> Resources</a></li>
+      <li><a href="#upload" data-tab="upload"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</a></li>
+      <li><a href="#site-sections" data-tab="site-sections"><i class="fa-solid fa-globe"></i> Site Sections</a></li>
+      <li><a href="#users" data-tab="users"><i class="fa-solid fa-users"></i> Users</a></li>
+      <li><a href="#analytics" data-tab="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div id="admin-user-info">Admin</div>
+      <button class="btn btn-sm btn-outline" style="margin-top:8px;color:#fff;border-color:rgba(255,255,255,0.3);" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+    </div>
+  </aside>
 
-            <!-- Site Sections Tab -->
-            <div id="site-sections-tab" class="tab-content hidden p-8">
-                <h2 class="text-3xl font-bold mb-6">Site Sections Management</h2>
-                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="sections-list"></div>
-            </div>
+  <main class="main-content">
 
-            <!-- Users Tab -->
-            <div id="users-tab" class="tab-content hidden p-8">
-                <h2 class="text-3xl font-bold mb-6">User Management</h2>
-                <div class="bg-gray-800 rounded-xl overflow-hidden">
-                    <table class="w-full">
-                        <thead class="bg-gray-700">
-                            <tr>
-                                <th class="px-6 py-3 text-left">Email</th>
-                                <th class="px-6 py-3 text-left">Role</th>
-                                <th class="px-6 py-3 text-left">Status</th>
-                                <th class="px-6 py-3 text-left">Actions</th>
-                            </tr>
-                        </thead>
-                        <tbody id="users-list"></tbody>
-                    </table>
-                </div>
-            </div>
-
-            <!-- Analytics Tab -->
-            <div id="analytics-tab" class="tab-content hidden p-8">
-                <h2 class="text-3xl font-bold mb-6">Analytics</h2>
-                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="analytics-content"></div>
-            </div>
-
-            <!-- Settings Tab -->
-            <div id="settings-tab" class="tab-content hidden p-8">
-                <h2 class="text-3xl font-bold mb-6">Admin Settings</h2>
-                <div class="bg-gray-800 rounded-xl p-6 max-w-2xl">
-                    <h3 class="text-xl font-semibold mb-4">Your Permissions</h3>
-                    <div id="permissions-list" class="space-y-2"></div>
-                </div>
-            </div>
-        </main>
+    <!-- DASHBOARD -->
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard</h1>
+        <p class="page-subtitle">System overview</p>
+      </div>
+      <div class="stats-grid" id="dashboard-stats">
+        <div class="stat-card"><div class="stat-icon" style="background:#d1ecf1;color:var(--cyan);"><i class="fa-solid fa-file-pdf"></i></div><div class="stat-value" id="stat-resources">—</div><div class="stat-label">Total Resources</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#d4edda;color:var(--success);"><i class="fa-solid fa-users"></i></div><div class="stat-value" id="stat-users">—</div><div class="stat-label">Total Users</div></div>
+        <div class="stat-card"><div class="stat-icon" style="background:#fff3cd;color:var(--warning);"><i class="fa-solid fa-download"></i></div><div class="stat-value" id="stat-downloads">—</div><div class="stat-label">Total Downloads</div></div>
+      </div>
     </div>
 
-    <!-- Upload Modal -->
-    <div id="upload-modal" class="modal fixed inset-0 hidden items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-8 max-w-2xl w-full mx-4">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">Upload Resource</h3>
-                <button onclick="closeModal('upload-modal')" class="text-gray-400 hover:text-white">&times;</button>
-            </div>
-            <form id="upload-form" enctype="multipart/form-data">
-                <div class="space-y-4">
-                    <input type="text" name="title" placeholder="Resource Title" class="w-full px-4 py-2 bg-gray-700 rounded-lg" required>
-                    <textarea name="description" placeholder="Description" rows="3" class="w-full px-4 py-2 bg-gray-700 rounded-lg"></textarea>
-                    <div class="grid grid-cols-2 gap-4">
-                        <select name="category" class="px-4 py-2 bg-gray-700 rounded-lg">
-                            <option value="Biology">Biology</option>
-                            <option value="Pharmacy">Pharmacy</option>
-                            <option value="Chemistry">Chemistry</option>
-                            <option value="Research">Research</option>
-                        </select>
-                        <select name="level" class="px-4 py-2 bg-gray-700 rounded-lg">
-                            <option value="Beginner">Beginner</option>
-                            <option value="Intermediate">Intermediate</option>
-                            <option value="Advanced">Advanced</option>
-                        </select>
-                    </div>
-                    <input type="text" name="tags" placeholder="Tags (comma separated)" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
-                    <select name="section_type" class="px-4 py-2 bg-gray-700 rounded-lg">
-                        <option value="Study Notes">Study Notes</option>
-                        <option value="Research Papers">Research Papers</option>
-                        <option value="Video Lectures">Video Lectures</option>
-                        <option value="Practice Tests">Practice Tests</option>
-                    </select>
-                    <div id="dropzone" class="upload-zone border-2 border-dashed border-cyan-500 rounded-lg p-8 text-center cursor-pointer">
-                        <i class="fas fa-cloud-upload-alt text-4xl text-cyan-500 mb-2"></i>
-                        <p class="text-gray-400">Drag & drop file here or click to select</p>
-                        <input type="file" id="file-input" name="file" class="hidden" required>
-                    </div>
-                    <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">Upload Resource</button>
-                </div>
-            </form>
+    <!-- RESOURCES -->
+    <div class="tab-content" id="tab-resources">
+      <div class="page-header">
+        <h1 class="page-title">Resources</h1>
+        <p class="page-subtitle">Manage PDFs and downloads</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>All Resources</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadResources()"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
-    </div>
-
-    <!-- Site Section Edit Modal -->
-    <div id="site-section-modal" class="modal fixed inset-0 hidden items-center justify-center z-50">
-        <div class="bg-gray-800 rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
-            <div class="flex justify-between items-center mb-6">
-                <h3 class="text-2xl font-bold">Edit Site Section</h3>
-                <button onclick="closeModal('site-section-modal')" class="text-gray-400 hover:text-white">&times;</button>
-            </div>
-            <form id="site-section-form">
-                <div id="section-editor"></div>
-                <button type="submit" class="mt-6 btn-primary px-6 py-2 rounded-lg">Save Changes</button>
-            </form>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Title</th><th>Category</th><th>Level</th><th>Actions</th></tr></thead>
+              <tbody id="resources-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
         </div>
+      </div>
     </div>
 
-    <div id="toast" class="fixed bottom-4 right-4 hidden toast"></div>
+    <!-- UPLOAD -->
+    <div class="tab-content" id="tab-upload">
+      <div class="page-header">
+        <h1 class="page-title">Upload</h1>
+        <p class="page-subtitle">Add new resources</p>
+      </div>
+      <div class="panel" style="max-width:600px;">
+        <div class="panel-header"><span>Upload PDF Resource</span></div>
+        <div class="panel-body">
+          <form id="upload-form" enctype="multipart/form-data">
+            <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="upload-title" required /></div>
+            <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="upload-description"></textarea></div>
+            <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="upload-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Physics</option></select></div>
+            <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="upload-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option><option>Graduate</option></select></div>
+            <div class="form-group"><label class="form-label">Tags (comma separated)</label><input type="text" class="form-input" id="upload-tags" placeholder="e.g. nutrition, enzymes" /></div>
+            <div class="form-group"><label class="form-label">PDF File</label><input type="file" class="form-input" id="upload-file" accept=".pdf" required /></div>
+            <button type="submit" class="btn btn-magenta"><i class="fa-solid fa-upload"></i> Upload Resource</button>
+          </form>
+        </div>
+      </div>
+    </div>
 
-    <script>
-        let currentAdmin = null;
-        let authToken = localStorage.getItem('admin_token');
+    <!-- SITE SECTIONS -->
+    <div class="tab-content" id="tab-site-sections">
+      <div class="page-header">
+        <h1 class="page-title">Site Sections</h1>
+        <p class="page-subtitle">Edit hero, footer, navigation</p>
+      </div>
+      <div class="tabs" id="section-tabs">
+        <button class="tab-btn active" data-section="hero">Hero</button>
+        <button class="tab-btn" data-section="footer">Footer</button>
+        <button class="tab-btn" data-section="navigation">Navigation</button>
+      </div>
+      <div id="site-section-editor" style="max-width:600px;">
+        <p style="color:var(--text-muted);">Select a section to edit.</p>
+      </div>
+    </div>
 
-        // Check authentication
-        if (!authToken) {
-            window.location.href = '/admin-login.html';
+    <!-- USERS -->
+    <div class="tab-content" id="tab-users">
+      <div class="page-header">
+        <h1 class="page-title">Users</h1>
+        <p class="page-subtitle">Manage registered users</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span>All Users</span></div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
+              <tbody id="users-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- ANALYTICS -->
+    <div class="tab-content" id="tab-analytics">
+      <div class="page-header">
+        <h1 class="page-title">Analytics</h1>
+        <p class="page-subtitle">Downloads and popular resources</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span>Popular Resources</span></div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Resource</th><th>Downloads</th></tr></thead>
+              <tbody id="popular-table"><tr><td colspan="2" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+  </main>
+</div>
+
+<!-- Edit Resource Modal -->
+<div class="modal-overlay" id="edit-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Resource</h3>
+      <button class="modal-close" onclick="closeEditModal()">✕</button>
+    </div>
+    <form id="edit-form">
+      <input type="hidden" id="edit-id" />
+      <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="edit-title" required /></div>
+      <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="edit-description"></textarea></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="edit-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Physics</option></select></div>
+      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option><option>Graduate</option></select></div>
+      <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="edit-tags" /></div>
+      <button type="submit" class="btn btn-cyan">Save Changes</button>
+    </form>
+  </div>
+</div>
+
+<script>
+  const API_BASE = '/api/admin';
+
+  function esc(t) {
+    const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(t || '').replace(/[&<>"']/g, c => m[c]);
+  }
+
+  function getToken() {
+    return localStorage.getItem('sb-token');
+  }
+
+  async function apiCall(endpoint, method = 'GET', body = null) {
+    const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
+    const token = getToken();
+    if (token) headers['Authorization'] = `Bearer ${token}`;
+
+    const options = { method, headers };
+    if (body && !(body instanceof FormData)) {
+      options.body = JSON.stringify(body);
+    } else if (body instanceof FormData) {
+      delete headers['Content-Type'];
+      options.body = body;
+    }
+
+    const controller = new AbortController();
+    options.signal = controller.signal;
+    const timeout = setTimeout(() => controller.abort(), 15000);
+
+    try {
+      const res = await fetch(`${API_BASE}${endpoint}`, options);
+      clearTimeout(timeout);
+      if (res.status === 401 || res.status === 403) {
+        localStorage.clear();
+        window.location.href = '/admin-login.html';
+        throw new Error('Unauthorized');
+      }
+      const json = await res.json();
+      if (!res.ok) throw new Error(json.error || 'Request failed');
+      return json;
+    } catch (err) {
+      clearTimeout(timeout);
+      throw err;
+    }
+  }
+
+  // ── Tab Navigation ──
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
+    link.addEventListener('click', (e) => {
+      e.preventDefault();
+      document.querySelectorAll('.sidebar-nav a').forEach(l => l.classList.remove('active'));
+      link.classList.add('active');
+      const tabId = link.dataset.tab;
+      document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
+      document.getElementById('tab-' + tabId).classList.add('active');
+      if (tabId === 'dashboard') loadDashboard();
+      if (tabId === 'resources') loadResources();
+      if (tabId === 'users') loadUsers();
+      if (tabId === 'analytics') loadAnalytics();
+    });
+  });
+
+  // ── Site Section Tabs ──
+  document.querySelectorAll('#section-tabs .tab-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      document.querySelectorAll('#section-tabs .tab-btn').forEach(b => b.classList.remove('active'));
+      btn.classList.add('active');
+      loadSiteSection(btn.dataset.section);
+    });
+  });
+
+  // ── Dashboard ──
+  async function loadDashboard() {
+    try {
+      const data = await apiCall('/stats');
+      document.getElementById('stat-resources').textContent = data.resources || 0;
+      document.getElementById('stat-users').textContent = data.users || 0;
+      document.getElementById('stat-downloads').textContent = data.downloads || 0;
+    } catch(e) {
+      console.error('Dashboard load failed:', e);
+    }
+  }
+
+  // ── Resources ──
+  async function loadResources() {
+    const tbody = document.getElementById('resources-table');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('/resources');
+      const resources = data.resources || [];
+      if (!resources.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No resources found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = resources.map(r => `
+        <tr>
+          <td><strong>${esc(r.title)}</strong></td>
+          <td>${esc(r.category || '—')}</td>
+          <td>${esc(r.level || '—')}</td>
+          <td>
+            <button class="btn btn-sm btn-outline" onclick="openEditResource('${esc(String(r.id))}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(r.id))}')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Failed to load.</td></tr>';
+    }
+  }
+
+  // ── Upload ──
+  document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const fileInput = document.getElementById('upload-file');
+    const file = fileInput.files[0];
+    if (!file) return alert('Select a file.');
+
+    const formData = new FormData();
+    formData.append('title', document.getElementById('upload-title').value);
+    formData.append('description', document.getElementById('upload-description').value);
+    formData.append('category', document.getElementById('upload-category').value);
+    formData.append('level', document.getElementById('upload-level').value);
+    formData.append('tags', document.getElementById('upload-tags').value);
+    formData.append('file', file);
+
+    try {
+      await apiCall('/resources/upload', 'POST', formData);
+      alert('Uploaded successfully!');
+      document.getElementById('upload-form').reset();
+    } catch(err) {
+      alert('Upload failed: ' + err.message);
+    }
+  });
+
+  // ── Edit Resource ──
+  window.openEditResource = async function(id) {
+    try {
+      const data = await apiCall(`/resources/${id}`);
+      const r = data.resource;
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-title').value = r.title || '';
+      document.getElementById('edit-description').value = r.description || '';
+      document.getElementById('edit-category').value = r.category || '';
+      document.getElementById('edit-level').value = r.level || '';
+      document.getElementById('edit-tags').value = Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || '');
+      document.getElementById('edit-modal').style.display = 'flex';
+    } catch(e) {
+      alert('Failed to load resource.');
+    }
+  };
+
+  window.closeEditModal = function() {
+    document.getElementById('edit-modal').style.display = 'none';
+  };
+
+  document.getElementById('edit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    const body = {
+      title: document.getElementById('edit-title').value,
+      description: document.getElementById('edit-description').value,
+      category: document.getElementById('edit-category').value,
+      level: document.getElementById('edit-level').value,
+      tags: document.getElementById('edit-tags').value
+    };
+    try {
+      await apiCall(`/resources/${id}`, 'PUT', body);
+      alert('Resource updated!');
+      closeEditModal();
+      loadResources();
+    } catch(err) {
+      alert('Update failed: ' + err.message);
+    }
+  });
+
+  // ── Delete Resource ──
+  window.deleteResource = async function(id) {
+    if (!confirm('Delete this resource?')) return;
+    try {
+      await apiCall(`/resources/${id}`, 'DELETE');
+      loadResources();
+    } catch(e) {
+      alert('Delete failed.');
+    }
+  };
+
+  // ── Site Sections ──
+  async function loadSiteSection(type) {
+    const editor = document.getElementById('site-section-editor');
+    editor.innerHTML = '<p>Loading...</p>';
+    try {
+      const data = await apiCall('/site-sections');
+      const sections = data.sections || [];
+      const section = sections.find(s => s.section_type === type);
+      const content = section ? JSON.stringify(section.content, null, 2) : '{}';
+      editor.innerHTML = `
+        <form id="section-form">
+          <div class="form-group"><label class="form-label">Content (JSON)</label><textarea class="form-textarea" id="section-content" style="min-height:200px;font-family:monospace;">${esc(content)}</textarea></div>
+          <button type="submit" class="btn btn-cyan">Save ${type.toUpperCase()}</button>
+        </form>
+      `;
+      document.getElementById('section-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          let parsed;
+          try { parsed = JSON.parse(document.getElementById('section-content').value); } catch { parsed = document.getElementById('section-content').value; }
+          await apiCall(`/site-sections/${type}`, 'PUT', parsed);
+          alert('Section updated!');
+        } catch(err) {
+          alert('Save failed: ' + err.message);
         }
+      });
+    } catch(e) {
+      editor.innerHTML = '<p style="color:red;">Failed to load section.</p>';
+    }
+  }
 
-        // API helper
-        async function apiCall(endpoint, options = {}) {
-            const response = await fetch(endpoint, {
-                ...options,
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': `Bearer ${authToken}`,
-                    ...options.headers
-                }
-            });
-            if (response.status === 401) {
-                localStorage.removeItem('admin_token');
-                window.location.href = '/admin-login.html';
-                throw new Error('Unauthorized');
-            }
-            const data = await response.json();
-            if (!response.ok) throw new Error(data.error || 'API call failed');
-            return data;
-        }
+  // ── Users ──
+  async function loadUsers() {
+    const tbody = document.getElementById('users-table');
+    tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
+    try {
+      const data = await apiCall('/users');
+      const users = data.users || [];
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No users found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td>${esc(u.email)}</td>
+          <td><span class="badge ${u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success'}">${esc(u.admin_role)}</span></td>
+          <td><span class="badge ${u.is_locked ? 'badge-danger' : 'badge-success'}">${u.is_locked ? 'Locked' : 'Active'}</span></td>
+          <td>
+            ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')"><i class="fa-solid fa-user-shield"></i> Make Admin</button>` : ''}
+            <button class="btn btn-sm btn-warning" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})"><i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Failed to load.</td></tr>';
+    }
+  }
 
-        // Toast notification
-        function showToast(message, type = 'success') {
-            const toast = document.getElementById('toast');
-            toast.className = `fixed bottom-4 right-4 toast px-6 py-3 rounded-lg shadow-lg ${
-                type === 'success' ? 'bg-green-500' : 'bg-red-500'
-            } text-white`;
-            toast.textContent = message;
-            toast.classList.remove('hidden');
-            setTimeout(() => toast.classList.add('hidden'), 3000);
-        }
+  window.makeAdmin = async function(userId) {
+    try {
+      await apiCall(`/users/${userId}/make-admin`, 'POST', { role: 'content_manager' });
+      alert('User promoted to admin!');
+      loadUsers();
+    } catch(e) {
+      alert('Failed: ' + e.message);
+    }
+  };
 
-        // Load dashboard stats
-        async function loadDashboard() {
-            try {
-                const data = await apiCall('/api/admin/analytics/dashboard');
-                const statsGrid = document.getElementById('stats-grid');
-                statsGrid.innerHTML = `
-                    <div class="stat-card rounded-xl p-6">
-                        <i class="fas fa-book text-cyan-500 text-3xl mb-2"></i>
-                        <p class="text-2xl font-bold">${data.analytics.total_resources}</p>
-                        <p class="text-gray-400">Total Resources</p>
-                    </div>
-                    <div class="stat-card rounded-xl p-6">
-                        <i class="fas fa-download text-cyan-500 text-3xl mb-2"></i>
-                        <p class="text-2xl font-bold">${data.analytics.total_downloads}</p>
-                        <p class="text-gray-400">Total Downloads</p>
-                    </div>
-                    <div class="stat-card rounded-xl p-6">
-                        <i class="fas fa-users text-cyan-500 text-3xl mb-2"></i>
-                        <p class="text-2xl font-bold">${data.analytics.total_admins}</p>
-                        <p class="text-gray-400">Admin Users</p>
-                    </div>
-                    <div class="stat-card rounded-xl p-6">
-                        <i class="fas fa-chart-line text-cyan-500 text-3xl mb-2"></i>
-                        <p class="text-2xl font-bold">${Object.keys(data.analytics.resources_by_category || {}).length}</p>
-                        <p class="text-gray-400">Categories</p>
-                    </div>
-                `;
-                
-                const recentActivity = document.getElementById('recent-activity');
-                recentActivity.innerHTML = data.analytics.recent_activity.map(activity => `
-                    <div class="bg-gray-800 rounded-lg p-3">
-                        <p class="text-sm"><strong>${activity.admin}</strong> - ${activity.last_action ? new Date(activity.last_action).toLocaleString() : 'N/A'}</p>
-                        ${activity.recent_actions ? `<p class="text-xs text-gray-400 mt-1">Last action: ${activity.recent_actions[activity.recent_actions.length - 1]?.action || 'None'}</p>` : ''}
-                    </div>
-                `).join('');
-            } catch (err) {
-                console.error('Failed to load dashboard:', err);
-            }
-        }
+  window.toggleLock = async function(userId, lock) {
+    try {
+      await apiCall(`/users/${userId}/lock`, 'PUT', { lock, reason: lock ? 'Locked by admin' : null });
+      loadUsers();
+    } catch(e) {
+      alert('Failed: ' + e.message);
+    }
+  };
 
-        // Load resources
-        async function loadResources() {
-            try {
-                const response = await fetch('/api/query', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'get_resources', filters: {} })
-                });
-                const data = await response.json();
-                const resourcesList = document.getElementById('resources-list');
-                if (data.data && data.data.length) {
-                    resourcesList.innerHTML = data.data.map(resource => `
-                        <div class="resource-item bg-gray-800 rounded-lg p-4 flex justify-between items-center transition-all">
-                            <div>
-                                <h4 class="font-semibold">${escapeHtml(resource.title)}</h4>
-                                <p class="text-sm text-gray-400">${escapeHtml(resource.description || '')}</p>
-                                <div class="flex gap-2 mt-2">
-                                    <span class="text-xs px-2 py-1 bg-cyan-500/20 rounded">${escapeHtml(resource.category)}</span>
-                                    <span class="text-xs px-2 py-1 bg-amber-500/20 rounded">${escapeHtml(resource.level)}</span>
-                                </div>
-                            </div>
-                            <div class="flex gap-2">
-                                <button onclick="deleteResource('${resource.id}')" class="text-red-400 hover:text-red-300">
-                                    <i class="fas fa-trash"></i>
-                                </button>
-                            </div>
-                        </div>
-                    `).join('');
-                } else {
-                    resourcesList.innerHTML = '<p class="text-gray-400 text-center py-8">No resources found. Upload your first resource!</p>';
-                }
-            } catch (err) {
-                console.error('Failed to load resources:', err);
-            }
-        }
+  // ── Analytics ──
+  async function loadAnalytics() {
+    const tbody = document.getElementById('popular-table');
+    tbody.innerHTML = '<tr><td colspan="2">Loading...</td></tr>';
+    try {
+      const data = await apiCall('/analytics/dashboard');
+      const popular = data.analytics?.popular_resources || [];
+      if (!popular.length) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No data.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = popular.map(r => `<tr><td>${esc(r.title)}</td><td>${r.downloads || 0}</td></tr>`).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:red;">Failed to load.</td></tr>';
+    }
+  }
 
-        // Load site sections
-        async function loadSiteSections() {
-            try {
-                const data = await apiCall('/api/admin/site-sections');
-                const sectionsList = document.getElementById('sections-list');
-                sectionsList.innerHTML = data.sections.map(section => `
-                    <div class="bg-gray-800 rounded-lg p-4">
-                        <h3 class="font-semibold text-lg mb-2 capitalize">${escapeHtml(section.section_type)}</h3>
-                        <p class="text-gray-400 text-sm mb-3">Last updated: ${new Date(section.updated_at).toLocaleString()}</p>
-                        <button onclick="editSiteSection('${section.section_type}', ${JSON.stringify(escapeHtml(JSON.stringify(section.content))).replace(/"/g, '&quot;')})" 
-                                class="btn-primary px-4 py-2 rounded-lg text-sm">
-                            <i class="fas fa-edit"></i> Edit Section
-                        </button>
-                    </div>
-                `).join('');
-            } catch (err) {
-                console.error('Failed to load site sections:', err);
-            }
-        }
+  // ── Sign Out ──
+  window.signOut = function() {
+    localStorage.clear();
+    sessionStorage.clear();
+    window.location.href = '/';
+  };
 
-        // Load users
-        async function loadUsers() {
-            try {
-                const data = await apiCall('/api/admin/users');
-                const usersList = document.getElementById('users-list');
-                usersList.innerHTML = data.users.map(user => `
-                    <tr class="border-b border-gray-700">
-                        <td class="px-6 py-4">${escapeHtml(user.email)}</td>
-                        <td class="px-6 py-4">
-                            <span class="px-2 py-1 rounded text-xs ${user.admin_role === 'super_admin' ? 'bg-purple-500/20 text-purple-400' : user.admin_role !== 'none' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}">
-                                ${user.admin_role}
-                            </span>
-                        </td>
-                        <td class="px-6 py-4">
-                            ${user.is_locked ? '<span class="text-red-400">Locked</span>' : '<span class="text-green-400">Active</span>'}
-                        </td>
-                        <td class="px-6 py-4">
-                            ${currentAdmin?.admin_role === 'super_admin' && user.admin_role !== 'super_admin' ? `
-                                <button onclick="toggleUserLock('${user.id}', ${!user.is_locked})" class="text-amber-400 hover:text-amber-300 mr-2">
-                                    <i class="fas ${user.is_locked ? 'fa-unlock' : 'fa-lock'}"></i>
-                                </button>
-                            ` : ''}
-                        </td>
-                    </tr>
-                `).join('');
-            } catch (err) {
-                console.error('Failed to load users:', err);
-            }
-        }
+  // ── Init ──
+  document.addEventListener('DOMContentLoaded', () => {
+    const email = localStorage.getItem('sb-email');
+    if (email) {
+      document.getElementById('admin-user-info').textContent = email;
+    }
+    loadDashboard();
+  });
+</script>
 
-        // Load analytics
-        async function loadAnalytics() {
-            try {
-                const data = await apiCall('/api/admin/analytics/dashboard');
-                const analyticsContent = document.getElementById('analytics-content');
-                analyticsContent.innerHTML = `
-                    <div class="bg-gray-800 rounded-xl p-6">
-                        <h3 class="text-xl font-semibold mb-4">Resources by Category</h3>
-                        <div class="space-y-2">
-                            ${Object.entries(data.analytics.resources_by_category || {}).map(([cat, count]) => `
-                                <div class="flex justify-between items-center">
-                                    <span>${escapeHtml(cat)}</span>
-                                    <span class="font-semibold">${count}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                    <div class="bg-gray-800 rounded-xl p-6">
-                        <h3 class="text-xl font-semibold mb-4">Admins by Role</h3>
-                        <div class="space-y-2">
-                            ${Object.entries(data.analytics.admins_by_role || {}).map(([role, count]) => `
-                                <div class="flex justify-between items-center">
-                                    <span>${escapeHtml(role)}</span>
-                                    <span class="font-semibold">${count}</span>
-                                </div>
-                            `).join('')}
-                        </div>
-                    </div>
-                `;
-            } catch (err) {
-                console.error('Failed to load analytics:', err);
-            }
-        }
-
-        // Load settings
-        async function loadSettings() {
-            try {
-                const response = await fetch('/api/query', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json' },
-                    body: JSON.stringify({ action: 'get_site_section', params: { section: 'site_config' } })
-                });
-                const data = await response.json();
-                const permissionsList = document.getElementById('permissions-list');
-                if (currentAdmin?.permissions) {
-                    permissionsList.innerHTML = Object.entries(currentAdmin.permissions).map(([perm, value]) => `
-                        <div class="flex justify-between items-center">
-                            <span>${perm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
-                            <span class="${value ? 'text-green-400' : 'text-red-400'}">${value ? '✓ Enabled' : '✗ Disabled'}</span>
-                        </div>
-                    `).join('');
-                }
-            } catch (err) {
-                console.error('Failed to load settings:', err);
-            }
-        }
-
-        // Upload resource
-        document.getElementById('upload-form')?.addEventListener('submit', async (e) => {
-            e.preventDefault();
-            const formData = new FormData(e.target);
-            
-            try {
-                const response = await fetch('/api/admin/resources/upload', {
-                    method: 'POST',
-                    headers: { 'Authorization': `Bearer ${authToken}` },
-                    body: formData
-                });
-                const data = await response.json();
-                if (data.success) {
-                    showToast('Resource uploaded successfully!');
-                    closeModal('upload-modal');
-                    loadResources();
-                    loadDashboard();
-                } else {
-                    throw new Error(data.error);
-                }
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        });
-
-        // Delete resource
-        async function deleteResource(id) {
-            if (!confirm('Are you sure you want to delete this resource?')) return;
-            try {
-                await apiCall(`/api/admin/resources/${id}`, { method: 'DELETE' });
-                showToast('Resource deleted successfully');
-                loadResources();
-                loadDashboard();
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        // Edit site section
-        async function editSiteSection(sectionType, content) {
-            const modal = document.getElementById('site-section-modal');
-            const editorDiv = document.getElementById('section-editor');
-            const form = document.getElementById('site-section-form');
-            
-            // Parse content based on section type
-            let editorHtml = '';
-            if (sectionType === 'hero') {
-                editorHtml = `
-                    <div class="space-y-4">
-                        <input type="text" name="title" placeholder="Hero Title" value="${escapeHtml(content?.slides?.[0]?.title || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
-                        <input type="text" name="subtitle" placeholder="Hero Subtitle" value="${escapeHtml(content?.slides?.[0]?.subtitle || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
-                        <input type="text" name="cta_text" placeholder="CTA Button Text" value="${escapeHtml(content?.slides?.[0]?.cta_text || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
-                        <input type="text" name="cta_link" placeholder="CTA Link" value="${escapeHtml(content?.slides?.[0]?.cta_link || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
-                        <div class="upload-zone border-2 border-dashed border-cyan-500 rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('hero-image').click()">
-                            <i class="fas fa-image"></i> Click to upload hero image
-                            <input type="file" id="hero-image" class="hidden" accept="image/*">
-                        </div>
-                    </div>
-                `;
-            } else if (sectionType === 'footer') {
-                editorHtml = `
-                    <div class="space-y-4">
-                        <textarea name="content" placeholder="Footer Content" rows="10" class="w-full px-4 py-2 bg-gray-700 rounded-lg">${escapeHtml(JSON.stringify(content, null, 2))}</textarea>
-                    </div>
-                `;
-            } else if (sectionType === 'navbar') {
-                editorHtml = `
-                    <div class="space-y-4">
-                        <div id="nav-links-editor">
-                            ${(content?.links || []).map((link, idx) => `
-                                <div class="flex gap-2 mb-2">
-                                    <input type="text" name="link_label_${idx}" value="${escapeHtml(link.label)}" placeholder="Label" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
-                                    <input type="text" name="link_href_${idx}" value="${escapeHtml(link.href)}" placeholder="URL" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
-                                    <button type="button" onclick="this.parentElement.remove()" class="text-red-400">✕</button>
-                                </div>
-                            `).join('')}
-                        </div>
-                        <button type="button" onclick="addNavLink()" class="btn-primary px-4 py-2 rounded-lg text-sm">+ Add Link</button>
-                    </div>
-                `;
-            }
-            
-            editorDiv.innerHTML = editorHtml;
-            modal.classList.remove('hidden');
-            modal.classList.add('flex');
-            
-            form.onsubmit = async (e) => {
-                e.preventDefault();
-                let updatedContent = {};
-                
-                if (sectionType === 'hero') {
-                    const formData = new FormData(e.target);
-                    updatedContent = {
-                        slides: [{
-                            title: formData.get('title'),
-                            subtitle: formData.get('subtitle'),
-                            cta_text: formData.get('cta_text'),
-                            cta_link: formData.get('cta_link')
-                        }]
-                    };
-                } else if (sectionType === 'footer') {
-                    try {
-                        updatedContent = JSON.parse(document.querySelector('[name="content"]').value);
-                    } catch(e) {
-                        updatedContent = { text: document.querySelector('[name="content"]').value };
-                    }
-                } else if (sectionType === 'navbar') {
-                    const links = [];
-                    const container = document.getElementById('nav-links-editor');
-                    container.querySelectorAll('[name^="link_label_"]').forEach((input, idx) => {
-                        const labelInput = input;
-                        const hrefInput = document.querySelector(`[name="link_href_${idx}"]`);
-                        if (labelInput && hrefInput && labelInput.value && hrefInput.value) {
-                            links.push({ label: labelInput.value, href: hrefInput.value });
-                        }
-                    });
-                    updatedContent = { links };
-                }
-                
-                try {
-                    await apiCall(`/api/admin/site-sections/${sectionType}`, {
-                        method: 'PUT',
-                        body: JSON.stringify(updatedContent)
-                    });
-                    showToast('Site section updated successfully!');
-                    closeModal('site-section-modal');
-                    loadSiteSections();
-                } catch (err) {
-                    showToast(err.message, 'error');
-                }
-            };
-        }
-
-        function addNavLink() {
-            const container = document.getElementById('nav-links-editor');
-            const idx = container.children.length;
-            const div = document.createElement('div');
-            div.className = 'flex gap-2 mb-2';
-            div.innerHTML = `
-                <input type="text" name="link_label_${idx}" placeholder="Label" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
-                <input type="text" name="link_href_${idx}" placeholder="URL" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
-                <button type="button" onclick="this.parentElement.remove()" class="text-red-400">✕</button>
-            `;
-            container.appendChild(div);
-        }
-
-        // Toggle user lock
-        async function toggleUserLock(userId, lock) {
-            try {
-                await apiCall(`/api/admin/users/${userId}/lock`, {
-                    method: 'PUT',
-                    body: JSON.stringify({ lock, reason: lock ? 'Locked by admin' : null })
-                });
-                showToast(`User ${lock ? 'locked' : 'unlocked'} successfully`);
-                loadUsers();
-            } catch (err) {
-                showToast(err.message, 'error');
-            }
-        }
-
-        // Logout
-        async function logout() {
-            localStorage.removeItem('admin_token');
-            window.location.href = '/admin-login.html';
-        }
-
-        // Modal helpers
-        function showUploadModal() {
-            document.getElementById('upload-modal').classList.remove('hidden');
-            document.getElementById('upload-modal').classList.add('flex');
-        }
-        
-        function showSiteSectionModal() {
-            editSiteSection('hero', {});
-        }
-        
-        function closeModal(modalId) {
-            const modal = document.getElementById(modalId);
-            modal.classList.remove('flex');
-            modal.classList.add('hidden');
-        }
-
-        // Tab navigation
-        document.querySelectorAll('.tab-link').forEach(link => {
-            link.addEventListener('click', (e) => {
-                e.preventDefault();
-                const tab = link.dataset.tab;
-                document.querySelectorAll('.tab-content').forEach(content => {
-                    content.classList.add('hidden');
-                });
-                document.getElementById(`${tab}-tab`).classList.remove('hidden');
-                document.querySelectorAll('.tab-link').forEach(l => {
-                    l.classList.remove('text-cyan-400', 'bg-cyan-500/10');
-                });
-                link.classList.add('text-cyan-400', 'bg-cyan-500/10');
-                
-                // Load tab-specific data
-                if (tab === 'dashboard') loadDashboard();
-                else if (tab === 'resources') loadResources();
-                else if (tab === 'site-sections') loadSiteSections();
-                else if (tab === 'users') loadUsers();
-                else if (tab === 'analytics') loadAnalytics();
-                else if (tab === 'settings') loadSettings();
-            });
-        });
-
-        // Drag and drop upload
-        const dropzone = document.getElementById('dropzone');
-        const fileInput = document.getElementById('file-input');
-        
-        if (dropzone) {
-            dropzone.addEventListener('click', () => fileInput.click());
-            dropzone.addEventListener('dragover', (e) => {
-                e.preventDefault();
-                dropzone.classList.add('drag-over');
-            });
-            dropzone.addEventListener('dragleave', () => {
-                dropzone.classList.remove('drag-over');
-            });
-            dropzone.addEventListener('drop', (e) => {
-                e.preventDefault();
-                dropzone.classList.remove('drag-over');
-                const files = e.dataTransfer.files;
-                if (files.length) {
-                    fileInput.files = files;
-                    dropzone.innerHTML = `<i class="fas fa-check-circle text-4xl text-green-500 mb-2"></i>
-                                          <p>${files[0].name}</p>`;
-                }
-            });
-            fileInput.addEventListener('change', () => {
-                if (fileInput.files.length) {
-                    dropzone.innerHTML = `<i class="fas fa-check-circle text-4xl text-green-500 mb-2"></i>
-                                          <p>${fileInput.files[0].name}</p>`;
-                }
-            });
-        }
-
-        // Escape HTML
-        function escapeHtml(str) {
-            if (!str) return '';
-            return String(str).replace(/[&<>]/g, function(m) {
-                if (m === '&') return '&amp;';
-                if (m === '<') return '&lt;';
-                if (m === '>') return '&gt;';
-                return m;
-            });
-        }
-
-        // Get admin info from token
-        async function getAdminInfo() {
-            try {
-                const response = await fetch('/api/query', {
-                    method: 'POST',
-                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
-                    body: JSON.stringify({ action: 'get_admin_info' })
-                });
-                const data = await response.json();
-                if (data.data) {
-                    currentAdmin = data.data;
-                    document.getElementById('admin-email').textContent = currentAdmin.admin_email;
-                    document.getElementById('admin-role').textContent = currentAdmin.admin_role;
-                }
-            } catch (err) {
-                console.error('Failed to get admin info:', err);
-            }
-        }
-
-        // Initialize
-        getAdminInfo();
-        loadDashboard();
-    </script>
 </body>
 </html>
