@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -507,44 +507,195 @@
       box-shadow: 0 0 18px rgba(10, 181, 181, 0.2);
     }
 
-    /* ── Filter Bar ── */
-    .filter-bar {
-      background: var(--clr-navy-card);
-      border: 1px solid var(--clr-border-glow);
-      border-radius: var(--radius-lg);
-      padding: 16px 20px;
-      margin-bottom: 24px;
-      backdrop-filter: blur(12px);
-      display: flex;
-      flex-wrap: wrap;
-      align-items: flex-end;
-      justify-content: space-between;
-      gap: 12px;
-    }
+     /* ── Compact Humanized Filter System ── */
+.filter-wrapper {
+  margin-bottom: 28px;
+}
 
-    .filter-bar label {
-      font-size: 0.65rem;
-      font-weight: 600;
-      color: var(--clr-text-muted);
-      text-transform: uppercase;
-      letter-spacing: 0.05em;
-      display: block;
-      margin-bottom: 4px;
-    }
+.top-controls {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  flex-wrap: wrap;
+}
 
-    .filter-bar select {
-      padding: 8px 12px;
-      border-radius: 8px;
-      font-family: var(--font-body);
-      font-size: 0.8rem;
-      color: var(--clr-white);
-      background: rgba(236, 248, 248, 0.9);
-      border: 1.5px solid rgba(10, 181, 181, 0.3);
-      min-width: 140px;
-    }
+.search-box {
+  flex: 1;
+  display: flex;
+  gap: 10px;
+  min-width: 220px;
+}
 
-    body.dark-mode .filter-bar select { background: rgba(2, 82, 82, 0.35); }
+.search-box input {
+  flex: 1;
+  padding: 13px 14px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(10,181,181,0.25);
+  background: rgba(255,255,255,0.75);
+  color: var(--clr-white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast),
+    background var(--transition-fast);
+}
 
+.search-box input:focus {
+  outline: none;
+  border-color: var(--clr-cyan);
+  box-shadow: 0 0 0 3px rgba(10,181,181,0.14);
+}
+
+body.dark-mode .search-box input {
+  background: rgba(2,82,82,0.35);
+}
+
+body.dark-mode .search-box input:focus {
+  background: rgba(2,82,82,0.5);
+}
+
+.filter-toggle-btn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 10px;
+  padding: 13px 18px;
+  border-radius: 14px;
+  border: 1.5px solid rgba(10,181,181,0.22);
+  background: var(--clr-navy-card);
+  color: var(--clr-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  backdrop-filter: blur(12px);
+  transition:
+    transform var(--transition-fast),
+    border-color var(--transition-fast),
+    background var(--transition-fast);
+}
+
+.filter-toggle-btn:hover {
+  border-color: var(--clr-cyan);
+  transform: translateY(-1px);
+}
+
+.filter-arrow {
+  transition: transform 0.25s ease;
+}
+
+.filter-toggle-btn.active .filter-arrow {
+  transform: rotate(180deg);
+}
+
+.filter-panel {
+  display: none;
+  flex-direction: column;
+  gap: 14px;
+  margin-top: 16px;
+  padding: 18px;
+  border-radius: var(--radius-lg);
+  background: var(--clr-navy-card);
+  border: 1px solid var(--clr-border-glow);
+  backdrop-filter: blur(14px);
+  box-shadow: var(--shadow-card);
+}
+
+.filter-panel.active {
+  display: flex;
+  animation: fadeUp 0.35s ease;
+}
+
+.filter-group {
+  border: 1px solid rgba(10,181,181,0.16);
+  border-radius: 14px;
+  overflow: hidden;
+  background: rgba(255,255,255,0.04);
+}
+
+.filter-group-btn {
+  width: 100%;
+  border: none;
+  background: transparent;
+  padding: 15px 18px;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  color: var(--clr-white);
+  font-family: var(--font-body);
+  font-weight: 600;
+  cursor: pointer;
+  transition: background var(--transition-fast);
+}
+
+.filter-group-btn:hover {
+  background: rgba(10,181,181,0.06);
+}
+
+.filter-group-btn i {
+  transition: transform 0.25s ease;
+}
+
+.filter-group-btn.active i {
+  transform: rotate(180deg);
+}
+
+.filter-content {
+  display: none;
+  padding: 0 18px 18px;
+}
+
+.filter-content.active {
+  display: block;
+  animation: fadeUp 0.25s ease;
+}
+
+.filter-content select {
+  width: 100%;
+  padding: 12px 14px;
+  border-radius: 12px;
+  border: 1.5px solid rgba(10,181,181,0.22);
+  background: rgba(255,255,255,0.75);
+  color: var(--clr-white);
+  font-family: var(--font-body);
+  font-size: 0.85rem;
+  transition:
+    border-color var(--transition-fast),
+    box-shadow var(--transition-fast);
+}
+
+.filter-content select:focus {
+  outline: none;
+  border-color: var(--clr-cyan);
+  box-shadow: 0 0 0 3px rgba(10,181,181,0.14);
+}
+
+body.dark-mode .filter-content select {
+  background: rgba(2,82,82,0.35);
+}
+
+.apply-filter-btn {
+  justify-content: center;
+  width: 100%;
+  margin-top: 6px;
+}
+
+@media (max-width: 768px) {
+
+  .top-controls {
+    flex-direction: column;
+    align-items: stretch;
+  }
+
+  .search-box {
+    width: 100%;
+  }
+
+  .filter-toggle-btn {
+    width: 100%;
+  }
+
+}
     /* ── Animations ── */
     @keyframes fadeUp {
       from { opacity: 0; transform: translateY(20px); }
@@ -639,28 +790,80 @@ body.dark-mode #search-input:focus {
           <p class="section-subtitle">Browse and download our complete collection of biology and pharmacy study materials.</p>
         </div>
 
-      <!-- Filter Bar -->
-<div class="filter-bar" id="filter-bar">
-  <div style="flex:1;min-width:200px;">
-    <label>Search Resources</label>
-    <div style="display:flex;gap:8px;">
-      <input type="text" id="search-input" placeholder="e.g. nutrition olevel..." style="flex:1;padding:8px 12px;border-radius:8px;font-family:var(--font-body);font-size:0.8rem;color:var(--clr-white);background:rgba(236,248,248,0.9);border:1.5px solid rgba(10,181,181,0.3);" />
-      <button class="btn-primary" id="search-btn" style="padding:8px 16px;font-size:0.8rem;"><i class="fa-solid fa-search"></i> Search</button>
+   <!-- Compact Filter System -->
+<div class="filter-wrapper">
+
+  <!-- Top Controls -->
+  <div class="top-controls">
+
+    <div class="search-box">
+      <input
+        type="text"
+        id="search-input"
+        placeholder="Search PDFs..."
+      />
+
+      <button class="btn-primary" id="search-btn">
+        <i class="fa-solid fa-search"></i>
+      </button>
     </div>
+
+    <button class="filter-toggle-btn" id="filter-toggle">
+      <i class="fa-solid fa-sliders"></i>
+      Filter PDFs
+      <i class="fa-solid fa-chevron-down filter-arrow"></i>
+    </button>
+
   </div>
-  <div>
-    <label>Level</label>
-    <select id="filter-level"><option value="">All Levels</option></select>
+
+  <!-- Expandable Filters -->
+  <div class="filter-panel" id="filter-panel">
+
+    <div class="filter-group">
+      <button class="filter-group-btn">
+        Category
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+
+      <div class="filter-content">
+        <select id="filter-category">
+          <option value="">All Categories</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <button class="filter-group-btn">
+        Level
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+
+      <div class="filter-content">
+        <select id="filter-level">
+          <option value="">All Levels</option>
+        </select>
+      </div>
+    </div>
+
+    <div class="filter-group">
+      <button class="filter-group-btn">
+        Tags
+        <i class="fa-solid fa-chevron-down"></i>
+      </button>
+
+      <div class="filter-content">
+        <select id="filter-tag">
+          <option value="">All Tags</option>
+        </select>
+      </div>
+    </div>
+
+    <button class="btn-primary apply-filter-btn" id="filter-submit">
+      Apply Filters
+    </button>
+
   </div>
-  <div>
-    <label>Category</label>
-    <select id="filter-category"><option value="">All Categories</option></select>
-  </div>
-  <div>
-    <label>Tags</label>
-    <select id="filter-tag"><option value="">All Tags</option></select>
-  </div>
-  <button class="btn-primary" id="filter-submit" style="padding:10px 20px;font-size:0.8rem;">Apply Filters</button>
+
 </div>
 
         <!-- PDF Grid -->
@@ -999,31 +1202,98 @@ document.addEventListener('DOMContentLoaded', async () => {
   await checkAuth();
   await loadFilters();
 
-  function getFilters() {
-    return {
-      search: document.getElementById('search-input').value.trim(),
-      level: document.getElementById('filter-level').value,
-      category: document.getElementById('filter-category').value,
-      tag: document.getElementById('filter-tag').value
-    };
-  }
+// ── FILTER UI ENHANCEMENTS (Only interaction fixes, no API/layout changes) ──
 
-  // Apply filters button
-  document.getElementById('filter-submit').onclick = () => {
-    loadPDFs(getFilters());
-  };
+const filterToggle = document.getElementById('filter-toggle');
+const filterPanel = document.getElementById('filter-panel');
 
-  // Search button
-  document.getElementById('search-btn').onclick = () => {
-    loadPDFs(getFilters());
-  };
+// 1. Filter panel toggle with active class and arrow rotation
+filterToggle.addEventListener('click', () => {
+  filterPanel.classList.toggle('active');
+  filterToggle.classList.toggle('active');
+});
 
-  // Enter key search
-  document.getElementById('search-input').addEventListener('keypress', (e) => {
-    if (e.key === 'Enter') {
-      loadPDFs(getFilters());
+// 2. Accordion single-open system with smooth arrow rotation
+const groupBtns = document.querySelectorAll('.filter-group-btn');
+
+function closeAllAccordions(exceptBtn = null) {
+  groupBtns.forEach(btn => {
+    const content = btn.parentElement.querySelector('.filter-content');
+    const icon = btn.querySelector('i');
+    if (btn !== exceptBtn) {
+      content.classList.remove('active');
+      btn.classList.remove('active');
+      if (icon) icon.style.transform = 'rotate(0deg)';
     }
   });
+}
+
+groupBtns.forEach(btn => {
+  const content = btn.parentElement.querySelector('.filter-content');
+  const icon = btn.querySelector('i');
+  
+  // initial icon style for smooth transition
+  if (icon) icon.style.transition = 'transform 0.25s ease';
+  
+  btn.addEventListener('click', (e) => {
+    e.stopPropagation();
+    const isActive = content.classList.contains('active');
+    
+    // close any other open section (single-open system)
+    closeAllAccordions(btn);
+    
+    // toggle current section
+    if (!isActive) {
+      content.classList.add('active');
+      btn.classList.add('active');
+      if (icon) icon.style.transform = 'rotate(180deg)';
+    } else {
+      // if it was active, just close it (toggle behavior)
+      content.classList.remove('active');
+      btn.classList.remove('active');
+      if (icon) icon.style.transform = 'rotate(0deg)';
+    }
+  });
+});
+
+// 3. Apply Filters button: apply filters, then close filter panel
+const applyBtn = document.getElementById('filter-submit');
+applyBtn.addEventListener('click', () => {
+  // get current filter values
+  const filters = {
+    search: document.getElementById('search-input').value.trim(),
+    level: document.getElementById('filter-level').value,
+    category: document.getElementById('filter-category').value,
+    tag: document.getElementById('filter-tag').value
+  };
+  loadPDFs(filters);
+  
+  // Close filter panel after applying
+  if (filterPanel.classList.contains('active')) {
+    filterPanel.classList.remove('active');
+    filterToggle.classList.remove('active');
+  }
+});
+
+// 4. Search button & Enter key trigger with same behavior
+const searchBtn = document.getElementById('search-btn');
+const searchInput = document.getElementById('search-input');
+
+function performSearch() {
+  const filters = {
+    search: searchInput.value.trim(),
+    level: document.getElementById('filter-level').value,
+    category: document.getElementById('filter-category').value,
+    tag: document.getElementById('filter-tag').value
+  };
+  loadPDFs(filters);
+  // optionally close panel? not required but UX improvement: we keep panel open unless user hits apply. 
+}
+
+searchBtn.onclick = performSearch;
+searchInput.addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') performSearch();
+});
 
 });
   </script>
