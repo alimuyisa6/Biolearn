@@ -42,7 +42,7 @@
       },
     }
   </script>
-  <style>
+ <style>
     /* ── Global Base & Variables ── */
     :root {
       --clr-deep-space: #eef7f7;
@@ -71,11 +71,14 @@
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
 
+    html { scroll-behavior: smooth; }
+
     body {
       background: var(--clr-deep-space);
       color: var(--clr-white);
       font-family: var(--font-body);
       overflow-x: hidden;
+      max-width: 100vw;
       transition: background 0.35s, color 0.35s;
     }
 
@@ -95,6 +98,11 @@
 
     body.light-mode {
       background-image: none;
+    }
+
+    #site {
+      max-width: 100vw;
+      overflow-x: hidden;
     }
 
     .skip-link {
@@ -131,6 +139,16 @@
     }
 
     .site-header.scrolled { box-shadow: var(--shadow-glow); }
+
+    .header-container {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      padding: 14px 24px;
+      width: 100%;
+    }
 
     .logo-link {
       font-family: var(--font-display);
@@ -432,10 +450,17 @@
       backdrop-filter: blur(8px);
     }
 
-    body.dark-mode .slide-overlay {
-      background: linear-gradient(180deg, rgba(1,44,44,0.75) 0%, rgba(1,44,44,0.55) 100%);
-    }
+     body.dark-mode .slide-overlay {
+  background: rgba(1, 44, 44, 0.45);
+}
 
+body.dark-mode .carousel-slide .slide-overlay h2 {
+  text-shadow: 0 2px 16px rgba(0,0,0,0.9);
+}
+
+body.dark-mode .carousel-slide .slide-overlay p {
+  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+}
     .carousel-controls {
       position: absolute;
       bottom: 2rem;
@@ -491,19 +516,26 @@
     .carousel-next { right: 1.5rem; }
 
     /* ── Hero Badge ── */
-    .hero-badge {
-      display: inline-flex;
-      align-items: center;
-      gap: 9px;
-      padding: 7px 18px;
-      border-radius: 50px;
-      background: rgba(10, 181, 181, 0.1);
-      border: 1px solid rgba(10, 181, 181, 0.3);
-      color: var(--clr-white);
-      font-family: 'DM Mono', monospace;
-      font-size: 0.72rem;
-      margin-bottom: 28px;
-    }
+ .hero-badge {
+  display: inline-flex;
+  align-items: center;
+  gap: 9px;
+  padding: 8px 20px;
+  border-radius: 50px;
+  background: rgba(255, 255, 255, 0.85);
+  backdrop-filter: blur(10px);
+  border: 1px solid rgba(10, 181, 181, 0.3);
+  color: var(--clr-white);
+  font-family: 'DM Mono', monospace;
+  font-size: 0.72rem;
+  margin-bottom: 28px;
+  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+}
+
+body.dark-mode .hero-badge {
+  background: rgba(1, 44, 44, 0.75);
+  border: 1px solid rgba(10, 181, 181, 0.4);
+}
 
     .pulse-dot {
       width: 8px;
@@ -577,6 +609,8 @@
       padding: 1.8rem;
       box-shadow: var(--shadow-card);
       transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+      margin-bottom: 8px;
+      height: fit-content;
     }
 
     .card:hover {
@@ -594,6 +628,7 @@
       border: 1px solid rgba(10, 181, 181, 0.22);
       border-radius: 24px;
       box-shadow: 0 8px 40px rgba(10, 181, 181, 0.1);
+      padding: 36px;
     }
 
     body.dark-mode .card-strong {
@@ -627,7 +662,7 @@
       border-radius: var(--radius-lg);
       padding: 2.5rem 2rem;
       text-align: center;
-      max-width: 700px;
+      max-width: 800px;
       margin: 0 auto;
       box-shadow: var(--shadow-card);
       backdrop-filter: blur(12px);
@@ -671,7 +706,11 @@
     }
 
     /* ── Pricing ── */
-    .pricing-card { text-align: center; }
+    .pricing-card { 
+      text-align: center;
+      position: relative;
+      height: fit-content;
+    }
 
     .pricing-card.featured {
       border-color: var(--clr-magenta);
@@ -804,7 +843,7 @@
     .resources-grid {
       display: grid;
       grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
-      gap: 1.5rem;
+      gap: 24px;
     }
 
     .resource-card {
@@ -818,6 +857,7 @@
       display: flex;
       flex-direction: column;
       gap: 0.6rem;
+      height: fit-content;
     }
 
     .resource-card:hover {
@@ -921,11 +961,18 @@
       border-top: 1px solid var(--clr-border-glow);
       padding: 3.5rem 1.5rem 2rem;
       margin-top: auto;
+      width: 100%;
     }
 
     body.dark-mode .footer-fat {
       background: #011f1f;
       border-top: 2px solid rgba(10, 181, 181, 0.3);
+    }
+
+    .footer-social {
+      display: flex;
+      gap: 12px;
+      margin-top: 16px;
     }
 
     .footer-social a {
@@ -938,6 +985,7 @@
       justify-content: center;
       color: var(--clr-cyan);
       transition: all var(--transition-fast);
+      text-decoration: none;
     }
 
     .footer-social a:hover {
@@ -947,6 +995,12 @@
       transform: translateY(-2px);
     }
 
+    .footer-grid {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 48px;
+    }
+
     .contact-info-card {
       background: var(--clr-navy-card);
       backdrop-filter: blur(12px);
@@ -954,6 +1008,7 @@
       padding: 1.8rem;
       border: 1px solid var(--clr-border-glow);
       transition: all var(--transition-smooth);
+      height: fit-content;
     }
 
     .contact-info-card:hover {
@@ -983,7 +1038,7 @@
     .stats-grid {
       display: grid;
       grid-template-columns: repeat(auto-fit, minmax(180px, 1fr));
-      gap: 1.5rem;
+      gap: 24px;
       text-align: center;
       background: var(--clr-navy-card);
       border-radius: var(--radius-lg);
@@ -1001,7 +1056,13 @@
       letter-spacing: -0.03em;
     }
 
-    .faq-list { max-width: 760px; margin: 0 auto; }
+    .faq-list { 
+      max-width: 760px; 
+      margin: 0 auto;
+      display: flex;
+      flex-direction: column;
+      gap: 12px;
+    }
 
     .faq-item {
       border-bottom: 1px solid var(--clr-border-glow);
@@ -1010,7 +1071,6 @@
       border: 1px solid var(--clr-border-glow);
       border-radius: 14px;
       overflow: hidden;
-      margin-bottom: 12px;
     }
 
     .faq-question {
@@ -1074,7 +1134,21 @@
       background: rgba(0, 0, 0, 0.8);
     }
 
-    .section { max-width: var(--max-width); margin: 4rem auto; padding: 100px 48px; }
+    /* ── Sections ── */
+    .section { 
+      max-width: var(--max-width); 
+      margin: 0 auto; 
+      padding: 80px 24px;
+      width: 100%;
+    }
+
+    section {
+      max-width: 100%;
+      overflow-x: hidden;
+      padding: 80px 48px;
+      margin-bottom: 20px;
+      width: 100%;
+    }
 
     .section-title {
       font-family: var(--font-display);
@@ -1153,6 +1227,7 @@
 
     .prog-gold { background: linear-gradient(90deg, var(--clr-magenta), #e2c06a); }
 
+    /* ── Course Rows ── */
     .course-row {
       background: var(--clr-navy-card);
       border: 1px solid var(--clr-border-glow);
@@ -1164,6 +1239,7 @@
       transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
       margin-bottom: 14px;
+      width: 100%;
     }
 
     .course-row:hover {
@@ -1188,11 +1264,14 @@
       font-size: 1rem;
     }
 
+    /* ── Testimonials ── */
     .testi {
       background: var(--clr-navy-card);
       border: 1px solid var(--clr-border-glow);
       border-radius: 20px;
       padding: 28px;
+      margin-bottom: 0;
+      height: fit-content;
     }
 
     .testi p {
@@ -1214,6 +1293,7 @@
       color: #fff;
     }
 
+    /* ── Resource Cards ── */
     .res {
       background: var(--clr-navy-card);
       border: 1px solid var(--clr-border-glow);
@@ -1222,6 +1302,7 @@
       text-align: center;
       transition: transform 0.3s, box-shadow 0.3s;
       cursor: pointer;
+      height: fit-content;
     }
 
     .res:hover {
@@ -1243,6 +1324,7 @@
       margin: 0 auto 16px;
     }
 
+    /* ── Form Elements ── */
     .f-label {
       display: block;
       font-size: 0.72rem;
@@ -1301,6 +1383,12 @@
       box-shadow: 0 14px 40px rgba(10, 181, 181, 0.48);
     }
 
+    /* ── Animations ── */
+    @keyframes fadeUp { 
+      from { opacity:0; transform:translateY(28px); } 
+      to { opacity:1; transform:translateY(0); } 
+    }
+
     .fu { opacity: 0; animation: fadeUp 0.8s ease forwards; }
 
     .reveal {
@@ -1311,30 +1399,115 @@
 
     .reveal.in { opacity: 1; transform: translateY(0); }
 
+    /* ── Grid Layouts ── */
+    .grid-2 {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 48px;
+      align-items: start;
+    }
+
+    .grid-3 {
+      display: grid;
+      grid-template-columns: repeat(3, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .grid-4 {
+      display: grid;
+      grid-template-columns: repeat(4, 1fr);
+      gap: 24px;
+      align-items: start;
+    }
+
+    .tc { text-align: center; }
+
+    .max-w {
+      max-width: var(--max-width);
+      margin: 0 auto;
+      width: 100%;
+      padding: 0 16px;
+    }
+
+    /* ── Responsive Styles ── */
+    @media (max-width: 1024px) {
+      .grid-4 {
+        grid-template-columns: repeat(2, 1fr);
+      }
+    }
+
     @media (max-width: 768px) {
       .hero-carousel { height: 55vh; min-height: 400px; }
       .carousel-arrow { display: none; }
       .main-nav { display: none; }
       .mobile-toggle { display: flex !important; }
+      
+      section {
+        padding: 60px 20px;
+        margin-bottom: 12px;
+      }
+      
+      .section {
+        padding: 60px 16px;
+      }
+      
+      .grid-2,
+      .grid-3,
+      .grid-4 {
+        grid-template-columns: 1fr;
+        gap: 20px;
+      }
+      
       .card { padding: 1.3rem; }
       .team-avatar { width: 75px; height: 75px; font-size: 1.8rem; }
       .testimonial-slider { padding: 1.8rem 1.2rem; }
       .pricing-card.featured { transform: scale(1); }
       .price { font-size: 2.2rem; }
-      .stats-grid { grid-template-columns: repeat(2, 1fr); padding: 1.5rem; }
+      .stats-grid { 
+        grid-template-columns: repeat(2, 1fr); 
+        padding: 1.5rem;
+        gap: 16px;
+      }
       .stat-number { font-size: 1.8rem; }
-      .resources-grid { grid-template-columns: 1fr; }
+      .resources-grid { 
+        grid-template-columns: 1fr;
+        gap: 16px;
+      }
       .footer-fat { padding: 2rem 1rem 1.5rem; }
-      .section { margin: 2.5rem auto; padding: 2.5rem 1rem; }
-      .grid-2, .grid-3, .grid-4 { grid-template-columns: 1fr; gap: 20px; }
-      .course-row { flex-direction: column; align-items: flex-start; }
+      .footer-grid {
+        grid-template-columns: 1fr;
+        gap: 32px;
+      }
+      .section-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+      .header-container { padding: 12px 16px; }
+      .course-row { 
+        flex-direction: column; 
+        align-items: flex-start;
+        gap: 12px;
+      }
+      
+      #contact .grid-2 {
+        gap: 32px;
+      }
     }
 
     @media (min-width: 769px) {
       .mobile-toggle { display: none; }
-      .grid-2 { display: grid; grid-template-columns: 1fr 1fr; gap: 60px; align-items: center; }
-      .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 20px; }
-      .grid-4 { display: grid; grid-template-columns: repeat(4, 1fr); gap: 18px; }
+    }
+
+    @media (max-width: 480px) {
+      section {
+        padding: 40px 16px;
+      }
+      
+      .stats-grid {
+        grid-template-columns: 1fr;
+      }
+      
+      .course-row {
+        padding: 16px;
+      }
     }
   </style>
 </head>
@@ -1407,17 +1580,26 @@
       <span class="sec-label">LEARNING TOOLS</span>
       <h2 class="section-title">Learning Resources</h2>
       <p class="section-subtitle">Browse our library of biology and pharmacy materials.</p>
-      <div class="filter-bar">
-        <div class="filter-bar-inner">
-          <span class="font-semibold text-xs uppercase tracking-wide" style="color:var(--clr-text-dim);">Filter Resources</span>
-          <div class="flex flex-col sm:flex-row gap-3">
-            <select class="form-input" id="filter-level" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Levels</option></select>
-            <select class="form-input" id="filter-category" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Categories</option></select>
-            <select class="form-input" id="filter-tag" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Tags</option></select>
-            <button class="btn-primary" id="filter-submit" style="padding:0.45rem 1.2rem;">Apply</button>
-          </div>
-        </div>
+ <div class="filter-bar">
+  <div class="filter-bar-inner">
+    <span class="font-semibold text-xs uppercase tracking-wide" style="color:var(--clr-text-dim);">Filter Resources</span>
+    <div class="flex flex-col sm:flex-row gap-3">
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Level</label>
+        <select class="form-input" id="filter-level" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Levels</option></select>
       </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Category</label>
+        <select class="form-input" id="filter-category" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Categories</option></select>
+      </div>
+      <div style="display:flex;flex-direction:column;gap:4px;">
+        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Tags</label>
+        <select class="form-input" id="filter-tag" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Tags</option></select>
+      </div>
+      <button class="btn-primary" id="filter-submit" style="padding:0.45rem 1.2rem;align-self:flex-end;">Apply Filters</button>
+    </div>
+  </div>
+</div>
       <div id="resources-container">
         <div style="text-align:center;padding:3rem;"><i class="fa-solid fa-dna animate-spin-slow text-3xl" style="color:var(--clr-cyan);"></i><p style="color:var(--clr-text-dim);margin-top:1rem;">Loading resources...</p></div>
       </div>
@@ -1557,9 +1739,9 @@
     <div style="max-width:var(--max-width);margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--clr-border-glow);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
       <p style="font-size:0.75rem;color:var(--clr-text-muted);">&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p>
       <div style="display:flex;gap:22px;">
-        <a href="#" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Privacy Policy</a>
-        <a href="#" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Terms of Use</a>
-        <a href="#" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Accessibility</a>
+        <a href="privacy.html" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Privacy Policy</a>
+        <a href="terms.html" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Terms of Use</a>
+        <a href="accessibility.html" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Accessibility</a>
       </div>
     </div>
   </footer>
