@@ -986,25 +986,45 @@ body.dark-mode #search-input:focus {
       frame();
     }
 
-    // ── Init ──
-    document.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('current-year').textContent = new Date().getFullYear();
-      initTheme();
-      initBackground();
-       function getFilters() {
-  return {
-    search: document.getElementById('search-input').value.trim(),
-    level: document.getElementById('filter-level').value,
-    category: document.getElementById('filter-category').value,
-    tag: document.getElementById('filter-tag').value
-  };
-}
+ // ── Init ──
+document.addEventListener('DOMContentLoaded', async () => {
 
-document.getElementById('filter-submit').onclick = () => loadPDFs(getFilters());
-document.getElementById('search-btn').onclick = () => loadPDFs(getFilters());
-document.getElementById('search-input').addEventListener('keypress', (e) => {
-  if (e.key === 'Enter') loadPDFs(getFilters());
-});
+  document.getElementById('current-year').textContent =
+    new Date().getFullYear();
+
+  initTheme();
+  initBackground();
+
+  // Load auth state and filters
+  await checkAuth();
+  await loadFilters();
+
+  function getFilters() {
+    return {
+      search: document.getElementById('search-input').value.trim(),
+      level: document.getElementById('filter-level').value,
+      category: document.getElementById('filter-category').value,
+      tag: document.getElementById('filter-tag').value
+    };
+  }
+
+  // Apply filters button
+  document.getElementById('filter-submit').onclick = () => {
+    loadPDFs(getFilters());
+  };
+
+  // Search button
+  document.getElementById('search-btn').onclick = () => {
+    loadPDFs(getFilters());
+  };
+
+  // Enter key search
+  document.getElementById('search-input').addEventListener('keypress', (e) => {
+    if (e.key === 'Enter') {
+      loadPDFs(getFilters());
+    }
+  });
+
 });
   </script>
 </body>
