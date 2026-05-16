@@ -26,7 +26,6 @@
       --radius: 12px;
       --font-body: 'DM Sans', sans-serif;
       --font-display: 'Playfair Display', serif;
-      --font-mono: 'DM Mono', monospace;
     }
 
     * { box-sizing: border-box; margin: 0; padding: 0; }
@@ -91,7 +90,34 @@
       padding: 16px 20px;
       border-top: 1px solid rgba(255,255,255,0.1);
       font-size: 0.75rem;
-      color: rgba(255,255,255,0.4);
+    }
+
+    .sidebar-footer .admin-email {
+      color: rgba(255,255,255,0.7);
+      margin-bottom: 8px;
+      word-break: break-all;
+    }
+
+    .btn-signout {
+      display: flex;
+      align-items: center;
+      gap: 8px;
+      width: 100%;
+      padding: 8px 14px;
+      background: rgba(255,255,255,0.1);
+      border: 1px solid rgba(255,255,255,0.2);
+      color: #fff;
+      border-radius: 8px;
+      cursor: pointer;
+      font-family: var(--font-body);
+      font-size: 0.8rem;
+      font-weight: 500;
+      transition: all 0.2s;
+    }
+
+    .btn-signout:hover {
+      background: rgba(231,76,60,0.3);
+      border-color: var(--danger);
     }
 
     .main-content { flex: 1; padding: 32px; overflow-y: auto; }
@@ -109,7 +135,7 @@
 
     .stats-grid {
       display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
       gap: 16px;
       margin-bottom: 32px;
     }
@@ -122,7 +148,7 @@
       box-shadow: var(--shadow);
     }
 
-    .stat-card .stat-icon {
+    .stat-icon {
       width: 42px;
       height: 42px;
       border-radius: 10px;
@@ -133,13 +159,13 @@
       margin-bottom: 12px;
     }
 
-    .stat-card .stat-value {
+    .stat-value {
       font-family: var(--font-display);
       font-weight: 900;
       font-size: 1.8rem;
     }
 
-    .stat-card .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
+    .stat-label { font-size: 0.75rem; color: var(--text-muted); margin-top: 2px; }
 
     .panel {
       background: var(--surface);
@@ -167,17 +193,17 @@
 
     th {
       text-align: left;
-      padding: 12px 16px;
+      padding: 10px 14px;
       background: #f8f9fb;
       font-weight: 600;
       color: var(--text-dim);
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       text-transform: uppercase;
       letter-spacing: 0.05em;
       border-bottom: 2px solid var(--border);
     }
 
-    td { padding: 10px 16px; border-bottom: 1px solid var(--border); }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--border); }
     tr:hover td { background: #f8f9fb; }
 
     .btn {
@@ -192,7 +218,6 @@
       cursor: pointer;
       border: none;
       transition: all 0.2s;
-      text-decoration: none;
     }
 
     .btn-sm { padding: 5px 10px; font-size: 0.72rem; border-radius: 6px; }
@@ -209,7 +234,7 @@
 
     .form-label {
       display: block;
-      font-size: 0.72rem;
+      font-size: 0.7rem;
       font-weight: 700;
       color: var(--text-dim);
       text-transform: uppercase;
@@ -240,7 +265,7 @@
       display: inline-block;
       padding: 3px 10px;
       border-radius: 20px;
-      font-size: 0.68rem;
+      font-size: 0.65rem;
       font-weight: 600;
     }
 
@@ -280,7 +305,7 @@
     .modal-title { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; }
     .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--text-muted); }
 
-    .tabs { display: flex; gap: 0; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
+    .tabs { display: flex; border-bottom: 2px solid var(--border); margin-bottom: 20px; }
 
     .tab-btn {
       padding: 12px 24px;
@@ -303,7 +328,7 @@
     @media (max-width: 768px) {
       .admin-layout { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: relative; }
-      .main-content { padding: 20px 16px; }
+      .main-content { padding: 16px; }
       .stats-grid { grid-template-columns: repeat(2, 1fr); }
     }
   </style>
@@ -312,10 +337,11 @@
 
 <div class="admin-layout">
 
+  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">AliverBiopharm</div>
-      <div style="font-size:0.7rem;color:rgba(255,255,255,0.5);margin-top:4px;">Admin Panel</div>
+      <div style="font-size:0.65rem;color:rgba(255,255,255,0.4);margin-top:4px;">Admin Panel</div>
     </div>
     <ul class="sidebar-nav">
       <li><a href="#dashboard" class="active" data-tab="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
@@ -323,14 +349,16 @@
       <li><a href="#upload" data-tab="upload"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</a></li>
       <li><a href="#site-sections" data-tab="site-sections"><i class="fa-solid fa-globe"></i> Site Sections</a></li>
       <li><a href="#users" data-tab="users"><i class="fa-solid fa-users"></i> Users</a></li>
-      <li><a href="#analytics" data-tab="analytics"><i class="fa-solid fa-chart-line"></i> Analytics</a></li>
     </ul>
     <div class="sidebar-footer">
-      <div id="admin-user-info">Admin</div>
-      <button class="btn btn-sm btn-outline" style="margin-top:8px;color:#fff;border-color:rgba(255,255,255,0.3);" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+      <div class="admin-email" id="admin-email-display">Loading...</div>
+      <button class="btn-signout" onclick="signOut()">
+        <i class="fa-solid fa-right-from-bracket"></i> Sign Out
+      </button>
     </div>
   </aside>
 
+  <!-- MAIN -->
   <main class="main-content">
 
     <!-- DASHBOARD -->
@@ -339,10 +367,17 @@
         <h1 class="page-title">Dashboard</h1>
         <p class="page-subtitle">System overview</p>
       </div>
-      <div class="stats-grid" id="dashboard-stats">
-        <div class="stat-card"><div class="stat-icon" style="background:#d1ecf1;color:var(--cyan);"><i class="fa-solid fa-file-pdf"></i></div><div class="stat-value" id="stat-resources">—</div><div class="stat-label">Total Resources</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#d4edda;color:var(--success);"><i class="fa-solid fa-users"></i></div><div class="stat-value" id="stat-users">—</div><div class="stat-label">Total Users</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:#fff3cd;color:var(--warning);"><i class="fa-solid fa-download"></i></div><div class="stat-value" id="stat-downloads">—</div><div class="stat-label">Total Downloads</div></div>
+      <div class="stats-grid">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#d1ecf1;color:var(--cyan);"><i class="fa-solid fa-file-pdf"></i></div>
+          <div class="stat-value" id="stat-resources">—</div>
+          <div class="stat-label">Total Resources</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#d4edda;color:var(--success);"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-value" id="stat-users">—</div>
+          <div class="stat-label">Total Users</div>
+        </div>
       </div>
     </div>
 
@@ -350,7 +385,7 @@
     <div class="tab-content" id="tab-resources">
       <div class="page-header">
         <h1 class="page-title">Resources</h1>
-        <p class="page-subtitle">Manage PDFs and downloads</p>
+        <p class="page-subtitle">Manage biology notes and submissions</p>
       </div>
       <div class="panel">
         <div class="panel-header">
@@ -360,8 +395,8 @@
         <div class="panel-body">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Title</th><th>Category</th><th>Level</th><th>Actions</th></tr></thead>
-              <tbody id="resources-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+              <thead><tr><th>Title</th><th>Category</th><th>Level</th><th>Source</th><th>Actions</th></tr></thead>
+              <tbody id="resources-table"><tr><td colspan="5" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -380,9 +415,9 @@
           <form id="upload-form" enctype="multipart/form-data">
             <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="upload-title" required /></div>
             <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="upload-description"></textarea></div>
-            <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="upload-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Physics</option></select></div>
-            <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="upload-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option><option>Graduate</option></select></div>
-            <div class="form-group"><label class="form-label">Tags (comma separated)</label><input type="text" class="form-input" id="upload-tags" placeholder="e.g. nutrition, enzymes" /></div>
+            <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="upload-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option></select></div>
+            <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="upload-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option></select></div>
+            <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="upload-tags" placeholder="e.g. nutrition, enzymes" /></div>
             <div class="form-group"><label class="form-label">PDF File</label><input type="file" class="form-input" id="upload-file" accept=".pdf" required /></div>
             <button type="submit" class="btn btn-magenta"><i class="fa-solid fa-upload"></i> Upload Resource</button>
           </form>
@@ -394,7 +429,7 @@
     <div class="tab-content" id="tab-site-sections">
       <div class="page-header">
         <h1 class="page-title">Site Sections</h1>
-        <p class="page-subtitle">Edit hero, footer, navigation</p>
+        <p class="page-subtitle">Edit hero, footer, navigation content</p>
       </div>
       <div class="tabs" id="section-tabs">
         <button class="tab-btn active" data-section="hero">Hero</button>
@@ -402,7 +437,7 @@
         <button class="tab-btn" data-section="navigation">Navigation</button>
       </div>
       <div id="site-section-editor" style="max-width:600px;">
-        <p style="color:var(--text-muted);">Select a section to edit.</p>
+        <p style="color:var(--text-muted);padding:20px;">Select a section to edit.</p>
       </div>
     </div>
 
@@ -425,41 +460,22 @@
       </div>
     </div>
 
-    <!-- ANALYTICS -->
-    <div class="tab-content" id="tab-analytics">
-      <div class="page-header">
-        <h1 class="page-title">Analytics</h1>
-        <p class="page-subtitle">Downloads and popular resources</p>
-      </div>
-      <div class="panel">
-        <div class="panel-header"><span>Popular Resources</span></div>
-        <div class="panel-body">
-          <div class="table-wrap">
-            <table>
-              <thead><tr><th>Resource</th><th>Downloads</th></tr></thead>
-              <tbody id="popular-table"><tr><td colspan="2" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-
   </main>
 </div>
 
-<!-- Edit Resource Modal -->
+<!-- EDIT MODAL -->
 <div class="modal-overlay" id="edit-modal" style="display:none;">
   <div class="modal">
     <div class="modal-header">
       <h3 class="modal-title">Edit Resource</h3>
-      <button class="modal-close" onclick="closeEditModal()">✕</button>
+      <button class="modal-close" onclick="document.getElementById('edit-modal').style.display='none'">✕</button>
     </div>
     <form id="edit-form">
       <input type="hidden" id="edit-id" />
       <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="edit-title" required /></div>
       <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="edit-description"></textarea></div>
-      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="edit-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Physics</option></select></div>
-      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option><option>Graduate</option></select></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="edit-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option></select></div>
+      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option></select></div>
       <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="edit-tags" /></div>
       <button type="submit" class="btn btn-cyan">Save Changes</button>
     </form>
@@ -475,7 +491,8 @@
   }
 
   function getToken() {
-    return localStorage.getItem('sb-token');
+    // Check both storage keys
+    return localStorage.getItem('sb-token') || sessionStorage.getItem('sb-token');
   }
 
   async function apiCall(endpoint, method = 'GET', body = null) {
@@ -500,6 +517,7 @@
       clearTimeout(timeout);
       if (res.status === 401 || res.status === 403) {
         localStorage.clear();
+        sessionStorage.clear();
         window.location.href = '/admin-login.html';
         throw new Error('Unauthorized');
       }
@@ -508,11 +526,12 @@
       return json;
     } catch (err) {
       clearTimeout(timeout);
+      console.error(`API Error [${endpoint}]:`, err.message);
       throw err;
     }
   }
 
-  // ── Tab Navigation ──
+  // ── TAB NAVIGATION ──
   document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -520,15 +539,15 @@
       link.classList.add('active');
       const tabId = link.dataset.tab;
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
-      document.getElementById('tab-' + tabId).classList.add('active');
+      const tabEl = document.getElementById('tab-' + tabId);
+      if (tabEl) tabEl.classList.add('active');
       if (tabId === 'dashboard') loadDashboard();
       if (tabId === 'resources') loadResources();
       if (tabId === 'users') loadUsers();
-      if (tabId === 'analytics') loadAnalytics();
     });
   });
 
-  // ── Site Section Tabs ──
+  // ── SITE SECTION TABS ──
   document.querySelectorAll('#section-tabs .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#section-tabs .tab-btn').forEach(b => b.classList.remove('active'));
@@ -537,52 +556,60 @@
     });
   });
 
-  // ── Dashboard ──
+  // ── DASHBOARD ──
   async function loadDashboard() {
     try {
       const data = await apiCall('/stats');
       document.getElementById('stat-resources').textContent = data.resources || 0;
       document.getElementById('stat-users').textContent = data.users || 0;
-      document.getElementById('stat-downloads').textContent = data.downloads || 0;
     } catch(e) {
-      console.error('Dashboard load failed:', e);
+      document.getElementById('stat-resources').textContent = '!';
+      document.getElementById('stat-users').textContent = '!';
     }
   }
 
-  // ── Resources ──
+  // ── RESOURCES ──
   async function loadResources() {
     const tbody = document.getElementById('resources-table');
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
     try {
       const data = await apiCall('/resources');
       const resources = data.resources || [];
       if (!resources.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No resources found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No resources found.</td></tr>';
         return;
       }
       tbody.innerHTML = resources.map(r => `
         <tr>
-          <td><strong>${esc(r.title)}</strong></td>
+          <td><strong>${esc(r.title || 'Untitled')}</strong></td>
           <td>${esc(r.category || '—')}</td>
           <td>${esc(r.level || '—')}</td>
+          <td><span class="badge ${r.source === 'biology_notes' ? 'badge-info' : 'badge-warning'}">${r.source === 'biology_notes' ? 'Published' : 'Submission'}</span></td>
           <td>
-            <button class="btn btn-sm btn-outline" onclick="openEditResource('${esc(String(r.id))}')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-outline" onclick="openEdit('${esc(String(r.id))}')"><i class="fa-solid fa-pen"></i></button>
             <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(r.id))}')"><i class="fa-solid fa-trash"></i></button>
+            ${r.source === 'resource_submissions' && r.status === 'pending' ? `<button class="btn btn-sm btn-cyan" onclick="approveSubmission('${esc(String(r.id))}')"><i class="fa-solid fa-check"></i></button>` : ''}
           </td>
         </tr>
       `).join('');
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Failed to load.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
     }
   }
 
-  // ── Upload ──
+  window.approveSubmission = async function(id) {
+    try {
+      await apiCall(`/resources/${id}/approve`, 'POST');
+      loadResources();
+    } catch(e) { alert('Failed: ' + e.message); }
+  };
+
+  // ── UPLOAD ──
   document.getElementById('upload-form').addEventListener('submit', async (e) => {
     e.preventDefault();
     const fileInput = document.getElementById('upload-file');
     const file = fileInput.files[0];
     if (!file) return alert('Select a file.');
-
     const formData = new FormData();
     formData.append('title', document.getElementById('upload-title').value);
     formData.append('description', document.getElementById('upload-description').value);
@@ -590,18 +617,15 @@
     formData.append('level', document.getElementById('upload-level').value);
     formData.append('tags', document.getElementById('upload-tags').value);
     formData.append('file', file);
-
     try {
       await apiCall('/resources/upload', 'POST', formData);
-      alert('Uploaded successfully!');
+      alert('Uploaded!');
       document.getElementById('upload-form').reset();
-    } catch(err) {
-      alert('Upload failed: ' + err.message);
-    }
+    } catch(err) { alert('Upload failed: ' + err.message); }
   });
 
-  // ── Edit Resource ──
-  window.openEditResource = async function(id) {
+  // ── EDIT ──
+  window.openEdit = async function(id) {
     try {
       const data = await apiCall(`/resources/${id}`);
       const r = data.resource;
@@ -610,15 +634,9 @@
       document.getElementById('edit-description').value = r.description || '';
       document.getElementById('edit-category').value = r.category || '';
       document.getElementById('edit-level').value = r.level || '';
-      document.getElementById('edit-tags').value = Array.isArray(r.tags) ? r.tags.join(', ') : (r.tags || '');
+      document.getElementById('edit-tags').value = r.tag || '';
       document.getElementById('edit-modal').style.display = 'flex';
-    } catch(e) {
-      alert('Failed to load resource.');
-    }
-  };
-
-  window.closeEditModal = function() {
-    document.getElementById('edit-modal').style.display = 'none';
+    } catch(e) { alert('Failed to load resource.'); }
   };
 
   document.getElementById('edit-form').addEventListener('submit', async (e) => {
@@ -629,61 +647,57 @@
       description: document.getElementById('edit-description').value,
       category: document.getElementById('edit-category').value,
       level: document.getElementById('edit-level').value,
-      tags: document.getElementById('edit-tags').value
+      tag: document.getElementById('edit-tags').value
     };
     try {
       await apiCall(`/resources/${id}`, 'PUT', body);
-      alert('Resource updated!');
-      closeEditModal();
+      alert('Updated!');
+      document.getElementById('edit-modal').style.display = 'none';
       loadResources();
-    } catch(err) {
-      alert('Update failed: ' + err.message);
-    }
+    } catch(err) { alert('Failed: ' + err.message); }
   });
 
-  // ── Delete Resource ──
+  // ── DELETE ──
   window.deleteResource = async function(id) {
     if (!confirm('Delete this resource?')) return;
-    try {
-      await apiCall(`/resources/${id}`, 'DELETE');
-      loadResources();
-    } catch(e) {
-      alert('Delete failed.');
-    }
+    try { await apiCall(`/resources/${id}`, 'DELETE'); loadResources(); }
+    catch(e) { alert('Delete failed.'); }
   };
 
-  // ── Site Sections ──
-  async function loadSiteSection(type) {
+  // ── SITE SECTIONS ──
+  async function loadSiteSection(sectionName) {
     const editor = document.getElementById('site-section-editor');
-    editor.innerHTML = '<p>Loading...</p>';
+    editor.innerHTML = '<p style="padding:20px;">Loading...</p>';
     try {
       const data = await apiCall('/site-sections');
       const sections = data.sections || [];
-      const section = sections.find(s => s.section_type === type);
-      const content = section ? JSON.stringify(section.content, null, 2) : '{}';
+      const section = sections.find(s => s.section === sectionName);
+      const content = section?.data ? JSON.stringify(section.data, null, 2) : '{}';
       editor.innerHTML = `
-        <form id="section-form">
-          <div class="form-group"><label class="form-label">Content (JSON)</label><textarea class="form-textarea" id="section-content" style="min-height:200px;font-family:monospace;">${esc(content)}</textarea></div>
-          <button type="submit" class="btn btn-cyan">Save ${type.toUpperCase()}</button>
+        <form id="section-form" style="margin-top:16px;">
+          <div class="form-group">
+            <label class="form-label">Content (JSON)</label>
+            <textarea class="form-textarea" id="section-content" style="min-height:200px;font-family:monospace;font-size:0.8rem;">${esc(content)}</textarea>
+          </div>
+          <button type="submit" class="btn btn-cyan">Save ${sectionName.toUpperCase()}</button>
         </form>
       `;
       document.getElementById('section-form').addEventListener('submit', async (e) => {
         e.preventDefault();
         try {
           let parsed;
-          try { parsed = JSON.parse(document.getElementById('section-content').value); } catch { parsed = document.getElementById('section-content').value; }
-          await apiCall(`/site-sections/${type}`, 'PUT', parsed);
+          try { parsed = JSON.parse(document.getElementById('section-content').value); }
+          catch { parsed = document.getElementById('section-content').value; }
+          await apiCall(`/site-sections/${sectionName}`, 'PUT', parsed);
           alert('Section updated!');
-        } catch(err) {
-          alert('Save failed: ' + err.message);
-        }
+        } catch(err) { alert('Save failed: ' + err.message); }
       });
     } catch(e) {
-      editor.innerHTML = '<p style="color:red;">Failed to load section.</p>';
+      editor.innerHTML = '<p style="color:var(--danger);padding:20px;">Failed to load section.</p>';
     }
   }
 
-  // ── Users ──
+  // ── USERS ──
   async function loadUsers() {
     const tbody = document.getElementById('users-table');
     tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
@@ -691,74 +705,55 @@
       const data = await apiCall('/users');
       const users = data.users || [];
       if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No users found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No users found.</td></tr>';
         return;
       }
       tbody.innerHTML = users.map(u => `
         <tr>
           <td>${esc(u.email)}</td>
-          <td><span class="badge ${u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success'}">${esc(u.admin_role)}</span></td>
+          <td><span class="badge ${u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success'}">${esc(u.admin_role || 'user')}</span></td>
           <td><span class="badge ${u.is_locked ? 'badge-danger' : 'badge-success'}">${u.is_locked ? 'Locked' : 'Active'}</span></td>
           <td>
             ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')"><i class="fa-solid fa-user-shield"></i> Make Admin</button>` : ''}
-            <button class="btn btn-sm btn-warning" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})"><i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i></button>
+            <button class="btn btn-sm btn-outline" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})"><i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i></button>
           </td>
         </tr>
       `).join('');
     } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:red;">Failed to load.</td></tr>';
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
     }
   }
 
   window.makeAdmin = async function(userId) {
-    try {
-      await apiCall(`/users/${userId}/make-admin`, 'POST', { role: 'content_manager' });
-      alert('User promoted to admin!');
-      loadUsers();
-    } catch(e) {
-      alert('Failed: ' + e.message);
-    }
+    try { await apiCall(`/users/${userId}/make-admin`, 'POST'); loadUsers(); }
+    catch(e) { alert('Failed: ' + e.message); }
   };
 
   window.toggleLock = async function(userId, lock) {
-    try {
-      await apiCall(`/users/${userId}/lock`, 'PUT', { lock, reason: lock ? 'Locked by admin' : null });
-      loadUsers();
-    } catch(e) {
-      alert('Failed: ' + e.message);
-    }
+    try { await apiCall(`/users/${userId}/lock`, 'PUT', { lock, reason: lock ? 'Locked by admin' : null }); loadUsers(); }
+    catch(e) { alert('Failed: ' + e.message); }
   };
 
-  // ── Analytics ──
-  async function loadAnalytics() {
-    const tbody = document.getElementById('popular-table');
-    tbody.innerHTML = '<tr><td colspan="2">Loading...</td></tr>';
-    try {
-      const data = await apiCall('/analytics/dashboard');
-      const popular = data.analytics?.popular_resources || [];
-      if (!popular.length) {
-        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">No data.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = popular.map(r => `<tr><td>${esc(r.title)}</td><td>${r.downloads || 0}</td></tr>`).join('');
-    } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:red;">Failed to load.</td></tr>';
-    }
-  }
-
-  // ── Sign Out ──
+  // ── SIGN OUT ──
   window.signOut = function() {
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = '/';
   };
 
-  // ── Init ──
+  // ── INIT ──
   document.addEventListener('DOMContentLoaded', () => {
-    const email = localStorage.getItem('sb-email');
-    if (email) {
-      document.getElementById('admin-user-info').textContent = email;
-    }
+    // Show admin email
+    const email = localStorage.getItem('sb-email') || sessionStorage.getItem('sb-email') || 'Admin';
+    document.getElementById('admin-email-display').textContent = email;
+
+    // Check if actually admin
+    apiCall('/check').then(data => {
+      if (!data.isAdmin) {
+        document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;"><h1 style="color:#e74c3c;">Access Denied</h1><p>You do not have admin privileges.</p><a href="/" style="color:var(--cyan);">Go Home</a></div>';
+      }
+    }).catch(() => {});
+
     loadDashboard();
   });
 </script>
