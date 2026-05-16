@@ -576,6 +576,20 @@
     @media (max-width: 480px) {
       .main-content { padding: 16px 12px; }
     }
+    
+    #search-input:focus {
+  outline: none;
+  border-color: var(--clr-cyan);
+  box-shadow: 0 0 0 3px rgba(10,181,181,0.14);
+}
+
+body.dark-mode #search-input {
+  background: rgba(2,82,82,0.35);
+}
+
+body.dark-mode #search-input:focus {
+  background: rgba(2,82,82,0.5);
+}
   </style>
 </head>
 <body>
@@ -625,22 +639,29 @@
           <p class="section-subtitle">Browse and download our complete collection of biology and pharmacy study materials.</p>
         </div>
 
-        <!-- Filter Bar -->
-        <div class="filter-bar" id="filter-bar">
-          <div>
-            <label>Level</label>
-            <select id="filter-level"><option value="">All Levels</option></select>
-          </div>
-          <div>
-            <label>Category</label>
-            <select id="filter-category"><option value="">All Categories</option></select>
-          </div>
-          <div>
-            <label>Tags</label>
-            <select id="filter-tag"><option value="">All Tags</option></select>
-          </div>
-          <button class="btn-primary" id="filter-submit" style="padding:10px 20px;font-size:0.8rem;">Apply Filters</button>
-        </div>
+      <!-- Filter Bar -->
+<div class="filter-bar" id="filter-bar">
+  <div style="flex:1;min-width:200px;">
+    <label>Search Resources</label>
+    <div style="display:flex;gap:8px;">
+      <input type="text" id="search-input" placeholder="e.g. nutrition olevel..." style="flex:1;padding:8px 12px;border-radius:8px;font-family:var(--font-body);font-size:0.8rem;color:var(--clr-white);background:rgba(236,248,248,0.9);border:1.5px solid rgba(10,181,181,0.3);" />
+      <button class="btn-primary" id="search-btn" style="padding:8px 16px;font-size:0.8rem;"><i class="fa-solid fa-search"></i> Search</button>
+    </div>
+  </div>
+  <div>
+    <label>Level</label>
+    <select id="filter-level"><option value="">All Levels</option></select>
+  </div>
+  <div>
+    <label>Category</label>
+    <select id="filter-category"><option value="">All Categories</option></select>
+  </div>
+  <div>
+    <label>Tags</label>
+    <select id="filter-tag"><option value="">All Tags</option></select>
+  </div>
+  <button class="btn-primary" id="filter-submit" style="padding:10px 20px;font-size:0.8rem;">Apply Filters</button>
+</div>
 
         <!-- PDF Grid -->
         <div id="pdf-grid" class="pdf-grid">
@@ -756,44 +777,68 @@
       }
     }
 
-    // ── Load PDFs ──
-    async function loadPDFs(filters = {}) {
-      const grid = document.getElementById('pdf-grid');
-      grid.innerHTML = '<div class="loading-state"><i class="fa-solid fa-dna animate-spin-slow"></i><p style="color:var(--clr-text-dim);">Loading resources...</p></div>';
+ async function loadPDFs(filters = {}) {
+  const grid = document.getElementById('pdf-grid');
+  grid.innerHTML = '<div class="loading-state"><i class="fa-solid fa-spinner animate-spin-slow"></i><p style="color:var(--clr-text-dim);">Searching resources...</p></div>';
 
-      try {
-        const data = await apiCall('get_resources', { filters });
-        if (!data || !data.length) {
-          grid.innerHTML = '<div class="error-state"><i class="fa-solid fa-folder-open"></i><p style="color:var(--clr-text-dim);">No resources found matching your criteria.</p></div>';
-          return;
-        }
-
-        grid.innerHTML = data.map(item => `
-          <div class="pdf-card animate-in">
-            <div class="pdf-icon"><i class="fa-solid fa-file-pdf"></i></div>
-            <h3>${esc(item.title || 'Untitled Resource')}</h3>
-            <div class="pdf-meta">
-              <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
-              <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
-              <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
-            </div>
-            <p class="pdf-description">${esc(item.description || 'No description available.')}</p>
-            <div style="display:flex;flex-wrap:wrap;gap:6px;">
-              ${item.level ? `<span class="pill pill-teal">${esc(item.level)}</span>` : ''}
-              ${item.category ? `<span class="pill pill-gold">${esc(item.category)}</span>` : ''}
-            </div>
-            <div class="pdf-footer">
-              <button class="btn-download" onclick="downloadPDF('${esc(String(item.id))}')">
-                <i class="fa-solid fa-download"></i> Download
-              </button>
-            </div>
-          </div>
-        `).join('');
-
-      } catch (err) {
-        grid.innerHTML = `<div class="error-state"><i class="fa-solid fa-exclamation-triangle"></i><p style="color:var(--clr-magenta);">Failed to load resources. ${esc(err.message)}</p></div>`;
-      }
+  try {
+    const data = await apiCall('get_resources', { filters });
+    if (!data || !data.length) {
+      grid.innerHTML = '<div class="error-state"><i class="fa-solid fa-folder-open"></i><p style="color:var(--clr-text-dim);">No resources found matching your search.</p></div>';
+      return;
     }
+
+    let filteredData = data;
+    
+    // Apply search filter
+    if (filters.search) {
+      const searchTerms = filters.search.toLowerCase().split(' ');
+      filteredData = data.filter(item => {
+        const searchableText = [
+          item.title,
+          item.description,
+          item.author,
+          item.level,
+          item.category,
+          item.tags,
+          item.section_type
+        ].filter(Boolean).join(' ').toLowerCase();
+        
+        return searchTerms.every(term => searchableText.includes(term));
+      });
+    }
+
+    if (!filteredData.length) {
+      grid.innerHTML = '<div class="error-state"><i class="fa-solid fa-search"></i><p style="color:var(--clr-text-dim);">No resources match "' + esc(filters.search) + '". Try different keywords.</p></div>';
+      return;
+    }
+
+    grid.innerHTML = filteredData.map(item => `
+      <div class="pdf-card animate-in">
+        <div class="pdf-icon"><i class="fa-solid fa-file-pdf"></i></div>
+        <h3>${esc(item.title || 'Untitled Resource')}</h3>
+        <div class="pdf-meta">
+          <span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span>
+          <span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span>
+          <span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span>
+        </div>
+        <p class="pdf-description">${esc(item.description || 'No description available.')}</p>
+        <div style="display:flex;flex-wrap:wrap;gap:6px;">
+          ${item.level ? `<span class="pill pill-teal">${esc(item.level)}</span>` : ''}
+          ${item.category ? `<span class="pill pill-gold">${esc(item.category)}</span>` : ''}
+        </div>
+        <div class="pdf-footer">
+          <button class="btn-download" onclick="downloadPDF('${esc(String(item.id))}')">
+            <i class="fa-solid fa-download"></i> Download
+          </button>
+        </div>
+      </div>
+    `).join('');
+
+  } catch (err) {
+    grid.innerHTML = `<div class="error-state"><i class="fa-solid fa-exclamation-triangle"></i><p style="color:var(--clr-magenta);">Failed to load resources. ${esc(err.message)}</p></div>`;
+  }
+}
 
     // ── Download PDF ──
     window.downloadPDF = async function(id) {
@@ -946,16 +991,21 @@
       document.getElementById('current-year').textContent = new Date().getFullYear();
       initTheme();
       initBackground();
-      document.getElementById('filter-submit').onclick = () => {
-        loadPDFs({
-          level: document.getElementById('filter-level').value,
-          category: document.getElementById('filter-category').value,
-          tag: document.getElementById('filter-tag').value
-        });
-      };
-      await checkAuth();
-      await loadFilters();
-    });
+       function getFilters() {
+  return {
+    search: document.getElementById('search-input').value.trim(),
+    level: document.getElementById('filter-level').value,
+    category: document.getElementById('filter-category').value,
+    tag: document.getElementById('filter-tag').value
+  };
+}
+
+document.getElementById('filter-submit').onclick = () => loadPDFs(getFilters());
+document.getElementById('search-btn').onclick = () => loadPDFs(getFilters());
+document.getElementById('search-input').addEventListener('keypress', (e) => {
+  if (e.key === 'Enter') loadPDFs(getFilters());
+});
+});
   </script>
 </body>
 </html>
