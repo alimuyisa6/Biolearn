@@ -42,7 +42,7 @@
       },
     }
   </script>
- <style>
+  <style>
     /* ── Global Base & Variables ── */
     :root {
       --clr-deep-space: #eef7f7;
@@ -438,7 +438,7 @@
     .carousel-slide.active { opacity: 1; }
 
     .slide-overlay {
-      background: rgba(238, 247, 247, 0.75);
+      background: rgba(238, 247, 247, 0.4);
       width: 100%;
       height: 100%;
       display: flex;
@@ -447,20 +447,21 @@
       justify-content: center;
       text-align: center;
       padding: 2.5rem;
-      backdrop-filter: blur(8px);
+      backdrop-filter: blur(3px);
     }
 
-     body.dark-mode .slide-overlay {
-  background: rgba(1, 44, 44, 0.45);
-}
+    body.dark-mode .slide-overlay {
+      background: rgba(1, 44, 44, 0.45);
+    }
 
-body.dark-mode .carousel-slide .slide-overlay h2 {
-  text-shadow: 0 2px 16px rgba(0,0,0,0.9);
-}
+    body.dark-mode .carousel-slide .slide-overlay h2 {
+      text-shadow: 0 2px 16px rgba(0,0,0,0.9);
+    }
 
-body.dark-mode .carousel-slide .slide-overlay p {
-  text-shadow: 0 2px 12px rgba(0,0,0,0.8);
-}
+    body.dark-mode .carousel-slide .slide-overlay p {
+      text-shadow: 0 2px 12px rgba(0,0,0,0.8);
+    }
+
     .carousel-controls {
       position: absolute;
       bottom: 2rem;
@@ -515,27 +516,41 @@ body.dark-mode .carousel-slide .slide-overlay p {
     .carousel-prev { left: 1.5rem; }
     .carousel-next { right: 1.5rem; }
 
-    /* ── Hero Badge ── */
- .hero-badge {
-  display: inline-flex;
-  align-items: center;
-  gap: 9px;
-  padding: 8px 20px;
-  border-radius: 50px;
-  background: rgba(255, 255, 255, 0.85);
-  backdrop-filter: blur(10px);
-  border: 1px solid rgba(10, 181, 181, 0.3);
-  color: var(--clr-white);
-  font-family: 'DM Mono', monospace;
-  font-size: 0.72rem;
-  margin-bottom: 28px;
-  box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-}
+    /* ── Announcement Badge ── */
+    .hero-badge {
+      display: inline-flex;
+      align-items: center;
+      gap: 9px;
+      padding: 8px 20px;
+      border-radius: 50px;
+      background: rgba(255, 255, 255, 0.85);
+      backdrop-filter: blur(10px);
+      border: 1px solid rgba(10, 181, 181, 0.3);
+      color: var(--clr-white);
+      font-family: 'DM Mono', monospace;
+      font-size: 0.72rem;
+      box-shadow: 0 4px 16px rgba(0,0,0,0.08);
+    }
 
-body.dark-mode .hero-badge {
-  background: rgba(1, 44, 44, 0.75);
-  border: 1px solid rgba(10, 181, 181, 0.4);
-}
+    body.dark-mode .hero-badge {
+      background: rgba(1, 44, 44, 0.75);
+      border: 1px solid rgba(10, 181, 181, 0.4);
+    }
+
+    @keyframes badgeGlow {
+      0%, 100% { box-shadow: 0 4px 16px rgba(10,181,181,0.15); }
+      50% { box-shadow: 0 4px 28px rgba(10,181,181,0.35); }
+    }
+
+    @keyframes slideDown {
+      from { opacity: 0; transform: translateX(-50%) translateY(-20px); }
+      to { opacity: 1; transform: translateX(-50%) translateY(0); }
+    }
+
+    .hero-badge.visible {
+      display: inline-flex !important;
+      animation: slideDown 0.6s ease forwards, badgeGlow 3s ease-in-out 0.6s infinite;
+    }
 
     .pulse-dot {
       width: 8px;
@@ -1119,7 +1134,7 @@ body.dark-mode .hero-badge {
     .filter-bar-inner {
       display: flex;
       flex-wrap: wrap;
-      align-items: center;
+      align-items: flex-end;
       justify-content: space-between;
       gap: 0.8rem;
     }
@@ -1515,7 +1530,7 @@ body.dark-mode .hero-badge {
   <a href="#main-content" class="skip-link">Skip to main content</a>
 
   <header class="site-header" id="site-header">
-    <div class="header-container max-w-[var(--max-width)] mx-auto flex items-center justify-between px-4 md:px-8">
+    <div class="header-container">
       <a href="#" class="logo-link" id="site-logo">
         <div class="logo-icon">
           <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082"/></svg>
@@ -1551,8 +1566,8 @@ body.dark-mode .hero-badge {
   <main id="main-content">
     <!-- Hero Carousel -->
     <section id="home" class="hero-carousel">
-      <div class="hero-badge fu" style="animation-delay:0.1s; position:absolute; top:120px; left:50%; transform:translateX(-50%); z-index:10;">
-        <span class="pulse-dot"></span>Open Enrollment · Spring 2026 Cohort
+      <div class="hero-badge" id="hero-announcement" style="position:absolute; top:120px; left:50%; transform:translateX(-50%); z-index:10; display:none;">
+        <span class="pulse-dot"></span><span id="announcement-text"></span>
       </div>
     </section>
     
@@ -1580,26 +1595,26 @@ body.dark-mode .hero-badge {
       <span class="sec-label">LEARNING TOOLS</span>
       <h2 class="section-title">Learning Resources</h2>
       <p class="section-subtitle">Browse our library of biology and pharmacy materials.</p>
- <div class="filter-bar">
-  <div class="filter-bar-inner">
-    <span class="font-semibold text-xs uppercase tracking-wide" style="color:var(--clr-text-dim);">Filter Resources</span>
-    <div class="flex flex-col sm:flex-row gap-3">
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Level</label>
-        <select class="form-input" id="filter-level" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Levels</option></select>
+      <div class="filter-bar">
+        <div class="filter-bar-inner">
+          <span class="font-semibold text-xs uppercase tracking-wide" style="color:var(--clr-text-dim);">Filter Resources</span>
+          <div class="flex flex-col sm:flex-row gap-3">
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Level</label>
+              <select class="form-input" id="filter-level" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Levels</option></select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Category</label>
+              <select class="form-input" id="filter-category" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Categories</option></select>
+            </div>
+            <div style="display:flex;flex-direction:column;gap:4px;">
+              <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Tags</label>
+              <select class="form-input" id="filter-tag" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Tags</option></select>
+            </div>
+            <button class="btn-primary" id="filter-submit" style="padding:0.45rem 1.2rem;align-self:flex-end;">Apply Filters</button>
+          </div>
+        </div>
       </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Category</label>
-        <select class="form-input" id="filter-category" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Categories</option></select>
-      </div>
-      <div style="display:flex;flex-direction:column;gap:4px;">
-        <label style="font-size:0.65rem;font-weight:600;color:var(--clr-text-muted);text-transform:uppercase;letter-spacing:0.05em;">Tags</label>
-        <select class="form-input" id="filter-tag" style="width:auto;padding:0.4rem 0.8rem;"><option value="">All Tags</option></select>
-      </div>
-      <button class="btn-primary" id="filter-submit" style="padding:0.45rem 1.2rem;align-self:flex-end;">Apply Filters</button>
-    </div>
-  </div>
-</div>
       <div id="resources-container">
         <div style="text-align:center;padding:3rem;"><i class="fa-solid fa-dna animate-spin-slow text-3xl" style="color:var(--clr-cyan);"></i><p style="color:var(--clr-text-dim);margin-top:1rem;">Loading resources...</p></div>
       </div>
@@ -1645,7 +1660,7 @@ body.dark-mode .hero-badge {
     <section id="contact" class="section alt-bg reveal">
       <span class="sec-label">SUPPORT</span>
       <h2 class="section-title">Get in Touch</h2>
-      <div class="grid-2" style="gap:40px;">
+      <div class="grid-2">
         <form id="contact-form" novalidate style="display:flex;flex-direction:column;gap:18px;">
           <div>
             <label class="f-label" for="contact-name">FULL NAME</label>
@@ -1711,7 +1726,7 @@ body.dark-mode .hero-badge {
     <section class="section reveal">
       <span class="sec-label">UPDATES</span>
       <h2 class="section-title">Stay Updated</h2>
-      <p class="section-subtitle" style="margin-bottom:2rem;">Subscribe to receive the latest articles, resources, and updates.</p>
+      <p class="section-subtitle">Subscribe to receive the latest articles, resources, and updates.</p>
       <form id="newsletter-form">
         <div class="newsletter-box">
           <input type="email" placeholder="Enter your email address" required />
@@ -1731,10 +1746,9 @@ body.dark-mode .hero-badge {
           Aliver<span class="g-text">Biopharm</span>
         </a>
         <p style="font-size:0.85rem;line-height:1.7;color:var(--clr-text-dim);">Advancing biology and pharmacy education for every learner on the planet.</p>
-        <div class="footer-social flex gap-3 mt-4" id="footer-social"></div>
+        <div class="footer-social" id="footer-social"></div>
       </div>
-      <div class="footer-grid max-w-[var(--max-width)] mx-auto grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-8" id="footer-grid" style="display:grid;grid-template-columns:repeat(3,1fr);gap:48px;">
-      </div>
+      <div class="footer-grid" id="footer-grid"></div>
     </div>
     <div style="max-width:var(--max-width);margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--clr-border-glow);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
       <p style="font-size:0.75rem;color:var(--clr-text-muted);">&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p>
@@ -1749,7 +1763,6 @@ body.dark-mode .hero-badge {
   <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
   <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
-  <!-- ── JavaScript (completely unchanged) ── -->
   <script>
     const API_BASE = '/api/query';
     const cache = {};
@@ -1779,8 +1792,6 @@ body.dark-mode .hero-badge {
 
     function safeUrl(u, fallback = '#') { if (!u || typeof u !== 'string') return fallback; const t = u.trim(); if (!t) return fallback; const dangerous = /^(javascript:|data:|vbscript:|file:)/i; if (dangerous.test(t)) return fallback; if (t.includes('\\') || t.includes('\n') || t.includes('\r')) return fallback; return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/') || t.startsWith('#') || t.startsWith('mailto:') ? t : fallback; }
 
-    function createEl(tag, attrs = {}, children = []) { const el = document.createElement(tag); Object.entries(attrs).forEach(([k, v]) => { if (k === 'className') el.className = v; else if (k === 'textContent') el.textContent = v; else if (k.startsWith('on')) el.addEventListener(k.slice(2).toLowerCase(), v); else el.setAttribute(k, v); }); children.forEach(c => el.appendChild(typeof c === 'string' ? document.createTextNode(c) : c)); return el; }
-
     const icons = { 'Home': 'fa-solid fa-house', 'Resources': 'fa-solid fa-book', 'Study Notes': 'fa-solid fa-book-open', 'Blog': 'fa-solid fa-newspaper', 'Study Tips': 'fa-solid fa-lightbulb', 'Submit': 'fa-solid fa-upload', 'Guidelines': 'fa-solid fa-check-circle', 'Donate': 'fa-solid fa-heart', 'About': 'fa-solid fa-circle-info', 'Contact': 'fa-solid fa-envelope' };
 
     function updateMobilePanel(links) {
@@ -1791,13 +1802,13 @@ body.dark-mode .hero-badge {
         const token = localStorage.getItem('sb-token');
         if (token) {
             const email = localStorage.getItem('sb-email') || 'User';
-            footer.innerHTML = `<div class="mobile-user-info" style="display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0.5rem 1rem;color:var(--clr-text-dim);font-size:0.85rem;"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
+            footer.innerHTML = `<div style="display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0.5rem 1rem;color:var(--clr-text-dim);font-size:0.85rem;"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>${esc(email.split('@')[0])}</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>`;
         } else {
             footer.innerHTML = `<a href="#" class="mobile-signin-btn" onclick="showAuthForm('signin');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm('signup');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>`;
         }
     }
 
-    async function buildNavigation(d) { const links = d?.links || []; document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join(''); updateMobilePanel(links); loadSiteLogo(); }
+    async function buildNavigation(d) { const links = d?.links || []; document.getElementById('main-nav').innerHTML = links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join(''); updateMobilePanel(links); loadSiteLogo(); loadAnnouncement(); }
 
     async function loadSiteLogo() {
         try {
@@ -1807,6 +1818,18 @@ body.dark-mode .hero-badge {
                 if (logoEl) logoEl.innerHTML = `<img src="${esc(config.logo_url)}" alt="AliverBiopharm">`;
             }
         } catch(e) {}
+    }
+
+    async function loadAnnouncement() {
+      try {
+        const config = await apiCall('get_site_section', { section: 'site_config' });
+        const announcementEl = document.getElementById('hero-announcement');
+        const announcementText = document.getElementById('announcement-text');
+        if (config && config.announcement && announcementEl && announcementText) {
+          announcementText.textContent = config.announcement;
+          announcementEl.classList.add('visible');
+        }
+      } catch(e) {}
     }
 
     window.signOut = async function() { try { await apiCall('signout'); } catch (e) {} localStorage.removeItem('sb-token'); localStorage.removeItem('sb-email'); sessionStorage.clear(); updateMobilePanel([]); location.href = '/'; };
@@ -1825,23 +1848,29 @@ body.dark-mode .hero-badge {
 
     async function buildFooter(d) { if (!d) return; const fg = document.getElementById('footer-grid'), fs = document.getElementById('footer-social'); const cols = (d.columns || []).map(c => `<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">${esc(c.heading)}</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">${(c.items||[]).map(i => `<li><a href="${esc(i.href||'#')}" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color='var(--clr-cyan)'" onmouseout="this.style.color='var(--clr-text-dim)'">${i.icon?`<i class="${esc(i.icon)}" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>`:''}${esc(i.label)}</a></li>`).join('')}</ul></div>`).join(''); fg.innerHTML = cols; fs.innerHTML = (d.social_links||[]).map(s => `<a href="${esc(s.url)}" aria-label="${esc(s.platform)}"><i class="${esc(s.icon)}"></i></a>`).join(''); }
 
-    async function buildHero(d) { const slides=d?.slides||[]; if(!slides.length)return; const carousel=document.querySelector('.hero-carousel'); const badge=carousel.querySelector('.hero-badge'); carousel.innerHTML=slides.map((s,i)=>`<div class="carousel-slide${i===0?' active':''}" style="background-image:url('${esc(s.background_image)}');"><div class="slide-overlay"><h2 class="font-display font-black text-4xl md:text-6xl mb-4">${esc(s.title)}</h2><p class="text-lg md:text-xl max-w-2xl mb-8 text-text-dim">${esc(s.subtitle)}</p><a href="${esc(s.cta_link)}" class="btn-primary"><i class="${esc(s.icon||'fa-solid fa-arrow-right')}"></i> ${esc(s.cta_text)}</a></div></div>`).join('')+`<button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button><button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button><div class="carousel-controls">${slides.map((_,i)=>`<span class="carousel-dot${i===0?' active':''}" data-index="${i}"></span>`).join('')}</div>`; if(badge) carousel.insertBefore(badge, carousel.firstChild); initCarousel(slides.length); }
+    async function buildHero(d) { 
+      const slides=d?.slides||[]; 
+      if(!slides.length) return; 
+      const carousel=document.querySelector('.hero-carousel'); 
+      carousel.innerHTML=slides.map((s,i)=>`<div class="carousel-slide${i===0?' active':''}" style="background-image:url('${esc(s.background_image)}');"><div class="slide-overlay"><h2 class="font-display font-black text-4xl md:text-6xl mb-4" style="text-shadow: 0 2px 12px rgba(255,255,255,0.8);">${esc(s.title)}</h2><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:var(--clr-white);text-shadow: 0 2px 8px rgba(255,255,255,0.6);">${esc(s.subtitle)}</p><a href="${esc(s.cta_link)}" class="btn-primary"><i class="${esc(s.icon||'fa-solid fa-arrow-right')}"></i> ${esc(s.cta_text)}</a></div></div>`).join('')+`<button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button><button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button><div class="carousel-controls">${slides.map((_,i)=>`<span class="carousel-dot${i===0?' active':''}" data-index="${i}"></span>`).join('')}</div>`; 
+      initCarousel(slides.length); 
+    }
 
-    async function buildTeam(d) { const m=d?.members||[]; const g=document.getElementById('team-grid'); if(!m.length){g.innerHTML='<p class="text-center text-text-dim">Team coming soon.</p>';return} g.innerHTML=m.map(p=>`<div class="card team-card text-center"><div class="team-avatar">${p.avatar_url?`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">`:'<i class="fa-solid fa-user-tie"></i>'}</div><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);margin-top:0.5rem;">${esc(p.name)}${p.title?', '+esc(p.title):''}</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin-top:0.5rem;">${esc(p.bio||'')}</p></div>`).join(''); }
+    async function buildTeam(d) { const m=d?.members||[]; const g=document.getElementById('team-grid'); if(!m.length){g.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">Team coming soon.</p>';return} g.innerHTML=m.map(p=>`<div class="card team-card text-center"><div class="team-avatar">${p.avatar_url?`<img src="${esc(p.avatar_url)}" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML='<i class=\'fa-solid fa-user-tie\'></i>'">`:'<i class="fa-solid fa-user-tie"></i>'}</div><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);margin-top:0.5rem;">${esc(p.name)}${p.title?', '+esc(p.title):''}</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin-top:0.5rem;">${esc(p.bio||'')}</p></div>`).join(''); }
 
-    async function buildTestimonials(d) { const q=d?.quotes||[]; const s=document.getElementById('testimonial-slider'); if(!q.length){s.innerHTML='<p class="text-center text-text-dim">No testimonials yet.</p>';return} let c=0; function show(i){c=i;s.innerHTML=`<p class="testimonial-quote">"${esc(q[i].text)}"</p><p class="testimonial-author">— ${esc(q[i].author)}</p><div class="testimonial-nav">${q.map((_,j)=>`<span class="testimonial-dot${j===i?' active':''}" data-index="${j}"></span>`).join('')}</div>`;s.querySelectorAll('.testimonial-dot').forEach(d=>d.onclick=()=>show(+d.dataset.index))} show(0); setInterval(()=>show((c+1)%q.length),5000); }
+    async function buildTestimonials(d) { const q=d?.quotes||[]; const s=document.getElementById('testimonial-slider'); if(!q.length){s.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">No testimonials yet.</p>';return} let c=0; function show(i){c=i;s.innerHTML=`<p class="testimonial-quote">"${esc(q[i].text)}"</p><p class="testimonial-author">— ${esc(q[i].author)}</p><div class="testimonial-nav">${q.map((_,j)=>`<span class="testimonial-dot${j===i?' active':''}" data-index="${j}"></span>`).join('')}</div>`;s.querySelectorAll('.testimonial-dot').forEach(d=>d.onclick=()=>show(+d.dataset.index))} show(0); setInterval(()=>show((c+1)%q.length),5000); }
 
-    async function buildPricing(d) { const p=d?.plans||[]; const g=document.getElementById('pricing-grid'); if(!p.length){g.innerHTML='<p class="text-center text-text-dim">Plans coming soon.</p>';return} g.innerHTML=p.map(pl=>`<div class="card pricing-card${pl.featured?' featured':''}"><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">${esc(pl.name)}</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">${esc(pl.description||'')}</p><div class="price my-3">${esc(pl.price)}<span style="font-size:1rem;color:var(--clr-text-dim);">${esc(pl.period||'')}</span></div><ul class="pricing-features">${(pl.features||[]).map(f=>`<li><i class="fa-solid fa-check"></i> ${esc(f)}</li>`).join('')}</ul><button class="btn-primary w-full justify-center mt-4">${esc(pl.cta_text||'Subscribe')}</button></div>`).join(''); }
+    async function buildPricing(d) { const p=d?.plans||[]; const g=document.getElementById('pricing-grid'); if(!p.length){g.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">Plans coming soon.</p>';return} g.innerHTML=p.map(pl=>`<div class="card pricing-card${pl.featured?' featured':''}"><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">${esc(pl.name)}</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">${esc(pl.description||'')}</p><div class="price my-3">${esc(pl.price)}<span style="font-size:1rem;color:var(--clr-text-dim);">${esc(pl.period||'')}</span></div><ul class="pricing-features">${(pl.features||[]).map(f=>`<li><i class="fa-solid fa-check"></i> ${esc(f)}</li>`).join('')}</ul><button class="btn-primary w-full justify-center mt-4">${esc(pl.cta_text||'Subscribe')}</button></div>`).join(''); }
 
-    async function buildBlog(d) { const posts=d?.posts||[]; const g=document.getElementById('blog-grid'); if(!posts.length){g.innerHTML='<p class="text-center text-text-dim">Articles coming soon.</p>';return} g.innerHTML=posts.map(p=>`<div class="card">${p.image_url?`<img src="${esc(p.image_url)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">`:''}<div class="flex gap-4 text-xs text-text-muted mb-2"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date||'')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author||'')}</span></div><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">${esc(p.title)}</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">${esc(p.excerpt||'')}</p><a href="#" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;">Read Article <i class="fa-solid fa-arrow-right"></i></a></div>`).join(''); }
+    async function buildBlog(d) { const posts=d?.posts||[]; const g=document.getElementById('blog-grid'); if(!posts.length){g.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">Articles coming soon.</p>';return} g.innerHTML=posts.map(p=>`<div class="card">${p.image_url?`<img src="${esc(p.image_url)}" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display='none'">`:''}<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar"></i> ${esc(p.date||'')}</span><span><i class="fa-regular fa-user"></i> ${esc(p.author||'')}</span></div><h3 style="font-family:'Playfair Display',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">${esc(p.title)}</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">${esc(p.excerpt||'')}</p><a href="#" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;">Read Article <i class="fa-solid fa-arrow-right"></i></a></div>`).join(''); }
 
-    async function buildFAQ(d) { const items=d?.items||[]; const list=document.getElementById('faq-list'); if(!items.length){list.innerHTML='<p class="text-center text-text-dim">FAQ coming soon.</p>';return} list.innerHTML=items.map(i=>`<div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('active')"><span>${esc(i.question)}</span><span style="color:var(--clr-cyan);font-size:1.3rem;line-height:1;">+</span></button><div class="faq-answer"><p>${esc(i.answer)}</p></div></div>`).join(''); }
+    async function buildFAQ(d) { const items=d?.items||[]; const list=document.getElementById('faq-list'); if(!items.length){list.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">FAQ coming soon.</p>';return} list.innerHTML=items.map(i=>`<div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle('active')"><span>${esc(i.question)}</span><span style="color:var(--clr-cyan);font-size:1.3rem;line-height:1;">+</span></button><div class="faq-answer"><p>${esc(i.answer)}</p></div></div>`).join(''); }
 
-    async function buildStatistics(d) { const stats=d?.stats||[]; const grid=document.getElementById('stats-grid'); if(!stats.length){grid.innerHTML='<p class="text-center text-text-dim">Stats coming soon.</p>';return} grid.innerHTML=stats.map(s=>`<div><div class="stat-number" data-target="${s.value}" data-suffix="${esc(s.suffix||'')}">0</div><div style="color:var(--clr-text-dim);margin-top:0.25rem;font-size:0.875rem;">${esc(s.label)}</div></div>`).join(''); const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){grid.querySelectorAll('.stat-number').forEach(el=>{const t=+el.dataset.target,sf=el.dataset.suffix;let c=0;const inc=Math.ceil(t/50);const ti=setInterval(()=>{c+=inc;if(c>=t){c=t;clearInterval(ti)}el.textContent=c+sf},40)});obs.disconnect()}},{threshold:0.5});obs.observe(grid) }
+    async function buildStatistics(d) { const stats=d?.stats||[]; const grid=document.getElementById('stats-grid'); if(!stats.length){grid.innerHTML='<p style="text-align:center;color:var(--clr-text-dim);">Stats coming soon.</p>';return} grid.innerHTML=stats.map(s=>`<div><div class="stat-number" data-target="${s.value}" data-suffix="${esc(s.suffix||'')}">0</div><div style="color:var(--clr-text-dim);margin-top:0.25rem;font-size:0.875rem;">${esc(s.label)}</div></div>`).join(''); const obs=new IntersectionObserver(entries=>{if(entries[0].isIntersecting){grid.querySelectorAll('.stat-number').forEach(el=>{const t=+el.dataset.target,sf=el.dataset.suffix;let c=0;const inc=Math.ceil(t/50);const ti=setInterval(()=>{c+=inc;if(c>=t){c=t;clearInterval(ti)}el.textContent=c+sf},40)});obs.disconnect()}},{threshold:0.5});obs.observe(grid) }
 
     async function buildResources(filters = {}) {
         document.getElementById('resources-container').innerHTML = '<div style="text-align:center;padding:3rem;"><i class="fa-solid fa-dna animate-spin-slow text-3xl" style="color:var(--clr-cyan);"></i><p style="color:var(--clr-text-dim);margin-top:1rem;">Loading...</p></div>';
-        try { const data = await apiCall('get_resources', { filters }); if (!data.length) { document.getElementById('resources-container').innerHTML = '<p class="text-center" style="color:var(--clr-text-dim);">No resources found.</p>'; return; } const groups = {}; data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); }); document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `<div style="margin-bottom:3rem;"><h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:1rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2><div class="resources-grid">${items.map(item => `<div class="resource-card"><div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a><p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p><div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span><span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span><span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);"><a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div style="display:flex;gap:0.4rem;"><a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>`).join('')}</div></div>`).join(''); } catch (err) { document.getElementById('resources-container').innerHTML = '<p class="text-center" style="color:var(--clr-magenta);">Failed to load resources.</p>'; }
+        try { const data = await apiCall('get_resources', { filters }); if (!data.length) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; return; } const groups = {}; data.forEach(item => { const s = (item.section_type || 'Resources').trim(); if (!groups[s]) groups[s] = []; groups[s].push(item); }); document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => `<div style="margin-bottom:3rem;"><h2 style="font-family:'Playfair Display',serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:1rem;border-left:4px solid var(--clr-magenta);">${esc(name)}</h2><div class="resources-grid">${items.map(item => `<div class="resource-card"><div style="font-size:2.2rem;color:var(--clr-magenta);"><i class="fa-solid fa-file-pdf"></i></div><a href="notes.html?id=${esc(String(item.id))}" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">${esc(item.title || 'Untitled')}</a><p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">${esc(item.description || '')}</p><div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);"><span><i class="fa-regular fa-user"></i> ${esc(item.author || 'Unknown')}</span><span><i class="fa-regular fa-calendar"></i> ${item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A'}</span><span><i class="fa-regular fa-file"></i> ${esc(item.file_size || 'N/A')}</span></div><div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);"><a href="${esc(safeUrl(item.file_url))}" class="btn-download" download><i class="fa-solid fa-download"></i> Download</a><div style="display:flex;gap:0.4rem;"><a href="#" class="share-btn"><i class="fa-brands fa-facebook-f"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-x-twitter"></i></a><a href="#" class="share-btn"><i class="fa-brands fa-whatsapp"></i></a></div></div></div>`).join('')}</div></div>`).join(''); } catch (err) { document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; }
     }
 
     async function loadFilters() { try { const { levels, categories, tags } = await apiCall('get_filter_options'); ['filter-level','filter-category','filter-tag'].forEach((id,i)=>{ const opts=[levels,categories,tags][i]; const sel=document.getElementById(id); if(sel){sel.innerHTML='<option value="">All</option>';opts.forEach(o=>{const el=document.createElement('option');el.value=o;el.textContent=o;sel.appendChild(el)})}}) } catch (err) {} }
