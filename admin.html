@@ -1,0 +1,707 @@
+<!-- admin-dashboard.html -->
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Admin Dashboard - AliverBiopharm CMS</title>
+    <link href="https://cdn.jsdelivr.net/npm/tailwindcss@2.2.19/dist/tailwind.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body { font-family: 'Inter', sans-serif; background: #0a0f1c; color: #e2e8f0; }
+        .sidebar { background: linear-gradient(135deg, #0f172a 0%, #1e1b4b 100%); }
+        .stat-card { background: rgba(30, 41, 59, 0.5); backdrop-filter: blur(10px); border: 1px solid rgba(10, 181, 181, 0.2); }
+        .btn-primary { background: linear-gradient(135deg, #0ab5b5, #0e7070); }
+        .btn-primary:hover { transform: translateY(-2px); box-shadow: 0 10px 25px -5px rgba(10, 181, 181, 0.4); }
+        .resource-item:hover { background: rgba(10, 181, 181, 0.1); transform: translateX(5px); }
+        .tab-active { border-bottom: 2px solid #0ab5b5; color: #0ab5b5; }
+        .modal { background: rgba(0, 0, 0, 0.8); backdrop-filter: blur(8px); }
+        .toast { animation: slideIn 0.3s ease; }
+        @keyframes slideIn {
+            from { transform: translateX(100%); opacity: 0; }
+            to { transform: translateX(0); opacity: 1; }
+        }
+        .upload-zone { border: 2px dashed #0ab5b5; transition: all 0.3s; }
+        .upload-zone.drag-over { background: rgba(10, 181, 181, 0.1); border-color: #e2c06a; }
+    </style>
+</head>
+<body class="bg-gray-900">
+    <div class="flex h-screen">
+        <!-- Sidebar -->
+        <aside class="sidebar w-64 flex flex-col fixed h-full z-10">
+            <div class="p-6 border-b border-cyan-500/20">
+                <h1 class="text-2xl font-bold bg-gradient-to-r from-cyan-400 to-amber-400 bg-clip-text text-transparent">
+                    Aliver<span class="text-amber-400">Biopharm</span>
+                </h1>
+                <p class="text-xs text-gray-400 mt-1">Admin Control Panel</p>
+            </div>
+            <nav class="flex-1 p-4 space-y-2">
+                <a href="#" data-tab="dashboard" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-chart-line"></i> Dashboard
+                </a>
+                <a href="#" data-tab="resources" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-book"></i> Resources
+                </a>
+                <a href="#" data-tab="site-sections" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-laptop-code"></i> Site Sections
+                </a>
+                <a href="#" data-tab="users" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-users"></i> Users
+                </a>
+                <a href="#" data-tab="analytics" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-chart-bar"></i> Analytics
+                </a>
+                <a href="#" data-tab="settings" class="tab-link flex items-center gap-3 px-4 py-3 rounded-lg text-gray-300 hover:bg-cyan-500/10 hover:text-cyan-400 transition-all">
+                    <i class="fas fa-cog"></i> Settings
+                </a>
+            </nav>
+            <div class="p-4 border-t border-cyan-500/20">
+                <div class="flex items-center gap-3 mb-3">
+                    <div class="w-8 h-8 rounded-full bg-cyan-500 flex items-center justify-center">
+                        <i class="fas fa-user text-white text-sm"></i>
+                    </div>
+                    <div class="flex-1">
+                        <p class="text-sm font-semibold" id="admin-email">Admin User</p>
+                        <p class="text-xs text-gray-400" id="admin-role">Loading...</p>
+                    </div>
+                </div>
+                <button onclick="logout()" class="w-full px-4 py-2 bg-red-500/20 text-red-400 rounded-lg hover:bg-red-500/30 transition-all">
+                    <i class="fas fa-sign-out-alt"></i> Logout
+                </button>
+            </div>
+        </aside>
+
+        <!-- Main Content -->
+        <main class="flex-1 ml-64 overflow-y-auto">
+            <!-- Dashboard Tab -->
+            <div id="dashboard-tab" class="tab-content p-8">
+                <h2 class="text-3xl font-bold mb-6">Dashboard Overview</h2>
+                <div class="grid grid-cols-1 md:grid-cols-4 gap-6 mb-8" id="stats-grid">
+                    <div class="stat-card rounded-xl p-6"><div class="animate-pulse">Loading stats...</div></div>
+                </div>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6">
+                    <div class="stat-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Recent Activity</h3>
+                        <div id="recent-activity" class="space-y-3"></div>
+                    </div>
+                    <div class="stat-card rounded-xl p-6">
+                        <h3 class="text-lg font-semibold mb-4">Quick Actions</h3>
+                        <div class="space-y-3">
+                            <button onclick="showUploadModal()" class="w-full btn-primary px-4 py-3 rounded-lg text-white font-semibold">
+                                <i class="fas fa-upload"></i> Upload New Resource
+                            </button>
+                            <button onclick="showSiteSectionModal()" class="w-full bg-amber-500/20 text-amber-400 px-4 py-3 rounded-lg hover:bg-amber-500/30 transition-all">
+                                <i class="fas fa-edit"></i> Edit Homepage Content
+                            </button>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Resources Tab -->
+            <div id="resources-tab" class="tab-content hidden p-8">
+                <div class="flex justify-between items-center mb-6">
+                    <h2 class="text-3xl font-bold">Resource Management</h2>
+                    <button onclick="showUploadModal()" class="btn-primary px-6 py-2 rounded-lg">
+                        <i class="fas fa-plus"></i> Add Resource
+                    </button>
+                </div>
+                <div class="grid grid-cols-1 gap-4" id="resources-list"></div>
+            </div>
+
+            <!-- Site Sections Tab -->
+            <div id="site-sections-tab" class="tab-content hidden p-8">
+                <h2 class="text-3xl font-bold mb-6">Site Sections Management</h2>
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-6" id="sections-list"></div>
+            </div>
+
+            <!-- Users Tab -->
+            <div id="users-tab" class="tab-content hidden p-8">
+                <h2 class="text-3xl font-bold mb-6">User Management</h2>
+                <div class="bg-gray-800 rounded-xl overflow-hidden">
+                    <table class="w-full">
+                        <thead class="bg-gray-700">
+                            <tr>
+                                <th class="px-6 py-3 text-left">Email</th>
+                                <th class="px-6 py-3 text-left">Role</th>
+                                <th class="px-6 py-3 text-left">Status</th>
+                                <th class="px-6 py-3 text-left">Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody id="users-list"></tbody>
+                    </table>
+                </div>
+            </div>
+
+            <!-- Analytics Tab -->
+            <div id="analytics-tab" class="tab-content hidden p-8">
+                <h2 class="text-3xl font-bold mb-6">Analytics</h2>
+                <div class="grid grid-cols-1 md:grid-cols-2 gap-6" id="analytics-content"></div>
+            </div>
+
+            <!-- Settings Tab -->
+            <div id="settings-tab" class="tab-content hidden p-8">
+                <h2 class="text-3xl font-bold mb-6">Admin Settings</h2>
+                <div class="bg-gray-800 rounded-xl p-6 max-w-2xl">
+                    <h3 class="text-xl font-semibold mb-4">Your Permissions</h3>
+                    <div id="permissions-list" class="space-y-2"></div>
+                </div>
+            </div>
+        </main>
+    </div>
+
+    <!-- Upload Modal -->
+    <div id="upload-modal" class="modal fixed inset-0 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-2xl w-full mx-4">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Upload Resource</h3>
+                <button onclick="closeModal('upload-modal')" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <form id="upload-form" enctype="multipart/form-data">
+                <div class="space-y-4">
+                    <input type="text" name="title" placeholder="Resource Title" class="w-full px-4 py-2 bg-gray-700 rounded-lg" required>
+                    <textarea name="description" placeholder="Description" rows="3" class="w-full px-4 py-2 bg-gray-700 rounded-lg"></textarea>
+                    <div class="grid grid-cols-2 gap-4">
+                        <select name="category" class="px-4 py-2 bg-gray-700 rounded-lg">
+                            <option value="Biology">Biology</option>
+                            <option value="Pharmacy">Pharmacy</option>
+                            <option value="Chemistry">Chemistry</option>
+                            <option value="Research">Research</option>
+                        </select>
+                        <select name="level" class="px-4 py-2 bg-gray-700 rounded-lg">
+                            <option value="Beginner">Beginner</option>
+                            <option value="Intermediate">Intermediate</option>
+                            <option value="Advanced">Advanced</option>
+                        </select>
+                    </div>
+                    <input type="text" name="tags" placeholder="Tags (comma separated)" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                    <select name="section_type" class="px-4 py-2 bg-gray-700 rounded-lg">
+                        <option value="Study Notes">Study Notes</option>
+                        <option value="Research Papers">Research Papers</option>
+                        <option value="Video Lectures">Video Lectures</option>
+                        <option value="Practice Tests">Practice Tests</option>
+                    </select>
+                    <div id="dropzone" class="upload-zone border-2 border-dashed border-cyan-500 rounded-lg p-8 text-center cursor-pointer">
+                        <i class="fas fa-cloud-upload-alt text-4xl text-cyan-500 mb-2"></i>
+                        <p class="text-gray-400">Drag & drop file here or click to select</p>
+                        <input type="file" id="file-input" name="file" class="hidden" required>
+                    </div>
+                    <button type="submit" class="w-full btn-primary py-3 rounded-lg font-semibold">Upload Resource</button>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    <!-- Site Section Edit Modal -->
+    <div id="site-section-modal" class="modal fixed inset-0 hidden items-center justify-center z-50">
+        <div class="bg-gray-800 rounded-xl p-8 max-w-4xl w-full mx-4 max-h-[90vh] overflow-y-auto">
+            <div class="flex justify-between items-center mb-6">
+                <h3 class="text-2xl font-bold">Edit Site Section</h3>
+                <button onclick="closeModal('site-section-modal')" class="text-gray-400 hover:text-white">&times;</button>
+            </div>
+            <form id="site-section-form">
+                <div id="section-editor"></div>
+                <button type="submit" class="mt-6 btn-primary px-6 py-2 rounded-lg">Save Changes</button>
+            </form>
+        </div>
+    </div>
+
+    <div id="toast" class="fixed bottom-4 right-4 hidden toast"></div>
+
+    <script>
+        let currentAdmin = null;
+        let authToken = localStorage.getItem('admin_token');
+
+        // Check authentication
+        if (!authToken) {
+            window.location.href = '/admin-login.html';
+        }
+
+        // API helper
+        async function apiCall(endpoint, options = {}) {
+            const response = await fetch(endpoint, {
+                ...options,
+                headers: {
+                    'Content-Type': 'application/json',
+                    'Authorization': `Bearer ${authToken}`,
+                    ...options.headers
+                }
+            });
+            if (response.status === 401) {
+                localStorage.removeItem('admin_token');
+                window.location.href = '/admin-login.html';
+                throw new Error('Unauthorized');
+            }
+            const data = await response.json();
+            if (!response.ok) throw new Error(data.error || 'API call failed');
+            return data;
+        }
+
+        // Toast notification
+        function showToast(message, type = 'success') {
+            const toast = document.getElementById('toast');
+            toast.className = `fixed bottom-4 right-4 toast px-6 py-3 rounded-lg shadow-lg ${
+                type === 'success' ? 'bg-green-500' : 'bg-red-500'
+            } text-white`;
+            toast.textContent = message;
+            toast.classList.remove('hidden');
+            setTimeout(() => toast.classList.add('hidden'), 3000);
+        }
+
+        // Load dashboard stats
+        async function loadDashboard() {
+            try {
+                const data = await apiCall('/api/admin/analytics/dashboard');
+                const statsGrid = document.getElementById('stats-grid');
+                statsGrid.innerHTML = `
+                    <div class="stat-card rounded-xl p-6">
+                        <i class="fas fa-book text-cyan-500 text-3xl mb-2"></i>
+                        <p class="text-2xl font-bold">${data.analytics.total_resources}</p>
+                        <p class="text-gray-400">Total Resources</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-6">
+                        <i class="fas fa-download text-cyan-500 text-3xl mb-2"></i>
+                        <p class="text-2xl font-bold">${data.analytics.total_downloads}</p>
+                        <p class="text-gray-400">Total Downloads</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-6">
+                        <i class="fas fa-users text-cyan-500 text-3xl mb-2"></i>
+                        <p class="text-2xl font-bold">${data.analytics.total_admins}</p>
+                        <p class="text-gray-400">Admin Users</p>
+                    </div>
+                    <div class="stat-card rounded-xl p-6">
+                        <i class="fas fa-chart-line text-cyan-500 text-3xl mb-2"></i>
+                        <p class="text-2xl font-bold">${Object.keys(data.analytics.resources_by_category || {}).length}</p>
+                        <p class="text-gray-400">Categories</p>
+                    </div>
+                `;
+                
+                const recentActivity = document.getElementById('recent-activity');
+                recentActivity.innerHTML = data.analytics.recent_activity.map(activity => `
+                    <div class="bg-gray-800 rounded-lg p-3">
+                        <p class="text-sm"><strong>${activity.admin}</strong> - ${activity.last_action ? new Date(activity.last_action).toLocaleString() : 'N/A'}</p>
+                        ${activity.recent_actions ? `<p class="text-xs text-gray-400 mt-1">Last action: ${activity.recent_actions[activity.recent_actions.length - 1]?.action || 'None'}</p>` : ''}
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to load dashboard:', err);
+            }
+        }
+
+        // Load resources
+        async function loadResources() {
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_resources', filters: {} })
+                });
+                const data = await response.json();
+                const resourcesList = document.getElementById('resources-list');
+                if (data.data && data.data.length) {
+                    resourcesList.innerHTML = data.data.map(resource => `
+                        <div class="resource-item bg-gray-800 rounded-lg p-4 flex justify-between items-center transition-all">
+                            <div>
+                                <h4 class="font-semibold">${escapeHtml(resource.title)}</h4>
+                                <p class="text-sm text-gray-400">${escapeHtml(resource.description || '')}</p>
+                                <div class="flex gap-2 mt-2">
+                                    <span class="text-xs px-2 py-1 bg-cyan-500/20 rounded">${escapeHtml(resource.category)}</span>
+                                    <span class="text-xs px-2 py-1 bg-amber-500/20 rounded">${escapeHtml(resource.level)}</span>
+                                </div>
+                            </div>
+                            <div class="flex gap-2">
+                                <button onclick="deleteResource('${resource.id}')" class="text-red-400 hover:text-red-300">
+                                    <i class="fas fa-trash"></i>
+                                </button>
+                            </div>
+                        </div>
+                    `).join('');
+                } else {
+                    resourcesList.innerHTML = '<p class="text-gray-400 text-center py-8">No resources found. Upload your first resource!</p>';
+                }
+            } catch (err) {
+                console.error('Failed to load resources:', err);
+            }
+        }
+
+        // Load site sections
+        async function loadSiteSections() {
+            try {
+                const data = await apiCall('/api/admin/site-sections');
+                const sectionsList = document.getElementById('sections-list');
+                sectionsList.innerHTML = data.sections.map(section => `
+                    <div class="bg-gray-800 rounded-lg p-4">
+                        <h3 class="font-semibold text-lg mb-2 capitalize">${escapeHtml(section.section_type)}</h3>
+                        <p class="text-gray-400 text-sm mb-3">Last updated: ${new Date(section.updated_at).toLocaleString()}</p>
+                        <button onclick="editSiteSection('${section.section_type}', ${JSON.stringify(escapeHtml(JSON.stringify(section.content))).replace(/"/g, '&quot;')})" 
+                                class="btn-primary px-4 py-2 rounded-lg text-sm">
+                            <i class="fas fa-edit"></i> Edit Section
+                        </button>
+                    </div>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to load site sections:', err);
+            }
+        }
+
+        // Load users
+        async function loadUsers() {
+            try {
+                const data = await apiCall('/api/admin/users');
+                const usersList = document.getElementById('users-list');
+                usersList.innerHTML = data.users.map(user => `
+                    <tr class="border-b border-gray-700">
+                        <td class="px-6 py-4">${escapeHtml(user.email)}</td>
+                        <td class="px-6 py-4">
+                            <span class="px-2 py-1 rounded text-xs ${user.admin_role === 'super_admin' ? 'bg-purple-500/20 text-purple-400' : user.admin_role !== 'none' ? 'bg-cyan-500/20 text-cyan-400' : 'bg-gray-500/20 text-gray-400'}">
+                                ${user.admin_role}
+                            </span>
+                        </td>
+                        <td class="px-6 py-4">
+                            ${user.is_locked ? '<span class="text-red-400">Locked</span>' : '<span class="text-green-400">Active</span>'}
+                        </td>
+                        <td class="px-6 py-4">
+                            ${currentAdmin?.admin_role === 'super_admin' && user.admin_role !== 'super_admin' ? `
+                                <button onclick="toggleUserLock('${user.id}', ${!user.is_locked})" class="text-amber-400 hover:text-amber-300 mr-2">
+                                    <i class="fas ${user.is_locked ? 'fa-unlock' : 'fa-lock'}"></i>
+                                </button>
+                            ` : ''}
+                        </td>
+                    </tr>
+                `).join('');
+            } catch (err) {
+                console.error('Failed to load users:', err);
+            }
+        }
+
+        // Load analytics
+        async function loadAnalytics() {
+            try {
+                const data = await apiCall('/api/admin/analytics/dashboard');
+                const analyticsContent = document.getElementById('analytics-content');
+                analyticsContent.innerHTML = `
+                    <div class="bg-gray-800 rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Resources by Category</h3>
+                        <div class="space-y-2">
+                            ${Object.entries(data.analytics.resources_by_category || {}).map(([cat, count]) => `
+                                <div class="flex justify-between items-center">
+                                    <span>${escapeHtml(cat)}</span>
+                                    <span class="font-semibold">${count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                    <div class="bg-gray-800 rounded-xl p-6">
+                        <h3 class="text-xl font-semibold mb-4">Admins by Role</h3>
+                        <div class="space-y-2">
+                            ${Object.entries(data.analytics.admins_by_role || {}).map(([role, count]) => `
+                                <div class="flex justify-between items-center">
+                                    <span>${escapeHtml(role)}</span>
+                                    <span class="font-semibold">${count}</span>
+                                </div>
+                            `).join('')}
+                        </div>
+                    </div>
+                `;
+            } catch (err) {
+                console.error('Failed to load analytics:', err);
+            }
+        }
+
+        // Load settings
+        async function loadSettings() {
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({ action: 'get_site_section', params: { section: 'site_config' } })
+                });
+                const data = await response.json();
+                const permissionsList = document.getElementById('permissions-list');
+                if (currentAdmin?.permissions) {
+                    permissionsList.innerHTML = Object.entries(currentAdmin.permissions).map(([perm, value]) => `
+                        <div class="flex justify-between items-center">
+                            <span>${perm.replace(/_/g, ' ').replace(/\b\w/g, l => l.toUpperCase())}</span>
+                            <span class="${value ? 'text-green-400' : 'text-red-400'}">${value ? '✓ Enabled' : '✗ Disabled'}</span>
+                        </div>
+                    `).join('');
+                }
+            } catch (err) {
+                console.error('Failed to load settings:', err);
+            }
+        }
+
+        // Upload resource
+        document.getElementById('upload-form')?.addEventListener('submit', async (e) => {
+            e.preventDefault();
+            const formData = new FormData(e.target);
+            
+            try {
+                const response = await fetch('/api/admin/resources/upload', {
+                    method: 'POST',
+                    headers: { 'Authorization': `Bearer ${authToken}` },
+                    body: formData
+                });
+                const data = await response.json();
+                if (data.success) {
+                    showToast('Resource uploaded successfully!');
+                    closeModal('upload-modal');
+                    loadResources();
+                    loadDashboard();
+                } else {
+                    throw new Error(data.error);
+                }
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        });
+
+        // Delete resource
+        async function deleteResource(id) {
+            if (!confirm('Are you sure you want to delete this resource?')) return;
+            try {
+                await apiCall(`/api/admin/resources/${id}`, { method: 'DELETE' });
+                showToast('Resource deleted successfully');
+                loadResources();
+                loadDashboard();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Edit site section
+        async function editSiteSection(sectionType, content) {
+            const modal = document.getElementById('site-section-modal');
+            const editorDiv = document.getElementById('section-editor');
+            const form = document.getElementById('site-section-form');
+            
+            // Parse content based on section type
+            let editorHtml = '';
+            if (sectionType === 'hero') {
+                editorHtml = `
+                    <div class="space-y-4">
+                        <input type="text" name="title" placeholder="Hero Title" value="${escapeHtml(content?.slides?.[0]?.title || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <input type="text" name="subtitle" placeholder="Hero Subtitle" value="${escapeHtml(content?.slides?.[0]?.subtitle || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <input type="text" name="cta_text" placeholder="CTA Button Text" value="${escapeHtml(content?.slides?.[0]?.cta_text || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <input type="text" name="cta_link" placeholder="CTA Link" value="${escapeHtml(content?.slides?.[0]?.cta_link || '')}" class="w-full px-4 py-2 bg-gray-700 rounded-lg">
+                        <div class="upload-zone border-2 border-dashed border-cyan-500 rounded-lg p-4 text-center cursor-pointer" onclick="document.getElementById('hero-image').click()">
+                            <i class="fas fa-image"></i> Click to upload hero image
+                            <input type="file" id="hero-image" class="hidden" accept="image/*">
+                        </div>
+                    </div>
+                `;
+            } else if (sectionType === 'footer') {
+                editorHtml = `
+                    <div class="space-y-4">
+                        <textarea name="content" placeholder="Footer Content" rows="10" class="w-full px-4 py-2 bg-gray-700 rounded-lg">${escapeHtml(JSON.stringify(content, null, 2))}</textarea>
+                    </div>
+                `;
+            } else if (sectionType === 'navbar') {
+                editorHtml = `
+                    <div class="space-y-4">
+                        <div id="nav-links-editor">
+                            ${(content?.links || []).map((link, idx) => `
+                                <div class="flex gap-2 mb-2">
+                                    <input type="text" name="link_label_${idx}" value="${escapeHtml(link.label)}" placeholder="Label" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
+                                    <input type="text" name="link_href_${idx}" value="${escapeHtml(link.href)}" placeholder="URL" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
+                                    <button type="button" onclick="this.parentElement.remove()" class="text-red-400">✕</button>
+                                </div>
+                            `).join('')}
+                        </div>
+                        <button type="button" onclick="addNavLink()" class="btn-primary px-4 py-2 rounded-lg text-sm">+ Add Link</button>
+                    </div>
+                `;
+            }
+            
+            editorDiv.innerHTML = editorHtml;
+            modal.classList.remove('hidden');
+            modal.classList.add('flex');
+            
+            form.onsubmit = async (e) => {
+                e.preventDefault();
+                let updatedContent = {};
+                
+                if (sectionType === 'hero') {
+                    const formData = new FormData(e.target);
+                    updatedContent = {
+                        slides: [{
+                            title: formData.get('title'),
+                            subtitle: formData.get('subtitle'),
+                            cta_text: formData.get('cta_text'),
+                            cta_link: formData.get('cta_link')
+                        }]
+                    };
+                } else if (sectionType === 'footer') {
+                    try {
+                        updatedContent = JSON.parse(document.querySelector('[name="content"]').value);
+                    } catch(e) {
+                        updatedContent = { text: document.querySelector('[name="content"]').value };
+                    }
+                } else if (sectionType === 'navbar') {
+                    const links = [];
+                    const container = document.getElementById('nav-links-editor');
+                    container.querySelectorAll('[name^="link_label_"]').forEach((input, idx) => {
+                        const labelInput = input;
+                        const hrefInput = document.querySelector(`[name="link_href_${idx}"]`);
+                        if (labelInput && hrefInput && labelInput.value && hrefInput.value) {
+                            links.push({ label: labelInput.value, href: hrefInput.value });
+                        }
+                    });
+                    updatedContent = { links };
+                }
+                
+                try {
+                    await apiCall(`/api/admin/site-sections/${sectionType}`, {
+                        method: 'PUT',
+                        body: JSON.stringify(updatedContent)
+                    });
+                    showToast('Site section updated successfully!');
+                    closeModal('site-section-modal');
+                    loadSiteSections();
+                } catch (err) {
+                    showToast(err.message, 'error');
+                }
+            };
+        }
+
+        function addNavLink() {
+            const container = document.getElementById('nav-links-editor');
+            const idx = container.children.length;
+            const div = document.createElement('div');
+            div.className = 'flex gap-2 mb-2';
+            div.innerHTML = `
+                <input type="text" name="link_label_${idx}" placeholder="Label" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
+                <input type="text" name="link_href_${idx}" placeholder="URL" class="flex-1 px-4 py-2 bg-gray-700 rounded-lg">
+                <button type="button" onclick="this.parentElement.remove()" class="text-red-400">✕</button>
+            `;
+            container.appendChild(div);
+        }
+
+        // Toggle user lock
+        async function toggleUserLock(userId, lock) {
+            try {
+                await apiCall(`/api/admin/users/${userId}/lock`, {
+                    method: 'PUT',
+                    body: JSON.stringify({ lock, reason: lock ? 'Locked by admin' : null })
+                });
+                showToast(`User ${lock ? 'locked' : 'unlocked'} successfully`);
+                loadUsers();
+            } catch (err) {
+                showToast(err.message, 'error');
+            }
+        }
+
+        // Logout
+        async function logout() {
+            localStorage.removeItem('admin_token');
+            window.location.href = '/admin-login.html';
+        }
+
+        // Modal helpers
+        function showUploadModal() {
+            document.getElementById('upload-modal').classList.remove('hidden');
+            document.getElementById('upload-modal').classList.add('flex');
+        }
+        
+        function showSiteSectionModal() {
+            editSiteSection('hero', {});
+        }
+        
+        function closeModal(modalId) {
+            const modal = document.getElementById(modalId);
+            modal.classList.remove('flex');
+            modal.classList.add('hidden');
+        }
+
+        // Tab navigation
+        document.querySelectorAll('.tab-link').forEach(link => {
+            link.addEventListener('click', (e) => {
+                e.preventDefault();
+                const tab = link.dataset.tab;
+                document.querySelectorAll('.tab-content').forEach(content => {
+                    content.classList.add('hidden');
+                });
+                document.getElementById(`${tab}-tab`).classList.remove('hidden');
+                document.querySelectorAll('.tab-link').forEach(l => {
+                    l.classList.remove('text-cyan-400', 'bg-cyan-500/10');
+                });
+                link.classList.add('text-cyan-400', 'bg-cyan-500/10');
+                
+                // Load tab-specific data
+                if (tab === 'dashboard') loadDashboard();
+                else if (tab === 'resources') loadResources();
+                else if (tab === 'site-sections') loadSiteSections();
+                else if (tab === 'users') loadUsers();
+                else if (tab === 'analytics') loadAnalytics();
+                else if (tab === 'settings') loadSettings();
+            });
+        });
+
+        // Drag and drop upload
+        const dropzone = document.getElementById('dropzone');
+        const fileInput = document.getElementById('file-input');
+        
+        if (dropzone) {
+            dropzone.addEventListener('click', () => fileInput.click());
+            dropzone.addEventListener('dragover', (e) => {
+                e.preventDefault();
+                dropzone.classList.add('drag-over');
+            });
+            dropzone.addEventListener('dragleave', () => {
+                dropzone.classList.remove('drag-over');
+            });
+            dropzone.addEventListener('drop', (e) => {
+                e.preventDefault();
+                dropzone.classList.remove('drag-over');
+                const files = e.dataTransfer.files;
+                if (files.length) {
+                    fileInput.files = files;
+                    dropzone.innerHTML = `<i class="fas fa-check-circle text-4xl text-green-500 mb-2"></i>
+                                          <p>${files[0].name}</p>`;
+                }
+            });
+            fileInput.addEventListener('change', () => {
+                if (fileInput.files.length) {
+                    dropzone.innerHTML = `<i class="fas fa-check-circle text-4xl text-green-500 mb-2"></i>
+                                          <p>${fileInput.files[0].name}</p>`;
+                }
+            });
+        }
+
+        // Escape HTML
+        function escapeHtml(str) {
+            if (!str) return '';
+            return String(str).replace(/[&<>]/g, function(m) {
+                if (m === '&') return '&amp;';
+                if (m === '<') return '&lt;';
+                if (m === '>') return '&gt;';
+                return m;
+            });
+        }
+
+        // Get admin info from token
+        async function getAdminInfo() {
+            try {
+                const response = await fetch('/api/query', {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json', 'Authorization': `Bearer ${authToken}` },
+                    body: JSON.stringify({ action: 'get_admin_info' })
+                });
+                const data = await response.json();
+                if (data.data) {
+                    currentAdmin = data.data;
+                    document.getElementById('admin-email').textContent = currentAdmin.admin_email;
+                    document.getElementById('admin-role').textContent = currentAdmin.admin_role;
+                }
+            } catch (err) {
+                console.error('Failed to get admin info:', err);
+            }
+        }
+
+        // Initialize
+        getAdminInfo();
+        loadDashboard();
+    </script>
+</body>
+</html>
