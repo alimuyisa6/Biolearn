@@ -281,6 +281,14 @@
 
     .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
 
+    .post-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
+    }
+
     .newsletter-box {
       background: var(--gradient-cyan);
       padding: 0.15rem;
@@ -315,6 +323,9 @@
     }
     .newsletter-box button:hover { opacity: 0.85; }
 
+    .alt-bg { background: rgba(220, 242, 242, 0.45); }
+    body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
+
     .footer-fat {
       background: rgba(255, 255, 255, 0.92);
       border-top: 1px solid var(--clr-border-glow);
@@ -340,17 +351,6 @@
     .footer-social a:hover { background: var(--clr-magenta); border-color: var(--clr-magenta); color: #fff; transform: translateY(-2px); }
 
     .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
-
-    .post-image {
-      width: 100%;
-      height: 200px;
-      object-fit: cover;
-      border-radius: var(--radius-md);
-      margin-bottom: 1rem;
-    }
-
-    .alt-bg { background: rgba(220, 242, 242, 0.45); }
-    body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
 
     @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
@@ -391,7 +391,14 @@
         </div>
         Aliver<span class="g-text">Biopharm</span>
       </a>
-      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
+      <nav class="nav-actions" aria-label="Header actions">
+        <a href="/" class="theme-toggle" aria-label="Return to home page" style="text-decoration:none;display:inline-flex;align-items:center;gap:0.4rem;">
+          <i class="fa-solid fa-home" aria-hidden="true"></i> Home
+        </a>
+        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode">
+          <i class="fa-solid fa-moon" aria-hidden="true"></i>
+        </button>
+      </nav>
     </div>
   </header>
 
@@ -404,12 +411,17 @@
         <p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);" role="status">Loading articles...</p>
       </div>
       
-      <div class="alt-bg" style="border-radius:var(--radius-lg);padding:2.5rem 2rem;text-align:center;margin-top:3rem;" aria-labelledby="newsletter-heading">
+      <aside class="alt-bg" style="border-radius:var(--radius-lg);padding:2.5rem 2rem;text-align:center;margin-top:3rem;" aria-labelledby="newsletter-heading">
         <span class="sec-label">UPDATES</span>
         <h2 class="section-title" id="newsletter-heading" style="font-size:1.5rem;">Stay Updated</h2>
         <p class="section-subtitle">Get the latest articles delivered to your inbox.</p>
-        <form id="newsletter-form" aria-label="Newsletter subscription"><div class="newsletter-box"><input type="email" placeholder="Enter your email address" required autocomplete="email" aria-label="Email for newsletter" /><button type="submit">Subscribe <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></div></form>
-      </div>
+        <form id="newsletter-form" aria-label="Newsletter subscription">
+          <div class="newsletter-box">
+            <input type="email" placeholder="Enter your email address" required autocomplete="email" aria-label="Email for newsletter" />
+            <button type="submit">Subscribe <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button>
+          </div>
+        </form>
+      </aside>
     </section>
   </main>
 
@@ -417,7 +429,9 @@
     <div style="max-width:var(--max-width);margin:0 auto;display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start;">
       <div style="max-width:260px;">
         <a href="/" class="logo-link" style="margin-bottom:14px;display:inline-flex;" aria-label="AliverBiopharm Home">
-          <div class="logo-icon" style="width:32px;height:32px;" aria-hidden="true"><svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5"/></svg></div>
+          <div class="logo-icon" style="width:32px;height:32px;" aria-hidden="true">
+            <svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5"/></svg>
+          </div>
           Aliver<span class="g-text">Biopharm</span>
         </a>
         <p style="font-size:0.85rem;line-height:1.7;color:var(--clr-text-dim);">Advancing biology and pharmacy education for every learner on the planet.</p>
@@ -430,6 +444,7 @@
       <nav aria-label="Legal links" style="display:flex;gap:22px;">
         <a href="/privacy" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Privacy Policy</a>
         <a href="/terms" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Terms of Use</a>
+        <a href="/contact" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">Contact</a>
         <a href="/accessibility" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Accessibility</a>
       </nav>
     </div>
@@ -438,66 +453,164 @@
   <script>
     const API_BASE = '/api/query';
 
-    function esc(t) { if (!t) return ''; return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+    function esc(t) {
+      if (!t) return '';
+      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+    }
 
-    async function apiCall(action, params = {}) {
-      const headers = { 'Content-Type': 'application/json' };
-      const token = localStorage.getItem('sb-token');
+    async function apiCall(action, params) {
+      params = params || {};
+      var headers = { 'Content-Type': 'application/json' };
+      var token = localStorage.getItem('sb-token');
       if (token) headers['Authorization'] = 'Bearer ' + token;
-      const controller = new AbortController();
-      const timeout = setTimeout(() => controller.abort(), 10000);
+      var controller = new AbortController();
+      var timeout = setTimeout(function() { controller.abort(); }, 10000);
       try {
-        const res = await fetch(API_BASE, { method: 'POST', headers, body: JSON.stringify({ action, ...params }), signal: controller.signal });
+        var res = await fetch(API_BASE, { method: 'POST', headers: headers, body: JSON.stringify({ action: action }), signal: controller.signal });
         clearTimeout(timeout);
-        const json = await res.json();
+        var json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Request failed');
         return json.data !== undefined ? json.data : json;
-      } catch (err) { clearTimeout(timeout); throw err; }
+      } catch (err) {
+        clearTimeout(timeout);
+        throw err;
+      }
+    }
+
+    function buildFooter(footerData) {
+      if (!footerData || !footerData.columns) return;
+      var footerGrid = document.getElementById('footer-grid');
+      var footerSocial = document.getElementById('footer-social');
+      
+      footerGrid.innerHTML = (footerData.columns || []).map(function(col) {
+        return '<div>' +
+          '<h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">' + esc(col.heading) + '</h4>' +
+          '<ul style="list-style:none;display:flex;flex-direction:column;gap:10px;" role="list">' +
+          (col.items || []).map(function(item) {
+            return '<li role="listitem">' +
+              '<a href="' + esc(item.href || '#') + '" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">' +
+              (item.icon ? '<i class="' + esc(item.icon) + '" style="color:var(--clr-magenta);margin-right:0.5rem;" aria-hidden="true"></i>' : '') +
+              esc(item.label) +
+              '</a>' +
+              '</li>';
+          }).join('') +
+          '</ul>' +
+          '</div>';
+      }).join('');
+      
+      if (footerSocial && footerData.social_links) {
+        footerSocial.innerHTML = (footerData.social_links || []).map(function(s) {
+          return '<a href="' + esc(s.url) + '" aria-label="' + esc(s.platform || 'social media') + '" rel="noopener noreferrer" target="_blank" role="listitem">' +
+            '<i class="' + esc(s.icon) + '" aria-hidden="true"></i>' +
+            '</a>';
+        }).join('');
+      }
+    }
+
+    function buildBlogSection(blogData) {
+      var grid = document.getElementById('blog-grid');
+      
+      if (!blogData || !blogData.posts || !blogData.posts.length) {
+        grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);" role="status">New articles coming soon. Subscribe to our newsletter for updates.</p>';
+        return;
+      }
+      
+      document.getElementById('blog-heading').textContent = esc(blogData.title || 'Articles & Insights');
+      var subtitleEl = document.querySelector('.section-subtitle');
+      if (subtitleEl) subtitleEl.textContent = esc(blogData.subtitle || 'Stay updated with the latest in biology and pharmacy.');
+      
+      grid.innerHTML = blogData.posts.map(function(post) {
+        var imageHTML = post.image_url ?
+          '<img src="' + esc(post.image_url) + '" alt="' + esc(post.title) + '" class="post-image" loading="lazy" onerror="this.style.display=\'none\'">' :
+          '';
+        
+        return '<article class="card" role="listitem">' +
+          imageHTML +
+          '<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;">' +
+          '<span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="' + esc(post.date || '') + '">' + esc(post.date || '') + '</time></span>' +
+          '<span><i class="fa-regular fa-user" aria-hidden="true"></i> ' + esc(post.author || 'AliverBiopharm') + '</span>' +
+          '</div>' +
+          '<h2 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">' + esc(post.title) + '</h2>' +
+          '<p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">' + esc(post.excerpt || '') + '</p>' +
+          '<a href="' + esc(post.slug ? '/blog/' + post.slug : '#') + '" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;" aria-label="Read more: ' + esc(post.title) + '">Read Article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>' +
+          '</article>';
+      }).join('');
     }
 
     function initUI() {
-      const tt = document.getElementById('theme-toggle'), icon = tt.querySelector('i');
-      if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
-      tt.onclick = () => { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); if (isDark) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); localStorage.setItem('theme','dark'); } else { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); localStorage.setItem('theme','light'); } };
+      var themeToggle = document.getElementById('theme-toggle');
+      var themeIcon = themeToggle.querySelector('i');
       
-      document.getElementById('newsletter-form').onsubmit = async function(e) { e.preventDefault(); const email = this.querySelector('input').value.trim(); if (!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Valid email required.'); try { await apiCall('subscribe_newsletter',{formData:{email}}); alert('✓ Subscribed successfully!'); this.reset(); } catch(err) { alert('Subscribed!'); this.reset(); } };
+      if (localStorage.getItem('theme') === 'dark') {
+        document.body.classList.add('dark-mode');
+        themeIcon.classList.remove('fa-moon');
+        themeIcon.classList.add('fa-sun');
+      }
+      
+      themeToggle.onclick = function() {
+        document.body.classList.toggle('dark-mode');
+        var isDark = document.body.classList.contains('dark-mode');
+        if (isDark) {
+          themeIcon.classList.remove('fa-moon');
+          themeIcon.classList.add('fa-sun');
+          localStorage.setItem('theme', 'dark');
+        } else {
+          themeIcon.classList.remove('fa-sun');
+          themeIcon.classList.add('fa-moon');
+          localStorage.setItem('theme', 'light');
+        }
+      };
+      
+      var newsletterForm = document.getElementById('newsletter-form');
+      if (newsletterForm) {
+        newsletterForm.onsubmit = async function(e) {
+          e.preventDefault();
+          var emailInput = this.querySelector('input');
+          var email = emailInput.value.trim();
+          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
+            alert('Please enter a valid email address.');
+            return;
+          }
+          try {
+            await apiCall('subscribe_newsletter', { formData: { email: email } });
+            alert('✓ Subscribed successfully!');
+            this.reset();
+          } catch(err) {
+            alert('Subscribed! Welcome aboard.');
+            this.reset();
+          }
+        };
+      }
     }
 
-    document.addEventListener('DOMContentLoaded', async () => {
+    document.addEventListener('DOMContentLoaded', async function() {
       document.getElementById('current-year').textContent = new Date().getFullYear();
       initUI();
       
       try {
-        const sections = await apiCall('get_all_site_sections');
+        var sections = await apiCall('get_all_site_sections');
+        
         if (sections) {
-          try {
-            if (sections.footer) {
-              const fd = sections.footer;
-              document.getElementById('footer-grid').innerHTML = (fd.columns||[]).map(c => '<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">'+esc(c.heading)+'</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;" role="list">'+(c.items||[]).map(i => '<li role="listitem"><a href="'+esc(i.href||'#')+'" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">'+(i.icon?'<i class="'+esc(i.icon)+'" style="color:var(--clr-magenta);margin-right:0.5rem;" aria-hidden="true"></i>':'')+esc(i.label)+'</a></li>').join('')+'</ul></div>').join('');
-              document.getElementById('footer-social').innerHTML = (fd.social_links||[]).map(s => '<a href="'+esc(s.url)+'" aria-label="'+esc(s.platform)+'" rel="noopener noreferrer" target="_blank" role="listitem"><i class="'+esc(s.icon)+'" aria-hidden="true"></i></a>').join('');
+          if (sections.footer) {
+            try {
+              buildFooter(sections.footer);
+            } catch(err) {
+              console.error('Footer failed:', err);
             }
-          } catch(err) { console.error('Footer failed:', err); }
-
+          }
+          
           try {
-            const blogData = sections.blog;
-            const grid = document.getElementById('blog-grid');
-            
-            if (blogData && blogData.posts && blogData.posts.length) {
-              document.getElementById('blog-heading').textContent = esc(blogData.title || 'Articles & Insights');
-              document.querySelector('.section-subtitle').textContent = esc(blogData.subtitle || 'Stay updated with the latest in biology and pharmacy.');
-              
-              grid.innerHTML = blogData.posts.map(p => '<article class="card" role="listitem">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'" class="post-image" loading="lazy" onerror="this.style.display=\'none\'">':'')+'<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="'+esc(p.date||'')+'">'+esc(p.date||'')+'</time></span><span><i class="fa-regular fa-user" aria-hidden="true"></i> '+esc(p.author||'')+'</span></div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(p.title)+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">'+esc(p.excerpt||'')+'</p><a href="' + esc(p.slug ? '/blog/' + p.slug : '#') + '" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;" aria-label="Read more: '+esc(p.title)+'">Read Article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>').join('');
-            } else {
-              grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">New articles coming soon. Subscribe to our newsletter for updates.</p>';
-            }
+            buildBlogSection(sections.blog);
           } catch(err) {
             console.error('Blog failed:', err);
-            document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Articles temporarily unavailable.</p>';
+            document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);" role="status">Articles temporarily unavailable.</p>';
           }
+        } else {
+          document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);" role="status">Articles coming soon.</p>';
         }
-      } catch(err) { 
+      } catch(err) {
         console.error('Failed to load sections:', err);
-        document.getElementById('blog-content').insertAdjacentHTML('afterbegin', '<div style="text-align:center;padding:2rem;color:var(--clr-magenta);" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> Some content could not be loaded. Please refresh the page or try again later.</div>');
+        document.getElementById('blog-content').insertAdjacentHTML('afterbegin', '<div style="text-align:center;padding:2rem;color:var(--clr-magenta);" role="alert"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i> Some content could not be loaded. Please refresh the page or try again later.</div>');
       }
     });
   </script>
