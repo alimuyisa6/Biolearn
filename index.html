@@ -1956,6 +1956,217 @@
         await loadFilters();
         await buildResources();
     });
-  </script>
+ 
+class ScreenWakeManager {
+
+    constructor() {
+        this.wakeLock = null;
+        this.isSupported = 'wakeLock' in navigator;
+
+        this.createStatusIndicator();
+        this.initialize();
+    }
+
+    async initialize() {
+
+        if (!this.isSupported) {
+            this.updateStatus(
+                'Wake Lock not supported on this browser',
+                'warning'
+            );
+            return;
+        }
+
+        // Auto-enable after first interaction
+        const enableEvents = [
+            'click',
+            'touchstart',
+            'keydown'
+        ];
+
+        const enableWakeLockOnce = async () => {
+            await this.enableWakeLock();
+
+            enableEvents.forEach(event => {
+                document.removeEventListener(
+                    event,
+                    enableWakeLockOnce
+                );
+            });
+        };
+
+        enableEvents.forEach(event => {
+            document.addEventListener(
+                event,
+                enableWakeLockOnce,
+                { once: true }
+            );
+        });
+
+        // Re-enable when user returns to page
+        document.addEventListener(
+            'visibilitychange',
+            async () => {
+
+                if (
+                    document.visibilityState === 'visible' &&
+                    this.wakeLock === null
+                ) {
+                    await this.enableWakeLock();
+                }
+            }
+        );
+
+        // Optional:
+        // Auto-enable immediately
+        try {
+            await this.enableWakeLock();
+        } catch (error) {
+            console.log(
+                'Waiting for user interaction...'
+            );
+        }
+    }
+
+    async enableWakeLock() {
+
+        try {
+
+            this.wakeLock =
+                await navigator.wakeLock.request('screen');
+
+            console.log(
+                'Screen Wake Lock enabled'
+            );
+
+            this.updateStatus(
+                'Screen Awake Enabled',
+                'success'
+            );
+
+            this.wakeLock.addEventListener(
+                'release',
+                () => {
+
+                    console.log(
+                        'Screen Wake Lock released'
+                    );
+
+                    this.wakeLock = null;
+
+                    this.updateStatus(
+                        'Screen Awake Disabled',
+                        'warning'
+                    );
+                }
+            );
+
+        } catch (error) {
+
+            console.error(
+                'Wake Lock Error:',
+                error
+            );
+
+            this.updateStatus(
+                error.message,
+                'error'
+            );
+        }
+    }
+
+    async disableWakeLock() {
+
+        if (this.wakeLock !== null) {
+
+            await this.wakeLock.release();
+
+            this.wakeLock = null;
+
+            this.updateStatus(
+                'Screen Awake Disabled',
+                'warning'
+            );
+        }
+    }
+
+    createStatusIndicator() {
+
+        const indicator =
+            document.createElement('div');
+
+        indicator.id = 'wake-lock-status';
+
+        indicator.style.position = 'fixed';
+        indicator.style.bottom = '20px';
+        indicator.style.right = '20px';
+        indicator.style.padding = '10px 16px';
+        indicator.style.borderRadius = '12px';
+        indicator.style.fontSize = '14px';
+        indicator.style.fontWeight = '600';
+        indicator.style.zIndex = '99999';
+        indicator.style.backdropFilter = 'blur(10px)';
+        indicator.style.boxShadow =
+            '0 4px 15px rgba(0,0,0,0.15)';
+        indicator.style.transition =
+            'all 0.3s ease';
+        indicator.style.fontFamily =
+            'Arial, sans-serif';
+
+        indicator.innerText =
+            'Initializing Wake Lock...';
+
+        document.body.appendChild(indicator);
+    }
+
+    updateStatus(message, type) {
+
+        const indicator =
+            document.getElementById(
+                'wake-lock-status'
+            );
+
+        if (!indicator) return;
+
+        indicator.innerText = message;
+
+        switch (type) {
+
+            case 'success':
+                indicator.style.background =
+                    'rgba(16,185,129,0.95)';
+                indicator.style.color = '#fff';
+                break;
+
+            case 'warning':
+                indicator.style.background =
+                    'rgba(245,158,11,0.95)';
+                indicator.style.color = '#fff';
+                break;
+
+            case 'error':
+                indicator.style.background =
+                    'rgba(239,68,68,0.95)';
+                indicator.style.color = '#fff';
+                break;
+
+            default:
+                indicator.style.background =
+                    'rgba(59,130,246,0.95)';
+                indicator.style.color = '#fff';
+        }
+    }
+}
+
+// Initialize system
+window.addEventListener(
+    'DOMContentLoaded',
+    () => {
+
+        window.screenWakeManager =
+            new ScreenWakeManager();
+    }
+);
+</script>
 </body>
 </html>
