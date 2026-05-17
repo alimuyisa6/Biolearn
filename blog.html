@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -22,7 +22,7 @@
   <meta name="twitter:title" content="Blog — AliverBiopharm | Biology & Pharmacy Insights" />
   <meta name="twitter:description" content="Expert insights on biology, pharmacy, and clinical research from AliverBiopharm." />
   
-  <meta name="theme-color" content="#0b0b1a" />
+  <meta name="theme-color" content="#0a4f4f" />
   <meta name="referrer" content="strict-origin-when-cross-origin" />
   
   <meta http-equiv="Content-Security-Policy" content="default-src 'self' https: http: 'unsafe-inline' 'unsafe-eval'; script-src 'self' https: http: 'unsafe-inline' 'unsafe-eval' https://pagead2.googlesyndication.com https://www.googletagmanager.com https://www.google-analytics.com; style-src 'self' https: http: 'unsafe-inline'; img-src 'self' https: http: data: blob:; font-src 'self' https: http: data:; connect-src 'self' https: http: wss:; frame-src 'self' https:; media-src 'self' https:; object-src 'none'; base-uri 'self'; form-action 'self';" />
@@ -32,73 +32,104 @@
   <link rel="preconnect" href="https://pagead2.googlesyndication.com" />
   <link rel="preconnect" href="https://www.googletagmanager.com" />
   
-  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" as="style" />
-  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" as="style" />
+  <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" as="style" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" as="style" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" as="style" />
+  <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" as="style" />
   
-  <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
-  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" media="print" onload="this.media='all'" crossorigin="anonymous" />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" media="print" onload="this.media='all'" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" media="print" onload="this.media='all'" />
   
   <noscript>
-    <link href="https://fonts.googleapis.com/css2?family=Inter:opsz,wght@14..32,400;14..32,500;14..32,600;14..32,700&family=Space+Grotesk:wght@400;500;600;700&display=swap" rel="stylesheet" />
-    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+    <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" />
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" />
   </noscript>
+  
+  <script src="https://cdn.tailwindcss.com"></script>
+  <script>
+    tailwind.config = {
+      theme: {
+        extend: {
+          fontFamily: {
+            display: ['Playfair Display', 'serif'],
+            body: ['DM Sans', 'sans-serif'],
+            mono: ['DM Mono', 'monospace'],
+          },
+          colors: {
+            teal: {
+              950: '#0a4f4f', 900: '#0e7070', 800: '#0ab5b5', 700: '#6ee7e7',
+              600: '#8ef0f0', 500: '#b8f5f5', 400: '#d4fafa',
+            },
+            gold: { 500: '#b8873a', 400: '#e2c06a', 300: '#f0d896' },
+          },
+        },
+      },
+    }
+  </script>
   
   <style>
     :root {
-      --clr-deep-space: #0b0b1a;
-      --clr-cyan: #00d9ff;
-      --clr-magenta: #ff00aa;
-      --clr-navy-card: #1a1a2e;
-      --clr-navy-light: #16213e;
-      --clr-white: #e0f0ff;
-      --clr-text-dim: #9aa9c1;
-      --clr-text-muted: #6b7a94;
-      --clr-border-glow: rgba(0, 217, 255, 0.25);
-      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.3);
+      --clr-deep-space: #eef7f7;
+      --clr-cyan: #0ab5b5;
+      --clr-magenta: #b8873a;
+      --clr-navy-card: rgba(255, 255, 255, 0.82);
+      --clr-navy-light: rgba(10, 181, 181, 0.1);
+      --clr-white: #0d2e2e;
+      --clr-text-dim: #2d5c5c;
+      --clr-text-muted: #4a7c7c;
+      --clr-border-glow: rgba(10, 181, 181, 0.22);
+      --shadow-glow: 0 4px 28px rgba(10, 181, 181, 0.07);
+      --shadow-magenta: 0 8px 28px rgba(184, 135, 58, 0.38);
+      --shadow-card: 0 4px 28px rgba(10, 181, 181, 0.07);
       --transition-fast: 180ms ease;
-      --transition-smooth: 350ms cubic-bezier(0.4, 0, 0.2, 1);
-      --max-width: 1200px;
-      --font-body: 'Inter', sans-serif;
-      --font-display: 'Space Grotesk', sans-serif;
+      --transition-smooth: 350ms cubic-bezier(0.4,0,0.2,1);
+      --max-width: 1100px;
+      --font-body: 'DM Sans', sans-serif;
+      --font-display: 'Playfair Display', serif;
       --radius-sm: 0.5rem;
-      --radius-md: 0.75rem;
-      --radius-lg: 1.25rem;
-      --gradient-cyan: linear-gradient(135deg, #00d9ff, #00b4d8);
-      --gradient-magenta: linear-gradient(135deg, #ff00aa, #d6008e);
+      --radius-md: 0.85rem;
+      --radius-lg: 1.4rem;
+      --gradient-cyan: linear-gradient(135deg, #0ab5b5, #0e7070);
+      --gradient-magenta: linear-gradient(135deg, #b8873a, #e2c06a);
     }
 
-    body.light-mode {
-      --clr-deep-space: #f0f4f8;
-      --clr-cyan: #0077b6;
-      --clr-magenta: #d6008e;
-      --clr-navy-card: #ffffff;
-      --clr-navy-light: #e8edf2;
-      --clr-white: #0b1a2f;
-      --clr-text-dim: #2c3e50;
-      --clr-text-muted: #4a5568;
-      --clr-border-glow: rgba(0, 119, 182, 0.25);
-      --shadow-card: 0 8px 32px rgba(0, 0, 0, 0.08);
-    }
-
-    *,
-    *::before,
-    *::after { box-sizing: border-box; margin: 0; padding: 0; }
-
-    html { scroll-behavior: smooth; font-size: 16px; -webkit-text-size-adjust: 100%; }
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
 
     body {
-      font-family: var(--font-body);
       background: var(--clr-deep-space);
       color: var(--clr-white);
+      font-family: var(--font-body);
+      overflow-x: hidden;
+      max-width: 100vw;
+      transition: background 0.35s, color 0.35s;
       line-height: 1.6;
+      -webkit-font-smoothing: antialiased;
+      -moz-osx-font-smoothing: grayscale;
       min-height: 100vh;
       display: flex;
       flex-direction: column;
-      transition: background 0.3s, color 0.3s;
-      -webkit-font-smoothing: antialiased;
-      -moz-osx-font-smoothing: grayscale;
     }
 
+    body.dark-mode {
+      --clr-deep-space: #012c2c;
+      --clr-cyan: #0ab5b5;
+      --clr-magenta: #c9a84c;
+      --clr-navy-card: rgba(2, 82, 82, 0.45);
+      --clr-navy-light: rgba(2, 82, 82, 0.25);
+      --clr-white: #f9f5ee;
+      --clr-text-dim: rgba(249, 245, 238, 0.7);
+      --clr-text-muted: rgba(249, 245, 238, 0.45);
+      --clr-border-glow: rgba(10, 181, 181, 0.25);
+      --shadow-card: 0 15px 40px rgba(0, 0, 0, 0.4);
+      background-image: radial-gradient(ellipse 80% 50% at 20% -10%, rgba(10,181,181,0.08) 0%, transparent 60%), radial-gradient(ellipse 60% 40% at 80% 110%, rgba(201,168,76,0.06) 0%, transparent 60%);
+    }
+
+    body.light-mode { background-image: none; }
     img { max-width: 100%; height: auto; }
 
     .skip-link {
@@ -107,12 +138,13 @@
       left: 1rem;
       z-index: 1000;
       background: var(--clr-cyan);
-      color: #0b0b1a;
+      color: #012c2c;
       padding: 0.65rem 1.3rem;
       border-radius: 30px;
       font-weight: 700;
       text-decoration: none;
       transition: top var(--transition-fast);
+      letter-spacing: 0.01em;
       font-size: 0.9rem;
     }
     .skip-link:focus { top: 0.75rem; }
@@ -121,14 +153,14 @@
       position: sticky;
       top: 0;
       z-index: 100;
-      background: rgba(11, 11, 26, 0.9);
-      backdrop-filter: blur(20px);
-      -webkit-backdrop-filter: blur(20px);
+      background: rgba(238, 247, 247, 0.92);
+      backdrop-filter: blur(22px);
+      -webkit-backdrop-filter: blur(22px);
       border-bottom: 1px solid var(--clr-border-glow);
-      padding: 0.8rem 0;
-      transition: background 0.3s;
+      transition: box-shadow var(--transition-smooth), background var(--transition-smooth);
     }
-    body.light-mode .site-header { background: rgba(240, 244, 248, 0.92); }
+    body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
+    .site-header.scrolled { box-shadow: var(--shadow-glow); }
 
     .header-container {
       max-width: var(--max-width);
@@ -136,234 +168,201 @@
       display: flex;
       align-items: center;
       justify-content: space-between;
-      padding: 0 1.5rem;
+      padding: 14px 24px;
+      width: 100%;
     }
 
     .logo-link {
       font-family: var(--font-display);
-      font-size: 1.5rem;
+      font-size: 1.2rem;
       font-weight: 700;
-      color: var(--clr-cyan);
-      text-decoration: none;
-      display: flex;
-      align-items: center;
-      gap: 0.5rem;
-      transition: opacity var(--transition-fast);
-    }
-    .logo-link:hover { opacity: 0.85; }
-    .logo-link i { color: var(--clr-magenta); }
-
-    .nav-actions { display: flex; gap: 0.8rem; align-items: center; }
-
-    .theme-toggle,
-    .home-btn {
-      background: transparent;
-      border: 1px solid var(--clr-cyan);
-      color: var(--clr-cyan);
-      font-size: 0.9rem;
-      padding: 0.5rem 1rem;
-      border-radius: 30px;
-      cursor: pointer;
+      color: var(--clr-white);
       text-decoration: none;
       display: inline-flex;
       align-items: center;
-      gap: 0.4rem;
-      transition: all var(--transition-fast);
-      font-family: var(--font-body);
+      gap: 0.5rem;
+      letter-spacing: -0.02em;
+      transition: opacity var(--transition-fast);
     }
-    .home-btn:hover,
-    .theme-toggle:hover {
-      background: var(--clr-cyan);
-      color: #0b0b1a;
+    .logo-link:hover { opacity: 0.88; }
+    .logo-link img { height: 38px; width: auto; object-fit: contain; }
+
+    .logo-icon {
+      width: 38px;
+      height: 38px;
+      border-radius: 50%;
+      background: var(--gradient-cyan);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      color: #fff;
     }
 
-    .section { max-width: var(--max-width); margin: 3rem auto; padding: 0 1.5rem; }
+    .g-text {
+      background: linear-gradient(130deg, var(--clr-cyan) 0%, var(--clr-magenta) 100%);
+      -webkit-background-clip: text;
+      -webkit-text-fill-color: transparent;
+      background-clip: text;
+    }
+
+    .theme-toggle {
+      background: transparent;
+      border: 1.5px solid var(--clr-cyan);
+      color: var(--clr-cyan);
+      font-size: 0.95rem;
+      padding: 0.42rem 0.75rem;
+      border-radius: 30px;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+    }
+    .theme-toggle:hover { background: var(--clr-cyan); color: #fff; }
+
+    .btn-primary {
+      display: inline-flex;
+      align-items: center;
+      gap: 0.55rem;
+      background: var(--gradient-magenta);
+      color: #fff;
+      padding: 14px 34px;
+      border-radius: 50px;
+      font-weight: 700;
+      font-size: 0.875rem;
+      text-decoration: none;
+      border: none;
+      cursor: pointer;
+      transition: all var(--transition-fast);
+      box-shadow: var(--shadow-magenta);
+      letter-spacing: 0.01em;
+    }
+    .btn-primary:hover { transform: scale(1.04); box-shadow: 0 12px 38px rgba(184, 135, 58, 0.54); }
+
+    .card {
+      background: var(--clr-navy-card);
+      backdrop-filter: blur(12px);
+      border: 1px solid var(--clr-border-glow);
+      border-radius: var(--radius-lg);
+      padding: 1.8rem;
+      box-shadow: var(--shadow-card);
+      transition: transform var(--transition-smooth), border-color var(--transition-smooth), box-shadow var(--transition-smooth);
+      margin-bottom: 8px;
+      height: fit-content;
+      contain: layout style;
+    }
+    .card:hover {
+      transform: translateY(-6px);
+      border-color: rgba(184, 135, 58, 0.45);
+      box-shadow: 0 20px 56px rgba(10, 181, 181, 0.14);
+    }
+    body.dark-mode .card:hover { box-shadow: 0 0 34px rgba(201, 168, 76, 0.18); }
+
+    .section { max-width: var(--max-width); margin: 0 auto; padding: 80px 24px; width: 100%; flex: 1; }
 
     .section-title {
       font-family: var(--font-display);
-      font-size: clamp(1.8rem, 4vw, 2.5rem);
-      font-weight: 700;
-      color: var(--clr-cyan);
-      margin-bottom: 0.5rem;
-      text-align: center;
-      letter-spacing: -0.02em;
-    }
-    .section-subtitle { text-align: center; color: var(--clr-text-dim); margin-bottom: 2rem; font-size: 1rem; max-width: 600px; margin-left: auto; margin-right: auto; }
-
-    .posts-grid { display: grid; grid-template-columns: repeat(auto-fill, minmax(340px, 1fr)); gap: 1.5rem; }
-
-    .post-card {
-      background: var(--clr-navy-card);
-      border: 1px solid var(--clr-border-glow);
-      border-radius: var(--radius-lg);
-      overflow: hidden;
-      box-shadow: var(--shadow-card);
-      transition: all var(--transition-fast);
-      display: flex;
-      flex-direction: column;
-    }
-    .post-card:hover { transform: translateY(-4px); border-color: var(--clr-magenta); }
-
-    .post-image {
-      height: 180px;
-      background-size: cover;
-      background-position: center;
-      background-repeat: no-repeat;
-    }
-
-    .post-body { padding: 1.5rem; display: flex; flex-direction: column; flex: 1; }
-
-    .post-body h2 {
+      font-size: clamp(2rem, 4vw, 3rem);
+      font-weight: 900;
       color: var(--clr-white);
-      margin-bottom: 0.5rem;
-      font-size: 1.1rem;
-      font-family: var(--font-display);
-      font-weight: 600;
-      line-height: 1.4;
-    }
-    .post-body p { color: var(--clr-text-dim); font-size: 0.9rem; line-height: 1.6; margin-bottom: 1rem; flex: 1; }
-
-    .post-meta { display: flex; gap: 1rem; font-size: 0.8rem; color: var(--clr-text-muted); margin-bottom: 0.8rem; flex-wrap: wrap; }
-
-    .read-more {
-      color: var(--clr-magenta);
-      text-decoration: none;
-      font-weight: 600;
-      font-size: 0.9rem;
-      transition: color var(--transition-fast);
-      align-self: flex-start;
-    }
-    .read-more:hover { color: var(--clr-cyan); text-decoration: underline; }
-
-    .newsletter-card {
-      background: var(--gradient-magenta);
-      color: #fff;
-      border-radius: var(--radius-lg);
-      padding: 2rem;
+      margin-bottom: 1rem;
       text-align: center;
-      margin-top: 3rem;
-      box-shadow: 0 12px 40px rgba(255, 0, 170, 0.25);
+      letter-spacing: -0.025em;
+      line-height: 1.2;
     }
-    .newsletter-card h2 {
-      font-family: var(--font-display);
-      margin-bottom: 0.5rem;
-      font-size: 1.5rem;
+    .section-subtitle { text-align: center; color: var(--clr-text-dim); font-size: 0.95rem; max-width: 480px; margin: 12px auto 2.5rem; line-height: 1.6; }
+    .sec-label {
+      font-family: 'DM Mono', monospace;
+      font-size: 0.7rem;
+      letter-spacing: 0.2em;
+      color: var(--clr-cyan);
+      margin-bottom: 14px;
+      display: block;
+      text-align: center;
+      text-transform: uppercase;
     }
-    .newsletter-card p { margin-bottom: 1rem; opacity: 0.9; }
 
-    .newsletter-form { display: flex; gap: 0.5rem; max-width: 450px; margin: 1rem auto 0; }
-    .newsletter-form input {
+    .grid-3 { display: grid; grid-template-columns: repeat(3, 1fr); gap: 24px; align-items: start; }
+
+    .newsletter-box {
+      background: var(--gradient-cyan);
+      padding: 0.15rem;
+      border-radius: 50px;
+      display: flex;
+      max-width: 500px;
+      margin: 0 auto;
+      box-shadow: 0 0 24px rgba(10, 181, 181, 0.25);
+    }
+    .newsletter-box input {
       flex: 1;
-      padding: 0.7rem 1rem;
+      padding: 0.85rem 1.4rem;
       border: none;
-      border-radius: 30px;
+      border-radius: 50px 0 0 50px;
+      background: var(--clr-deep-space);
+      color: var(--clr-white);
       font-family: var(--font-body);
+      outline: none;
       font-size: 0.9rem;
     }
-    .newsletter-form button {
-      padding: 0.7rem 1.5rem;
+    .newsletter-box button {
+      padding: 0.85rem 1.8rem;
       border: none;
-      border-radius: 30px;
-      background: #0b0b1a;
+      border-radius: 0 50px 50px 0;
+      background: transparent;
       color: #fff;
-      font-weight: 600;
+      font-weight: 700;
       cursor: pointer;
       font-family: var(--font-body);
       font-size: 0.9rem;
-      transition: all var(--transition-fast);
+      transition: opacity var(--transition-fast);
     }
-    .newsletter-form button:hover { background: #1a1a2e; transform: scale(1.03); }
+    .newsletter-box button:hover { opacity: 0.85; }
 
     .footer-fat {
-      background: #060615;
-      border-top: 2px solid var(--clr-cyan);
-      padding: 3rem 1.5rem 1.5rem;
+      background: rgba(255, 255, 255, 0.92);
+      border-top: 1px solid var(--clr-border-glow);
+      padding: 3.5rem 1.5rem 2rem;
       margin-top: auto;
+      width: 100%;
     }
-    body.light-mode .footer-fat { background: #e0e8f0; }
+    body.dark-mode .footer-fat { background: #011f1f; border-top: 2px solid rgba(10, 181, 181, 0.3); }
 
-    .footer-grid {
-      max-width: var(--max-width);
-      margin: 0 auto;
-      display: grid;
-      grid-template-columns: repeat(auto-fit, minmax(220px, 1fr));
-      gap: 2rem;
-    }
-    .footer-col h3 {
-      font-family: var(--font-display);
-      color: var(--clr-cyan);
-      font-weight: 600;
-      margin-bottom: 1rem;
-      text-transform: uppercase;
-      font-size: 0.9rem;
-      letter-spacing: 0.05em;
-    }
-    .footer-col ul { list-style: none; display: flex; flex-direction: column; gap: 0.5rem; }
-    .footer-col a {
-      color: var(--clr-text-dim);
-      text-decoration: none;
-      font-size: 0.85rem;
-      transition: color var(--transition-fast);
-    }
-    .footer-col a:hover { color: var(--clr-magenta); }
-
-    .footer-social { display: flex; gap: 1rem; margin-top: 1rem; }
+    .footer-social { display: flex; gap: 12px; margin-top: 16px; }
     .footer-social a {
       width: 36px;
       height: 36px;
       border-radius: 50%;
-      border: 1px solid var(--clr-cyan);
-      display: flex;
+      border: 1.5px solid var(--clr-cyan);
+      display: inline-flex;
       align-items: center;
       justify-content: center;
       color: var(--clr-cyan);
-      text-decoration: none;
       transition: all var(--transition-fast);
+      text-decoration: none;
     }
-    .footer-social a:hover { background: var(--clr-magenta); border-color: var(--clr-magenta); color: #fff; }
+    .footer-social a:hover { background: var(--clr-magenta); border-color: var(--clr-magenta); color: #fff; transform: translateY(-2px); }
 
-    .footer-bottom {
-      max-width: var(--max-width);
-      margin: 2rem auto 0;
-      padding-top: 1rem;
-      border-top: 1px solid rgba(255, 255, 255, 0.08);
-      display: flex;
-      justify-content: space-between;
-      align-items: center;
-      flex-wrap: wrap;
-      gap: 1rem;
-      font-size: 0.8rem;
-      color: var(--clr-text-muted);
+    .footer-grid { display: grid; grid-template-columns: repeat(3, 1fr); gap: 48px; }
+
+    .post-image {
+      width: 100%;
+      height: 200px;
+      object-fit: cover;
+      border-radius: var(--radius-md);
+      margin-bottom: 1rem;
     }
-    .footer-bottom nav { display: flex; gap: 1.5rem; }
-    .footer-bottom nav a { color: var(--clr-text-dim); text-decoration: none; font-size: 0.8rem; }
-    .footer-bottom nav a:hover { color: var(--clr-magenta); }
 
-    .spinner { text-align: center; padding: 3rem; color: var(--clr-cyan); }
-    .spinner i { font-size: 2.5rem; animation: spin 1.2s linear infinite; }
+    .alt-bg { background: rgba(220, 242, 242, 0.45); }
+    body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
 
-    .no-content { text-align: center; padding: 3rem 1rem; color: var(--clr-text-dim); }
-    .no-content i { font-size: 3rem; color: var(--clr-cyan); margin-bottom: 1rem; display: block; }
-
-    .error-state { text-align: center; padding: 3rem 1rem; color: var(--clr-magenta); }
-    .error-state i { font-size: 3rem; margin-bottom: 1rem; display: block; }
-
-    @keyframes spin { to { transform: rotate(360deg); } }
-
+    @media (max-width: 1024px) { .grid-3 { grid-template-columns: repeat(2, 1fr); } }
     @media (max-width: 768px) {
-      .posts-grid { grid-template-columns: 1fr; }
-      .newsletter-form { flex-direction: column; }
-      .newsletter-form button { width: 100%; }
-      .footer-bottom { flex-direction: column; text-align: center; }
-      .footer-bottom nav { justify-content: center; }
-      .section { margin: 2rem auto; }
+      .section { padding: 60px 16px; }
+      .grid-3 { grid-template-columns: 1fr; gap: 20px; }
+      .card { padding: 1.3rem; }
+      .footer-fat { padding: 2rem 1rem 1.5rem; }
+      .footer-grid { grid-template-columns: 1fr; gap: 32px; }
+      .section-title { font-size: clamp(1.6rem, 6vw, 2.2rem); }
+      .header-container { padding: 12px 16px; }
     }
-
-    @media (max-width: 480px) {
-      .header-container { padding: 0 1rem; }
-      .logo-link { font-size: 1.2rem; }
-      .section { padding: 0 1rem; }
-    }
+    @media (max-width: 480px) { .section { padding: 40px 16px; } }
   </style>
   
   <script type="application/ld+json">
@@ -384,56 +383,63 @@
 <body>
   <a href="#main-content" class="skip-link" aria-label="Skip to main content">Skip to main content</a>
 
-  <header class="site-header" role="banner">
+  <header class="site-header" id="site-header" role="banner">
     <div class="header-container">
       <a href="/" class="logo-link" aria-label="AliverBiopharm Home">
-        <i class="fa-solid fa-dna" aria-hidden="true"></i> AliverBiopharm
+        <div class="logo-icon" aria-hidden="true">
+          <svg width="18" height="18" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082"/></svg>
+        </div>
+        Aliver<span class="g-text">Biopharm</span>
       </a>
-      <nav class="nav-actions" aria-label="Header actions">
-        <button class="theme-toggle" id="theme-toggle" aria-label="Toggle light/dark mode">
-          <i class="fa-solid fa-moon" aria-hidden="true"></i>
-          <span class="sr-only">Toggle theme</span>
-        </button>
-        <a href="/" class="home-btn" aria-label="Return to home page">
-          <i class="fa-solid fa-home" aria-hidden="true"></i> Home
-        </a>
-      </nav>
+      <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
     </div>
   </header>
 
   <main id="main-content">
     <section class="section" id="blog-content" aria-labelledby="blog-heading">
-      <div class="spinner" role="status" aria-live="polite">
-        <i class="fa-solid fa-dna" aria-hidden="true"></i>
-        <p>Loading articles...</p>
+      <span class="sec-label">INSIGHTS</span>
+      <h1 class="section-title" id="blog-heading">Articles & Insights</h1>
+      <p class="section-subtitle">Stay updated with the latest in biology and pharmacy.</p>
+      <div class="grid-3" id="blog-grid" role="list" aria-label="Blog articles">
+        <p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);" role="status">Loading articles...</p>
+      </div>
+      
+      <div class="alt-bg" style="border-radius:var(--radius-lg);padding:2.5rem 2rem;text-align:center;margin-top:3rem;" aria-labelledby="newsletter-heading">
+        <span class="sec-label">UPDATES</span>
+        <h2 class="section-title" id="newsletter-heading" style="font-size:1.5rem;">Stay Updated</h2>
+        <p class="section-subtitle">Get the latest articles delivered to your inbox.</p>
+        <form id="newsletter-form" aria-label="Newsletter subscription"><div class="newsletter-box"><input type="email" placeholder="Enter your email address" required autocomplete="email" aria-label="Email for newsletter" /><button type="submit">Subscribe <i class="fa-solid fa-paper-plane" aria-hidden="true"></i></button></div></form>
       </div>
     </section>
   </main>
 
   <footer class="footer-fat" role="contentinfo">
-    <div class="footer-grid" id="footer-grid">
-      <div class="footer-col">
-        <a href="/" class="logo-link" style="font-size:1.2rem" aria-label="AliverBiopharm Home">
-          <i class="fa-solid fa-dna" aria-hidden="true"></i> AliverBiopharm
+    <div style="max-width:var(--max-width);margin:0 auto;display:flex;justify-content:space-between;gap:40px;flex-wrap:wrap;align-items:flex-start;">
+      <div style="max-width:260px;">
+        <a href="/" class="logo-link" style="margin-bottom:14px;display:inline-flex;" aria-label="AliverBiopharm Home">
+          <div class="logo-icon" style="width:32px;height:32px;" aria-hidden="true"><svg width="15" height="15" fill="none" stroke="#fff" stroke-width="2" viewBox="0 0 24 24"><path stroke-linecap="round" stroke-linejoin="round" d="M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5"/></svg></div>
+          Aliver<span class="g-text">Biopharm</span>
         </a>
-        <p style="color:var(--clr-text-dim);margin-top:0.5rem">Advancing biology and pharmacy education for every learner.</p>
+        <p style="font-size:0.85rem;line-height:1.7;color:var(--clr-text-dim);">Advancing biology and pharmacy education for every learner on the planet.</p>
         <div class="footer-social" id="footer-social" role="list" aria-label="Social media links"></div>
       </div>
+      <nav class="footer-grid" id="footer-grid" aria-label="Footer navigation"></nav>
     </div>
-    <div class="footer-bottom">
-      <p>&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p>
-      <nav aria-label="Legal links">
-        <a href="/privacy" rel="noopener">Privacy Policy</a>
-        <a href="/terms" rel="noopener">Terms of Use</a>
-        <a href="/contact">Contact</a>
-        <a href="/accessibility" rel="noopener">Accessibility</a>
+    <div style="max-width:var(--max-width);margin:2rem auto 0;padding-top:1.5rem;border-top:1px solid var(--clr-border-glow);display:flex;justify-content:space-between;align-items:center;flex-wrap:wrap;gap:12px;">
+      <p style="font-size:0.75rem;color:var(--clr-text-muted);">&copy; <span id="current-year"></span> AliverBiopharm. All rights reserved.</p>
+      <nav aria-label="Legal links" style="display:flex;gap:22px;">
+        <a href="/privacy" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Privacy Policy</a>
+        <a href="/terms" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Terms of Use</a>
+        <a href="/accessibility" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;" rel="noopener">Accessibility</a>
       </nav>
     </div>
   </footer>
 
   <script>
     const API_BASE = '/api/query';
-    
+
+    function esc(t) { if (!t) return ''; return String(t).replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;').replace(/"/g,'&quot;').replace(/'/g,'&#039;'); }
+
     async function apiCall(action, params = {}) {
       const headers = { 'Content-Type': 'application/json' };
       const token = localStorage.getItem('sb-token');
@@ -446,155 +452,52 @@
         const json = await res.json();
         if (!res.ok) throw new Error(json.error || 'Request failed');
         return json.data !== undefined ? json.data : json;
-      } catch (err) {
-        clearTimeout(timeout);
-        throw err;
-      }
+      } catch (err) { clearTimeout(timeout); throw err; }
     }
-    
-    function esc(t) {
-      if (!t) return '';
-      return String(t).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#039;');
+
+    function initUI() {
+      const tt = document.getElementById('theme-toggle'), icon = tt.querySelector('i');
+      if (localStorage.getItem('theme') === 'dark') { document.body.classList.add('dark-mode'); icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); }
+      tt.onclick = () => { document.body.classList.toggle('dark-mode'); const isDark = document.body.classList.contains('dark-mode'); if (isDark) { icon.classList.remove('fa-moon'); icon.classList.add('fa-sun'); localStorage.setItem('theme','dark'); } else { icon.classList.remove('fa-sun'); icon.classList.add('fa-moon'); localStorage.setItem('theme','light'); } };
+      
+      document.getElementById('newsletter-form').onsubmit = async function(e) { e.preventDefault(); const email = this.querySelector('input').value.trim(); if (!email||!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Valid email required.'); try { await apiCall('subscribe_newsletter',{formData:{email}}); alert('✓ Subscribed successfully!'); this.reset(); } catch(err) { alert('Subscribed!'); this.reset(); } };
     }
-    
-    function buildFooter(footerData) {
-      if (!footerData || !footerData.columns) return;
-      const footerGrid = document.getElementById('footer-grid');
-      const footerSocial = document.getElementById('footer-social');
-      const logoCol = footerGrid.querySelector('.footer-col');
-      
-      footerGrid.innerHTML = logoCol.outerHTML + footerData.columns.map(function(col) {
-        return '<div class="footer-col">' +
-          '<h3>' + esc(col.heading) + '</h3>' +
-          '<ul role="list">' +
-          (col.items || []).map(function(item) {
-            return '<li role="listitem">' +
-              '<a href="' + esc(item.href || '#') + '">' +
-              (item.icon ? '<i class="' + esc(item.icon) + '" style="color:var(--clr-magenta);margin-right:0.5rem" aria-hidden="true"></i>' : '') +
-              esc(item.label) +
-              '</a>' +
-              '</li>';
-          }).join('') +
-          '</ul>' +
-          '</div>';
-      }).join('');
-      
-      if (footerSocial && footerData.social_links) {
-        footerSocial.innerHTML = footerData.social_links.map(function(s) {
-          return '<a href="' + esc(s.url) + '" aria-label="' + esc(s.platform || 'social media') + '" rel="noopener noreferrer" target="_blank" role="listitem">' +
-            '<i class="' + esc(s.icon) + '" aria-hidden="true"></i>' +
-            '</a>';
-        }).join('');
-      }
-    }
-    
-    function buildBlogSection(blogData) {
-      var container = document.getElementById('blog-content');
-      
-      if (!blogData || !blogData.posts || !blogData.posts.length) {
-        container.innerHTML = '<div class="no-content" role="status">' +
-          '<i class="fa-solid fa-newspaper" aria-hidden="true"></i>' +
-          '<h1 class="section-title">Blog</h1>' +
-          '<p>Articles coming soon. Subscribe to our newsletter to be notified when new content is published.</p>' +
-          '</div>';
-        return;
-      }
-      
-      var title = esc(blogData.title || 'Articles & Insights');
-      var subtitle = esc(blogData.subtitle || 'Stay updated with the latest in biology and pharmacy.');
-      
-      var postsHTML = blogData.posts.map(function(post) {
-        var imageHTML = post.image_url ?
-          '<div class="post-image" style="background-image:url(\'' + esc(post.image_url) + '\');" role="img" aria-label="' + esc(post.title) + ' featured image"></div>' :
-          '';
-        
-        return '<article class="post-card">' +
-          imageHTML +
-          '<div class="post-body">' +
-          '<h2>' + esc(post.title) + '</h2>' +
-          '<p>' + esc(post.excerpt || '') + '</p>' +
-          '<div class="post-meta">' +
-          '<span><i class="fa-regular fa-user" aria-hidden="true"></i> ' + esc(post.author || 'AliverBiopharm') + '</span>' +
-          '<span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="' + esc(post.date || '') + '">' + esc(post.date || '') + '</time></span>' +
-          '</div>' +
-          '<a href="' + esc(post.slug ? '/blog/' + post.slug : '#') + '" class="read-more" aria-label="Read more: ' + esc(post.title) + '">Read More <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a>' +
-          '</div>' +
-          '</article>';
-      }).join('');
-      
-      container.innerHTML = '<h1 class="section-title" id="blog-heading">' + title + '</h1>' +
-        '<p class="section-subtitle">' + subtitle + '</p>' +
-        '<div class="posts-grid" role="list" aria-label="Blog articles">' + postsHTML + '</div>' +
-        '<aside class="newsletter-card" aria-labelledby="newsletter-heading">' +
-        '<h2 id="newsletter-heading">Stay Updated</h2>' +
-        '<p>Get the latest articles delivered to your inbox.</p>' +
-        '<form class="newsletter-form" aria-label="Newsletter subscription">' +
-        '<input type="email" placeholder="Your email address" required autocomplete="email" aria-label="Email for newsletter" />' +
-        '<button type="submit">Subscribe</button>' +
-        '</form>' +
-        '</aside>';
-      
-      var newsletterForm = container.querySelector('.newsletter-form');
-      if (newsletterForm) {
-        newsletterForm.onsubmit = async function(e) {
-          e.preventDefault();
-          var emailInput = e.target.querySelector('input');
-          var email = emailInput.value.trim();
-          if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) {
-            alert('Please enter a valid email address.');
-            return;
-          }
-          try {
-            await apiCall('subscribe_newsletter', { formData: { email: email } });
-            alert('✓ Subscribed successfully!');
-            e.target.reset();
-          } catch(err) {
-            alert('Subscribed! Welcome aboard.');
-            e.target.reset();
-          }
-        };
-      }
-    }
-    
-    document.addEventListener('DOMContentLoaded', async function() {
+
+    document.addEventListener('DOMContentLoaded', async () => {
       document.getElementById('current-year').textContent = new Date().getFullYear();
-      
-      var themeToggle = document.getElementById('theme-toggle');
-      var themeIcon = themeToggle.querySelector('i');
-      
-      if (localStorage.getItem('theme') === 'light') {
-        document.body.classList.add('light-mode');
-        themeIcon.classList.replace('fa-moon', 'fa-sun');
-      }
-      
-      themeToggle.onclick = function() {
-        document.body.classList.toggle('light-mode');
-        var isLight = document.body.classList.contains('light-mode');
-        if (isLight) {
-          themeIcon.classList.replace('fa-moon', 'fa-sun');
-          localStorage.setItem('theme', 'light');
-        } else {
-          themeIcon.classList.replace('fa-sun', 'fa-moon');
-          localStorage.setItem('theme', 'dark');
-        }
-      };
+      initUI();
       
       try {
-        var sections = await apiCall('get_all_site_sections');
-        
+        const sections = await apiCall('get_all_site_sections');
         if (sections) {
-          if (sections.footer) {
-            buildFooter(sections.footer);
+          try {
+            if (sections.footer) {
+              const fd = sections.footer;
+              document.getElementById('footer-grid').innerHTML = (fd.columns||[]).map(c => '<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">'+esc(c.heading)+'</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;" role="list">'+(c.items||[]).map(i => '<li role="listitem"><a href="'+esc(i.href||'#')+'" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">'+(i.icon?'<i class="'+esc(i.icon)+'" style="color:var(--clr-magenta);margin-right:0.5rem;" aria-hidden="true"></i>':'')+esc(i.label)+'</a></li>').join('')+'</ul></div>').join('');
+              document.getElementById('footer-social').innerHTML = (fd.social_links||[]).map(s => '<a href="'+esc(s.url)+'" aria-label="'+esc(s.platform)+'" rel="noopener noreferrer" target="_blank" role="listitem"><i class="'+esc(s.icon)+'" aria-hidden="true"></i></a>').join('');
+            }
+          } catch(err) { console.error('Footer failed:', err); }
+
+          try {
+            const blogData = sections.blog;
+            const grid = document.getElementById('blog-grid');
+            
+            if (blogData && blogData.posts && blogData.posts.length) {
+              document.getElementById('blog-heading').textContent = esc(blogData.title || 'Articles & Insights');
+              document.querySelector('.section-subtitle').textContent = esc(blogData.subtitle || 'Stay updated with the latest in biology and pharmacy.');
+              
+              grid.innerHTML = blogData.posts.map(p => '<article class="card" role="listitem">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'" class="post-image" loading="lazy" onerror="this.style.display=\'none\'">':'')+'<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="'+esc(p.date||'')+'">'+esc(p.date||'')+'</time></span><span><i class="fa-regular fa-user" aria-hidden="true"></i> '+esc(p.author||'')+'</span></div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(p.title)+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">'+esc(p.excerpt||'')+'</p><a href="' + esc(p.slug ? '/blog/' + p.slug : '#') + '" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;" aria-label="Read more: '+esc(p.title)+'">Read Article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>').join('');
+            } else {
+              grid.innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">New articles coming soon. Subscribe to our newsletter for updates.</p>';
+            }
+          } catch(err) {
+            console.error('Blog failed:', err);
+            document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Articles temporarily unavailable.</p>';
           }
-          
-          var blogData = sections.blog;
-          buildBlogSection(blogData);
-        } else {
-          document.getElementById('blog-content').innerHTML = '<div class="no-content" role="status"><i class="fa-solid fa-newspaper" aria-hidden="true"></i><h1 class="section-title">Blog</h1><p>Articles coming soon.</p></div>';
         }
-      } catch(err) {
-        console.error('Failed to load blog:', err);
-        document.getElementById('blog-content').innerHTML = '<div class="error-state" role="alert"><i class="fa-solid fa-triangle-exclamation" aria-hidden="true"></i><h1 class="section-title">Blog</h1><p>Unable to load articles. Please refresh the page or try again later.</p></div>';
+      } catch(err) { 
+        console.error('Failed to load sections:', err);
+        document.getElementById('blog-content').insertAdjacentHTML('afterbegin', '<div style="text-align:center;padding:2rem;color:var(--clr-magenta);" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> Some content could not be loaded. Please refresh the page or try again later.</div>');
       }
     });
   </script>
