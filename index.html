@@ -1751,696 +1751,672 @@
   <button class="back-to-top" id="back-to-top" aria-label="Back to top"><i class="fa-solid fa-arrow-up"></i></button>
   <a href="#pricing" class="sticky-cta"><i class="fa-solid fa-rocket"></i> Start Learning</a>
 
-  <script>
-    const API_BASE = '/api/query';
-    const cache = new Map();
-    const requestQueue = new Map();
-    const viewCache = {};
+   <script>
+/* =========================================
+   ALIVERBIOPHARM FRONTEND CORE SCRIPT
+   Clean rebuild without Wake Lock
+========================================= */
 
-    function getCachedView(key) {
-        try {
-            const cached = sessionStorage.getItem('view_' + key);
-            if (cached) {
-                const parsed = JSON.parse(cached);
-                if (Date.now() - parsed.timestamp < 300000) {
-                    return parsed.data;
-                }
-            }
-        } catch(e) {}
-        return null;
-    }
+const API_BASE = '/api/query';
 
-    function cacheView(key, data) {
-        try {
-            sessionStorage.setItem('view_' + key, JSON.stringify({
-                data: data,
-                timestamp: Date.now()
-            }));
-        } catch(e) {}
-    }
+/* =========================================
+   GLOBAL STATE
+========================================= */
+const AppState = {
+  user: null,
+  sections: {},
+  resources: [],
+  filters: {
+    levels: [],
+    categories: [],
+    tags: []
+  },
+  quizzes: [],
+  currentQuiz: null
+};
 
-    async function apiCall(action, params = {}, retries = 1) {
-        const cacheKey = JSON.stringify({ action, params });
-        
-        if (cache.has(cacheKey)) {
-            return cache.get(cacheKey);
-        }
-        
-        if (requestQueue.has(cacheKey)) {
-            return requestQueue.get(cacheKey);
-        }
-        
-        const request = (async () => {
-            const headers = { 
-                'Content-Type': 'application/json', 
-                'X-Requested-With': 'XMLHttpRequest' 
-            };
-            const token = localStorage.getItem('sb-token');
-            if (token) headers['Authorization'] = 'Bearer ' + token;
-            
-            const controller = new AbortController();
-            const timeout = setTimeout(() => controller.abort(), 8000);
-            
-            try {
-                const res = await fetch(API_BASE, { 
-                    method: 'POST', 
-                    headers, 
-                    body: JSON.stringify({ action, ...params }), 
-                    signal: controller.signal 
-                });
-                
-                clearTimeout(timeout);
-                
-                if (res.status === 429) throw new Error('Too many requests');
-                if (res.status === 401) { 
-                    localStorage.removeItem('sb-token'); 
-                    localStorage.removeItem('sb-email'); 
-                    updateMobilePanel([]); 
-                }
-                
-                const json = await res.json();
-                if (!res.ok) throw new Error(json.error || 'Request failed');
-                
-                const result = json.data !== undefined ? json.data : json;
-                
-                cache.set(cacheKey, result);
-                setTimeout(() => cache.delete(cacheKey), 300000);
-                
-                return result;
-            } catch (err) {
-                clearTimeout(timeout);
-                if (retries > 0) {
-                    await new Promise(r => setTimeout(r, 1000));
-                    return apiCall(action, params, retries - 1);
-                }
-                throw err;
-            } finally {
-                requestQueue.delete(cacheKey);
-            }
-        })();
-        
-        requestQueue.set(cacheKey, request);
-        return request;
-    }
+/* =========================================
+   HELPERS
+========================================= */
+function qs(selector) {
+  return document.querySelector(selector);
+}
 
-    function esc(t) { 
-        const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; 
-        return String(t || '').replace(/[&<>"']/g, c => m[c]); 
-    }
+function qsa(selector) {
+  return [...document.querySelectorAll(selector)];
+}
 
-    function isTokenExpired() { 
-        const token = localStorage.getItem('sb-token'); 
-        if (!token) return true; 
-        try { 
-            const payload = JSON.parse(atob(token.split('.')[1])); 
-            return (payload.exp * 1000) < Date.now(); 
-        } catch (e) { 
-            return true; 
-        } 
-    }
+function escapeHtml(str = '') {
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
 
-    function safeUrl(u, fallback = '#') { 
-        if (!u || typeof u !== 'string') return fallback; 
-        const t = u.trim(); 
-        if (!t) return fallback; 
-        const dangerous = /^(javascript:|data:|vbscript:|file:)/i; 
-        if (dangerous.test(t)) return fallback; 
-        if (t.includes('\\') || t.includes('\n') || t.includes('\r')) return fallback; 
-        return t.startsWith('http://') || t.startsWith('https://') || t.startsWith('/') || t.startsWith('#') || t.startsWith('mailto:') ? t : fallback; 
-    }
+function notify(message, type = 'info') {
+  const box = document.createElement('div');
 
-    const icons = { 
-        'Home': 'fa-solid fa-house', 
-        'Resources': 'fa-solid fa-book', 
-        'Study Notes': 'fa-solid fa-book-open', 
-        'Blog': 'fa-solid fa-newspaper', 
-        'Study Tips': 'fa-solid fa-lightbulb', 
-        'Submit': 'fa-solid fa-upload', 
-        'Guidelines': 'fa-solid fa-check-circle', 
-        'Donate': 'fa-solid fa-heart', 
-        'About': 'fa-solid fa-circle-info', 
-        'Contact': 'fa-solid fa-envelope' 
+  box.className = `notification ${type}`;
+
+  box.innerHTML = `
+    <div class="notification-content">
+      ${escapeHtml(message)}
+    </div>
+  `;
+
+  document.body.appendChild(box);
+
+  setTimeout(() => {
+    box.classList.add('show');
+  }, 10);
+
+  setTimeout(() => {
+    box.classList.remove('show');
+
+    setTimeout(() => {
+      box.remove();
+    }, 300);
+  }, 3500);
+}
+
+function showLoading(selector) {
+  const el = qs(selector);
+
+  if (!el) return;
+
+  el.innerHTML = `
+    <div class="loading-box">
+      <div class="loading-spinner"></div>
+      <p>Loading...</p>
+    </div>
+  `;
+}
+
+function showEmpty(selector, message = 'No data found') {
+  const el = qs(selector);
+
+  if (!el) return;
+
+  el.innerHTML = `
+    <div class="empty-state">
+      <p>${escapeHtml(message)}</p>
+    </div>
+  `;
+}
+
+function showError(selector, message = 'Something went wrong') {
+  const el = qs(selector);
+
+  if (!el) return;
+
+  el.innerHTML = `
+    <div class="error-state">
+      <p>${escapeHtml(message)}</p>
+    </div>
+  `;
+}
+
+/* =========================================
+   API CLIENT
+========================================= */
+async function apiCall(
+  action,
+  params = {},
+  method = 'POST'
+) {
+  try {
+    const headers = {
+      'Content-Type': 'application/json',
+      'X-Requested-With': 'XMLHttpRequest'
     };
 
-    function updateMobilePanel(links) {
-        if (isTokenExpired()) { 
-            localStorage.removeItem('sb-token'); 
-            localStorage.removeItem('sb-email'); 
+    const token = localStorage.getItem('auth_token');
+
+    if (token) {
+      headers.Authorization = `Bearer ${token}`;
+    }
+
+    let response;
+
+    if (method === 'GET') {
+      const query = new URLSearchParams({
+        action,
+        ...params
+      });
+
+      response = await fetch(
+        `${API_BASE}?${query.toString()}`,
+        {
+          method: 'GET',
+          headers
         }
-        const navLinks = document.getElementById('mobile-nav-links');
-        const footer = document.getElementById('mobile-nav-footer');
-        if (!navLinks || !footer) return;
-        
-        navLinks.innerHTML = (links || []).map(l => 
-            '<a href="' + esc(l.href) + '"><i class="' + (icons[l.label] || 'fa-solid fa-chevron-right') + '"></i> ' + esc(l.label) + '</a>'
-        ).join('');
-        
-        const token = localStorage.getItem('sb-token');
-        if (token) {
-            const email = localStorage.getItem('sb-email') || 'User';
-            footer.innerHTML = '<div style="display:flex;align-items:center;gap:0.8rem;padding:0.5rem 0.5rem 1rem;color:var(--clr-text-dim);font-size:0.85rem;"><i class="fa-solid fa-circle-user"></i> <span>Signed in as <strong>' + esc(email.split('@')[0]) + '</strong></span></div><button class="mobile-signout-btn" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>';
-        } else {
-            footer.innerHTML = '<a href="#" class="mobile-signin-btn" onclick="showAuthForm(\'signin\');return false;"><i class="fa-solid fa-right-to-bracket"></i> Sign In</a><a href="#" class="mobile-signup-btn" onclick="showAuthForm(\'signup\');return false;"><i class="fa-solid fa-user-plus"></i> Create Account</a>';
-        }
+      );
+    } else {
+      response = await fetch(API_BASE, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({
+          action,
+          ...params
+        })
+      });
     }
 
-    async function buildNavigation(d) { 
-        const links = d?.links || []; 
-        document.getElementById('main-nav').innerHTML = links.map(l => '<li><a href="' + esc(l.href) + '">' + esc(l.label) + '</a></li>').join(''); 
-        updateMobilePanel(links); 
-        loadSiteLogo(); 
-        loadAnnouncement(); 
+    if (!response.ok) {
+      throw new Error(
+        `Server returned ${response.status}`
+      );
     }
 
-    async function loadSiteLogo() {
-        try {
-            const config = await apiCall('get_site_section', { section: 'site_config' });
-            if (config && config.logo_url) {
-                const logoEl = document.getElementById('site-logo');
-                if (logoEl) logoEl.innerHTML = '<img src="' + esc(config.logo_url) + '" alt="AliverBiopharm">';
-            }
-        } catch(e) {}
-    }
+    const result = await response.json();
 
-    async function loadAnnouncement() {
-      try {
-        const config = await apiCall('get_site_section', { section: 'site_config' });
-        const announcementEl = document.getElementById('hero-announcement');
-        const announcementText = document.getElementById('announcement-text');
-        if (config && config.announcement && announcementEl && announcementText) {
-          announcementText.textContent = config.announcement;
-          announcementEl.classList.add('visible');
-        }
-      } catch(e) {}
-    }
+    return result.data || result;
+  } catch (error) {
+    console.error(`API ERROR (${action})`, error);
 
-    window.signOut = async function() { 
-        try { await apiCall('signout'); } catch (e) {} 
-        localStorage.removeItem('sb-token'); 
-        localStorage.removeItem('sb-email'); 
-        sessionStorage.clear(); 
-        updateMobilePanel([]); 
-        location.href = '/'; 
+    return {
+      success: false,
+      error: true,
+      message: error.message
     };
+  }
+}
 
-    window.showAuthForm = function(mode) {
-        const existing = document.getElementById('auth-modal'); 
-        if (existing) existing.remove();
-        
-        const modal = document.createElement('div'); 
-        modal.id = 'auth-modal';
-        modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
-        modal.innerHTML = '<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:var(--radius-lg);padding:2rem;max-width:380px;width:90%;position:relative;backdrop-filter:blur(20px);"><button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;font-size:1.2rem;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;text-align:center;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" class="form-input" placeholder="Email" required><input type="password" id="auth-password" class="form-input" placeholder="Password (min 6 chars)" minlength="6" required><button type="submit" class="btn-primary" style="justify-content:center;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</button></form><p style="text-align:center;margin-top:1rem;color:var(--clr-text-dim);font-size:0.9rem;">' + (mode === 'signin' ? "No account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign up</a>" : "Have account? <a href='#' id='switch-mode' style='color:var(--clr-magenta);'>Sign in</a>") + '</p><p id="auth-error" style="color:#ff4444;text-align:center;margin-top:0.5rem;display:none;"></p></div>';
-        document.body.appendChild(modal);
-        
-        document.getElementById('close-auth').onclick = () => modal.remove();
-        modal.addEventListener('click', (e) => { if (e.target === modal) modal.remove(); });
-        document.getElementById('switch-mode').onclick = (e) => { e.preventDefault(); modal.remove(); showAuthForm(mode === 'signin' ? 'signup' : 'signin'); };
-        document.getElementById('auth-form').onsubmit = async (e) => { 
-            e.preventDefault(); 
-            const email = document.getElementById('auth-email').value.trim();
-            const password = document.getElementById('auth-password').value;
-            const errEl = document.getElementById('auth-error'); 
-            errEl.style.display = 'none'; 
-            try { 
-                const action = mode === 'signin' ? 'signin' : 'signup'; 
-                const data = await apiCall(action, { email, password }); 
-                if (data.session) { 
-                    localStorage.setItem('sb-token', data.session.access_token); 
-                    localStorage.setItem('sb-email', data.user.email); 
-                    modal.remove(); 
-                    updateMobilePanel([]); 
-                    location.reload(); 
-                } else if (mode === 'signup') { 
-                    errEl.textContent = 'Check your email to confirm signup.'; 
-                    errEl.style.display = 'block'; 
-                } 
-            } catch (err) { 
-                errEl.textContent = err.message; 
-                errEl.style.display = 'block'; 
-            } 
-        };
-    };
+/* =========================================
+   LOAD SITE SECTIONS
+========================================= */
+async function loadSections() {
+  const data = await apiCall(
+    'get_all_site_sections',
+    {},
+    'GET'
+  );
 
-    async function buildFooter(d) { 
-        if (!d) return; 
-        const fg = document.getElementById('footer-grid');
-        const fs = document.getElementById('footer-social'); 
-        const cols = (d.columns || []).map(c => '<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">' + esc(c.heading) + '</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;">' + (c.items || []).map(i => '<li><a href="' + esc(i.href || '#') + '" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;transition:color 0.2s;" onmouseover="this.style.color=\'var(--clr-cyan)\'" onmouseout="this.style.color=\'var(--clr-text-dim)\'">' + (i.icon ? '<i class="' + esc(i.icon) + '" style="color:var(--clr-magenta);margin-right:0.5rem;"></i>' : '') + esc(i.label) + '</a></li>').join('') + '</ul></div>').join(''); 
-        fg.innerHTML = cols; 
-        fs.innerHTML = (d.social_links || []).map(s => '<a href="' + esc(s.url) + '" aria-label="' + esc(s.platform) + '"><i class="' + esc(s.icon) + '"></i></a>').join(''); 
-    }
+  if (data?.error) return;
 
-    async function buildHero(d) { 
-      const slides = d?.slides || []; 
-      if (!slides.length) return; 
-      const carousel = document.querySelector('.hero-carousel'); 
-      carousel.innerHTML = slides.map((s, i) => '<div class="carousel-slide' + (i === 0 ? ' active' : '') + '" style="background-image:url(\'' + esc(s.background_image) + '\');"><div class="slide-overlay"><h2 class="font-display font-black text-4xl md:text-6xl mb-4" style="text-shadow: 0 2px 12px rgba(255,255,255,0.8);">' + esc(s.title) + '</h2><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:var(--clr-white);text-shadow: 0 2px 8px rgba(255,255,255,0.6);">' + esc(s.subtitle) + '</p><a href="' + esc(s.cta_link) + '" class="btn-primary"><i class="' + esc(s.icon || 'fa-solid fa-arrow-right') + '"></i> ' + esc(s.cta_text) + '</a></div></div>').join('') + '<button class="carousel-arrow carousel-prev"><i class="fa-solid fa-chevron-left"></i></button><button class="carousel-arrow carousel-next"><i class="fa-solid fa-chevron-right"></i></button><div class="carousel-controls">' + slides.map((_, i) => '<span class="carousel-dot' + (i === 0 ? ' active' : '') + '" data-index="' + i + '"></span>').join('') + '</div>'; 
-      initCarousel(slides.length); 
-    }
+  AppState.sections = data || {};
 
-    async function buildTeam(d) { 
-        const m = d?.members || []; 
-        const g = document.getElementById('team-grid'); 
-        
-        const cached = getCachedView('team');
-        if (cached && !m.length) {
-            g.innerHTML = cached;
-            return;
-        }
-        
-        if (!m.length) {
-            g.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Team coming soon.</p>';
-            return;
-        }
-        
-        g.innerHTML = m.map(p => '<div class="card team-card text-center"><div class="team-avatar">' + (p.avatar_url ? '<img src="' + esc(p.avatar_url) + '" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" onerror="this.parentElement.innerHTML=\'<i class=\\\'fa-solid fa-user-tie\\\'></i>\'">' : '<i class="fa-solid fa-user-tie"></i>') + '</div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);margin-top:0.5rem;">' + esc(p.name) + (p.title ? ', ' + esc(p.title) : '') + '</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin-top:0.5rem;">' + esc(p.bio || '') + '</p></div>').join(''); 
-        
-        cacheView('team', g.innerHTML);
-    }
+  renderHero();
+  renderFooter();
+  renderFeatures();
+}
 
-    async function buildTestimonials(d) { 
-        const q = d?.quotes || []; 
-        const s = document.getElementById('testimonial-slider'); 
-        if (!q.length) {
-            s.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No testimonials yet.</p>';
-            return;
-        } 
-        let c = 0; 
-        function show(i) {
-            c = i;
-            s.innerHTML = '<p class="testimonial-quote">"' + esc(q[i].text) + '"</p><p class="testimonial-author">— ' + esc(q[i].author) + '</p><div class="testimonial-nav">' + q.map((_, j) => '<span class="testimonial-dot' + (j === i ? ' active' : '') + '" data-index="' + j + '"></span>').join('') + '</div>';
-            s.querySelectorAll('.testimonial-dot').forEach(d => d.onclick = () => show(+d.dataset.index));
-        } 
-        show(0); 
-        setInterval(() => show((c + 1) % q.length), 5000); 
-    }
+/* =========================================
+   HERO
+========================================= */
+function renderHero() {
+  const hero = AppState.sections.hero;
 
-    async function buildPricing(d) { 
-        const p = d?.plans || []; 
-        const g = document.getElementById('pricing-grid'); 
-        if (!p.length) {
-            g.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Plans coming soon.</p>';
-            return;
-        } 
-        g.innerHTML = p.map(pl => '<div class="card pricing-card' + (pl.featured ? ' featured' : '') + '"><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">' + esc(pl.name) + '</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">' + esc(pl.description || '') + '</p><div class="price my-3">' + esc(pl.price) + '<span style="font-size:1rem;color:var(--clr-text-dim);">' + esc(pl.period || '') + '</span></div><ul class="pricing-features">' + (pl.features || []).map(f => '<li><i class="fa-solid fa-check"></i> ' + esc(f) + '</li>').join('') + '</ul><button class="btn-primary w-full justify-center mt-4">' + esc(pl.cta_text || 'Subscribe') + '</button></div>').join(''); 
-    }
+  const container = qs('#hero-section');
 
-    async function buildBlog(d) { 
-        const posts = d?.posts || []; 
-        const g = document.getElementById('blog-grid'); 
-        if (!posts.length) {
-            g.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Articles coming soon.</p>';
-            return;
-        } 
-        g.innerHTML = posts.map(p => '<div class="card">' + (p.image_url ? '<img src="' + esc(p.image_url) + '" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" onerror="this.style.display=\'none\'">' : '') + '<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar"></i> ' + esc(p.date || '') + '</span><span><i class="fa-regular fa-user"></i> ' + esc(p.author || '') + '</span></div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">' + esc(p.title) + '</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">' + esc(p.excerpt || '') + '</p><a href="#" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;">Read Article <i class="fa-solid fa-arrow-right"></i></a></div>').join(''); 
-    }
+  if (!container || !hero) return;
 
-    async function buildFAQ(d) { 
-        const items = d?.items || []; 
-        const list = document.getElementById('faq-list'); 
-        if (!items.length) {
-            list.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">FAQ coming soon.</p>';
-            return;
-        } 
-        list.innerHTML = items.map(i => '<div class="faq-item"><button class="faq-question" onclick="this.parentElement.classList.toggle(\'active\')"><span>' + esc(i.question) + '</span><span style="color:var(--clr-cyan);font-size:1.3rem;line-height:1;">+</span></button><div class="faq-answer"><p>' + esc(i.answer) + '</p></div></div>').join(''); 
-    }
+  container.innerHTML = `
+    <section class="hero-wrapper">
 
-    async function buildStatistics(d) { 
-        const stats = d?.stats || []; 
-        const grid = document.getElementById('stats-grid'); 
-        if (!stats.length) {
-            grid.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Stats coming soon.</p>';
-            return;
-        } 
-        grid.innerHTML = stats.map(s => '<div><div class="stat-number" data-target="' + s.value + '" data-suffix="' + esc(s.suffix || '') + '">0</div><div style="color:var(--clr-text-dim);margin-top:0.25rem;font-size:0.875rem;">' + esc(s.label) + '</div></div>').join(''); 
-        const obs = new IntersectionObserver(entries => {
-            if (entries[0].isIntersecting) {
-                grid.querySelectorAll('.stat-number').forEach(el => {
-                    const t = +el.dataset.target;
-                    const sf = el.dataset.suffix;
-                    let c = 0;
-                    const inc = Math.ceil(t / 50);
-                    const ti = setInterval(() => {
-                        c += inc;
-                        if (c >= t) {
-                            c = t;
-                            clearInterval(ti);
-                        }
-                        el.textContent = c + sf;
-                    }, 40);
-                });
-                obs.disconnect();
-            }
-        }, { threshold: 0.5 }); 
-        obs.observe(grid); 
-    }
+      <div class="hero-content">
 
-    async function buildResources(filters = {}) {
-        document.getElementById('resources-container').innerHTML = '<div class="skeleton" style="height:300px;"></div>';
-        try { 
-            const data = await apiCall('get_resources', { filters }); 
-            if (!data || !data.length) { 
-                document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No resources found.</p>'; 
-                return; 
-            } 
-            const groups = {}; 
-            data.forEach(item => { 
-                const s = (item.section_type || 'Resources').trim(); 
-                if (!groups[s]) groups[s] = []; 
-                groups[s].push(item); 
-            }); 
-            document.getElementById('resources-container').innerHTML = Object.entries(groups).map(([name, items]) => '
-                <div style="margin-bottom:3rem;">
-                    <h2 style="font-family:\'Playfair Display\',serif;font-size:1.6rem;color:var(--clr-cyan);margin-bottom:1.25rem;padding-left:1rem;border-left:4px solid var(--clr-magenta);">' + esc(name) + '</h2>
-                    <div class="resources-grid">
-                        ' + items.map(item => {
-                            return '
-                            <div class="resource-card">
-                                <div style="font-size:2.2rem;color:var(--clr-magenta);">
-                                    <i class="fa-solid fa-file-pdf"></i>
-                                </div>
-                                <a href="notes.html?id=' + esc(String(item.id)) + '" style="font-weight:700;font-size:1.05rem;color:var(--clr-white);text-decoration:none;">
-                                    ' + esc(item.title || 'Untitled') + '
-                                </a>
-                                <p style="font-size:0.9rem;color:var(--clr-text-dim);flex-grow:1;">
-                                    ' + esc(item.description || '') + '
-                                </p>
-                                <div style="display:flex;flex-wrap:wrap;gap:0.6rem;font-size:0.8rem;color:var(--clr-text-muted);">
-                                    <span><i class="fa-regular fa-user"></i> ' + esc(item.author || 'Unknown') + '</span>
-                                    <span><i class="fa-regular fa-calendar"></i> ' + (item.created_at ? new Date(item.created_at).toLocaleDateString() : 'N/A') + '</span>
-                                    <span><i class="fa-regular fa-file"></i> ' + esc(item.file_size || 'N/A') + '</span>
-                                </div>
-                                <div style="display:flex;align-items:center;justify-content:space-between;padding-top:1rem;border-top:1px solid var(--clr-border-glow);">
-                                    <a href="pdf.html?id=' + esc(String(item.id)) + '" class="btn-download" onclick="event.stopPropagation();">
-                                        <i class="fa-solid fa-download"></i> Download
-                                    </a>
-                                    <div style="display:flex;gap:0.4rem;">
-                                        <a href="#" class="share-btn" onclick="event.preventDefault();event.stopPropagation();"><i class="fa-brands fa-facebook-f"></i></a>
-                                        <a href="#" class="share-btn" onclick="event.preventDefault();event.stopPropagation();"><i class="fa-brands fa-x-twitter"></i></a>
-                                        <a href="#" class="share-btn" onclick="event.preventDefault();event.stopPropagation();"><i class="fa-brands fa-whatsapp"></i></a>
-                                    </div>
-                                </div>
-                            </div>';
-                        }).join('') + '
-                    </div>
-                </div>
-            ').join(''); 
-        } catch (err) { 
-            document.getElementById('resources-container').innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load resources.</p>'; 
-        }
-    }
+        <h1>
+          ${escapeHtml(hero.title || 'AliverBiopharm')}
+        </h1>
 
-    async function loadFilters() { 
-        try { 
-            const { levels, categories, tags } = await apiCall('get_filter_options'); 
-            ['filter-level', 'filter-category', 'filter-tag'].forEach((id, i) => { 
-                const opts = [levels, categories, tags][i]; 
-                const sel = document.getElementById(id); 
-                if (sel) {
-                    sel.innerHTML = '<option value="">All</option>';
-                    opts.forEach(o => {
-                        const el = document.createElement('option');
-                        el.value = o;
-                        el.textContent = o;
-                        sel.appendChild(el);
-                    });
-                }
-            }); 
-        } catch (err) {} 
-    }
+        <p>
+          ${escapeHtml(
+            hero.description ||
+            'Professional biology and pharmacy learning resources.'
+          )}
+        </p>
 
-    function initCarousel(count) { 
-        const slides = document.querySelectorAll('.carousel-slide');
-        const dots = document.querySelectorAll('.carousel-dot'); 
-        let current = 0;
-        let interval; 
-        function go(i) {
-            slides[current].classList.remove('active');
-            dots[current]?.classList.remove('active');
-            current = i;
-            slides[current].classList.add('active');
-            dots[current]?.classList.add('active');
-        } 
-        function nxt() { go((current + 1) % count); } 
-        function prv() { go((current - 1 + count) % count); } 
-        function reset() {
-            clearInterval(interval);
-            interval = setInterval(nxt, 5000);
-        } 
-        document.querySelector('.carousel-prev')?.addEventListener('click', () => { prv(); reset(); }); 
-        document.querySelector('.carousel-next')?.addEventListener('click', () => { nxt(); reset(); }); 
-        dots.forEach(d => d.addEventListener('click', () => { go(+d.dataset.index); reset(); })); 
-        reset(); 
-    }
+        <button class="hero-button" id="hero-explore-btn">
+          Explore Resources
+        </button>
 
-    function initUI() {
-        const tt = document.getElementById('theme-toggle');
-        const icon = tt.querySelector('i');
-        if (localStorage.getItem('theme') === 'dark') { 
-            document.body.classList.add('dark-mode'); 
-            icon.classList.remove('fa-moon'); 
-            icon.classList.add('fa-sun'); 
-        }
-        tt.onclick = () => { 
-            document.body.classList.toggle('dark-mode'); 
-            const isDark = document.body.classList.contains('dark-mode'); 
-            if (isDark) { 
-                icon.classList.remove('fa-moon'); 
-                icon.classList.add('fa-sun'); 
-                localStorage.setItem('theme', 'dark'); 
-            } else { 
-                icon.classList.remove('fa-sun'); 
-                icon.classList.add('fa-moon'); 
-                localStorage.setItem('theme', 'light'); 
-            } 
-        };
-        
-        const mt = document.getElementById('mobile-toggle');
-        const mp = document.getElementById('mobile-nav-panel');
-        const mo = document.getElementById('mobile-nav-overlay');
-        const closeBtn = document.getElementById('mobile-close-btn');
-        
-        function open() { 
-            mp.classList.add('active'); 
-            mo.classList.add('active'); 
-            document.body.style.overflow = 'hidden'; 
-        }
-        function close() { 
-            mp.classList.remove('active'); 
-            mo.classList.remove('active'); 
-            document.body.style.overflow = ''; 
-        }
-        
-        mt.onclick = () => mp.classList.contains('active') ? close() : open();
-        mo.onclick = close; 
-        closeBtn.onclick = close;
-        document.addEventListener('keydown', e => { if (e.key === 'Escape') close(); });
-        
-        const bb = document.getElementById('back-to-top');
-        window.addEventListener('scroll', () => { 
-            bb.classList.toggle('visible', window.scrollY > 500); 
-            document.getElementById('site-header').classList.toggle('scrolled', window.scrollY > 50); 
-        }, { passive: true });
-        bb.onclick = () => window.scrollTo({ top: 0, behavior: 'smooth' });
-        
-        document.querySelectorAll('a[href^="#"]').forEach(a => a.addEventListener('click', function(e) { 
-            if (this.getAttribute('href') === '#') return; 
-            e.preventDefault(); 
-            document.querySelector(this.getAttribute('href'))?.scrollIntoView({ behavior: 'smooth' }); 
-        }));
-        
-        const obs = new IntersectionObserver(entries => { 
-            entries.forEach(e => { 
-                if (e.isIntersecting) { 
-                    e.target.classList.add('in'); 
-                    obs.unobserve(e.target); 
-                } 
-            }); 
-        }, { threshold: 0.1 });
-        document.querySelectorAll('.reveal').forEach(el => obs.observe(el));
-        
-        document.getElementById('contact-form').onsubmit = async function(e) { 
-            e.preventDefault(); 
-            const fd = { 
-                name: document.getElementById('contact-name').value.trim(), 
-                email: document.getElementById('contact-email').value.trim(), 
-                subject: document.getElementById('contact-subject').value.trim(), 
-                message: document.getElementById('contact-message').value.trim() 
-            }; 
-            if (!fd.name || !fd.email || !fd.subject || !fd.message) return alert('Please fill all fields.'); 
-            if (!/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(fd.email)) return alert('Please enter a valid email.'); 
-            try { 
-                await apiCall('submit_contact', { formData: fd }); 
-                const s = document.getElementById('form-success'); 
-                s.textContent = '✓ Message sent!'; 
-                s.style.display = 'block'; 
-                this.reset(); 
-                setTimeout(() => s.style.display = 'none', 5000); 
-            } catch (err) { 
-                alert('Failed: ' + err.message); 
-            } 
-        };
-        
-        document.getElementById('newsletter-form').onsubmit = async function(e) { 
-            e.preventDefault(); 
-            const email = this.querySelector('input').value.trim(); 
-            if (!email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(email)) return alert('Valid email required.'); 
-            try { 
-                await apiCall('subscribe_newsletter', { formData: { email } }); 
-                alert('✓ Subscribed!'); 
-                this.reset(); 
-            } catch (err) { 
-                alert('Subscribed!'); 
-                this.reset(); 
-            } 
-        };
-        
-        document.getElementById('filter-submit').onclick = () => buildResources({ 
-            level: document.getElementById('filter-level').value, 
-            category: document.getElementById('filter-category').value, 
-            tag: document.getElementById('filter-tag').value 
-        });
-    }
+      </div>
 
-    document.addEventListener('DOMContentLoaded', async () => {
-        document.getElementById('current-year').textContent = new Date().getFullYear();
-        initUI();
-        
-        try { 
-            const sections = await apiCall('get_all_site_sections'); 
-            if (sections) { 
-                await Promise.allSettled([
-                    buildNavigation(sections.navigation), 
-                    buildFooter(sections.footer), 
-                    buildHero(sections.hero), 
-                    buildTeam(sections.team), 
-                    buildTestimonials(sections.testimonials), 
-                    buildPricing(sections.pricing), 
-                    buildBlog(sections.blog), 
-                    buildFAQ(sections.faq), 
-                    buildStatistics(sections.statistics)
-                ]); 
-            } 
-        } catch (err) { 
-            console.error('Failed to load sections:', err); 
-        }
-        
-        Promise.allSettled([
-            loadFilters(),
-            buildResources()
-        ]);
+    </section>
+  `;
+
+  const btn = qs('#hero-explore-btn');
+
+  if (btn) {
+    btn.addEventListener('click', () => {
+      qs('#resources-section')?.scrollIntoView({
+        behavior: 'smooth'
+      });
     });
+  }
+}
 
-    class ScreenWakeManager {
-        constructor() {
-            this.wakeLock = null;
-            this.isSupported = 'wakeLock' in navigator;
-            this.createStatusIndicator();
-            this.initialize();
-        }
+/* =========================================
+   FEATURES
+========================================= */
+function renderFeatures() {
+  const section = AppState.sections.features;
 
-        async initialize() {
-            if (!this.isSupported) {
-                this.updateStatus('Wake Lock not supported on this browser', 'warning');
-                return;
-            }
+  const container = qs('#features-section');
 
-            const enableEvents = ['click', 'touchstart', 'keydown'];
-            const enableWakeLockOnce = async () => {
-                await this.enableWakeLock();
-                enableEvents.forEach(event => {
-                    document.removeEventListener(event, enableWakeLockOnce);
-                });
-            };
+  if (!container || !section?.items) return;
 
-            enableEvents.forEach(event => {
-                document.addEventListener(event, enableWakeLockOnce, { once: true });
-            });
+  container.innerHTML = section.items.map(item => `
+    <div class="feature-card">
 
-            document.addEventListener('visibilitychange', async () => {
-                if (document.visibilityState === 'visible' && this.wakeLock === null) {
-                    await this.enableWakeLock();
-                }
-            });
+      <h3>
+        ${escapeHtml(item.title)}
+      </h3>
 
-            try {
-                await this.enableWakeLock();
-            } catch (error) {
-                console.log('Waiting for user interaction...');
-            }
-        }
+      <p>
+        ${escapeHtml(item.description)}
+      </p>
 
-        async enableWakeLock() {
-            try {
-                this.wakeLock = await navigator.wakeLock.request('screen');
-                console.log('Screen Wake Lock enabled');
-                this.updateStatus('Screen Awake Enabled', 'success');
-                this.wakeLock.addEventListener('release', () => {
-                    console.log('Screen Wake Lock released');
-                    this.wakeLock = null;
-                    this.updateStatus('Screen Awake Disabled', 'warning');
-                });
-            } catch (error) {
-                console.error('Wake Lock Error:', error);
-                this.updateStatus(error.message, 'error');
-            }
-        }
+    </div>
+  `).join('');
+}
 
-        async disableWakeLock() {
-            if (this.wakeLock !== null) {
-                await this.wakeLock.release();
-                this.wakeLock = null;
-                this.updateStatus('Screen Awake Disabled', 'warning');
-            }
-        }
+/* =========================================
+   FOOTER
+========================================= */
+function renderFooter() {
+  const footer = AppState.sections.footer;
 
-        createStatusIndicator() {
-            const indicator = document.createElement('div');
-            indicator.id = 'wake-lock-status';
-            indicator.style.position = 'fixed';
-            indicator.style.bottom = '20px';
-            indicator.style.right = '20px';
-            indicator.style.padding = '10px 16px';
-            indicator.style.borderRadius = '12px';
-            indicator.style.fontSize = '14px';
-            indicator.style.fontWeight = '600';
-            indicator.style.zIndex = '99999';
-            indicator.style.backdropFilter = 'blur(10px)';
-            indicator.style.boxShadow = '0 4px 15px rgba(0,0,0,0.15)';
-            indicator.style.transition = 'all 0.3s ease';
-            indicator.style.fontFamily = 'Arial, sans-serif';
-            indicator.innerText = 'Initializing Wake Lock...';
-            document.body.appendChild(indicator);
-        }
+  const container = qs('#footer-section');
 
-        updateStatus(message, type) {
-            const indicator = document.getElementById('wake-lock-status');
-            if (!indicator) return;
-            indicator.innerText = message;
-            switch (type) {
-                case 'success':
-                    indicator.style.background = 'rgba(16,185,129,0.95)';
-                    indicator.style.color = '#fff';
-                    break;
-                case 'warning':
-                    indicator.style.background = 'rgba(245,158,11,0.95)';
-                    indicator.style.color = '#fff';
-                    break;
-                case 'error':
-                    indicator.style.background = 'rgba(239,68,68,0.95)';
-                    indicator.style.color = '#fff';
-                    break;
-                default:
-                    indicator.style.background = 'rgba(59,130,246,0.95)';
-                    indicator.style.color = '#fff';
-            }
-        }
+  if (!container) return;
+
+  container.innerHTML = `
+    <footer class="footer-wrapper">
+
+      <p>
+        ${escapeHtml(
+          footer?.text ||
+          '© 2026 AliverBiopharm'
+        )}
+      </p>
+
+    </footer>
+  `;
+}
+
+/* =========================================
+   LOAD RESOURCES
+========================================= */
+async function loadResources(filters = {}) {
+  showLoading('#resources-container');
+
+  const data = await apiCall(
+    'get_resources',
+    { filters }
+  );
+
+  if (data?.error) {
+    showError(
+      '#resources-container',
+      'Failed to load resources'
+    );
+    return;
+  }
+
+  AppState.resources = data || [];
+
+  renderResources();
+}
+
+/* =========================================
+   RENDER RESOURCES
+========================================= */
+function renderResources() {
+  const container = qs('#resources-container');
+
+  if (!container) return;
+
+  if (!AppState.resources.length) {
+    showEmpty(
+      '#resources-container',
+      'No resources available'
+    );
+    return;
+  }
+
+  container.innerHTML = AppState.resources.map(resource => `
+    <article class="resource-card">
+
+      <div class="resource-top">
+
+        <h3>
+          ${escapeHtml(resource.title || 'Untitled')}
+        </h3>
+
+        <span class="resource-level">
+          ${escapeHtml(resource.level || 'General')}
+        </span>
+
+      </div>
+
+      <p class="resource-description">
+        ${escapeHtml(resource.description || '')}
+      </p>
+
+      <div class="resource-meta">
+
+        <span>
+          ${escapeHtml(resource.category || '')}
+        </span>
+
+        <span>
+          ${escapeHtml(resource.tag || '')}
+        </span>
+
+      </div>
+
+      ${
+        resource.file_url
+          ? `
+            <a
+              href="${resource.file_url}"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="resource-download-btn"
+            >
+              Download
+            </a>
+          `
+          : ''
+      }
+
+    </article>
+  `).join('');
+}
+
+/* =========================================
+   FILTERS
+========================================= */
+async function loadFilters() {
+  const data = await apiCall(
+    'get_filter_options'
+  );
+
+  if (data?.error) return;
+
+  AppState.filters = data;
+
+  renderFilters();
+}
+
+function renderFilters() {
+  populateSelect(
+    '#level-filter',
+    AppState.filters.levels || []
+  );
+
+  populateSelect(
+    '#category-filter',
+    AppState.filters.categories || []
+  );
+
+  populateSelect(
+    '#tag-filter',
+    AppState.filters.tags || []
+  );
+}
+
+function populateSelect(selector, items) {
+  const select = qs(selector);
+
+  if (!select) return;
+
+  select.innerHTML = `
+    <option value="">
+      All
+    </option>
+
+    ${items.map(item => `
+      <option value="${escapeHtml(item)}">
+        ${escapeHtml(item)}
+      </option>
+    `).join('')}
+  `;
+}
+
+function setupFilterEvents() {
+  const filters = [
+    '#level-filter',
+    '#category-filter',
+    '#tag-filter'
+  ];
+
+  filters.forEach(selector => {
+    const element = qs(selector);
+
+    if (!element) return;
+
+    element.addEventListener('change', applyFilters);
+  });
+}
+
+async function applyFilters() {
+  const filters = {
+    level: qs('#level-filter')?.value || '',
+    category: qs('#category-filter')?.value || '',
+    tag: qs('#tag-filter')?.value || ''
+  };
+
+  await loadResources(filters);
+}
+
+/* =========================================
+   AUTH
+========================================= */
+async function signUp(email, password) {
+  const result = await apiCall('signup', {
+    email,
+    password
+  });
+
+  if (result?.user) {
+    notify('Account created', 'success');
+  }
+
+  return result;
+}
+
+async function signIn(email, password) {
+  const result = await apiCall('signin', {
+    email,
+    password
+  });
+
+  if (result?.session?.access_token) {
+    localStorage.setItem(
+      'auth_token',
+      result.session.access_token
+    );
+
+    AppState.user = result.user;
+
+    notify('Signed in successfully', 'success');
+  }
+
+  return result;
+}
+
+async function loadCurrentUser() {
+  const result = await apiCall('get_user');
+
+  if (result?.user) {
+    AppState.user = result.user;
+  }
+}
+
+function signOut() {
+  localStorage.removeItem('auth_token');
+
+  AppState.user = null;
+
+  notify('Signed out');
+
+  setTimeout(() => {
+    location.reload();
+  }, 500);
+}
+
+/* =========================================
+   CONTACT FORM
+========================================= */
+async function submitContact(formData) {
+  const result = await apiCall(
+    'submit_contact',
+    { formData }
+  );
+
+  if (result?.success) {
+    notify(
+      'Message sent successfully',
+      'success'
+    );
+  }
+
+  return result;
+}
+
+/* =========================================
+   NEWSLETTER
+========================================= */
+async function subscribeNewsletter(email) {
+  const result = await apiCall(
+    'subscribe_newsletter',
+    {
+      formData: { email }
     }
+  );
 
-    window.addEventListener('DOMContentLoaded', () => {
-        window.screenWakeManager = new ScreenWakeManager();
+  if (result?.success) {
+    notify(
+      'Subscribed successfully',
+      'success'
+    );
+  }
+
+  return result;
+}
+
+/* =========================================
+   QUIZZES
+========================================= */
+async function loadQuizzes(category = 'all') {
+  const data = await apiCall(
+    'get_quizzes',
+    { category },
+    'GET'
+  );
+
+  if (data?.error) return;
+
+  AppState.quizzes = data || [];
+
+  renderQuizzes();
+}
+
+function renderQuizzes() {
+  const container = qs('#quiz-container');
+
+  if (!container) return;
+
+  if (!AppState.quizzes.length) {
+    showEmpty(
+      '#quiz-container',
+      'No quizzes available'
+    );
+    return;
+  }
+
+  container.innerHTML = AppState.quizzes.map(quiz => `
+    <div class="quiz-card">
+
+      <h3>
+        ${escapeHtml(quiz.title)}
+      </h3>
+
+      <p>
+        ${escapeHtml(quiz.description || '')}
+      </p>
+
+      <button
+        class="quiz-btn"
+        data-quiz-id="${quiz.id}"
+      >
+        Start Quiz
+      </button>
+
+    </div>
+  `).join('');
+
+  qsa('.quiz-btn').forEach(button => {
+    button.addEventListener('click', async () => {
+      const id = button.dataset.quizId;
+
+      await openQuiz(id);
     });
-  </script>
+  });
+}
+
+async function openQuiz(id) {
+  const quiz = await apiCall(
+    'get_quiz',
+    { id },
+    'GET'
+  );
+
+  if (quiz?.error) {
+    notify(
+      'Failed to load quiz',
+      'error'
+    );
+    return;
+  }
+
+  AppState.currentQuiz = quiz;
+
+  console.log('Quiz loaded:', quiz);
+}
+
+/* =========================================
+   INITIALIZATION
+========================================= */
+async function initializeApp() {
+  try {
+    await Promise.all([
+      loadSections(),
+      loadResources(),
+      loadFilters(),
+      loadCurrentUser()
+    ]);
+
+    setupFilterEvents();
+
+    console.log(
+      'Application initialized successfully'
+    );
+  } catch (error) {
+    console.error(
+      'Initialization failed',
+      error
+    );
+
+    notify(
+      'Application failed to initialize',
+      'error'
+    );
+  }
+}
+
+/* =========================================
+   DOM READY
+========================================= */
+document.addEventListener(
+  'DOMContentLoaded',
+  initializeApp
+);
+</script>
 </body>
 </html>
