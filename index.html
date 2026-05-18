@@ -1437,168 +1437,159 @@
     }
 
          document.addEventListener('DOMContentLoaded', async () => {
-      document.getElementById('current-year').textContent = new Date().getFullYear();
-      initUI();
+  document.getElementById('current-year').textContent = new Date().getFullYear();
+  initUI();
+  try {
+    const sections = await apiCall('get_all_site_sections');
+    if (sections) {
       try {
-        const sections = await apiCall('get_all_site_sections');
-        if (sections) {
-          try {
-            if (sections.navigation) {
-  if (sections.site_config && sections.site_config.logo_url) {
-  const logoUrl = sections.site_config.logo_url;
-  const headerLogoLink = document.querySelector('.site-header .logo-link');
-  const mobileLogoLink = document.querySelector('.mobile-nav-header .logo-link');
-  const footerLogoLink = document.querySelector('.footer-fat .logo-link');
-  const headerContainer = document.querySelector('.header-container');
-  const navActions = document.querySelector('.nav-actions');
-  
-  if (headerContainer) {
-    headerContainer.style.cssText = 'max-width:var(--max-width);margin:0 auto;display:flex;align-items:center;justify-content:space-between;padding:14px 24px;width:100%;position:relative;';
-  }
-  
-  if (navActions) {
-    navActions.style.cssText = 'display:flex;gap:0.5rem;align-items:center;flex-shrink:0;order:3;';
-  }
-  
-  if (headerLogoLink) {
-    headerLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;z-index:101;order:2;flex-shrink:0;';
-    headerLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:400px;width:auto;max-width:50vw;object-fit:contain;display:block;margin:-180px 0;position:relative;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' aria-hidden=\\'true\\'><svg width=\\'18\\' height=\\'18\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
-  }
-  
-  if (mobileLogoLink) {
-    mobileLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;z-index:201;';
-    mobileLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:300px;width:auto;max-width:60vw;object-fit:contain;display:block;margin:-135px 0;position:relative;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' style=\\'width:32px;height:32px;\\' aria-hidden=\\'true\\'><svg width=\\'14\\' height=\\'14\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
-  }
-  
-  if (footerLogoLink) {
-    footerLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;';
-    footerLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:350px;width:auto;max-width:80vw;object-fit:contain;display:block;margin:-155px 0;margin-bottom:8px;position:relative;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' style=\\'width:32px;height:32px;\\' aria-hidden=\\'true\\'><svg width=\\'15\\' height=\\'15\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
-  }
-}
-             const links = sections.navigation.links || [];
-              document.getElementById('main-nav').innerHTML = links.map(l => '<li role="listitem"><a href="' + esc(l.href) + '">' + esc(l.label) + '</a></li>').join('');
-              updateMobilePanel(links);
-            }
-          } catch(err) {
-            console.error('Navigation failed:', err);
-            document.getElementById('main-nav').innerHTML = '<li><a href="#">Home</a></li><li><a href="#courses">Resources</a></li><li><a href="#contact">Contact</a></li>';
+        if (sections.site_config && sections.site_config.logo_url) {
+          const logoUrl = sections.site_config.logo_url;
+          const headerLogoLink = document.querySelector('.site-header .logo-link');
+          const mobileLogoLink = document.querySelector('.mobile-nav-header .logo-link');
+          const footerLogoLink = document.querySelector('.footer-fat .logo-link');
+          
+          if (headerLogoLink) {
+            headerLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;z-index:101;';
+            headerLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:120px;width:auto;max-width:50vw;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' aria-hidden=\\'true\\'><svg width=\\'18\\' height=\\'18\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
           }
-
-          try {
-            if (sections.hero && sections.hero.slides && sections.hero.slides.length) {
-              const slides = sections.hero.slides;
-              document.querySelector('.hero-carousel').innerHTML = slides.map((s,i) => '<div class="carousel-slide'+(i===0?' active':'')+'" style="background-image:url(\''+esc(s.background_image)+'\');" role="img" aria-label="' + esc(s.title) + '"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;text-shadow:0 2px 16px rgba(0,0,0,0.9);">'+esc(s.title)+'</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.8);">'+esc(s.subtitle)+'</p><a href="'+esc(s.cta_link)+'" class="btn-primary"><i class="'+esc(s.icon||'fa-solid fa-arrow-right')+'" aria-hidden="true"></i> '+esc(s.cta_text)+'</a></div></div>').join('') + '<button class="carousel-arrow carousel-prev" aria-label="Previous slide"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button><button class="carousel-arrow carousel-next" aria-label="Next slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button><div class="carousel-controls" role="tablist" aria-label="Slide navigation">' + slides.map((_,i) => '<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'" role="tab" aria-label="Slide '+(i+1)+'" tabindex="0"></span>').join('') + '</div>';
-              initCarousel(slides.length);
-            } else {
-              document.querySelector('.hero-carousel').innerHTML = '<div class="carousel-slide active" style="background:linear-gradient(135deg,#0a4f4f,#0e7070);"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;">Welcome to AliverBiopharm</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;">Advanced Biology & Pharmacy Learning Platform</p><a href="#courses" class="btn-primary">Explore Resources <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>';
-            }
-          } catch(err) {
-            console.error('Hero failed:', err);
-            document.querySelector('.hero-carousel').innerHTML = '<div class="carousel-slide active" style="background:linear-gradient(135deg,#0a4f4f,#0e7070);"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;">Welcome to AliverBiopharm</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;">Advanced Biology & Pharmacy Learning Platform</p><a href="#courses" class="btn-primary">Explore Resources <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>';
+          
+          if (mobileLogoLink) {
+            mobileLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;z-index:201;';
+            mobileLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:90px;width:auto;max-width:50vw;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' style=\\'width:32px;height:32px;\\' aria-hidden=\\'true\\'><svg width=\\'14\\' height=\\'14\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
           }
-
-          if (sections.site_config && sections.site_config.announcement) {
-            try {
-              const ae = document.getElementById('hero-announcement'), at = document.getElementById('announcement-text');
-              if (ae && at) {
-                at.textContent = sections.site_config.announcement;
-                ae.classList.add('visible');
-              }
-            } catch(err) { console.error('Announcement failed:', err); }
+          
+          if (footerLogoLink) {
+            footerLogoLink.style.cssText = 'overflow:visible;display:inline-flex;align-items:center;position:relative;margin-bottom:14px;';
+            footerLogoLink.innerHTML = `<img src="${esc(logoUrl)}" alt="AliverBiopharm" style="height:100px;width:auto;max-width:60vw;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML='<div class=\\'logo-icon\\' style=\\'width:32px;height:32px;\\' aria-hidden=\\'true\\'><svg width=\\'15\\' height=\\'15\\' fill=\\'none\\' stroke=\\'#fff\\' stroke-width=\\'2\\' viewBox=\\'0 0 24 24\\'><path stroke-linecap=\\'round\\' stroke-linejoin=\\'round\\' d=\\'M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5\\'/></svg></div>Aliver<span class=\\'g-text\\'>Biopharm</span>';">`;
           }
-
-          try {
-            if (sections.team && sections.team.members && sections.team.members.length) {
-              document.getElementById('team-grid').innerHTML = sections.team.members.map(p => '<div class="card team-card text-center" role="listitem"><div class="team-avatar" aria-hidden="true">' + (p.avatar_url ? '<img src="'+esc(p.avatar_url)+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=fa-solid fa-user-tie></i>\'">' : '<i class="fa-solid fa-user-tie"></i>') + '</div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);margin-top:0.5rem;">'+esc(p.name)+(p.title?', '+esc(p.title):'')+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin-top:0.5rem;">'+esc(p.bio||'')+'</p></div>').join('');
-            } else {
-              document.getElementById('team-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Our expert faculty information is being updated. Check back soon.</p>';
-            }
-          } catch(err) {
-            console.error('Team failed:', err);
-            document.getElementById('team-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Faculty information temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.testimonials && sections.testimonials.quotes && sections.testimonials.quotes.length) {
-              const q = sections.testimonials.quotes;
-              let c = 0;
-              function show(i) { c = i; document.getElementById('testimonial-slider').innerHTML = '<blockquote class="testimonial-quote">"'+esc(q[i].text)+'"</blockquote><cite class="testimonial-author">— '+esc(q[i].author)+'</cite><div class="testimonial-nav">'+q.map((_,j)=>'<span class="testimonial-dot'+(j===i?' active':'')+'" data-index="'+j+'" role="button" aria-label="Testimonial '+(j+1)+'" tabindex="0"></span>').join('')+'</div>'; document.querySelectorAll('.testimonial-dot').forEach(d=>d.onclick=()=>show(+d.dataset.index)); }
-              show(0); setInterval(() => show((c+1)%q.length), 5000);
-            } else {
-              document.getElementById('testimonial-slider').innerHTML = '<p style="color:var(--clr-text-dim);">Student success stories coming soon.</p>';
-            }
-          } catch(err) {
-            console.error('Testimonials failed:', err);
-            document.getElementById('testimonial-slider').innerHTML = '<p style="color:var(--clr-text-dim);">Testimonials temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.pricing && sections.pricing.plans && sections.pricing.plans.length) {
-              document.getElementById('pricing-grid').innerHTML = sections.pricing.plans.map(pl => '<div class="card pricing-card'+(pl.featured?' featured':'')+'" role="listitem"><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(pl.name)+'</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">'+esc(pl.description||'')+'</p><div class="price my-3">'+esc(pl.price)+'<span style="font-size:1rem;color:var(--clr-text-dim);">'+esc(pl.period||'')+'</span></div><ul class="pricing-features" role="list">'+(pl.features||[]).map(f=>'<li role="listitem"><i class="fa-solid fa-check" aria-hidden="true"></i> '+esc(f)+'</li>').join('')+'</ul><button class="btn-primary w-full justify-center mt-4">'+esc(pl.cta_text||'Subscribe')+'</button></div>').join('');
-            } else {
-              document.getElementById('pricing-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Membership plans are being updated. Contact us for details.</p>';
-            }
-          } catch(err) {
-            console.error('Pricing failed:', err);
-            document.getElementById('pricing-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Pricing information temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.statistics && sections.statistics.stats && sections.statistics.stats.length) {
-              document.getElementById('stats-grid').innerHTML = sections.statistics.stats.map(s => '<div role="listitem"><div class="stat-number">'+esc(s.value)+esc(s.suffix||'')+'</div><div style="color:var(--clr-text-dim);margin-top:0.25rem;font-size:0.875rem;">'+esc(s.label)+'</div></div>').join('');
-            } else {
-              document.getElementById('stats-grid').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Impact statistics coming soon.</p>';
-            }
-          } catch(err) {
-            console.error('Statistics failed:', err);
-            document.getElementById('stats-grid').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Statistics temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.blog && sections.blog.posts && sections.blog.posts.length) {
-              document.getElementById('blog-grid').innerHTML = sections.blog.posts.map(p => '<article class="card" role="listitem">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" loading="lazy" onerror="this.style.display=\'none\'">':'')+'<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="'+esc(p.date||'')+'">'+esc(p.date||'')+'</time></span><span><i class="fa-regular fa-user" aria-hidden="true"></i> '+esc(p.author||'')+'</span></div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(p.title)+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">'+esc(p.excerpt||'')+'</p><a href="#" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;" aria-label="Read more: '+esc(p.title)+'">Read Article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>').join('');
-            } else {
-              document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">New articles coming soon. Subscribe to our newsletter for updates.</p>';
-            }
-          } catch(err) {
-            console.error('Blog failed:', err);
-            document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Articles temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.faq && sections.faq.items && sections.faq.items.length) {
-              document.getElementById('faq-list').innerHTML = sections.faq.items.map(i => '<div class="faq-item" role="listitem"><button class="faq-question" onclick="this.parentElement.classList.toggle(\'active\')" aria-expanded="false"><span>'+esc(i.question)+'</span><span style="color:var(--clr-cyan);font-size:1.3rem;line-height:1;" aria-hidden="true">+</span></button><div class="faq-answer" role="region"><p>'+esc(i.answer)+'</p></div></div>').join('');
-            } else {
-              document.getElementById('faq-list').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Frequently asked questions coming soon.</p>';
-            }
-          } catch(err) {
-            console.error('FAQ failed:', err);
-            document.getElementById('faq-list').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">FAQ temporarily unavailable.</p>';
-          }
-
-          try {
-            if (sections.footer) {
-              const fd = sections.footer;
-              document.getElementById('footer-grid').innerHTML = (fd.columns||[]).map(c => '<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">'+esc(c.heading)+'</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;" role="list">'+(c.items||[]).map(i => '<li role="listitem"><a href="'+esc(i.href||'#')+'" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">'+(i.icon?'<i class="'+esc(i.icon)+'" style="color:var(--clr-magenta);margin-right:0.5rem;" aria-hidden="true"></i>':'')+esc(i.label)+'</a></li>').join('')+'</ul></div>').join('');
-              document.getElementById('footer-social').innerHTML = (fd.social_links||[]).map(s => '<a href="'+esc(s.url)+'" aria-label="'+esc(s.platform)+'" rel="noopener noreferrer" target="_blank" role="listitem"><i class="'+esc(s.icon)+'" aria-hidden="true"></i></a>').join('');
-            }
-          } catch(err) { console.error('Footer failed:', err); }
-
-          try {
-            if (sections.contact && sections.contact.info) {
-              const ci = sections.contact.info;
-              document.getElementById('contact-info-card').innerHTML += ci.map(c => '<div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--clr-border-glow);"><div class="contact-icon" aria-hidden="true"><i class="'+esc(c.icon)+'"></i></div><div><div style="font-size:0.7rem;color:var(--clr-text-muted);">'+esc(c.label)+'</div><a href="'+esc(c.href)+'" style="color:var(--clr-white);text-decoration:none;" rel="noopener noreferrer">'+esc(c.value)+'</a></div></div>').join('');
-            }
-          } catch(err) { console.error('Contact info failed:', err); }
-
         }
-      } catch(err) { 
-        console.error('Failed to load sections:', err);
-        document.querySelector('main').insertAdjacentHTML('afterbegin', '<div style="text-align:center;padding:2rem;color:var(--clr-magenta);" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> Some content could not be loaded. Please refresh the page or try again later.</div>');
+        
+        if (sections.navigation) {
+          const links = sections.navigation.links || [];
+          document.getElementById('main-nav').innerHTML = links.map(l => '<li role="listitem"><a href="' + esc(l.href) + '">' + esc(l.label) + '</a></li>').join('');
+          updateMobilePanel(links);
+        }
+      } catch(err) {
+        console.error('Navigation failed:', err);
+        document.getElementById('main-nav').innerHTML = '<li><a href="#">Home</a></li><li><a href="#courses">Resources</a></li><li><a href="#contact">Contact</a></li>';
       }
-      await loadFilters();
-      await buildResources();
-    });
+
+      try {
+        if (sections.hero && sections.hero.slides && sections.hero.slides.length) {
+          const slides = sections.hero.slides;
+          document.querySelector('.hero-carousel').innerHTML = slides.map((s,i) => '<div class="carousel-slide'+(i===0?' active':'')+'" style="background-image:url(\''+esc(s.background_image)+'\');" role="img" aria-label="' + esc(s.title) + '"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;text-shadow:0 2px 16px rgba(0,0,0,0.9);">'+esc(s.title)+'</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;text-shadow:0 2px 12px rgba(0,0,0,0.8);">'+esc(s.subtitle)+'</p><a href="'+esc(s.cta_link)+'" class="btn-primary"><i class="'+esc(s.icon||'fa-solid fa-arrow-right')+'" aria-hidden="true"></i> '+esc(s.cta_text)+'</a></div></div>').join('') + '<button class="carousel-arrow carousel-prev" aria-label="Previous slide"><i class="fa-solid fa-chevron-left" aria-hidden="true"></i></button><button class="carousel-arrow carousel-next" aria-label="Next slide"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i></button><div class="carousel-controls" role="tablist" aria-label="Slide navigation">' + slides.map((_,i) => '<span class="carousel-dot'+(i===0?' active':'')+'" data-index="'+i+'" role="tab" aria-label="Slide '+(i+1)+'" tabindex="0"></span>').join('') + '</div>';
+          initCarousel(slides.length);
+        } else {
+          document.querySelector('.hero-carousel').innerHTML = '<div class="carousel-slide active" style="background:linear-gradient(135deg,#0a4f4f,#0e7070);"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;">Welcome to AliverBiopharm</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;">Advanced Biology & Pharmacy Learning Platform</p><a href="#courses" class="btn-primary">Explore Resources <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>';
+        }
+      } catch(err) {
+        console.error('Hero failed:', err);
+        document.querySelector('.hero-carousel').innerHTML = '<div class="carousel-slide active" style="background:linear-gradient(135deg,#0a4f4f,#0e7070);"><div class="slide-overlay"><h1 class="font-display font-black text-4xl md:text-6xl mb-4" style="color:#fff;">Welcome to AliverBiopharm</h1><p class="text-lg md:text-xl max-w-2xl mb-8" style="color:#fff;">Advanced Biology & Pharmacy Learning Platform</p><a href="#courses" class="btn-primary">Explore Resources <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></div></div>';
+      }
+
+      if (sections.site_config && sections.site_config.announcement) {
+        try {
+          const ae = document.getElementById('hero-announcement'), at = document.getElementById('announcement-text');
+          if (ae && at) {
+            at.textContent = sections.site_config.announcement;
+            ae.classList.add('visible');
+          }
+        } catch(err) { console.error('Announcement failed:', err); }
+      }
+
+      try {
+        if (sections.team && sections.team.members && sections.team.members.length) {
+          document.getElementById('team-grid').innerHTML = sections.team.members.map(p => '<div class="card team-card text-center" role="listitem"><div class="team-avatar" aria-hidden="true">' + (p.avatar_url ? '<img src="'+esc(p.avatar_url)+'" alt="'+esc(p.name)+'" style="width:100%;height:100%;border-radius:50%;object-fit:cover;" loading="lazy" onerror="this.parentElement.innerHTML=\'<i class=fa-solid fa-user-tie></i>\'">' : '<i class="fa-solid fa-user-tie"></i>') + '</div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);margin-top:0.5rem;">'+esc(p.name)+(p.title?', '+esc(p.title):'')+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin-top:0.5rem;">'+esc(p.bio||'')+'</p></div>').join('');
+        } else {
+          document.getElementById('team-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Our expert faculty information is being updated. Check back soon.</p>';
+        }
+      } catch(err) {
+        console.error('Team failed:', err);
+        document.getElementById('team-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Faculty information temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.testimonials && sections.testimonials.quotes && sections.testimonials.quotes.length) {
+          const q = sections.testimonials.quotes;
+          let c = 0;
+          function show(i) { c = i; document.getElementById('testimonial-slider').innerHTML = '<blockquote class="testimonial-quote">"'+esc(q[i].text)+'"</blockquote><cite class="testimonial-author">— '+esc(q[i].author)+'</cite><div class="testimonial-nav">'+q.map((_,j)=>'<span class="testimonial-dot'+(j===i?' active':'')+'" data-index="'+j+'" role="button" aria-label="Testimonial '+(j+1)+'" tabindex="0"></span>').join('')+'</div>'; document.querySelectorAll('.testimonial-dot').forEach(d=>d.onclick=()=>show(+d.dataset.index)); }
+          show(0); setInterval(() => show((c+1)%q.length), 5000);
+        } else {
+          document.getElementById('testimonial-slider').innerHTML = '<p style="color:var(--clr-text-dim);">Student success stories coming soon.</p>';
+        }
+      } catch(err) {
+        console.error('Testimonials failed:', err);
+        document.getElementById('testimonial-slider').innerHTML = '<p style="color:var(--clr-text-dim);">Testimonials temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.pricing && sections.pricing.plans && sections.pricing.plans.length) {
+          document.getElementById('pricing-grid').innerHTML = sections.pricing.plans.map(pl => '<div class="card pricing-card'+(pl.featured?' featured':'')+'" role="listitem"><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(pl.name)+'</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">'+esc(pl.description||'')+'</p><div class="price my-3">'+esc(pl.price)+'<span style="font-size:1rem;color:var(--clr-text-dim);">'+esc(pl.period||'')+'</span></div><ul class="pricing-features" role="list">'+(pl.features||[]).map(f=>'<li role="listitem"><i class="fa-solid fa-check" aria-hidden="true"></i> '+esc(f)+'</li>').join('')+'</ul><button class="btn-primary w-full justify-center mt-4">'+esc(pl.cta_text||'Subscribe')+'</button></div>').join('');
+        } else {
+          document.getElementById('pricing-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Membership plans are being updated. Contact us for details.</p>';
+        }
+      } catch(err) {
+        console.error('Pricing failed:', err);
+        document.getElementById('pricing-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Pricing information temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.statistics && sections.statistics.stats && sections.statistics.stats.length) {
+          document.getElementById('stats-grid').innerHTML = sections.statistics.stats.map(s => '<div role="listitem"><div class="stat-number">'+esc(s.value)+esc(s.suffix||'')+'</div><div style="color:var(--clr-text-dim);margin-top:0.25rem;font-size:0.875rem;">'+esc(s.label)+'</div></div>').join('');
+        } else {
+          document.getElementById('stats-grid').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Impact statistics coming soon.</p>';
+        }
+      } catch(err) {
+        console.error('Statistics failed:', err);
+        document.getElementById('stats-grid').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Statistics temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.blog && sections.blog.posts && sections.blog.posts.length) {
+          document.getElementById('blog-grid').innerHTML = sections.blog.posts.map(p => '<article class="card" role="listitem">'+(p.image_url?'<img src="'+esc(p.image_url)+'" alt="'+esc(p.title)+'" style="width:100%;height:200px;object-fit:cover;border-radius:var(--radius-md);margin-bottom:1rem;" loading="lazy" onerror="this.style.display=\'none\'">':'')+'<div class="flex gap-4 text-xs" style="color:var(--clr-text-muted);margin-bottom:0.5rem;"><span><i class="fa-regular fa-calendar" aria-hidden="true"></i> <time datetime="'+esc(p.date||'')+'">'+esc(p.date||'')+'</time></span><span><i class="fa-regular fa-user" aria-hidden="true"></i> '+esc(p.author||'')+'</span></div><h3 style="font-family:\'Playfair Display\',serif;font-weight:700;font-size:1.15rem;color:var(--clr-white);">'+esc(p.title)+'</h3><p style="font-size:0.84rem;line-height:1.7;color:var(--clr-text-dim);margin:0.5rem 0;">'+esc(p.excerpt||'')+'</p><a href="#" style="color:var(--clr-magenta);font-weight:600;font-size:0.875rem;text-decoration:none;" aria-label="Read more: '+esc(p.title)+'">Read Article <i class="fa-solid fa-arrow-right" aria-hidden="true"></i></a></article>').join('');
+        } else {
+          document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">New articles coming soon. Subscribe to our newsletter for updates.</p>';
+        }
+      } catch(err) {
+        console.error('Blog failed:', err);
+        document.getElementById('blog-grid').innerHTML = '<p style="text-align:center;grid-column:1/-1;color:var(--clr-text-dim);">Articles temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.faq && sections.faq.items && sections.faq.items.length) {
+          document.getElementById('faq-list').innerHTML = sections.faq.items.map(i => '<div class="faq-item" role="listitem"><button class="faq-question" onclick="this.parentElement.classList.toggle(\'active\')" aria-expanded="false"><span>'+esc(i.question)+'</span><span style="color:var(--clr-cyan);font-size:1.3rem;line-height:1;" aria-hidden="true">+</span></button><div class="faq-answer" role="region"><p>'+esc(i.answer)+'</p></div></div>').join('');
+        } else {
+          document.getElementById('faq-list').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">Frequently asked questions coming soon.</p>';
+        }
+      } catch(err) {
+        console.error('FAQ failed:', err);
+        document.getElementById('faq-list').innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">FAQ temporarily unavailable.</p>';
+      }
+
+      try {
+        if (sections.footer) {
+          const fd = sections.footer;
+          document.getElementById('footer-grid').innerHTML = (fd.columns||[]).map(c => '<div><h4 style="font-weight:700;color:var(--clr-white);font-size:0.9rem;margin-bottom:16px;">'+esc(c.heading)+'</h4><ul style="list-style:none;display:flex;flex-direction:column;gap:10px;" role="list">'+(c.items||[]).map(i => '<li role="listitem"><a href="'+esc(i.href||'#')+'" style="font-size:0.875rem;color:var(--clr-text-dim);text-decoration:none;">'+(i.icon?'<i class="'+esc(i.icon)+'" style="color:var(--clr-magenta);margin-right:0.5rem;" aria-hidden="true"></i>':'')+esc(i.label)+'</a></li>').join('')+'</ul></div>').join('');
+          document.getElementById('footer-social').innerHTML = (fd.social_links||[]).map(s => '<a href="'+esc(s.url)+'" aria-label="'+esc(s.platform)+'" rel="noopener noreferrer" target="_blank" role="listitem"><i class="'+esc(s.icon)+'" aria-hidden="true"></i></a>').join('');
+        }
+      } catch(err) { console.error('Footer failed:', err); }
+
+      try {
+        if (sections.contact && sections.contact.info) {
+          const ci = sections.contact.info;
+          document.getElementById('contact-info-card').innerHTML += ci.map(c => '<div style="display:flex;align-items:center;gap:1rem;padding:0.8rem 0;border-bottom:1px solid var(--clr-border-glow);"><div class="contact-icon" aria-hidden="true"><i class="'+esc(c.icon)+'"></i></div><div><div style="font-size:0.7rem;color:var(--clr-text-muted);">'+esc(c.label)+'</div><a href="'+esc(c.href)+'" style="color:var(--clr-white);text-decoration:none;" rel="noopener noreferrer">'+esc(c.value)+'</a></div></div>').join('');
+        }
+      } catch(err) { console.error('Contact info failed:', err); }
+
+    }
+  } catch(err) { 
+    console.error('Failed to load sections:', err);
+    document.querySelector('main').insertAdjacentHTML('afterbegin', '<div style="text-align:center;padding:2rem;color:var(--clr-magenta);" role="alert"><i class="fa-solid fa-triangle-exclamation"></i> Some content could not be loaded. Please refresh the page or try again later.</div>');
+  }
+  await loadFilters();
+  await buildResources();
+});
   </script>
 </body>
 </html>
