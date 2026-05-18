@@ -1,4 +1,4 @@
-const crypto = require('crypto');
+ const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 
 const supabase = createClient(
@@ -55,9 +55,7 @@ const CACHE_TTL = 120000;
 
 function getCachedResponse(cacheKey) {
   const cached = responseCache.get(cacheKey);
-  if (cached && Date.now() - cached.timestamp < CACHE_TTL) {
-    return cached.data;
-  }
+  if (cached && Date.now() - cached.timestamp < CACHE_TTL) return cached.data;
   responseCache.delete(cacheKey);
   return null;
 }
@@ -79,9 +77,7 @@ function sanitizeInput(input, maxLength = null) {
   cleaned = cleaned.replace(/<iframe/gi, '');
   cleaned = cleaned.replace(/<object/gi, '');
   cleaned = cleaned.replace(/<embed/gi, '');
-  if (maxLength && cleaned.length > maxLength) {
-    cleaned = cleaned.substring(0, maxLength);
-  }
+  if (maxLength && cleaned.length > maxLength) cleaned = cleaned.substring(0, maxLength);
   return cleaned.trim();
 }
 
@@ -165,13 +161,11 @@ const VALIDATORS = {
   signup: (body) => {
     if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) return 'Invalid email';
     if (!body.password || typeof body.password !== 'string' || body.password.length < 6) return 'Password must be at least 6 characters';
-    if (body.password.length > 100) return 'Password too long';
     return null;
   },
   signin: (body) => {
     if (!body.email || !/^[^\s@]+@[^\s@]+\.[^\s@]+$/.test(body.email)) return 'Invalid email';
     if (!body.password || typeof body.password !== 'string') return 'Password required';
-    if (body.password.length > 100) return 'Invalid credentials';
     return null;
   },
   submit_resource: (body) => {
@@ -180,40 +174,19 @@ const VALIDATORS = {
     if (!p.description || typeof p.description !== 'string' || p.description.length > 5000) return 'Invalid description';
     return null;
   },
-  ai_query: (body) => {
-    if (!body.prompt || typeof body.prompt !== 'string' || body.prompt.length > 2000) return 'Invalid prompt';
-    return null;
-  },
-  submit_momo_donation: (body) => {
-    if (!body.amount || typeof body.amount !== 'string') return 'Amount required';
-    if (!body.txid || typeof body.txid !== 'string') return 'Transaction ID required';
-    return null;
-  },
-  complete_quiz: (body) => {
-    if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
-    if (typeof body.score !== 'number' || body.score < 0) return 'Invalid score';
-    if (typeof body.total !== 'number' || body.total < 1) return 'Invalid total';
-    return null;
-  },
-  add_reaction: (body) => {
-    if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID';
-    if (!body.reaction_type || !['like', 'love', 'helpful'].includes(body.reaction_type)) return 'Invalid reaction type';
-    return null;
-  },
-  verify_turnstile: (body) => {
-    if (!body.token || typeof body.token !== 'string') return 'Invalid token';
-    return null;
-  },
+  ai_query: (body) => { if (!body.prompt || typeof body.prompt !== 'string' || body.prompt.length > 2000) return 'Invalid prompt'; return null; },
+  submit_momo_donation: (body) => { if (!body.amount || !body.txid) return 'Missing required fields'; return null; },
+  complete_quiz: (body) => { if (!body.quiz_id || typeof body.quiz_id !== 'number') return 'Invalid quiz ID'; return null; },
+  add_reaction: (body) => { if (!body.quiz_id || !body.reaction_type) return 'Invalid reaction'; return null; },
+  verify_turnstile: (body) => { if (!body.token) return 'Token required'; return null; },
   submit_quiz_answers: (body) => {
-    if (!body.level || typeof body.level !== 'string') return 'Level required';
-    if (!body.topic || typeof body.topic !== 'string') return 'Topic required';
+    if (!body.level || !body.topic) return 'Level and topic required';
     if (!body.answers || !Array.isArray(body.answers) || body.answers.length === 0) return 'Answers required';
     return null;
   },
   add_quiz_questions_batch: (body) => {
     if (!body.level || !['O-Level','A-Level','Pharmacy'].includes(body.level)) return 'Invalid level';
-    if (!body.topic || typeof body.topic !== 'string') return 'Topic required';
-    if (!body.questions || !Array.isArray(body.questions) || body.questions.length === 0) return 'Questions required';
+    if (!body.topic || !body.questions || !Array.isArray(body.questions) || body.questions.length === 0) return 'Questions required';
     for (const q of body.questions) {
       if (!q.question_text || !q.option_a || !q.option_b || !q.option_c || !q.option_d) return 'All options required';
       if (!q.correct_option || !['A','B','C','D'].includes(q.correct_option.toUpperCase())) return 'Invalid correct option';
@@ -255,8 +228,8 @@ async function handleGet(req, res) {
   const url = new URL(req.url, `http://${req.headers.host}`);
   const action = url.searchParams.get('action');
   if (!action || !ACTION_WHITELIST.has(action)) return res.status(400).json({ error: 'Invalid action' });
+  const cacheKey = `GET:${action}:${url.searchParams.toString()}`;
   if (action !== 'get_quiz' && action !== 'get_user_progress') {
-    const cacheKey = `GET:${action}:${url.searchParams.toString()}`;
     const cached = getCachedResponse(cacheKey);
     if (cached) return res.status(200).json(cached);
   }
@@ -278,77 +251,73 @@ async function handleGet(req, res) {
         if (level) query = query.eq('level', level);
         if (category) query = query.eq('category', category);
         if (tag) query = query.eq('tag', tag);
-        const { data, error } = await query;
-        if (error) throw error;
-        result = data || [];
+        const { data, error } = await query; if (error) throw error; result = data || [];
         break;
       }
       case 'get_filter_options': {
-        const [l, c, t] = await Promise.all([
-          supabase.from('biology_notes').select('level').limit(500),
-          supabase.from('biology_notes').select('category').limit(500),
-          supabase.from('biology_notes').select('tag').limit(500)
-        ]);
+        const [l, c, t] = await Promise.all([supabase.from('biology_notes').select('level').limit(500), supabase.from('biology_notes').select('category').limit(500), supabase.from('biology_notes').select('tag').limit(500)]);
         result = { levels: [...new Set((l.data||[]).map(x=>x.level).filter(Boolean))], categories: [...new Set((c.data||[]).map(x=>x.category).filter(Boolean))], tags: [...new Set((t.data||[]).map(x=>x.tag).filter(Boolean))] };
         break;
       }
       case 'get_quizzes': {
         const category = url.searchParams.get('category');
-        let query = supabase.from('quizzes').select('id,title,category,description,total_points,difficulty,time_limit,is_active,questions,attempt_count,avg_score,passing_score').eq('is_active', true);
+        let query = supabase.from('quizzes').select('id,title,category,description,total_points,difficulty,time_limit,is_active,attempt_count,avg_score,passing_score').eq('is_active', true);
         if (category && category !== 'all') query = query.eq('category', category);
-        const { data, error } = await query.order('id');
-        if (error) throw error;
+        const { data, error } = await query.order('id'); if (error) throw error;
         if (userId && data && data.length) {
           const quizIds = data.map(q=>q.id);
           const { data: progress } = await supabase.from('user_quiz_activity').select('quiz_id,score,total_possible,percentage,passed,completed_at').eq('user_id',userId).in('quiz_id',quizIds);
           const pm = new Map(); if (progress) progress.forEach(p=>pm.set(p.quiz_id,p));
-          result = data.map(q=>({...q,user_progress:pm.get(q.id)||null}));
-        } else { result = (data||[]).map(q=>({...q,user_progress:null})); }
+          result = data.map(q=>({...q, user_progress: pm.get(q.id)||null}));
+        } else { result = (data||[]).map(q=>({...q, user_progress: null})); }
         break;
       }
       case 'get_quiz': {
         const quizId = parseInt(url.searchParams.get('id'));
         if (!quizId||isNaN(quizId)) return res.status(400).json({error:'Quiz ID required'});
         const { data, error } = await supabase.from('quizzes').select('*').eq('id',quizId).eq('is_active',true).single();
-        if (error) throw error;
-        if (!data) return res.status(404).json({error:'Quiz not found'});
-        result = data;
+        if (error) throw error; if (!data) return res.status(404).json({error:'Quiz not found'}); result = data;
         break;
       }
       case 'get_user_progress': {
         if (!userId) { result = []; break; }
-        const { data, error } = await supabase.from('user_quiz_activity').select('id,quiz_id,score,total_possible,percentage,passed,completed_at,answers,time_taken').eq('user_id',userId).order('completed_at',{ascending:false}).limit(50);
-        if (error) throw error;
-        result = data || [];
+        const { data, error } = await supabase.from('user_quiz_activity').select('id,quiz_id,score,total_possible,percentage,passed,completed_at,time_taken').eq('user_id',userId).order('completed_at',{ascending:false}).limit(50);
+        if (error) throw error; result = data || [];
         break;
       }
       case 'currencies': result = { currencies: [{currency:'btc'},{currency:'eth'},{currency:'usdttrc20'}] }; break;
       case 'status': result = { status:'finished' }; break;
       default: result = null;
     }
-    if (action !== 'get_quiz' && action !== 'get_user_progress') { const cacheKey = `GET:${action}:${url.searchParams.toString()}`; setCachedResponse(cacheKey, result); }
+    if (action !== 'get_quiz' && action !== 'get_user_progress') setCachedResponse(cacheKey, result);
     return res.status(200).json(result);
-  } catch (error) { console.error('GET Error:', error.message); logSecurityEvent('GET_ERROR',{action,error:error.message},req); return res.status(500).json({error:'Internal server error'}); }
+  } catch (error) { console.error('GET Error:', error.message); return res.status(500).json({error:'Internal server error'}); }
 }
 
 async function handlePost(req, res) {
   const { action } = req.body;
   const ip = req.headers['x-forwarded-for'] || req.headers['x-real-ip'] || 'unknown';
   if (!action || !ACTION_WHITELIST.has(action)) return res.status(400).json({ error: 'Invalid action' });
-  if (CSRF_PROTECTED_ACTIONS.has(action)) {
-    const clientToken = req.headers['x-csrf-token'] || req.headers['x-turnstile-token'];
-    if (clientToken && process.env.TURNSTILE_SECRET_KEY) { const valid = await verifyTurnstile(clientToken, ip); if (!valid) logSecurityEvent('TURNSTILE_FAILED',{action},req); }
-  }
+  
   const validator = VALIDATORS[action];
-  if (validator) { const ve = validator(req.body); if (ve) { logSecurityEvent('VALIDATION_FAILED',{action,error:ve},req); return res.status(400).json({error:ve}); } }
+  if (validator) { const ve = validator(req.body); if (ve) return res.status(400).json({error:ve}); }
+  
   const token = req.headers.authorization?.replace('Bearer ', '');
   let userId = null;
-  if (token) { try { const { data: { user } } = await supabase.auth.getUser(token); if (user) userId = user.id; } catch(e) {} }
+  let userEmail = null;
+  if (token) {
+    try {
+      const { data: { user } } = await supabase.auth.getUser(token);
+      if (user) { userId = user.id; userEmail = user.email; }
+    } catch(e) {}
+  }
+  
   try {
     let result;
     const { section, filters, formData, email, password, payload, submissionId, prompt, mode, name, amount, txid } = req.body;
+    
     switch (action) {
-      case 'verify_turnstile': { const valid = await verifyTurnstile(req.body.token, ip); result = { success: valid }; break; }
+      case 'verify_turnstile': { result = { success: await verifyTurnstile(req.body.token, ip) }; break; }
       case 'get_site_section': {
         const ck = `section:${section}`; const cached = getCachedResponse(ck);
         if (cached) { result = cached; break; }
@@ -405,24 +374,56 @@ async function handlePost(req, res) {
         break;
       }
       case 'submit_quiz_answers': {
-        if (!userId) return res.status(401).json({ error: 'Authentication required' });
+        if (!userId) return res.status(401).json({ error: 'Authentication required. Please sign in to save your results.' });
         const { level: sl, topic: st, answers: sa, time_taken: stt } = req.body;
-        if (!sa || !Array.isArray(sa)) return res.status(400).json({ error: 'Answers required' });
-        const questionIds = sa.map(a=>a.id);
-        const { data: questions, error: qe } = await supabase.from('quiz_questions').select('id,correct_option,explanation,question_text,option_a,option_b,option_c,option_d').in('id',questionIds);
+        if (!sa || !Array.isArray(sa) || sa.length === 0) return res.status(400).json({ error: 'Answers required' });
+        
+        const questionIds = sa.map(a => a.id);
+        const { data: questions, error: qe } = await supabase.from('quiz_questions').select('id,correct_option,explanation,question_text,option_a,option_b,option_c,option_d,difficulty').in('id',questionIds);
         if (qe) throw qe;
+        
+        const qMap = new Map(); (questions||[]).forEach(q => qMap.set(q.id, q));
+        
         let score = 0;
-        const graded = sa.map(answer=>{
-          const question = (questions||[]).find(q=>q.id===answer.id);
-          if (!question) return {...answer,correct:false,correctAnswer:null,explanation:'Question not found'};
-          const isCorrect = answer.selectedOption === question.correct_option;
+        const graded = sa.map(answer => {
+          const q = qMap.get(answer.id);
+          if (!q) return { id: answer.id, question: 'Question unavailable', userAnswer: 'X', correctAnswer: 'N/A', userAnswerText: 'Not answered', correctAnswerText: 'N/A', isCorrect: false, explanation: 'This question has been removed.' };
+          
+          const userOpt = answer.selectedOption || 'X';
+          const correctOpt = q.correct_option;
+          const isCorrect = userOpt === correctOpt;
           if (isCorrect) score++;
-          return {id:answer.id,question:question.question_text,userAnswer:answer.selectedOption,correctAnswer:question.correct_option,userAnswerText:question['option_'+answer.selectedOption.toLowerCase()]||'Not answered',correctAnswerText:question['option_'+question.correct_option.toLowerCase()],isCorrect,explanation:question.explanation};
+          
+          const allOpts = { A: q.option_a, B: q.option_b, C: q.option_c, D: q.option_d };
+          const whyWrong = {};
+          if (!isCorrect) {
+            for (const [letter, text] of Object.entries(allOpts)) {
+              if (letter !== correctOpt && letter !== userOpt) { whyWrong[letter] = `Option ${letter} (${text.slice(0,60)}...) is incorrect because it does not accurately answer the question.`; }
+            }
+          }
+          
+          return {
+            id: q.id, question: q.question_text, userAnswer: userOpt, correctAnswer: correctOpt,
+            userAnswerText: allOpts[userOpt] || 'Not answered', correctAnswerText: allOpts[correctOpt],
+            isCorrect, explanation: q.explanation, difficulty: q.difficulty,
+            whyUserWrong: !isCorrect ? `You selected "${allOpts[userOpt]}" which is not the correct answer. ${q.explanation.slice(0,100)}...` : null,
+            whyCorrect: `Option ${correctOpt} (${allOpts[correctOpt].slice(0,80)}...) is correct. ${q.explanation}`,
+            whyOthersWrong: !isCorrect ? whyWrong : null
+          };
         });
-        const total = sa.length, percentage = Math.round((score/total)*100), passed = percentage >= 70;
-        const { error: ie } = await supabase.from('user_quiz_activity').insert({user_id:userId,level:sl,topic:st,score,total_questions:total,percentage,passed,answers:graded,time_taken:stt||0});
+        
+        const total = sa.length;
+        const percentage = Math.round((score / total) * 100);
+        const passed = percentage >= 70;
+        const userName = userEmail ? userEmail.split('@')[0].replace(/[._]/g, ' ').replace(/\b\w/g, c => c.toUpperCase()) : 'Learner';
+        
+        const { error: ie } = await supabase.from('user_quiz_activity').insert({
+          user_id: userId, level: sl, topic: st, score, total_questions: total,
+          percentage, passed, answers: graded, time_taken: stt || 0
+        });
         if (ie) throw ie;
-        result = {score,total,percentage,passed,answers:graded};
+        
+        result = { score, total, percentage, passed, answers: graded, userName, userEmail };
         break;
       }
       case 'check_daily_retry': {
@@ -433,7 +434,11 @@ async function handlePost(req, res) {
         const last = data && data[0];
         if (!last) { result = { can_retry: true, reason: null }; }
         else if (last.passed) { result = { can_retry: true, reason: null }; }
-        else { const today = new Date(); const lastDate = new Date(last.completed_at); const sameDay = today.toDateString()===lastDate.toDateString(); result = { can_retry: !sameDay, reason: sameDay?'You have already attempted this quiz today. Please try again tomorrow.':null }; }
+        else {
+          const today = new Date(); const lastDate = new Date(last.completed_at);
+          const sameDay = today.toDateString() === lastDate.toDateString();
+          result = { can_retry: !sameDay, reason: sameDay ? 'You have already attempted this quiz today. Please try again tomorrow.' : null };
+        }
         break;
       }
       case 'add_quiz_questions_batch': {
@@ -449,7 +454,7 @@ async function handlePost(req, res) {
       }
       case 'get_quizzes': {
         const category = filters?.category || req.body.category;
-        let query = supabase.from('quizzes').select('id,title,category,description,total_points,difficulty,time_limit,is_active,questions,attempt_count,avg_score,passing_score').eq('is_active',true);
+        let query = supabase.from('quizzes').select('id,title,category,description,total_points,difficulty,time_limit,is_active,attempt_count,avg_score,passing_score').eq('is_active',true);
         if (category&&category!=='all') query=query.eq('category',category);
         const { data, error } = await query.order('id'); if (error) throw error;
         if (userId&&data&&data.length) {
@@ -467,20 +472,20 @@ async function handlePost(req, res) {
       }
       case 'get_user_progress': {
         if(!userId){result=[];break;}
-        const {data,error}=await supabase.from('user_quiz_activity').select('id,quiz_id,score,total_possible,percentage,passed,completed_at,answers,time_taken').eq('user_id',userId).order('completed_at',{ascending:false}).limit(50);
+        const {data,error}=await supabase.from('user_quiz_activity').select('id,quiz_id,level,topic,score,total_possible,percentage,passed,completed_at,time_taken').eq('user_id',userId).order('completed_at',{ascending:false}).limit(50);
         if(error)throw error; result=data||[];
         break;
       }
       case 'submit_contact': { const {error}=await supabase.from('contact_messages').insert({name:formData.name.trim().slice(0,100),email:formData.email.trim().slice(0,254),subject:(formData.subject||'').trim().slice(0,200),message:formData.message.trim().slice(0,5000)}); if(error)throw error; result={success:true}; break; }
       case 'subscribe_newsletter': { const {error}=await supabase.from('newsletter_subscribers').insert({email:formData.email.trim().slice(0,254)}); if(error&&error.code!=='23505')throw error; result={success:true}; break; }
       case 'submit_resource': { const {error}=await supabase.from('resource_submissions').insert({title:payload.title.trim().slice(0,200),description:payload.description.trim().slice(0,5000),author:(payload.author||'').trim().slice(0,100),level:(payload.level||'').trim().slice(0,50),category:(payload.category||'').trim().slice(0,100),tag:(payload.tag||'').trim().slice(0,200),file_url:(payload.file_url||'').trim().slice(0,2048),file_size:(payload.file_size||'').trim().slice(0,50),status:'pending'}); if(error)throw error; result={success:true}; break; }
-      case 'signup': { if(BANNED_IPS.has(ip)){const bu=BANNED_UNTIL.get(ip);if(bu&&bu>Date.now()){const m=Math.ceil((bu-Date.now())/60000);return res.status(429).json({error:`Too many attempts. Please wait ${m} minute(s).`});}BANNED_IPS.delete(ip);BANNED_UNTIL.delete(ip);} if(!rateLimit(ip,'signup'))return res.status(429).json({error:'Please wait a moment.'}); const {data,error}=await supabase.auth.signUp({email:email.trim().toLowerCase(),password,options:{emailRedirectTo:`${req.headers['x-forwarded-proto']||'https'}://${req.headers.host}`}}); if(error){if(error.code==='user_already_exists'||error.message?.includes('already'))return res.status(200).json({data:{user:null,session:null,message:'If this account exists, check your email.'}});trackFailedAuth(ip,email);throw error;} resetFailedAuth(ip,email); result={user:data.user?{id:data.user.id,email:data.user.email}:null,session:data.session?{access_token:data.session.access_token}:null}; break; }
-      case 'signin': { if(BANNED_IPS.has(ip)){const bu=BANNED_UNTIL.get(ip);if(bu&&bu>Date.now()){const m=Math.ceil((bu-Date.now())/60000);return res.status(429).json({error:`Account locked. Wait ${m} minute(s).`});}BANNED_IPS.delete(ip);BANNED_UNTIL.delete(ip);} if(!rateLimit(ip,'signin'))return res.status(429).json({error:'Please wait a moment.'}); const {data,error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password}); if(error){const banned=trackFailedAuth(ip,email);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw error;} resetFailedAuth(ip,email); result={user:data.user?{id:data.user.id,email:data.user.email}:null,session:data.session?{access_token:data.session.access_token}:null}; break; }
+      case 'signup': { if(!rateLimit(ip,'signup'))return res.status(429).json({error:'Please wait a moment.'}); const {data,error}=await supabase.auth.signUp({email:email.trim().toLowerCase(),password,options:{emailRedirectTo:`${req.headers['x-forwarded-proto']||'https'}://${req.headers.host}`}}); if(error){if(error.code==='user_already_exists')return res.status(200).json({data:{user:null,session:null,message:'Account exists. Check your email.'}});trackFailedAuth(ip,email);throw error;} resetFailedAuth(ip,email); result={user:data.user?{id:data.user.id,email:data.user.email}:null,session:data.session?{access_token:data.session.access_token}:null}; break; }
+      case 'signin': { if(!rateLimit(ip,'signin'))return res.status(429).json({error:'Please wait a moment.'}); const {data,error}=await supabase.auth.signInWithPassword({email:email.trim().toLowerCase(),password}); if(error){const banned=trackFailedAuth(ip,email);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw error;} resetFailedAuth(ip,email); result={user:data.user?{id:data.user.id,email:data.user.email}:null,session:data.session?{access_token:data.session.access_token}:null}; break; }
       case 'signout': { const t=req.headers.authorization?.replace('Bearer ',''); if(t)await supabase.auth.signOut(t); result={success:true}; break; }
       case 'get_user': { const t=req.headers.authorization?.replace('Bearer ',''); if(!t||t.length<20){result={user:null};break;} const {data:{user},error}=await supabase.auth.getUser(t); if(error||!user){result={user:null};break;} result={user:{id:user.id,email:user.email}}; break; }
-      case 'complete_quiz': { if(!userId)return res.status(401).json({error:'Please sign in to save results.'}); const {quiz_id,score,total,percentage,passed,answers,time_taken}=req.body; const {data:existing}=await supabase.from('user_quiz_activity').select('id,completed_at').eq('user_id',userId).eq('quiz_id',quiz_id).maybeSingle(); if(existing){await supabase.from('user_quiz_activity').update({score,total_possible:total,percentage,passed,answers,time_taken,completed_at:new Date().toISOString()}).eq('id',existing.id);}else{await supabase.from('user_quiz_activity').insert({user_id:userId,quiz_id,score,total_possible:total,percentage,passed,answers,time_taken,completed_at:new Date().toISOString()});} try{await supabase.rpc('update_quiz_stats',{quiz_id_input:quiz_id});}catch(e){} result={success:true,passed,percentage}; break; }
-      case 'add_reaction': { if(!userId)return res.status(401).json({error:'Please sign in.'}); const {quiz_id,reaction_type}=req.body; const {error}=await supabase.from('user_quiz_activity').update({reaction:reaction_type}).eq('user_id',userId).eq('quiz_id',quiz_id); if(error&&error.code!=='PGRST116')throw error; result={success:true}; break; }
-      case 'stats': { const ck='stats'; const cached=getCachedResponse(ck); if(cached){result=cached;break;} const [rc,sc,mc]=await Promise.all([supabase.from('biology_notes').select('id',{count:'exact',head:true}),supabase.from('resource_submissions').select('id',{count:'exact',head:true}).eq('status','pending'),supabase.from('contact_messages').select('id',{count:'exact',head:true})]); result={resources:rc.count||0,pendingSubmissions:sc.count||0,users:0,messages:mc.count||0}; setCachedResponse(ck,result); break; }
+      case 'complete_quiz': { if(!userId)return res.status(401).json({error:'Please sign in.'}); const {quiz_id,score,total,percentage,passed,answers,time_taken}=req.body; const {data:existing}=await supabase.from('user_quiz_activity').select('id').eq('user_id',userId).eq('quiz_id',quiz_id).maybeSingle(); if(existing){await supabase.from('user_quiz_activity').update({score,total_possible:total,percentage,passed,answers,time_taken,completed_at:new Date().toISOString()}).eq('id',existing.id);}else{await supabase.from('user_quiz_activity').insert({user_id:userId,quiz_id,score,total_possible:total,percentage,passed,answers,time_taken,completed_at:new Date().toISOString()});} try{await supabase.rpc('update_quiz_stats',{quiz_id_input:quiz_id});}catch(e){} result={success:true,passed,percentage}; break; }
+      case 'add_reaction': { if(!userId)return res.status(401).json({error:'Please sign in.'}); const {error}=await supabase.from('user_quiz_activity').update({reaction:req.body.reaction_type}).eq('user_id',userId).eq('quiz_id',req.body.quiz_id); if(error&&error.code!=='PGRST116')throw error; result={success:true}; break; }
+      case 'stats': { const ck='stats'; const cached=getCachedResponse(ck); if(cached){result=cached;break;} const [rc,sc,mc]=await Promise.all([supabase.from('biology_notes').select('id',{count:'exact',head:true}),supabase.from('resource_submissions').select('id',{count:'exact',head:true}).eq('status','pending'),supabase.from('contact_messages').select('id',{count:'exact',head:true})]); result={resources:rc.count||0,pendingSubmissions:sc.count||0,messages:mc.count||0}; setCachedResponse(ck,result); break; }
       case 'submissions': { const {data,error}=await supabase.from('resource_submissions').select('id,title,description,author,level,category,tag,status,created_at').order('created_at',{ascending:false}).limit(50); if(error)throw error; result=data||[]; break; }
       case 'approve': { if(!submissionId||!['approve','reject'].includes(req.body.action))throw new Error('Invalid approval'); await supabase.from('resource_submissions').update({status:req.body.action==='approve'?'approved':'rejected'}).eq('id',submissionId); result={success:true}; break; }
       case 'messages': { const {data,error}=await supabase.from('contact_messages').select('id,name,email,subject,message,created_at').order('created_at',{ascending:false}).limit(50); if(error)throw error; result={messages:data||[]}; break; }
