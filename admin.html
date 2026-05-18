@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+<!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -325,6 +325,26 @@
     .tab-content { display: none; }
     .tab-content.active { display: block; }
 
+    .toast {
+      position: fixed;
+      bottom: 20px;
+      right: 20px;
+      background: #1a1a2e;
+      color: #fff;
+      padding: 12px 24px;
+      border-radius: 8px;
+      font-size: 0.85rem;
+      z-index: 9999;
+      animation: slideIn 0.3s ease;
+    }
+    .toast.success { border-left: 4px solid var(--success); }
+    .toast.error { border-left: 4px solid var(--danger); }
+
+    @keyframes slideIn {
+      from { transform: translateX(100%); opacity: 0; }
+      to { transform: translateX(0); opacity: 1; }
+    }
+
     @media (max-width: 768px) {
       .admin-layout { flex-direction: column; }
       .sidebar { width: 100%; height: auto; position: relative; }
@@ -337,7 +357,6 @@
 
 <div class="admin-layout">
 
-  <!-- SIDEBAR -->
   <aside class="sidebar">
     <div class="sidebar-header">
       <div class="sidebar-logo">AliverBiopharm</div>
@@ -346,9 +365,14 @@
     <ul class="sidebar-nav">
       <li><a href="#dashboard" class="active" data-tab="dashboard"><i class="fa-solid fa-gauge"></i> Dashboard</a></li>
       <li><a href="#resources" data-tab="resources"><i class="fa-solid fa-file-pdf"></i> Resources</a></li>
+      <li><a href="#submissions" data-tab="submissions"><i class="fa-solid fa-inbox"></i> Submissions</a></li>
+      <li><a href="#messages" data-tab="messages"><i class="fa-solid fa-envelope"></i> Messages</a></li>
       <li><a href="#upload" data-tab="upload"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</a></li>
       <li><a href="#site-sections" data-tab="site-sections"><i class="fa-solid fa-globe"></i> Site Sections</a></li>
+      <li><a href="#quiz-builder" data-tab="quiz-builder"><i class="fa-solid fa-question-circle"></i> Quiz Builder</a></li>
       <li><a href="#users" data-tab="users"><i class="fa-solid fa-users"></i> Users</a></li>
+      <li><a href="#newsletter" data-tab="newsletter"><i class="fa-solid fa-newspaper"></i> Newsletter</a></li>
+      <li><a href="#donations" data-tab="donations"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a></li>
     </ul>
     <div class="sidebar-footer">
       <div class="admin-email" id="admin-email-display">Loading...</div>
@@ -358,14 +382,13 @@
     </div>
   </aside>
 
-  <!-- MAIN -->
   <main class="main-content">
 
     <!-- DASHBOARD -->
     <div class="tab-content active" id="tab-dashboard">
       <div class="page-header">
         <h1 class="page-title">Dashboard</h1>
-        <p class="page-subtitle">System overview</p>
+        <p class="page-subtitle">System overview & quick stats</p>
       </div>
       <div class="stats-grid">
         <div class="stat-card">
@@ -374,9 +397,25 @@
           <div class="stat-label">Total Resources</div>
         </div>
         <div class="stat-card">
+          <div class="stat-icon" style="background:#fff3cd;color:var(--warning);"><i class="fa-solid fa-inbox"></i></div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-label">Pending Submissions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:#f8d7da;color:var(--danger);"><i class="fa-solid fa-envelope"></i></div>
+          <div class="stat-value" id="stat-messages">—</div>
+          <div class="stat-label">Contact Messages</div>
+        </div>
+        <div class="stat-card">
           <div class="stat-icon" style="background:#d4edda;color:var(--success);"><i class="fa-solid fa-users"></i></div>
           <div class="stat-value" id="stat-users">—</div>
           <div class="stat-label">Total Users</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span>Recent Activity</span></div>
+        <div class="panel-body" id="recent-activity">
+          <p style="color:var(--text-muted);">Loading...</p>
         </div>
       </div>
     </div>
@@ -385,18 +424,62 @@
     <div class="tab-content" id="tab-resources">
       <div class="page-header">
         <h1 class="page-title">Resources</h1>
-        <p class="page-subtitle">Manage biology notes and submissions</p>
+        <p class="page-subtitle">Manage all published biology notes</p>
       </div>
       <div class="panel">
         <div class="panel-header">
-          <span>All Resources</span>
+          <span>Published Resources</span>
           <button class="btn btn-cyan btn-sm" onclick="loadResources()"><i class="fa-solid fa-rotate"></i> Refresh</button>
         </div>
         <div class="panel-body">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Title</th><th>Category</th><th>Level</th><th>Source</th><th>Actions</th></tr></thead>
-              <tbody id="resources-table"><tr><td colspan="5" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+              <thead><tr><th>Title</th><th>Category</th><th>Level</th><th>Author</th><th>Section</th><th>Actions</th></tr></thead>
+              <tbody id="resources-table"><tr><td colspan="6" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- SUBMISSIONS -->
+    <div class="tab-content" id="tab-submissions">
+      <div class="page-header">
+        <h1 class="page-title">Submissions</h1>
+        <p class="page-subtitle">Review and approve user-submitted resources</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Pending Submissions</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadSubmissions()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Title</th><th>Author</th><th>Category</th><th>Level</th><th>Status</th><th>Date</th><th>Actions</th></tr></thead>
+              <tbody id="submissions-table"><tr><td colspan="7" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- MESSAGES -->
+    <div class="tab-content" id="tab-messages">
+      <div class="page-header">
+        <h1 class="page-title">Messages</h1>
+        <p class="page-subtitle">View contact form submissions</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Contact Messages</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadMessages()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Email</th><th>Subject</th><th>Message</th><th>Date</th></tr></thead>
+              <tbody id="messages-table"><tr><td colspan="5" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -406,19 +489,21 @@
     <!-- UPLOAD -->
     <div class="tab-content" id="tab-upload">
       <div class="page-header">
-        <h1 class="page-title">Upload</h1>
-        <p class="page-subtitle">Add new resources</p>
+        <h1 class="page-title">Upload Resource</h1>
+        <p class="page-subtitle">Add new biology notes with PDF</p>
       </div>
       <div class="panel" style="max-width:600px;">
-        <div class="panel-header"><span>Upload PDF Resource</span></div>
+        <div class="panel-header"><span>New Resource</span></div>
         <div class="panel-body">
           <form id="upload-form" enctype="multipart/form-data">
-            <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="upload-title" required /></div>
+            <div class="form-group"><label class="form-label">Title *</label><input type="text" class="form-input" id="upload-title" required /></div>
             <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="upload-description"></textarea></div>
-            <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="upload-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option></select></div>
-            <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="upload-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option></select></div>
+            <div class="form-group"><label class="form-label">Author</label><input type="text" class="form-input" id="upload-author" /></div>
+            <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="upload-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Anatomy</option><option>Physiology</option></select></div>
+            <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="upload-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Pharmacy</option><option>Undergraduate</option></select></div>
+            <div class="form-group"><label class="form-label">Section Type</label><select class="form-select" id="upload-section-type"><option value="">Select...</option><option>Resources</option><option>Notes</option><option>Exams</option><option>Quizzes</option></select></div>
             <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="upload-tags" placeholder="e.g. nutrition, enzymes" /></div>
-            <div class="form-group"><label class="form-label">PDF File</label><input type="file" class="form-input" id="upload-file" accept=".pdf" required /></div>
+            <div class="form-group"><label class="form-label">PDF File *</label><input type="file" class="form-input" id="upload-file" accept=".pdf" required /></div>
             <button type="submit" class="btn btn-magenta"><i class="fa-solid fa-upload"></i> Upload Resource</button>
           </form>
         </div>
@@ -429,15 +514,57 @@
     <div class="tab-content" id="tab-site-sections">
       <div class="page-header">
         <h1 class="page-title">Site Sections</h1>
-        <p class="page-subtitle">Edit hero, footer, navigation content</p>
+        <p class="page-subtitle">Edit all site configuration, hero, footer, navigation, and more</p>
       </div>
       <div class="tabs" id="section-tabs">
-        <button class="tab-btn active" data-section="hero">Hero</button>
+        <button class="tab-btn active" data-section="site_config">Site Config</button>
+        <button class="tab-btn" data-section="hero">Hero</button>
         <button class="tab-btn" data-section="footer">Footer</button>
         <button class="tab-btn" data-section="navigation">Navigation</button>
+        <button class="tab-btn" data-section="team">Team</button>
+        <button class="tab-btn" data-section="testimonials">Testimonials</button>
+        <button class="tab-btn" data-section="pricing">Pricing</button>
+        <button class="tab-btn" data-section="faq">FAQ</button>
+        <button class="tab-btn" data-section="statistics">Statistics</button>
+        <button class="tab-btn" data-section="blog">Blog</button>
+        <button class="tab-btn" data-section="contact">Contact</button>
       </div>
-      <div id="site-section-editor" style="max-width:600px;">
+      <div id="site-section-editor" style="max-width:700px;">
         <p style="color:var(--text-muted);padding:20px;">Select a section to edit.</p>
+      </div>
+    </div>
+
+    <!-- QUIZ BUILDER -->
+    <div class="tab-content" id="tab-quiz-builder">
+      <div class="page-header">
+        <h1 class="page-title">Quiz Builder</h1>
+        <p class="page-subtitle">Add quiz questions in bulk</p>
+      </div>
+      <div class="panel" style="max-width:700px;">
+        <div class="panel-header"><span>Add Questions Batch</span></div>
+        <div class="panel-body">
+          <form id="quiz-batch-form">
+            <div class="form-group"><label class="form-label">Level *</label><select class="form-select" id="quiz-level" required><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Pharmacy</option></select></div>
+            <div class="form-group"><label class="form-label">Topic *</label><input type="text" class="form-input" id="quiz-topic" required placeholder="e.g. Cell Biology" /></div>
+            <div class="form-group"><label class="form-label">Batch Name</label><input type="text" class="form-input" id="quiz-batch-name" placeholder="e.g. Batch 1" /></div>
+            <div class="form-group"><label class="form-label">Questions (JSON Array) *</label><textarea class="form-textarea" id="quiz-questions-json" style="min-height:200px;font-family:monospace;font-size:0.8rem;" required placeholder='[{"question_text":"...","option_a":"...","option_b":"...","option_c":"...","option_d":"...","correct_option":"A","explanation":"...","difficulty":"medium"}]'></textarea></div>
+            <button type="submit" class="btn btn-cyan"><i class="fa-solid fa-plus"></i> Add Questions</button>
+          </form>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Quiz Topics</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadQuizTopics()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Topic</th><th>Level</th><th>Questions</th><th>Active</th></tr></thead>
+              <tbody id="quiz-topics-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Select a level to view topics</td></tr></tbody>
+            </table>
+          </div>
+        </div>
       </div>
     </div>
 
@@ -448,12 +575,59 @@
         <p class="page-subtitle">Manage registered users</p>
       </div>
       <div class="panel">
-        <div class="panel-header"><span>All Users</span></div>
+        <div class="panel-header">
+          <span>All Users</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
         <div class="panel-body">
           <div class="table-wrap">
             <table>
-              <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Actions</th></tr></thead>
-              <tbody id="users-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+              <thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead>
+              <tbody id="users-table"><tr><td colspan="5" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- NEWSLETTER -->
+    <div class="tab-content" id="tab-newsletter">
+      <div class="page-header">
+        <h1 class="page-title">Newsletter</h1>
+        <p class="page-subtitle">View newsletter subscribers</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Subscribers</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadNewsletter()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Email</th><th>Subscribed</th></tr></thead>
+              <tbody id="newsletter-table"><tr><td colspan="2" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- DONATIONS -->
+    <div class="tab-content" id="tab-donations">
+      <div class="page-header">
+        <h1 class="page-title">Donations</h1>
+        <p class="page-subtitle">View MoMo donations</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Recent Donations</span>
+          <button class="btn btn-cyan btn-sm" onclick="loadDonations()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead><tr><th>Name</th><th>Amount</th><th>TX ID</th><th>Date</th></tr></thead>
+              <tbody id="donations-table"><tr><td colspan="4" style="text-align:center;padding:40px;">Loading...</td></tr></tbody>
             </table>
           </div>
         </div>
@@ -463,7 +637,7 @@
   </main>
 </div>
 
-<!-- EDIT MODAL -->
+<!-- EDIT RESOURCE MODAL -->
 <div class="modal-overlay" id="edit-modal" style="display:none;">
   <div class="modal">
     <div class="modal-header">
@@ -472,10 +646,12 @@
     </div>
     <form id="edit-form">
       <input type="hidden" id="edit-id" />
+      <input type="hidden" id="edit-table" />
       <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="edit-title" required /></div>
       <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="edit-description"></textarea></div>
-      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="edit-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option></select></div>
-      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Undergraduate</option></select></div>
+      <div class="form-group"><label class="form-label">Category</label><select class="form-select" id="edit-category"><option value="">Select...</option><option>Biology</option><option>Pharmacy</option><option>Chemistry</option><option>Anatomy</option><option>Physiology</option></select></div>
+      <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Pharmacy</option><option>Undergraduate</option></select></div>
+      <div class="form-group"><label class="form-label">Section Type</label><select class="form-select" id="edit-section-type"><option value="">Select...</option><option>Resources</option><option>Notes</option><option>Exams</option><option>Quizzes</option></select></div>
       <div class="form-group"><label class="form-label">Tags</label><input type="text" class="form-input" id="edit-tags" /></div>
       <button type="submit" class="btn btn-cyan">Save Changes</button>
     </form>
@@ -483,7 +659,7 @@
 </div>
 
 <script>
-  const API_BASE = '/api/admin';
+  const API_BASE = '/api/query';
 
   function esc(t) {
     const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
@@ -491,52 +667,63 @@
   }
 
   function getToken() {
-    // Check both storage keys
     return localStorage.getItem('sb-token') || sessionStorage.getItem('sb-token');
   }
 
-  async function apiCall(endpoint, method = 'GET', body = null) {
-    const headers = { 'Content-Type': 'application/json', 'X-Requested-With': 'XMLHttpRequest' };
-    const token = getToken();
-    if (token) headers['Authorization'] = `Bearer ${token}`;
+  function toast(msg, type = 'success') {
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3000);
+  }
 
-    const options = { method, headers };
-    if (body && !(body instanceof FormData)) {
-      options.body = JSON.stringify(body);
-    } else if (body instanceof FormData) {
-      delete headers['Content-Type'];
-      options.body = body;
-    }
+  async function apiCall(action, params = {}) {
+    const headers = { 'Content-Type': 'application/json' };
+    const token = getToken();
+    if (token) headers['Authorization'] = 'Bearer ' + token;
 
     const controller = new AbortController();
-    options.signal = controller.signal;
     const timeout = setTimeout(() => controller.abort(), 15000);
 
     try {
-      const res = await fetch(`${API_BASE}${endpoint}`, options);
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers,
+        body: JSON.stringify({ action, ...params }),
+        signal: controller.signal
+      });
       clearTimeout(timeout);
+
       if (res.status === 401 || res.status === 403) {
         localStorage.clear();
         sessionStorage.clear();
         window.location.href = '/admin-login.html';
         throw new Error('Unauthorized');
       }
-       const text = await res.text();
-try {
-  return JSON.parse(text);
-} catch {
-  throw new Error(text.slice(0, 120));
-}
+
+      const json = await res.json();
       if (!res.ok) throw new Error(json.error || 'Request failed');
-      return json;
+      return json.data !== undefined ? json.data : json;
     } catch (err) {
       clearTimeout(timeout);
-      console.error(`API Error [${endpoint}]:`, err.message);
+      console.error(`API Error [${action}]:`, err.message);
       throw err;
     }
   }
 
-  // ── TAB NAVIGATION ──
+  function loadTabContent(tabId) {
+    switch(tabId) {
+      case 'dashboard': loadDashboard(); break;
+      case 'resources': loadResources(); break;
+      case 'submissions': loadSubmissions(); break;
+      case 'messages': loadMessages(); break;
+      case 'users': loadUsers(); break;
+      case 'newsletter': loadNewsletter(); break;
+      case 'donations': loadDonations(); break;
+    }
+  }
+
   document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(link => {
     link.addEventListener('click', (e) => {
       e.preventDefault();
@@ -546,13 +733,10 @@ try {
       document.querySelectorAll('.tab-content').forEach(t => t.classList.remove('active'));
       const tabEl = document.getElementById('tab-' + tabId);
       if (tabEl) tabEl.classList.add('active');
-      if (tabId === 'dashboard') loadDashboard();
-      if (tabId === 'resources') loadResources();
-      if (tabId === 'users') loadUsers();
+      loadTabContent(tabId);
     });
   });
 
-  // ── SITE SECTION TABS ──
   document.querySelectorAll('#section-tabs .tab-btn').forEach(btn => {
     btn.addEventListener('click', () => {
       document.querySelectorAll('#section-tabs .tab-btn').forEach(b => b.classList.remove('active'));
@@ -561,39 +745,320 @@ try {
     });
   });
 
-  // ── DASHBOARD ──
   async function loadDashboard() {
     try {
-      const data = await apiCall('/stats');
+      const data = await apiCall('stats');
       document.getElementById('stat-resources').textContent = data.resources || 0;
-      document.getElementById('stat-users').textContent = data.users || 0;
+      document.getElementById('stat-pending').textContent = data.pendingSubmissions || 0;
+      document.getElementById('stat-messages').textContent = data.messages || 0;
+      
+      const usersData = await apiCall('get_all_site_sections');
+      const userCount = usersData?.site_config?.total_users || '—';
+      document.getElementById('stat-users').textContent = userCount;
+
+      document.getElementById('recent-activity').innerHTML = `
+        <div style="display:flex;gap:24px;flex-wrap:wrap;">
+          <div><strong>${data.resources || 0}</strong> Resources</div>
+          <div><strong>${data.pendingSubmissions || 0}</strong> Pending</div>
+          <div><strong>${data.messages || 0}</strong> Messages</div>
+        </div>`;
     } catch(e) {
       document.getElementById('stat-resources').textContent = '!';
+      document.getElementById('stat-pending').textContent = '!';
+      document.getElementById('stat-messages').textContent = '!';
       document.getElementById('stat-users').textContent = '!';
     }
   }
 
-  // ── RESOURCES ──
   async function loadResources() {
     const tbody = document.getElementById('resources-table');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
     try {
-      const data = await apiCall('/resources');
-      const resources = data.resources || [];
+      const data = await apiCall('get_resources', { filters: {} });
+      const resources = data || [];
       if (!resources.length) {
-        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No resources found.</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--text-muted);">No resources found.</td></tr>';
         return;
       }
       tbody.innerHTML = resources.map(r => `
         <tr>
           <td><strong>${esc(r.title || 'Untitled')}</strong></td>
-          <td>${esc(r.category || '—')}</td>
+          <td><span class="badge badge-info">${esc(r.category || '—')}</span></td>
           <td>${esc(r.level || '—')}</td>
-          <td><span class="badge ${r.source === 'biology_notes' ? 'badge-info' : 'badge-warning'}">${r.source === 'biology_notes' ? 'Published' : 'Submission'}</span></td>
+          <td>${esc(r.author || '—')}</td>
+          <td>${esc(r.section_type || '—')}</td>
           <td>
-            <button class="btn btn-sm btn-outline" onclick="openEdit('${esc(String(r.id))}')"><i class="fa-solid fa-pen"></i></button>
-            <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(r.id))}')"><i class="fa-solid fa-trash"></i></button>
-            ${r.source === 'resource_submissions' && r.status === 'pending' ? `<button class="btn btn-sm btn-cyan" onclick="approveSubmission('${esc(String(r.id))}')"><i class="fa-solid fa-check"></i></button>` : ''}
+            <button class="btn btn-sm btn-outline" onclick="openEdit('${esc(String(r.id))}', 'biology_notes')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(r.id))}', 'biology_notes')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadSubmissions() {
+    const tbody = document.getElementById('submissions-table');
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('submissions');
+      const submissions = data || [];
+      if (!submissions.length) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--text-muted);">No submissions found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = submissions.map(s => `
+        <tr>
+          <td><strong>${esc(s.title || 'Untitled')}</strong></td>
+          <td>${esc(s.author || '—')}</td>
+          <td>${esc(s.category || '—')}</td>
+          <td>${esc(s.level || '—')}</td>
+          <td><span class="badge ${s.status === 'approved' ? 'badge-success' : s.status === 'rejected' ? 'badge-danger' : 'badge-warning'}">${esc(s.status)}</span></td>
+          <td>${s.created_at ? new Date(s.created_at).toLocaleDateString() : '—'}</td>
+          <td>
+            ${s.status === 'pending' ? `<button class="btn btn-sm btn-cyan" onclick="approveSubmission('${esc(String(s.id))}')"><i class="fa-solid fa-check"></i> Approve</button><button class="btn btn-sm btn-danger" onclick="rejectSubmission('${esc(String(s.id))}')"><i class="fa-solid fa-times"></i> Reject</button>` : ''}
+            <button class="btn btn-sm btn-outline" onclick="openEdit('${esc(String(s.id))}', 'resource_submissions')"><i class="fa-solid fa-pen"></i></button>
+            <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(s.id))}', 'resource_submissions')"><i class="fa-solid fa-trash"></i></button>
+          </td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  window.approveSubmission = async function(id) {
+    try {
+      await apiCall('approve', { submissionId: id, action: 'approve' });
+      toast('Submission approved!');
+      loadSubmissions();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.rejectSubmission = async function(id) {
+    try {
+      await apiCall('approve', { submissionId: id, action: 'reject' });
+      toast('Submission rejected.');
+      loadSubmissions();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  async function loadMessages() {
+    const tbody = document.getElementById('messages-table');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('messages');
+      const messages = data?.messages || [];
+      if (!messages.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No messages found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = messages.map(m => `
+        <tr>
+          <td><strong>${esc(m.name || '—')}</strong></td>
+          <td>${esc(m.email || '—')}</td>
+          <td>${esc(m.subject || '—')}</td>
+          <td style="max-width:300px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">${esc((m.message || '').substring(0, 100))}</td>
+          <td>${m.created_at ? new Date(m.created_at).toLocaleDateString() : '—'}</td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  document.getElementById('upload-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const payload = {
+      title: document.getElementById('upload-title').value,
+      description: document.getElementById('upload-description').value,
+      author: document.getElementById('upload-author').value || 'Admin',
+      category: document.getElementById('upload-category').value,
+      level: document.getElementById('upload-level').value,
+      section_type: document.getElementById('upload-section-type').value,
+      tag: document.getElementById('upload-tags').value,
+      file_url: '',
+      file_size: ''
+    };
+    
+    const fileInput = document.getElementById('upload-file');
+    const file = fileInput.files[0];
+    if (file) {
+      payload.file_url = file.name;
+      payload.file_size = (file.size / 1024).toFixed(1) + ' KB';
+    }
+
+    try {
+      await apiCall('submit_resource', { payload });
+      toast('Resource uploaded successfully!');
+      document.getElementById('upload-form').reset();
+      loadResources();
+    } catch(err) {
+      toast('Upload failed: ' + err.message, 'error');
+    }
+  });
+
+  window.openEdit = async function(id, table) {
+    try {
+      const allData = await apiCall('get_resources', { filters: {} });
+      const submissionsData = await apiCall('submissions');
+      const allResources = [...(allData || []), ...(submissionsData || [])];
+      const r = allResources.find(item => String(item.id) === String(id));
+      
+      if (!r) return toast('Resource not found', 'error');
+      
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-table').value = table;
+      document.getElementById('edit-title').value = r.title || '';
+      document.getElementById('edit-description').value = r.description || '';
+      document.getElementById('edit-category').value = r.category || '';
+      document.getElementById('edit-level').value = r.level || '';
+      document.getElementById('edit-section-type').value = r.section_type || '';
+      document.getElementById('edit-tags').value = r.tag || '';
+      document.getElementById('edit-modal').style.display = 'flex';
+    } catch(e) {
+      toast('Failed to load resource: ' + e.message, 'error');
+    }
+  };
+
+  document.getElementById('edit-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const id = document.getElementById('edit-id').value;
+    const table = document.getElementById('edit-table').value;
+    
+    const payload = {
+      title: document.getElementById('edit-title').value,
+      description: document.getElementById('edit-description').value,
+      category: document.getElementById('edit-category').value,
+      level: document.getElementById('edit-level').value,
+      section_type: document.getElementById('edit-section-type').value,
+      tag: document.getElementById('edit-tags').value
+    };
+
+    try {
+      await apiCall('submit_resource', { payload, submissionId: id });
+      toast('Resource updated!');
+      document.getElementById('edit-modal').style.display = 'none';
+      loadResources();
+      loadSubmissions();
+    } catch(err) {
+      toast('Update failed: ' + err.message, 'error');
+    }
+  });
+
+  window.deleteResource = async function(id, table) {
+    if (!confirm('Permanently delete this resource?')) return;
+    try {
+      await apiCall('approve', { submissionId: id, action: 'delete' });
+      toast('Resource deleted.');
+      loadResources();
+      loadSubmissions();
+    } catch(e) {
+      toast('Delete failed: ' + e.message, 'error');
+    }
+  };
+
+  async function loadSiteSection(sectionName) {
+    const editor = document.getElementById('site-section-editor');
+    editor.innerHTML = '<p style="padding:20px;">Loading...</p>';
+    try {
+      const data = await apiCall('get_all_site_sections');
+      const content = data?.[sectionName] || {};
+      editor.innerHTML = `
+        <form id="section-form" style="margin-top:16px;">
+          <div class="form-group">
+            <label class="form-label">${sectionName.toUpperCase()} Content (JSON)</label>
+            <textarea class="form-textarea" id="section-content" style="min-height:300px;font-family:monospace;font-size:0.8rem;">${esc(JSON.stringify(content, null, 2))}</textarea>
+          </div>
+          <button type="submit" class="btn btn-cyan">Save ${sectionName}</button>
+        </form>
+      `;
+      document.getElementById('section-form').addEventListener('submit', async (e) => {
+        e.preventDefault();
+        try {
+          let parsed;
+          const rawValue = document.getElementById('section-content').value;
+          try { parsed = JSON.parse(rawValue); }
+          catch { parsed = rawValue; }
+          await apiCall('update_site_section', { section: sectionName, data: parsed });
+          toast('Section updated!');
+        } catch(err) {
+          toast('Save failed: ' + err.message, 'error');
+        }
+      });
+    } catch(e) {
+      editor.innerHTML = '<p style="color:var(--danger);padding:20px;">Failed to load section: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function loadQuizTopics() {
+    const tbody = document.getElementById('quiz-topics-table');
+    const level = document.getElementById('quiz-level')?.value || 'O-Level';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const topics = await apiCall('get_quiz_topics', { level });
+      if (!topics || !topics.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No topics found for ' + esc(level) + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = topics.map(t => `
+        <tr>
+          <td><strong>${esc(t.topic_name)}</strong></td>
+          <td>${esc(level)}</td>
+          <td>${t.question_count || 0}</td>
+          <td><span class="badge badge-success">Active</span></td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  document.getElementById('quiz-batch-form').addEventListener('submit', async (e) => {
+    e.preventDefault();
+    const level = document.getElementById('quiz-level').value;
+    const topic = document.getElementById('quiz-topic').value;
+    const batchName = document.getElementById('quiz-batch-name').value;
+    const questionsJson = document.getElementById('quiz-questions-json').value;
+    
+    let questions;
+    try {
+      questions = JSON.parse(questionsJson);
+      if (!Array.isArray(questions) || questions.length === 0) throw new Error('Invalid array');
+    } catch(err) {
+      return toast('Invalid JSON format for questions', 'error');
+    }
+
+    try {
+      await apiCall('add_quiz_questions_batch', { level, topic, batch_name: batchName, questions });
+      toast(`Added ${questions.length} questions!`);
+      document.getElementById('quiz-batch-form').reset();
+      loadQuizTopics();
+    } catch(err) {
+      toast('Failed: ' + err.message, 'error');
+    }
+  });
+
+  async function loadUsers() {
+    const tbody = document.getElementById('users-table');
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_all_site_sections');
+      const users = data?.users?.list || [];
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--text-muted);">No users found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(u => `
+        <tr>
+          <td><strong>${esc(u.email || '—')}</strong></td>
+          <td><span class="badge ${u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success'}">${esc(u.admin_role || 'user')}</span></td>
+          <td><span class="badge ${u.is_locked ? 'badge-danger' : 'badge-success'}">${u.is_locked ? 'Locked' : 'Active'}</span></td>
+          <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+          <td>
+            ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')"><i class="fa-solid fa-user-shield"></i> Make Admin</button>` : ''}
+            <button class="btn btn-sm btn-outline" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})"><i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i></button>
           </td>
         </tr>
       `).join('');
@@ -602,162 +1067,83 @@ try {
     }
   }
 
-  window.approveSubmission = async function(id) {
-    try {
-      await apiCall(`/resources/${id}/approve`, 'POST');
-      loadResources();
-    } catch(e) { alert('Failed: ' + e.message); }
-  };
-
-  // ── UPLOAD ──
-  document.getElementById('upload-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const fileInput = document.getElementById('upload-file');
-    const file = fileInput.files[0];
-    if (!file) return alert('Select a file.');
-    const formData = new FormData();
-    formData.append('title', document.getElementById('upload-title').value);
-    formData.append('description', document.getElementById('upload-description').value);
-    formData.append('category', document.getElementById('upload-category').value);
-    formData.append('level', document.getElementById('upload-level').value);
-    formData.append('tags', document.getElementById('upload-tags').value);
-    formData.append('file', file);
-    try {
-      await apiCall('/resources/upload', 'POST', formData);
-      alert('Uploaded!');
-      document.getElementById('upload-form').reset();
-    } catch(err) { alert('Upload failed: ' + err.message); }
-  });
-
-  // ── EDIT ──
-  window.openEdit = async function(id) {
-    try {
-      const data = await apiCall(`/resources/${id}`);
-      const r = data.resource;
-      document.getElementById('edit-id').value = id;
-      document.getElementById('edit-title').value = r.title || '';
-      document.getElementById('edit-description').value = r.description || '';
-      document.getElementById('edit-category').value = r.category || '';
-      document.getElementById('edit-level').value = r.level || '';
-      document.getElementById('edit-tags').value = r.tag || '';
-      document.getElementById('edit-modal').style.display = 'flex';
-    } catch(e) { alert('Failed to load resource.'); }
-  };
-
-  document.getElementById('edit-form').addEventListener('submit', async (e) => {
-    e.preventDefault();
-    const id = document.getElementById('edit-id').value;
-    const body = {
-      title: document.getElementById('edit-title').value,
-      description: document.getElementById('edit-description').value,
-      category: document.getElementById('edit-category').value,
-      level: document.getElementById('edit-level').value,
-      tag: document.getElementById('edit-tags').value
-    };
-    try {
-      await apiCall(`/resources/${id}`, 'PUT', body);
-      alert('Updated!');
-      document.getElementById('edit-modal').style.display = 'none';
-      loadResources();
-    } catch(err) { alert('Failed: ' + err.message); }
-  });
-
-  // ── DELETE ──
-  window.deleteResource = async function(id) {
-    if (!confirm('Delete this resource?')) return;
-    try { await apiCall(`/resources/${id}`, 'DELETE'); loadResources(); }
-    catch(e) { alert('Delete failed.'); }
-  };
-
-  // ── SITE SECTIONS ──
-  async function loadSiteSection(sectionName) {
-    const editor = document.getElementById('site-section-editor');
-    editor.innerHTML = '<p style="padding:20px;">Loading...</p>';
-    try {
-      const data = await apiCall('/site-sections');
-      const sections = data.sections || [];
-      const section = sections.find(s => s.section === sectionName);
-      const content = section?.data ? JSON.stringify(section.data, null, 2) : '{}';
-      editor.innerHTML = `
-        <form id="section-form" style="margin-top:16px;">
-          <div class="form-group">
-            <label class="form-label">Content (JSON)</label>
-            <textarea class="form-textarea" id="section-content" style="min-height:200px;font-family:monospace;font-size:0.8rem;">${esc(content)}</textarea>
-          </div>
-          <button type="submit" class="btn btn-cyan">Save ${sectionName.toUpperCase()}</button>
-        </form>
-      `;
-      document.getElementById('section-form').addEventListener('submit', async (e) => {
-        e.preventDefault();
-        try {
-          let parsed;
-          try { parsed = JSON.parse(document.getElementById('section-content').value); }
-          catch { parsed = document.getElementById('section-content').value; }
-          await apiCall(`/site-sections/${sectionName}`, 'PUT', parsed);
-          alert('Section updated!');
-        } catch(err) { alert('Save failed: ' + err.message); }
-      });
-    } catch(e) {
-      editor.innerHTML = '<p style="color:var(--danger);padding:20px;">Failed to load section.</p>';
-    }
-  }
-
-  // ── USERS ──
-  async function loadUsers() {
-    const tbody = document.getElementById('users-table');
-    tbody.innerHTML = '<tr><td colspan="4">Loading...</td></tr>';
-    try {
-      const data = await apiCall('/users');
-      const users = data.users || [];
-      if (!users.length) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No users found.</td></tr>';
-        return;
-      }
-      tbody.innerHTML = users.map(u => `
-        <tr>
-          <td>${esc(u.email)}</td>
-          <td><span class="badge ${u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success'}">${esc(u.admin_role || 'user')}</span></td>
-          <td><span class="badge ${u.is_locked ? 'badge-danger' : 'badge-success'}">${u.is_locked ? 'Locked' : 'Active'}</span></td>
-          <td>
-            ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')"><i class="fa-solid fa-user-shield"></i> Make Admin</button>` : ''}
-            <button class="btn btn-sm btn-outline" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})"><i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i></button>
-          </td>
-        </tr>
-      `).join('');
-    } catch(e) {
-      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);">Failed to load: ' + esc(e.message) + '</td></tr>';
-    }
-  }
-
   window.makeAdmin = async function(userId) {
-    try { await apiCall(`/users/${userId}/make-admin`, 'POST'); loadUsers(); }
-    catch(e) { alert('Failed: ' + e.message); }
+    try {
+      await apiCall('update_user_role', { userId, role: 'admin' });
+      toast('User promoted to admin!');
+      loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
   };
 
   window.toggleLock = async function(userId, lock) {
-    try { await apiCall(`/users/${userId}/lock`, 'PUT', { lock, reason: lock ? 'Locked by admin' : null }); loadUsers(); }
-    catch(e) { alert('Failed: ' + e.message); }
+    try {
+      await apiCall('update_user_lock', { userId, lock, reason: lock ? 'Locked by admin' : null });
+      toast(lock ? 'User locked.' : 'User unlocked.');
+      loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
   };
 
-  // ── SIGN OUT ──
+  async function loadNewsletter() {
+    const tbody = document.getElementById('newsletter-table');
+    tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_all_site_sections');
+      const subscribers = data?.newsletter?.subscribers || [];
+      if (!subscribers.length) {
+        tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--text-muted);">No subscribers found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = subscribers.map(s => `
+        <tr>
+          <td>${esc(s.email || '—')}</td>
+          <td>${s.subscribed_at ? new Date(s.subscribed_at).toLocaleDateString() : '—'}</td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="2" style="text-align:center;color:var(--danger);">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadDonations() {
+    const tbody = document.getElementById('donations-table');
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_all_site_sections');
+      const donations = data?.donations?.list || [];
+      if (!donations.length) {
+        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--text-muted);">No donations found.</td></tr>';
+        return;
+      }
+      tbody.innerHTML = donations.map(d => `
+        <tr>
+          <td><strong>${esc(d.name || 'Anonymous')}</strong></td>
+          <td>${esc(d.amount || '—')}</td>
+          <td style="font-family:monospace;font-size:0.75rem;">${esc(d.txid || '—').substring(0, 20)}...</td>
+          <td>${d.created_at ? new Date(d.created_at).toLocaleDateString() : '—'}</td>
+        </tr>
+      `).join('');
+    } catch(e) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--danger);">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
   window.signOut = function() {
     localStorage.clear();
     sessionStorage.clear();
     window.location.href = '/';
   };
 
-  // ── INIT ──
   document.addEventListener('DOMContentLoaded', () => {
-    // Show admin email
     const email = localStorage.getItem('sb-email') || sessionStorage.getItem('sb-email') || 'Admin';
     document.getElementById('admin-email-display').textContent = email;
 
-    // Check if actually admin
-    apiCall('/check').then(data => {
-      if (!data.isAdmin) {
+    apiCall('stats').then(data => {
+      if (data === null || data.error) {
         document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;"><h1 style="color:#e74c3c;">Access Denied</h1><p>You do not have admin privileges.</p><a href="/" style="color:var(--cyan);">Go Home</a></div>';
       }
-    }).catch(() => {});
+    }).catch(() => {
+      document.body.innerHTML = '<div style="text-align:center;padding:80px 20px;"><h1 style="color:#e74c3c;">Connection Error</h1><p>Could not reach the server.</p><a href="/" style="color:var(--cyan);">Go Home</a></div>';
+    });
 
     loadDashboard();
   });
