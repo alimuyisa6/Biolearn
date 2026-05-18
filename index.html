@@ -340,7 +340,6 @@
     .toast.success { border-left: 4px solid var(--success); }
     .toast.error { border-left: 4px solid var(--danger); }
 
-    /* Spinner */
     .spinner-overlay {
       position: absolute;
       inset: 0;
@@ -794,15 +793,16 @@
       document.getElementById('stat-pending').textContent = data.pendingSubmissions || 0;
       document.getElementById('stat-messages').textContent = data.messages || 0;
       
-      const usersData = await apiCall('get_all_site_sections');
-      const userCount = usersData?.site_config?.total_users || '—';
-      document.getElementById('stat-users').textContent = userCount;
+      const sections = await apiCall('get_all_site_sections');
+      const users = sections?.users?.list || [];
+      document.getElementById('stat-users').textContent = users.length;
 
       document.getElementById('recent-activity').innerHTML = `
         <div style="display:flex;gap:24px;flex-wrap:wrap;">
           <div><strong>${data.resources || 0}</strong> Resources</div>
           <div><strong>${data.pendingSubmissions || 0}</strong> Pending</div>
           <div><strong>${data.messages || 0}</strong> Messages</div>
+          <div><strong>${users.length}</strong> Users</div>
         </div>`;
     } catch(e) {
       document.getElementById('stat-resources').textContent = '!';
@@ -1240,6 +1240,7 @@
   async function verifyAdminAccess() {
     const token = getToken();
     if (!token) {
+      document.getElementById('auth-wall').style.display = 'none';
       showAuthForm();
       return;
     }
