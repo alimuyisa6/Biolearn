@@ -289,7 +289,7 @@
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function getToken() { return localStorage.getItem('sb-token') || sessionStorage.getItem('sb-token'); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
-  async function apiCall(action, params) {
+   async function apiCall(action, params) {
     params = params || {};
     var headers = { 'Content-Type': 'application/json' };
     var token = getToken();
@@ -297,7 +297,13 @@
     var controller = new AbortController();
     var tid = setTimeout(function() { controller.abort(); }, 15000);
     try {
-      var res = await fetch(API_BASE, { method: 'POST', headers: headers, body: JSON.stringify({ action: action, ...params }), signal: controller.signal });
+      var body = { action: action };
+      for (var key in params) {
+        if (params.hasOwnProperty(key)) {
+          body[key] = params[key];
+        }
+      }
+      var res = await fetch(API_BASE, { method: 'POST', headers: headers, body: JSON.stringify(body), signal: controller.signal });
       clearTimeout(tid);
       var text = await res.text();
       var json;
