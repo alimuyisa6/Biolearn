@@ -297,7 +297,7 @@
     var controller = new AbortController();
     var tid = setTimeout(function() { controller.abort(); }, 15000);
     try {
-      var res = await fetch(API_BASE, { method: 'POST', headers: headers, body: JSON.stringify({ action: action }, params), signal: controller.signal });
+      var res = await fetch(API_BASE, { method: 'POST', headers: headers, body: JSON.stringify({ action: action, ...params }), signal: controller.signal });
       clearTimeout(tid);
       var text = await res.text();
       var json;
@@ -490,38 +490,30 @@
     catch (e) { toast('Save failed: ' + e.message, 'error'); }
   }
 
-   async function loadQuizTopics() {
-    const tbody = document.getElementById('quiz-topics-table');
-    const levelSelect = document.getElementById('quiz-level');
-    const level = (levelSelect && levelSelect.value) ? levelSelect.value : 'O-Level';
+  async function loadQuizTopics() {
+    var tbody = document.getElementById('quiz-topics-table');
+    var levelSelect = document.getElementById('quiz-level');
+    var level = (levelSelect && levelSelect.value) ? levelSelect.value : 'O-Level';
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">Loading topics for ' + esc(level) + '…</td></tr>';
     try {
-        const topics = await apiCall('get_quiz_topics', { level: level });
-        if (!topics || !topics.length) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">No topics found for ' + esc(level) + '. Add questions first.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = topics.map(t => 
-            '<tr><td><strong>' + esc(t.topic_name) + '</strong></td>' +
-            '<td>' + esc(level) + '</td>' +
-            '<td>' + (t.question_count || 0) + '</td>' +
-            '<td><span class="badge badge-success">Active</span></td></tr>'
-        ).join('');
-    } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
-    }
-}
+      var topics = await apiCall('get_quiz_topics', { level: level });
+      if (!topics || !topics.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">No topics found for ' + esc(level) + '. Add questions first.</td></tr>'; return; }
+      tbody.innerHTML = topics.map(function(t) { return '<tr><td><strong>' + esc(t.topic_name) + '</strong></td><td>' + esc(level) + '</td><td>' + (t.question_count || 0) + '</td><td><span class="badge badge-success">Active</span></td></tr>'; }).join('');
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+  }
 
   async function submitQuizBatch() {
     var level = document.getElementById('quiz-level').value;
     var topic = document.getElementById('quiz-topic').value.trim();
     var batchName = document.getElementById('quiz-batch-name').value.trim();
+    if (!level) { toast('Please select a level', 'error'); return; }
+    if (!topic) { toast('Topic is required', 'error'); return; }
     var questions;
-    try { questions = JSON.parse(document.getElementById('quiz-questions-json').value); if (!Array.isArray(questions) || !questions.length) throw new Error('Empty'); }
-    catch (e) { toast('Invalid JSON', 'error'); return; }
+    try { questions = JSON.parse(document.getElementById('quiz-questions-json').value); if (!Array.isArray(questions) || !questions.length) throw new Error('Empty array'); }
+    catch (e) { toast('Invalid JSON format', 'error'); return; }
     try {
-      await apiCall('add_quiz_questions_batch', { level: level, topic: topic, batch_name: batchName, questions: questions });
-      toast('Added ' + questions.length + ' questions!');
+      var result = await apiCall('add_quiz_questions_batch', { level: level, topic: topic, batch_name: batchName || 'Batch ' + new Date().toISOString().slice(0,10), questions: questions });
+      toast('Added ' + result.questions_added + ' questions!');
       document.getElementById('quiz-topic').value = '';
       document.getElementById('quiz-batch-name').value = '';
       document.getElementById('quiz-questions-json').value = '';
@@ -535,7 +527,7 @@
     try {
       var data = await apiCall('get_app_features', { page_id: 'all' });
       if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No features found.</td></tr>'; return; }
-      tbody.innerHTML = data.map(function(f) { return '<tr><td><strong>' + esc(f.feature_key) + '</strong></td><td>' + esc(f.feature_name) + '</td><td><span class="badge badge-info">' + esc(f.page_id) + '</span></td><td>' + esc(f.category) + '</td><td><span class="badge ' + (f.is_enabled?'badge-success':'badge-danger') + '">' + (f.is_enabled?'Yes':'No') + '</span></td><td>' + (f.display_order||0) + '</td><td><button class="btn btn-sm btn-outline" onclick="openFeatureEdit(\'' + esc(f.feature_key) + '\',\'' + esc(String(f.is_enabled)) + '\',\'' + esc(JSON.stringify(f.settings||{})) + '\')"><i class="fa-solid fa-pen"></i></button></td></tr>'; }).join('');
+      tbody.innerHTML = data.map(function(f) { return '<tr><td><strong>' + esc(f.feature_key) + '</strong></td><td>' + esc(f.feature_name) + '</td><td><span class="badge badge-info">' + esc(f.page_id) + '</span></td><td>' + esc(f.category) + '</td><td><span class="badge ' + (f.is_enabled?'badge-success':'badge-danger') + '">' + (f.is_enabled?'Yes':'No') + '</span></td><td>' + (f.display_order||0) + '</td><td><button class="btn btn-sm btn-outline" onclick="openFeatureEdit(\'' + esc(f.feature_key) + '\',\'' + esc(String(f.is_enabled)) + '\',\'' + esc(JSON.stringify(f.settings||{}).replace(/'/g,"\\'")) + '\')"><i class="fa-solid fa-pen"></i></button></td></tr>'; }).join('');
     } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
   }
 
@@ -543,7 +535,7 @@
     document.getElementById('feature-edit-key').value = key;
     document.getElementById('feature-edit-key-display').value = key;
     document.getElementById('feature-edit-enabled').value = enabled === 'true' ? 'true' : 'false';
-    document.getElementById('feature-edit-settings').value = settings || '{}';
+    try { document.getElementById('feature-edit-settings').value = JSON.stringify(JSON.parse(settings), null, 2); } catch(e) { document.getElementById('feature-edit-settings').value = settings || '{}'; }
     document.getElementById('feature-edit-modal').style.display = 'flex';
   };
 
