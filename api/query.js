@@ -887,19 +887,45 @@ async function handlePost(req, res) {
       }
 
       case 'submit_rating': {
-        if (!userId) return res.status(401).json({ error: 'Authentication required' });
-        const { resource_id, rating, metadata } = req.body;
-        // Use upsert via unique constraint on (user_id, resource_id) where interaction_type='rating'
-        const { error } = await supabase.from('user_interactions').upsert({
-          user_id: userId,
-          resource_id,
-          interaction_type: 'rating',
-          value: rating,
-          metadata: metadata || {}
-        }, { onConflict: 'user_id, resource_id' });  // partial unique constraint will be applied
-        if (error) throw error;
-        result = { success: true };
-        break;
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const { resource_id, rating, metadata } = req.body;
+  
+  // Check if this user already rated this resource
+  const { data: existing } = await supabase
+    .from('user_interactions')
+    .select('id')
+    .eq('user_id', userId)
+    .eq('resource_id', resource_id)
+    .eq('interaction_type', 'rating')
+    .maybeSingle();
+  
+  if (existing) {
+    // Update existing rating
+    const { error } = await supabase
+      .from('user_interactions')
+      .update({
+        value: rating,
+        metadata: metadata || {},
+        created_at: new Date().toISOString()  // optionally refresh timestamp
+      })
+      .eq('id', existing.id);
+    if (error) throw error;
+  } else {
+    // Insert new rating
+    const { error } = await supabase
+      .from('user_interactions')
+      .insert({
+        user_id: userId,
+        resource_id,
+        interaction_type: 'rating',
+        value: rating,
+        metadata: metadata || {}
+      });
+    if (error) throw error;
+  }
+  
+  result = { success: true };
+  break;
       }
 
       case 'get_all_ratings': {
