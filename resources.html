@@ -705,19 +705,22 @@
         });
         starsDiv.appendChild(star);
       }
-      document.getElementById('submit-rating').onclick = async () => {
-        const selected = document.querySelector('#rating-stars-input .star[data-selected]');
-        if (!selected) return alert('Please select a rating.');
-        const rating = parseInt(selected.dataset.selected);
-        const comment = document.getElementById('rating-comment').value.trim();
-        try {
-          await apiCall('submit_rating', { resource_id: resourceId, rating, metadata: comment ? { comment } : {} });
-          alert('Rating submitted!');
-          modal.style.display = 'none';
-          // Refresh ratings
-          loadRatings();
-        } catch (err) { alert('Failed: ' + err.message); }
-      };
+       document.getElementById('submit-rating').onclick = async () => {
+  const selected = document.querySelector('#rating-stars-input .star[data-selected]');
+  if (!selected) return alert('Please select a rating.');
+  const rating = parseInt(selected.dataset.selected);
+  const comment = document.getElementById('rating-comment').value.trim();
+  try {
+    await apiCall('submit_rating', { resource_id: resourceId, rating, metadata: comment ? { comment } : {} });
+    alert('Rating submitted!');
+    modal.style.display = 'none';
+    // Refresh ratings and keep current filters
+    const level = document.querySelector('input[name="level"]:checked')?.value || '';
+    const category = document.querySelector('input[name="category"]:checked')?.value || '';
+    await loadFavoritesAndRatings();
+    renderFilteredResources(level, category);
+  } catch (err) { alert('Failed: ' + err.message); }
+};
       document.getElementById('close-rating-modal').onclick = () => modal.style.display = 'none';
       modal.addEventListener('click', (e) => { if (e.target === modal) modal.style.display = 'none'; });
     }
