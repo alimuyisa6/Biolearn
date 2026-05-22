@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -1186,7 +1186,44 @@
 .chat-clear-btn:hover { color: #e74c3c; }
  .theme-toggle i { color: var(--clr-cyan); }
 .mobile-toggle i { color: var(--clr-magenta); }
-  </style>
+  /* --- Prominent colourful icons (homepage only) --- */
+.fa-file-pdf                   { color: #e74c3c; }
+.fa-user, .fa-user-tie         { color: #3498db; }
+.fa-calendar                   { color: #e67e22; }
+.fa-file                       { color: #9b59b6; }
+.fa-download                   { color: #16a085; }
+.fa-facebook-f                 { color: #1877f2; }
+.fa-x-twitter                  { color: #000; }
+.fa-whatsapp                   { color: #25d366; }
+.fa-headset                    { color: #e91e63; }
+.fa-paper-plane                { color: #2ecc71; }
+.fa-check                      { color: #27ae60; }
+.fa-rocket                     { color: #f39c12; }
+.fa-arrow-up                   { color: #0ab5b5; }
+.fa-filter                     { color: #e67e22; }
+.fa-chevron-down               { color: #b8873a; }
+.fa-chevron-left,
+.fa-chevron-right              { color: #fff; }
+.fa-bars,
+.fa-xmark                      { color: #b8873a; }
+.fa-house                      { color: #f39c12; }
+.fa-book                       { color: #3498db; }
+.fa-newspaper                  { color: #9b59b6; }
+.fa-circle-info                { color: #1abc9c; }
+.fa-envelope                   { color: #e74c3c; }
+.fa-heart                      { color: #ff5722; }
+.fa-tag                        { color: #f39c12; }
+.fa-circle-question            { color: #e67e22; }
+.fa-users                      { color: #ff9800; }
+.fa-triangle-exclamation       { color: #f1c40f; }
+.fa-arrow-right                { color: #fff; }
+.fa-moon, .fa-sun              { color: var(--clr-cyan); }   /* theme toggle */
+.fa-bars                       { color: var(--clr-magenta); } 
+.fa-solid, .fa-regular, .fa-brands {
+  font-size: 1.15em;
+  vertical-align: -0.1em;
+}
+</style>
 </head>
 <body>
   <a href="#main-content" class="skip-link" aria-label="Skip to main content">Skip to main content</a>
@@ -1874,75 +1911,6 @@
       if (chatPollInterval) clearInterval(chatPollInterval);
     });
   })();
-
-(function() {
-  const SVG_MAP = {
-    'fa-file-pdf':   `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2h7l5 5v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" fill="#e74c3c"/><path d="M13 2v5h5" stroke="#e74c3c" stroke-width="2"/><text x="7" y="17" font-size="6" fill="#fff" font-weight="bold">PDF</text></svg>`,
-    'fa-user':        `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="8" r="4" fill="#3498db"/><path d="M4 20v-1a6 6 0 016-6h4a6 6 0 016 6v1" stroke="#3498db" stroke-width="2" fill="none"/></svg>`,
-    'fa-user-tie':    `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="6" r="4" fill="#2ecc71"/><path d="M8 14h8M8 14l2 7h4l2-7" stroke="#2ecc71" stroke-width="2"/></svg>`,
-    'fa-calendar':    `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="3" y="4" width="18" height="18" rx="2" stroke="#e67e22" stroke-width="2"/><path d="M16 2v4M8 2v4M3 10h18" stroke="#e67e22" stroke-width="2"/></svg>`,
-    'fa-file':        `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 2h7l5 5v14a2 2 0 01-2 2H6a2 2 0 01-2-2V4a2 2 0 012-2z" stroke="#9b59b6" stroke-width="2"/><path d="M13 2v5h5" stroke="#9b59b6" stroke-width="2"/></svg>`,
-    'fa-download':    `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 3v12m0 0l4-4m-4 4l-4-4" stroke="#16a085" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M4 17v2a2 2 0 002 2h12a2 2 0 002-2v-2" stroke="#16a085" stroke-width="2"/></svg>`,
-    'fa-facebook-f':  `<svg viewBox="0 0 24 24" fill="#1877f2" aria-hidden="true"><path d="M22.676 0H1.324C.593 0 0 .593 0 1.324v21.352C0 23.408.593 24 1.324 24h11.494v-9.294H9.689v-3.621h3.129V8.41c0-3.099 1.894-4.785 4.659-4.785 1.325 0 2.464.099 2.795.143v3.24l-1.918.001c-1.504 0-1.795.715-1.795 1.763v2.313h3.587l-.467 3.621h-3.12V24h6.116c.73 0 1.323-.593 1.323-1.324V1.324C24 .593 23.407 0 22.676 0z"/></svg>`,
-    'fa-x-twitter':   `<svg viewBox="0 0 24 24" fill="#000" aria-hidden="true"><path d="M18.244 2.25h3.308l-7.227 8.26 8.502 11.24H16.17l-5.214-6.817L4.99 21.75H1.68l7.73-8.835L1.254 2.25H8.08l4.713 6.231zm-1.161 17.52h1.833L7.084 4.126H5.117z"/></svg>`,
-    'fa-whatsapp':    `<svg viewBox="0 0 24 24" fill="#25d366" aria-hidden="true"><path d="M17.472 14.382c-.297-.149-1.758-.867-2.03-.967-.273-.099-.471-.148-.67.15-.197.297-.767.966-.94 1.164-.173.199-.347.223-.644.075-.297-.15-1.255-.463-2.39-1.475-.883-.788-1.48-1.761-1.653-2.059-.173-.297-.018-.458.13-.606.134-.133.298-.347.446-.52.149-.174.198-.298.298-.497.099-.198.05-.371-.025-.52-.075-.149-.669-1.612-.916-2.207-.242-.579-.487-.5-.669-.51-.173-.008-.371-.01-.57-.01-.198 0-.52.074-.792.372-.272.297-1.04 1.016-1.04 2.479 0 1.462 1.065 2.875 1.213 3.074.149.198 2.096 3.2 5.077 4.487.709.306 1.262.489 1.694.625.712.227 1.36.195 1.871.118.571-.085 1.758-.719 2.006-1.413.248-.694.248-1.289.173-1.413-.074-.124-.272-.198-.57-.347m-5.421 7.403h-.004a9.87 9.87 0 01-5.031-1.378l-.361-.214-3.741.982.998-3.648-.235-.374a9.86 9.86 0 01-1.51-5.26c.001-5.45 4.436-9.884 9.888-9.884 2.64 0 5.122 1.03 6.988 2.898a9.825 9.825 0 012.893 6.994c-.003 5.45-4.437 9.884-9.885 9.884zm8.413-18.297A11.815 11.815 0 0012.05 0C5.495 0 .16 5.335.157 11.892c0 2.096.547 4.142 1.588 5.945L.057 24l6.305-1.654a11.882 11.882 0 005.683 1.448h.005c6.554 0 11.89-5.335 11.893-11.893a11.821 11.821 0 00-3.48-8.413z"/></svg>`,
-    'fa-headset':     `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 11v2a2 2 0 012 2v1a2 2 0 002 2v0a2 2 0 002-2v-4a2 2 0 00-2-2H5a2 2 0 00-2 2v0z" fill="#e91e63"/><path d="M21 11v2a2 2 0 01-2 2h-2a2 2 0 01-2-2v-4a2 2 0 012-2h2a2 2 0 012 2v0z" fill="#e91e63"/><circle cx="12" cy="13" r="2" fill="#fff"/></svg>`,
-    'fa-paper-plane': `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M22 2L11 13" stroke="#2ecc71" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M22 2l-7 20-4-9-9-4 20-7z" fill="#2ecc71"/></svg>`,
-    'fa-check':       `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 12l5 5L20 6" stroke="#27ae60" stroke-width="3" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-rocket':      `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 15l-3 3m0 0l-1.9-1.9M9 18l-5.6 1.4M9 18l1.4-5.6M21 3l-7 7m0 0l-2.1 2.1M14 10l4.9-4.9" stroke="#f39c12" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/><path d="M5 19l1-5" stroke="#f39c12" stroke-width="2"/></svg>`,
-    'fa-arrow-up':    `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 19V5m0 0l-6 6m6-6l6 6" stroke="#0ab5b5" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-filter':      `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M7 12h10m-7 6h4" stroke="#e67e22" stroke-width="2" stroke-linecap="round"/><circle cx="6" cy="6" r="1.5" fill="#e67e22"/><circle cx="16" cy="12" r="1.5" fill="#e67e22"/><circle cx="12" cy="18" r="1.5" fill="#e67e22"/></svg>`,
-    'fa-chevron-down':`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M6 9l6 6 6-6" stroke="#b8873a" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-chevron-left':`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M15 18l-6-6 6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-chevron-right':`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M9 18l6-6-6-6" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-bars':        `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16M4 12h16M4 18h16" stroke="#b8873a" stroke-width="2" stroke-linecap="round"/></svg>`,
-    'fa-xmark':       `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M18 6L6 18M6 6l12 12" stroke="#b8873a" stroke-width="2" stroke-linecap="round"/></svg>`,
-    'fa-house':       `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M3 10l9-7 9 7v11a2 2 0 01-2 2H5a2 2 0 01-2-2V10z" fill="#f39c12"/><path d="M9 22V12h6v10" stroke="#fff" stroke-width="2"/></svg>`,
-    'fa-book':        `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M4 6h16v12H4z" fill="#3498db"/><path d="M4 6h16M4 12h16M4 18h16" stroke="#fff" stroke-width="1.5"/><path d="M12 6v12" stroke="#fff" stroke-width="1.5"/></svg>`,
-    'fa-newspaper':   `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" fill="#9b59b6"/><path d="M6 8h12M6 12h8M6 16h10" stroke="#fff" stroke-width="1.5"/></svg>`,
-    'fa-circle-info': `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="#1abc9c" stroke-width="2"/><path d="M12 16v-4M12 8h.01" stroke="#1abc9c" stroke-width="2" stroke-linecap="round"/></svg>`,
-    'fa-envelope':    `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="4" width="20" height="16" rx="2" stroke="#e74c3c" stroke-width="2"/><path d="M2 6l10 7 10-7" stroke="#e74c3c" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`,
-    'fa-heart':       `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 21.35l-1.45-1.32C5.4 15.36 2 12.28 2 8.5 2 5.42 4.42 3 7.5 3c1.74 0 3.41.81 4.5 2.09C13.09 3.81 14.76 3 16.5 3 19.58 3 22 5.42 22 8.5c0 3.78-3.4 6.86-8.55 11.54L12 21.35z" fill="#ff5722"/></svg>`,
-    'fa-tag':         `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L2 7l10 5 10-5-10-5z" fill="#f39c12"/><path d="M2 17l10 5 10-5" stroke="#fff" stroke-width="2"/><path d="M2 12l10 5 10-5" stroke="#fff" stroke-width="2"/></svg>`,
-    'fa-circle-question':`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" stroke="#e67e22" stroke-width="2"/><path d="M9.5 9.5c0-1.4 1.1-2.5 2.5-2.5s2.5 1.1 2.5 2.5c0 2.5-3.5 2.5-3.5 5" stroke="#e67e22" stroke-width="2" stroke-linecap="round"/><circle cx="12" cy="18" r="0.5" fill="#e67e22"/></svg>`,
-    'fa-users':       `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="7" r="4" fill="#ff9800"/><path d="M4 20v-1a6 6 0 016-6h4a6 6 0 016 6v1" stroke="#ff9800" stroke-width="2"/></svg>`,
-    'fa-triangle-exclamation':`<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M12 2L2 22h20L12 2z" fill="#f1c40f"/><path d="M12 9v5M12 17v.5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>`,
-    'fa-arrow-right': `<svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><path d="M5 12h14M13 5l7 7-7 7" stroke="#fff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"/></svg>`
-  };
-
-  function replaceIcons() {
-    document.querySelectorAll('i[class*="fa-"]').forEach(icon => {
-      if (icon.closest('#theme-toggle') || icon.closest('#mobile-toggle')) return;
-      const classes = Array.from(icon.classList);
-      for (let cls of classes) {
-        if (SVG_MAP[cls]) {
-          const span = document.createElement('span');
-          span.innerHTML = SVG_MAP[cls];
-          const svg = span.firstElementChild;
-          svg.style.width = '1em';
-          svg.style.height = '1em';
-          svg.style.verticalAlign = '-0.125em';
-          svg.style.display = 'inline-block';
-          icon.replaceWith(svg);
-          break;
-        }
-      }
-    });
-  }
-
-  if (document.readyState === 'loading') {
-    document.addEventListener('DOMContentLoaded', replaceIcons);
-  } else {
-    replaceIcons();
-  }
-
-  const origBuildResources = buildResources;
-  buildResources = async function() {
-    const result = await origBuildResources.apply(this, arguments);
-    setTimeout(replaceIcons, 100);
-    return result;
-  };
-})();
 </script>
 </body>
 </html>
