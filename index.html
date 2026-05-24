@@ -858,6 +858,7 @@
       loadFlashcards();
       loadCommunityActivity();
       loadContinueLearning();
+          document.querySelectorAll('.reveal').forEach(el => el.classList.add('in'));
     });
     (function(){
       let chatRoomId = null, chatPollInterval = null;
