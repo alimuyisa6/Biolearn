@@ -1403,51 +1403,54 @@ body.dark-mode .f-input:focus { background: rgba(2, 82, 82, 0.5); }
       if (sections.weekly_challenge) initQuizCard(sections.weekly_challenge);
     }
 
-    async function loadFlashcards() {
-      const container = document.getElementById('flashcards-container');
-      if (!container) return;
-      try {
-        const data = await apiCall('get_flashcards');
-        if (!data || !data.length) {
-          container.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No flashcards yet. Check back soon!</p>';
-          return;
-        }
-        const decks = {};
-        data.forEach(card => {
-          const cat = card.category || 'General';
-          if (!decks[cat]) decks[cat] = [];
-          decks[cat].push(card);
-        });
-        let knownIds = [];
-        if (currentUser) {
-          try { knownIds = await apiCall('get_known_flashcards'); } catch (e) {}
-        }
-        container.innerHTML = Object.entries(decks).map(([cat, cards]) => `
-          <div>
-            <h3><i class="fa-solid fa-layer-group"></i> ${esc(cat)}</h3>
-            <div class="flashcard-grid">
-              ${cards.map(card => `
-                <div class="flashcard-deck" data-id="${card.id}" data-known="${knownIds.includes(card.id)}">
-                  <div class="flashcard-face" onclick="this.classList.toggle('flipped');event.stopPropagation();">
-                    <div class="front">
-                      ${card.image_url ? `<img src="${esc(card.image_url)}" alt="">` : ''}
-                      <strong>${esc(card.front_text)}</strong>
-                    </div>
-                    <div class="back">${esc(card.back_text)}</div>
-                  </div>
-                  <div>
-                    <span>${card.thumb_url ? `<img src="${esc(card.thumb_url)}" alt="">` : ''}</span>
-                    <button class="btn-download" onclick="toggleKnown(${card.id},this)">${knownIds.includes(card.id) ? 'Known' : 'Mark Known'}</button>
-                  </div>
-                </div>
-              `).join('')}
-            </div>
-          </div>
-        `).join('');
-      } catch (err) {
-        container.innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load flashcards.</p>';
-      }
+     async function loadFlashcards() {
+  const container = document.getElementById('flashcards-container');
+  if (!container) return;
+  try {
+    const data = await apiCall('get_flashcards');
+    if (!data || !data.length) {
+      container.innerHTML = '<p style="text-align:center;color:var(--clr-text-dim);">No flashcards yet. Check back soon!</p>';
+      return;
     }
+    const decks = {};
+    data.forEach(card => {
+      const cat = card.category || 'General';
+      if (!decks[cat]) decks[cat] = [];
+      decks[cat].push(card);
+    });
+    let knownIds = [];
+    if (currentUser) {
+      try { knownIds = await apiCall('get_known_flashcards'); } catch (e) {}
+    }
+    container.innerHTML = Object.entries(decks).map(([cat, cards]) => `
+      <div>
+        <h3><i class="fa-solid fa-layer-group"></i> ${esc(cat)}</h3>
+        <div class="flashcard-grid">
+          ${cards.map(card => {
+            const hasImage = card.image_url && card.image_url.trim() !== '';
+            return `
+            <div class="flashcard-deck" data-id="${card.id}" data-known="${knownIds.includes(card.id)}">
+              <div class="flashcard-face" onclick="this.classList.toggle('flipped');event.stopPropagation();">
+                <div class="front">
+                  ${hasImage ? `<div class="card-image"><img src="${esc(card.image_url)}" alt="" loading="lazy"></div>` : ''}
+                  <div class="card-text"><strong>${esc(card.front_text)}</strong></div>
+                </div>
+                <div class="back">${esc(card.back_text)}</div>
+              </div>
+              <div>
+                <span>${card.thumb_url ? `<img src="${esc(card.thumb_url)}" alt="" loading="lazy">` : ''}</span>
+                <button class="btn-download" onclick="toggleKnown(${card.id},this)">${knownIds.includes(card.id) ? 'Known' : 'Mark Known'}</button>
+              </div>
+            </div>
+            `;
+          }).join('')}
+        </div>
+      </div>
+    `).join('');
+  } catch (err) {
+    container.innerHTML = '<p style="text-align:center;color:var(--clr-magenta);">Failed to load flashcards.</p>';
+  }
+}
 
     window.toggleKnown = async function(id, btn) {
       if (!currentUser) {
