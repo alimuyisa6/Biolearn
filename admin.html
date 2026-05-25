@@ -1,0 +1,1934 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover" />
+  <title>Admin Dashboard — AliverBiopharm</title>
+  <meta name="theme-color" content="#0a4f4f" />
+  <meta name="robots" content="noindex, nofollow" />
+  <link rel="preconnect" href="https://fonts.googleapis.com" />
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin />
+  <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=DM+Sans:wght@300;400;500;600&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" />
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css" />
+  <style>
+    :root {
+      --clr-deep-space: #eef7f7; --clr-cyan: #0ab5b5; --clr-magenta: #b8873a;
+      --clr-navy-card: rgba(255, 255, 255, 0.82); --clr-navy-light: rgba(10, 181, 181, 0.1);
+      --clr-white: #0d2e2e; --clr-text-dim: #2d5c5c; --clr-text-muted: #4a7c7c;
+      --clr-border-glow: rgba(10, 181, 181, 0.22); --shadow-card: 0 4px 28px rgba(10, 181, 181, 0.07);
+      --shadow-magenta: 0 8px 28px rgba(184, 135, 58, 0.38); --transition-fast: 180ms ease;
+      --max-width: 1200px; --font-body: 'DM Sans', sans-serif; --font-display: 'Playfair Display', serif;
+      --font-mono: 'DM Mono', monospace; --radius-sm: 0.5rem; --radius-md: 0.85rem; --radius-lg: 1.4rem;
+      --gradient-cyan: linear-gradient(135deg, #0ab5b5, #0e7070); --gradient-magenta: linear-gradient(135deg, #b8873a, #e2c06a);
+    }
+    body.dark-mode {
+      --clr-deep-space: #012c2c; --clr-magenta: #c9a84c; --clr-navy-card: rgba(2, 82, 82, 0.45);
+      --clr-navy-light: rgba(2, 82, 82, 0.25); --clr-white: #f9f5ee;
+      --clr-text-dim: rgba(249, 245, 238, 0.7); --clr-text-muted: rgba(249, 245, 238, 0.45);
+      --clr-border-glow: rgba(10, 181, 181, 0.25); --shadow-card: 0 15px 40px rgba(0, 0, 0, 0.4);
+    }
+    *,*::before,*::after { box-sizing: border-box; margin: 0; padding: 0; }
+    html { scroll-behavior: smooth; -webkit-text-size-adjust: 100%; }
+    body { background: var(--clr-deep-space); color: var(--clr-white); font-family: var(--font-body); overflow-x: hidden; max-width: 100vw; line-height: 1.6; }
+    .auth-wall { display: flex; align-items: center; justify-content: center; min-height: 100vh; padding: 2rem; }
+    .auth-card { background: var(--clr-navy-card); backdrop-filter: blur(12px); border: 1px solid var(--clr-border-glow); border-radius: var(--radius-lg); padding: 3rem 2rem; max-width: 480px; width: 100%; text-align: center; box-shadow: var(--shadow-card); }
+    .spinner { width: 36px; height: 36px; border: 3px dotted var(--clr-cyan); border-radius: 50%; animation: spin 1.2s linear infinite; margin: 0 auto 1rem; }
+    @keyframes spin { to { transform: rotate(360deg); } }
+    .admin-layout { display: flex; min-height: 100vh; }
+    .sidebar { width: 260px; background: rgba(1, 44, 44, 0.95); backdrop-filter: blur(12px); color: #f9f5ee; display: flex; flex-direction: column; flex-shrink: 0; position: sticky; top: 0; height: 100vh; overflow-y: auto; border-right: 1px solid var(--clr-border-glow); z-index: 100; }
+    .sidebar-header { padding: 24px 20px; border-bottom: 1px solid rgba(10, 181, 181, 0.15); }
+    .sidebar-logo { font-family: var(--font-display); font-weight: 900; font-size: 1.2rem; }
+    .sidebar-logo .g-text { background: linear-gradient(130deg, var(--clr-cyan) 0%, var(--clr-magenta) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; background-clip: text; }
+    .sidebar-sub { font-size: 0.65rem; color: rgba(249, 245, 238, 0.35); margin-top: 4px; }
+    .sidebar-nav { flex: 1; padding: 12px 0; list-style: none; overflow-y: auto; }
+    .sidebar-nav li a { display: flex; align-items: center; gap: 12px; padding: 11px 20px; color: rgba(249, 245, 238, 0.65); text-decoration: none; font-size: 0.84rem; font-weight: 500; transition: all var(--transition-fast); }
+    .sidebar-nav li a:hover, .sidebar-nav li a.active { background: rgba(10, 181, 181, 0.12); color: var(--clr-cyan); }
+    .sidebar-nav li a i { width: 20px; text-align: center; font-size: 0.85rem; }
+    .sidebar-footer { padding: 16px 20px; border-top: 1px solid rgba(10, 181, 181, 0.15); font-size: 0.72rem; }
+    .sidebar-footer .admin-email { color: rgba(249, 245, 238, 0.6); margin-bottom: 8px; word-break: break-all; }
+    .sidebar-footer .admin-role { color: var(--clr-cyan); font-size: 0.68rem; margin-bottom: 8px; }
+    .btn-signout { display: flex; align-items: center; gap: 8px; width: 100%; padding: 8px 14px; background: rgba(249, 245, 238, 0.06); border: 1px solid rgba(249, 245, 238, 0.12); color: #f9f5ee; border-radius: 8px; cursor: pointer; font-family: var(--font-body); font-size: 0.78rem; font-weight: 500; }
+    .btn-signout:hover { background: rgba(231, 76, 60, 0.25); border-color: #e74c3c; }
+    .main-content { flex: 1; padding: 32px; overflow-y: auto; max-width: 100%; background: var(--clr-deep-space); }
+    .page-header { margin-bottom: 28px; }
+    .page-title { font-family: var(--font-display); font-weight: 900; font-size: 1.8rem; }
+    .page-subtitle { color: var(--clr-text-dim); font-size: 0.85rem; margin-top: 4px; }
+    .stats-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 16px; margin-bottom: 32px; }
+    .stat-card { background: var(--clr-navy-card); backdrop-filter: blur(12px); border: 1px solid var(--clr-border-glow); border-radius: var(--radius-lg); padding: 24px; box-shadow: var(--shadow-card); transition: transform var(--transition-fast); }
+    .stat-card:hover { transform: translateY(-2px); }
+    .stat-icon { width: 42px; height: 42px; border-radius: 10px; display: flex; align-items: center; justify-content: center; font-size: 1.1rem; margin-bottom: 12px; }
+    .stat-value { font-family: var(--font-display); font-weight: 900; font-size: 2rem; }
+    .stat-label { font-size: 0.72rem; color: var(--clr-text-muted); margin-top: 2px; }
+    .panel { background: var(--clr-navy-card); backdrop-filter: blur(12px); border: 1px solid var(--clr-border-glow); border-radius: var(--radius-lg); box-shadow: var(--shadow-card); margin-bottom: 20px; }
+    .panel-header { padding: 16px 20px; border-bottom: 1px solid var(--clr-border-glow); display: flex; align-items: center; justify-content: space-between; font-weight: 600; font-size: 0.88rem; flex-wrap: wrap; gap: 10px; }
+    .panel-body { padding: 20px; }
+    .table-wrap { overflow-x: auto; -webkit-overflow-scrolling: touch; }
+    table { width: 100%; border-collapse: collapse; font-size: 0.82rem; }
+    th { text-align: left; padding: 10px 14px; background: rgba(10, 181, 181, 0.06); font-weight: 600; color: var(--clr-text-dim); font-size: 0.68rem; text-transform: uppercase; letter-spacing: 0.05em; border-bottom: 2px solid var(--clr-border-glow); white-space: nowrap; }
+    td { padding: 10px 14px; border-bottom: 1px solid var(--clr-border-glow); }
+    tr:hover td { background: rgba(10, 181, 181, 0.04); }
+    .btn { display: inline-flex; align-items: center; gap: 6px; padding: 8px 18px; border-radius: 30px; font-family: var(--font-body); font-size: 0.78rem; font-weight: 600; cursor: pointer; border: none; transition: all var(--transition-fast); white-space: nowrap; }
+    .btn-sm { padding: 5px 12px; font-size: 0.7rem; }
+    .btn-cyan { background: var(--gradient-cyan); color: #fff; }
+    .btn-cyan:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-magenta { background: var(--gradient-magenta); color: #fff; }
+    .btn-magenta:hover { opacity: 0.9; transform: translateY(-1px); }
+    .btn-danger { background: #e74c3c; color: #fff; }
+    .btn-danger:hover { opacity: 0.9; }
+    .btn-outline { background: transparent; border: 1.5px solid var(--clr-border-glow); color: var(--clr-text-dim); }
+    .btn-outline:hover { border-color: var(--clr-cyan); color: var(--clr-cyan); }
+    .form-group { margin-bottom: 14px; }
+    .form-label { display: block; font-size: 0.68rem; font-weight: 700; color: var(--clr-text-dim); text-transform: uppercase; letter-spacing: 0.05em; margin-bottom: 6px; }
+    .form-input, .form-select, .form-textarea { width: 100%; padding: 10px 14px; border-radius: 12px; border: 1.5px solid var(--clr-border-glow); font-family: var(--font-body); font-size: 0.84rem; color: var(--clr-white); background: rgba(236, 248, 248, 0.9); transition: border-color var(--transition-fast); }
+    body.dark-mode .form-input, body.dark-mode .form-select, body.dark-mode .form-textarea { background: rgba(2, 82, 82, 0.35); }
+    .form-textarea { min-height: 100px; resize: vertical; }
+    .form-input:focus, .form-select:focus, .form-textarea:focus { outline: none; border-color: var(--clr-cyan); box-shadow: 0 0 0 3px rgba(10, 181, 181, 0.14); }
+    .badge { display: inline-block; padding: 3px 10px; border-radius: 20px; font-size: 0.64rem; font-weight: 600; white-space: nowrap; }
+    .badge-success { background: rgba(39, 174, 96, 0.2); color: #27ae60; }
+    .badge-danger { background: rgba(231, 76, 60, 0.2); color: #e74c3c; }
+    .badge-warning { background: rgba(243, 156, 18, 0.2); color: #f39c12; }
+    .badge-info { background: rgba(10, 181, 181, 0.2); color: var(--clr-cyan); }
+    .tabs { display: flex; border-bottom: 2px solid var(--clr-border-glow); margin-bottom: 20px; flex-wrap: wrap; gap: 4px; }
+    .tab-btn { padding: 12px 22px; background: none; border: none; border-bottom: 2px solid transparent; margin-bottom: -2px; font-family: var(--font-body); font-weight: 600; font-size: 0.82rem; color: var(--clr-text-dim); cursor: pointer; transition: all var(--transition-fast); }
+    .tab-btn:hover { color: var(--clr-cyan); }
+    .tab-btn.active { color: var(--clr-cyan); border-bottom-color: var(--clr-cyan); }
+    .tab-content { display: none; animation: fadeIn 0.3s ease; }
+    .tab-content.active { display: block; }
+    @keyframes fadeIn { from { opacity: 0; transform: translateY(10px); } to { opacity: 1; transform: translateY(0); } }
+    .modal-overlay { position: fixed; inset: 0; background: rgba(0,0,0,0.65); z-index: 999; display: flex; align-items: center; justify-content: center; padding: 20px; }
+    .modal { background: var(--clr-navy-card); backdrop-filter: blur(20px); border: 1px solid var(--clr-border-glow); border-radius: var(--radius-lg); padding: 28px; max-width: 600px; width: 100%; max-height: 80vh; overflow-y: auto; box-shadow: 0 20px 60px rgba(0,0,0,0.3); }
+    .modal-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
+    .modal-title { font-family: var(--font-display); font-weight: 900; font-size: 1.3rem; }
+    .modal-close { background: none; border: none; font-size: 1.3rem; cursor: pointer; color: var(--clr-text-muted); padding: 4px 8px; border-radius: 4px; }
+    .modal-close:hover { background: rgba(231, 76, 60, 0.1); color: #e74c3c; }
+    .toast { position: fixed; bottom: 24px; right: 24px; background: var(--clr-navy-card); backdrop-filter: blur(12px); border: 1px solid var(--clr-border-glow); color: var(--clr-white); padding: 12px 24px; border-radius: 12px; font-size: 0.84rem; z-index: 9999; animation: slideIn 0.3s ease; max-width: 340px; box-shadow: var(--shadow-card); }
+    .toast.success { border-left: 4px solid #27ae60; }
+    .toast.error { border-left: 4px solid #e74c3c; }
+    .toast.warning { border-left: 4px solid #f39c12; }
+    @keyframes slideIn { from { transform: translateX(100%); opacity: 0; } to { transform: translateX(0); opacity: 1; } }
+    .empty-state { text-align: center; padding: 40px; color: var(--clr-text-muted); }
+    .empty-state i { font-size: 2rem; margin-bottom: 10px; display: block; opacity: 0.5; }
+    .action-group { display: flex; gap: 6px; flex-wrap: wrap; }
+    .search-box { position: relative; margin-bottom: 16px; }
+    .search-box input { padding-left: 36px; }
+    .search-box i { position: absolute; left: 12px; top: 50%; transform: translateY(-50%); color: var(--clr-text-muted); }
+    @media (max-width: 768px) { 
+      .admin-layout { flex-direction: column; } 
+      .sidebar { width: 100%; height: auto; position: relative; max-height: 60vh; } 
+      .main-content { padding: 16px; } 
+      .stats-grid { grid-template-columns: repeat(2, 1fr); } 
+      .page-title { font-size: 1.4rem; }
+      .modal { max-width: 95%; }
+    }
+  </style>
+</head>
+<body>
+
+<div class="auth-wall" id="auth-wall">
+  <div class="auth-card" id="auth-checking">
+    <div class="spinner"></div>
+    <p style="color:var(--clr-text-muted);">Verifying admin access…</p>
+  </div>
+  <div class="auth-card" id="auth-denied" style="display:none;">
+    <div style="font-size:3rem;margin-bottom:1rem;">🔒</div>
+    <h2 style="font-family:var(--font-display);margin-bottom:0.5rem;">Access Denied</h2>
+    <p id="auth-denied-msg" style="color:var(--clr-text-dim);margin-bottom:1.5rem;">You must sign in with an admin account to view this page.</p>
+    <a href="/" style="display:inline-block;padding:10px 24px;background:var(--gradient-cyan);color:#fff;border-radius:30px;text-decoration:none;font-weight:600;font-size:0.85rem;">← Back to Home</a>
+  </div>
+</div>
+
+<div class="admin-layout" id="admin-layout" style="display:none;">
+  <aside class="sidebar">
+    <div class="sidebar-header">
+      <div class="sidebar-logo">Aliver<span class="g-text">Biopharm</span></div>
+      <div class="sidebar-sub">Admin Panel v3.0</div>
+    </div>
+    <ul class="sidebar-nav">
+      <li><a href="#dashboard" class="active" data-tab="dashboard"><i class="fa-solid fa-gauge-high"></i> Dashboard</a></li>
+      <li><a href="#resources" data-tab="resources"><i class="fa-solid fa-book"></i> Resources</a></li>
+      <li><a href="#submissions" data-tab="submissions"><i class="fa-solid fa-inbox"></i> Submissions</a></li>
+      <li><a href="#messages" data-tab="messages"><i class="fa-solid fa-envelope"></i> Messages</a></li>
+      <li><a href="#upload" data-tab="upload"><i class="fa-solid fa-cloud-upload-alt"></i> Upload</a></li>
+      <li><a href="#ratings" data-tab="ratings"><i class="fa-solid fa-star"></i> Ratings</a></li>
+      <li><a href="#chat" data-tab="chat"><i class="fa-solid fa-comments"></i> Live Chat</a></li>
+      <li><a href="#site-sections" data-tab="site-sections"><i class="fa-solid fa-globe"></i> Site Sections</a></li>
+      <li><a href="#quiz-builder" data-tab="quiz-builder"><i class="fa-solid fa-puzzle-piece"></i> Quiz Builder</a></li>
+      <li><a href="#app-features" data-tab="app-features"><i class="fa-solid fa-toggle-on"></i> App Features</a></li>
+      <li><a href="#users" data-tab="users"><i class="fa-solid fa-users"></i> Users</a></li>
+      <li><a href="#newsletter" data-tab="newsletter"><i class="fa-solid fa-newspaper"></i> Newsletter</a></li>
+      <li><a href="#donations" data-tab="donations"><i class="fa-solid fa-hand-holding-heart"></i> Donations</a></li>
+      <li><a href="#leaderboard" data-tab="leaderboard"><i class="fa-solid fa-trophy"></i> Leaderboard</a></li>
+      <li><a href="#user-stats" data-tab="user-stats"><i class="fa-solid fa-chart-bar"></i> User Stats</a></li>
+    </ul>
+    <div class="sidebar-footer">
+      <div class="admin-email" id="admin-email-display">—</div>
+      <div class="admin-role" id="admin-role-display"></div>
+      <button class="btn-signout" id="signout-btn"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button>
+    </div>
+  </aside>
+
+  <main class="main-content">
+    <div class="tab-content active" id="tab-dashboard">
+      <div class="page-header">
+        <h1 class="page-title">Dashboard Overview</h1>
+        <p class="page-subtitle">Real-time system metrics and quick actions</p>
+      </div>
+      <div class="stats-grid" id="dashboard-stats">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(10,181,181,0.12);color:var(--clr-cyan);"><i class="fa-solid fa-file-pdf"></i></div>
+          <div class="stat-value" id="stat-resources">—</div>
+          <div class="stat-label">Total Resources</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(243,156,18,0.12);color:#f39c12;"><i class="fa-solid fa-clock"></i></div>
+          <div class="stat-value" id="stat-pending">—</div>
+          <div class="stat-label">Pending Submissions</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(231,76,60,0.12);color:#e74c3c;"><i class="fa-solid fa-envelope"></i></div>
+          <div class="stat-value" id="stat-messages">—</div>
+          <div class="stat-label">Messages</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(39,174,96,0.12);color:#27ae60;"><i class="fa-solid fa-users"></i></div>
+          <div class="stat-value" id="stat-users">—</div>
+          <div class="stat-label">Registered Users</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(155,89,182,0.12);color:#9b59b6;"><i class="fa-solid fa-star"></i></div>
+          <div class="stat-value" id="stat-ratings">—</div>
+          <div class="stat-label">Total Ratings</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(241,196,15,0.12);color:#f1c40f;"><i class="fa-solid fa-hand-holding-heart"></i></div>
+          <div class="stat-value" id="stat-donations">—</div>
+          <div class="stat-label">Donations</div>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header"><span>Recent Activity</span></div>
+        <div class="panel-body" id="recent-activity">
+          <p class="empty-state"><i class="fa-solid fa-clock"></i> Loading recent activity...</p>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-resources">
+      <div class="page-header">
+        <h1 class="page-title">Resources Management</h1>
+        <p class="page-subtitle">Manage all published biology notes and study materials</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Published Resources</span>
+          <div class="action-group">
+            <button class="btn btn-outline btn-sm" id="export-resources-btn"><i class="fa-solid fa-download"></i> Export</button>
+            <button class="btn btn-cyan btn-sm" id="refresh-resources-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="search-box">
+            <i class="fa-solid fa-search"></i>
+            <input type="text" class="form-input" placeholder="Search resources..." id="resources-search">
+          </div>
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Category</th>
+                  <th>Level</th>
+                  <th>Author</th>
+                  <th>Section</th>
+                  <th>File</th>
+                  <th>Rating</th>
+                  <th>Downloads</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="resources-table">
+                <tr><td colspan="9" class="empty-state">Loading resources...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-submissions">
+      <div class="page-header">
+        <h1 class="page-title">Resource Submissions</h1>
+        <p class="page-subtitle">Review and approve user-submitted resources</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>All Submissions</span>
+          <div class="action-group">
+            <select class="form-select" id="submission-filter" style="width:auto;">
+              <option value="all">All Status</option>
+              <option value="pending">Pending</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
+            <button class="btn btn-cyan btn-sm" id="refresh-submissions-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Title</th>
+                  <th>Author</th>
+                  <th>Category</th>
+                  <th>Level</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="submissions-table">
+                <tr><td colspan="7" class="empty-state">Loading submissions...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-messages">
+      <div class="page-header">
+        <h1 class="page-title">Contact Messages</h1>
+        <p class="page-subtitle">View and manage contact form submissions</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>All Messages</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-messages-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Email</th>
+                  <th>Subject</th>
+                  <th>Message</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="messages-table">
+                <tr><td colspan="6" class="empty-state">Loading messages...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-upload">
+      <div class="page-header">
+        <h1 class="page-title">Upload New Resource</h1>
+        <p class="page-subtitle">Add new biology notes to the platform</p>
+      </div>
+      <div class="panel" style="max-width:700px;">
+        <div class="panel-header"><span>Resource Details</span></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Title *</label>
+            <input type="text" class="form-input" id="upload-title" placeholder="Enter resource title">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Description</label>
+            <textarea class="form-textarea" id="upload-description" placeholder="Brief description of the resource"></textarea>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Author</label>
+            <input type="text" class="form-input" id="upload-author" placeholder="Author name">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div class="form-group">
+              <label class="form-label">Category</label>
+              <select class="form-select" id="upload-category">
+                <option value="">Select category</option>
+                <option>Cell Biology</option>
+                <option>Genetics</option>
+                <option>Ecology</option>
+                <option>Pharmacology</option>
+                <option>Pharmaceutics</option>
+                <option>Microbiology</option>
+                <option>Biochemistry</option>
+              </select>
+            </div>
+            <div class="form-group">
+              <label class="form-label">Level</label>
+              <select class="form-select" id="upload-level">
+                <option value="">Select level</option>
+                <option>O-Level</option>
+                <option>A-Level</option>
+                <option>Pharmacy</option>
+              </select>
+            </div>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Section Type</label>
+            <select class="form-select" id="upload-section-type">
+              <option value="">Select section</option>
+              <option>O-Level Notes</option>
+              <option>A-Level Notes</option>
+              <option>Pharmacy Notes</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Tags (comma separated)</label>
+            <input type="text" class="form-input" id="upload-tags" placeholder="e.g. nutrition, enzymes, DNA">
+          </div>
+          <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+            <div class="form-group">
+              <label class="form-label">File URL</label>
+              <input type="text" class="form-input" id="upload-file-url" placeholder="https://...">
+            </div>
+            <div class="form-group">
+              <label class="form-label">File Size</label>
+              <input type="text" class="form-input" id="upload-file-size" placeholder="e.g. 3.2 MB">
+            </div>
+          </div>
+          <button class="btn btn-magenta" id="upload-submit-btn"><i class="fa-solid fa-upload"></i> Upload Resource</button>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-ratings">
+      <div class="page-header">
+        <h1 class="page-title">Resource Ratings</h1>
+        <p class="page-subtitle">Monitor user ratings and feedback</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Ratings Overview</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-ratings-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Resource ID</th>
+                  <th>Title</th>
+                  <th>Average Rating</th>
+                  <th>Total Ratings</th>
+                  <th>Rating Distribution</th>
+                </tr>
+              </thead>
+              <tbody id="ratings-table">
+                <tr><td colspan="5" class="empty-state">Loading ratings...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-chat">
+      <div class="page-header">
+        <h1 class="page-title">Live Chat Support</h1>
+        <p class="page-subtitle">Manage real-time user conversations</p>
+      </div>
+      <div style="display:flex; gap:20px; flex-wrap:wrap;">
+        <div style="flex:1; min-width:280px;">
+          <div class="panel">
+            <div class="panel-header">
+              <span>Pending Requests</span>
+              <button class="btn btn-cyan btn-sm" id="refresh-pending-btn"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="panel-body" id="pending-requests-list" style="max-height:300px; overflow-y:auto;">
+              <p class="empty-state">No pending requests</p>
+            </div>
+          </div>
+          <div class="panel">
+            <div class="panel-header">
+              <span>Active Conversations</span>
+              <button class="btn btn-cyan btn-sm" id="refresh-active-chats-btn"><i class="fa-solid fa-rotate"></i></button>
+            </div>
+            <div class="panel-body" id="active-chats-list" style="max-height:300px; overflow-y:auto;">
+              <p class="empty-state">No active conversations</p>
+            </div>
+          </div>
+        </div>
+        <div style="flex:2; min-width:400px;">
+          <div class="panel" style="height:70vh; display:flex; flex-direction:column;">
+            <div class="panel-header">
+              <span id="chat-header-title">Select a conversation</span>
+              <div style="display:flex; align-items:center; gap:10px;">
+                <label style="font-size:0.75rem; display:flex; align-items:center; gap:4px;">
+                  🟢 Online <input type="checkbox" id="admin-online-toggle" checked>
+                </label>
+                <span id="chat-user-name" style="font-weight:600;"></span>
+              </div>
+            </div>
+            <div class="panel-body" id="chat-messages" style="flex:1; overflow-y:auto; background:rgba(0,0,0,0.02); padding:10px;">
+              <p class="empty-state">Select a chat to view messages</p>
+            </div>
+            <div style="padding:10px; border-top:1px solid var(--clr-border-glow); display:flex; gap:10px;">
+              <input type="text" id="chat-input" placeholder="Type your reply..." class="form-input" style="flex:1;" disabled>
+              <button class="btn btn-cyan btn-sm" id="send-btn" disabled>Send</button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-site-sections">
+      <div class="page-header">
+        <h1 class="page-title">Site Content Management</h1>
+        <p class="page-subtitle">Edit all website sections and content</p>
+      </div>
+      <div class="tabs" id="section-tabs">
+        <button class="tab-btn active" data-section="site_config">Site Config</button>
+        <button class="tab-btn" data-section="hero">Hero</button>
+        <button class="tab-btn" data-section="footer">Footer</button>
+        <button class="tab-btn" data-section="navigation">Navigation</button>
+        <button class="tab-btn" data-section="team">Team</button>
+        <button class="tab-btn" data-section="testimonials">Testimonials</button>
+        <button class="tab-btn" data-section="pricing">Pricing</button>
+        <button class="tab-btn" data-section="faq">FAQ</button>
+        <button class="tab-btn" data-section="statistics">Statistics</button>
+        <button class="tab-btn" data-section="blog">Blog</button>
+        <button class="tab-btn" data-section="contact">Contact</button>
+        <button class="tab-btn" data-section="donate">Donate</button>
+        <button class="tab-btn" data-section="donate_config">Donate Config</button>
+      </div>
+      <div id="site-section-editor" style="max-width:800px;">
+        <p class="empty-state">Select a section to edit</p>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-quiz-builder">
+      <div class="page-header">
+        <h1 class="page-title">Quiz Builder</h1>
+        <p class="page-subtitle">Create and manage quiz questions</p>
+      </div>
+      <div class="panel" style="max-width:800px;">
+        <div class="panel-header"><span>Add Questions Batch</span></div>
+        <div class="panel-body">
+          <div class="form-group">
+            <label class="form-label">Level *</label>
+            <select class="form-select" id="quiz-level">
+              <option value="">Select level</option>
+              <option>O-Level</option>
+              <option>A-Level</option>
+              <option>Pharmacy</option>
+            </select>
+          </div>
+          <div class="form-group">
+            <label class="form-label">Topic *</label>
+            <input type="text" class="form-input" id="quiz-topic" placeholder="e.g. Cell Biology">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Batch Name</label>
+            <input type="text" class="form-input" id="quiz-batch-name" placeholder="e.g. Batch 1 - Cell Structure">
+          </div>
+          <div class="form-group">
+            <label class="form-label">Questions (JSON Array) *</label>
+            <textarea class="form-textarea" id="quiz-questions-json" style="min-height:200px;font-family:var(--font-mono);font-size:0.78rem;" placeholder='[{"question_text":"What is the powerhouse of the cell?","option_a":"Nucleus","option_b":"Mitochondria","option_c":"Ribosome","option_d":"Golgi body","correct_option":"B","explanation":"Mitochondria produce ATP through cellular respiration","difficulty":"easy"}]'></textarea>
+          </div>
+          <button class="btn btn-cyan" id="quiz-submit-btn"><i class="fa-solid fa-plus"></i> Add Questions</button>
+        </div>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Quiz Topics</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-quiz-topics-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th>Level</th>
+                  <th>Questions</th>
+                  <th>Status</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="quiz-topics-table">
+                <tr><td colspan="5" class="empty-state">Select a level to view topics</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-app-features">
+      <div class="page-header">
+        <h1 class="page-title">App Features</h1>
+        <p class="page-subtitle">Manage feature flags for all pages</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>All Features</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-features-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Feature Key</th>
+                  <th>Name</th>
+                  <th>Page</th>
+                  <th>Category</th>
+                  <th>Enabled</th>
+                  <th>Order</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="app-features-table">
+                <tr><td colspan="7" class="empty-state">Loading features...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-users">
+      <div class="page-header">
+        <h1 class="page-title">User Management</h1>
+        <p class="page-subtitle">Manage registered users and administrators</p>
+      </div>
+      <div class="tabs" id="user-tabs">
+        <button class="tab-btn active" data-user-tab="all-users">All Users</button>
+        <button class="tab-btn" data-user-tab="admin-users">Admin Users</button>
+      </div>
+      <div id="all-users-panel">
+        <div class="panel">
+          <div class="panel-header">
+            <span>Registered Users</span>
+            <div class="action-group">
+              <select class="form-select" id="user-role-filter" style="width:auto;">
+                <option value="all">All Roles</option>
+                <option value="admin">Admins</option>
+                <option value="user">Users</option>
+              </select>
+              <button class="btn btn-cyan btn-sm" id="refresh-users-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+            </div>
+          </div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Name</th>
+                    <th>Role</th>
+                    <th>Status</th>
+                    <th>Quiz Progress</th>
+                    <th>Created</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="users-table">
+                  <tr><td colspan="7" class="empty-state">Loading users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div id="admin-users-panel" style="display:none;">
+        <div class="panel">
+          <div class="panel-header">
+            <span>Administrators</span>
+            <button class="btn btn-cyan btn-sm" id="refresh-admin-users-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead>
+                  <tr>
+                    <th>Email</th>
+                    <th>Role</th>
+                    <th>Permissions</th>
+                    <th>Status</th>
+                    <th>Last Login</th>
+                    <th>Actions</th>
+                  </tr>
+                </thead>
+                <tbody id="admin-users-table">
+                  <tr><td colspan="6" class="empty-state">Loading admin users...</td></tr>
+                </tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="panel" style="max-width:500px;">
+          <div class="panel-header"><span>Add New Admin</span></div>
+          <div class="panel-body">
+            <div class="form-group">
+              <label class="form-label">Email</label>
+              <input type="email" class="form-input" id="new-admin-email" placeholder="admin@example.com">
+            </div>
+            <div class="form-group">
+              <label class="form-label">Role</label>
+              <select class="form-select" id="new-admin-role">
+                <option value="admin">Admin</option>
+                <option value="content_manager">Content Manager</option>
+                <option value="resource_manager">Resource Manager</option>
+              </select>
+            </div>
+            <button class="btn btn-cyan" id="add-admin-btn"><i class="fa-solid fa-user-plus"></i> Add Admin</button>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-newsletter">
+      <div class="page-header">
+        <h1 class="page-title">Newsletter Subscribers</h1>
+        <p class="page-subtitle">Manage email newsletter subscriptions</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Subscribers</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-newsletter-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Email</th>
+                  <th>Status</th>
+                  <th>Subscribed Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="newsletter-table">
+                <tr><td colspan="4" class="empty-state">Loading subscribers...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-donations">
+      <div class="page-header">
+        <h1 class="page-title">Donations</h1>
+        <p class="page-subtitle">View and manage MoMo donations</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Recent Donations</span>
+          <button class="btn btn-cyan btn-sm" id="refresh-donations-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Name</th>
+                  <th>Amount</th>
+                  <th>Transaction ID</th>
+                  <th>Provider</th>
+                  <th>Status</th>
+                  <th>Date</th>
+                  <th>Actions</th>
+                </tr>
+              </thead>
+              <tbody id="donations-table">
+                <tr><td colspan="7" class="empty-state">Loading donations...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-leaderboard">
+      <div class="page-header">
+        <h1 class="page-title">Leaderboard</h1>
+        <p class="page-subtitle">Top scoring users across all levels</p>
+      </div>
+      <div class="panel">
+        <div class="panel-header">
+          <span>Top Scorers</span>
+          <div class="action-group">
+            <select class="form-select" id="leaderboard-level" style="width:auto;">
+              <option value="">All Levels</option>
+              <option>O-Level</option>
+              <option>A-Level</option>
+              <option>Pharmacy</option>
+            </select>
+            <button class="btn btn-cyan btn-sm" id="refresh-leaderboard-btn"><i class="fa-solid fa-rotate"></i> Refresh</button>
+          </div>
+        </div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Rank</th>
+                  <th>User</th>
+                  <th>Level</th>
+                  <th>Topic</th>
+                  <th>Score</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="leaderboard-table">
+                <tr><td colspan="6" class="empty-state">Loading leaderboard...</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <div class="tab-content" id="tab-user-stats">
+      <div class="page-header">
+        <h1 class="page-title">User Statistics</h1>
+        <p class="page-subtitle">Detailed quiz progress and activity for any user</p>
+      </div>
+      <div style="display:flex; gap:14px; align-items:flex-end; margin-bottom:20px; flex-wrap:wrap;">
+        <div class="form-group" style="flex:1; min-width:250px;">
+          <label class="form-label">User ID or Email</label>
+          <input type="text" class="form-input" id="stats-user-id" placeholder="Enter user UUID or email address">
+        </div>
+        <button class="btn btn-cyan" id="load-stats-btn" style="margin-bottom:14px;"><i class="fa-solid fa-search"></i> Load Stats</button>
+      </div>
+      <div class="stats-grid" id="user-stats-grid" style="display:none;">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(10,181,181,0.12);color:var(--clr-cyan);"><i class="fa-solid fa-cubes"></i></div>
+          <div class="stat-value" id="ustat-blocks">—</div>
+          <div class="stat-label">Blocks Attempted</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(39,174,96,0.12);color:#27ae60;"><i class="fa-solid fa-check-circle"></i></div>
+          <div class="stat-value" id="ustat-passed">—</div>
+          <div class="stat-label">Blocks Passed</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(241,196,15,0.12);color:#f1c40f;"><i class="fa-solid fa-percent"></i></div>
+          <div class="stat-value" id="ustat-avg">—</div>
+          <div class="stat-label">Average Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(155,89,182,0.12);color:#9b59b6;"><i class="fa-solid fa-trophy"></i></div>
+          <div class="stat-value" id="ustat-best">—</div>
+          <div class="stat-label">Best Score</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(231,76,60,0.12);color:#e74c3c;"><i class="fa-solid fa-fire"></i></div>
+          <div class="stat-value" id="ustat-streak">—</div>
+          <div class="stat-label">Pass Streak</div>
+        </div>
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(52,152,219,0.12);color:#3498db;"><i class="fa-solid fa-book-open"></i></div>
+          <div class="stat-value" id="ustat-topics">—</div>
+          <div class="stat-label">Topics Attempted</div>
+        </div>
+      </div>
+      <div class="stats-grid" id="streak-grid" style="display:none;">
+        <div class="stat-card">
+          <div class="stat-icon" style="background:rgba(46,204,113,0.12);color:#2ecc71;"><i class="fa-solid fa-calendar-check"></i></div>
+          <div class="stat-value" id="ustat-daily-streak">—</div>
+          <div class="stat-label">Daily Visit Streak</div>
+        </div>
+      </div>
+      <div class="panel" id="panel-recent-activity">
+        <div class="panel-header"><span>Recent Quiz Activity</span></div>
+        <div class="panel-body">
+          <div class="table-wrap">
+            <table>
+              <thead>
+                <tr>
+                  <th>Topic</th>
+                  <th>Level</th>
+                  <th>Score</th>
+                  <th>Passed</th>
+                  <th>Date</th>
+                </tr>
+              </thead>
+              <tbody id="user-stats-table">
+                <tr><td colspan="5" class="empty-state">Enter a user ID above to view stats</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+      <div style="display:grid; grid-template-columns: 1fr 1fr; gap:20px;">
+        <div class="panel" id="panel-favorites" style="display:none;">
+          <div class="panel-header"><span>Favourited Resources</span></div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Resource ID</th><th>Title</th></tr></thead>
+                <tbody id="favorites-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+        <div class="panel" id="panel-ratings" style="display:none;">
+          <div class="panel-header"><span>User's Ratings</span></div>
+          <div class="panel-body">
+            <div class="table-wrap">
+              <table>
+                <thead><tr><th>Resource ID</th><th>Rating</th></tr></thead>
+                <tbody id="user-ratings-table"></tbody>
+              </table>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="panel" id="panel-achievements" style="display:none;">
+        <div class="panel-header"><span>Achievements & Badges</span></div>
+        <div class="panel-body"><div id="achievements-list"></div></div>
+      </div>
+    </div>
+  </main>
+</div>
+
+<div class="modal-overlay" id="edit-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Resource</h3>
+      <button class="modal-close" id="edit-modal-close">✕</button>
+    </div>
+    <input type="hidden" id="edit-id">
+    <input type="hidden" id="edit-table">
+    <div class="form-group">
+      <label class="form-label">Title</label>
+      <input type="text" class="form-input" id="edit-title">
+    </div>
+    <div class="form-group">
+      <label class="form-label">Description</label>
+      <textarea class="form-textarea" id="edit-description"></textarea>
+    </div>
+    <div style="display:grid; grid-template-columns: 1fr 1fr; gap:14px;">
+      <div class="form-group">
+        <label class="form-label">Category</label>
+        <select class="form-select" id="edit-category">
+          <option value="">Select</option>
+          <option>Cell Biology</option>
+          <option>Genetics</option>
+          <option>Ecology</option>
+          <option>Pharmacology</option>
+          <option>Pharmaceutics</option>
+        </select>
+      </div>
+      <div class="form-group">
+        <label class="form-label">Level</label>
+        <select class="form-select" id="edit-level">
+          <option value="">Select</option>
+          <option>O-Level</option>
+          <option>A-Level</option>
+          <option>Pharmacy</option>
+        </select>
+      </div>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Section Type</label>
+      <select class="form-select" id="edit-section-type">
+        <option value="">Select</option>
+        <option>O-Level Notes</option>
+        <option>A-Level Notes</option>
+        <option>Pharmacy Notes</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Tags</label>
+      <input type="text" class="form-input" id="edit-tags">
+    </div>
+    <div class="form-group">
+      <label class="form-label">File URL</label>
+      <input type="text" class="form-input" id="edit-file-url">
+    </div>
+    <div class="form-group">
+      <label class="form-label">File Size</label>
+      <input type="text" class="form-input" id="edit-file-size">
+    </div>
+    <button class="btn btn-cyan" id="edit-save-btn"><i class="fa-solid fa-save"></i> Save Changes</button>
+  </div>
+</div>
+
+<div class="modal-overlay" id="feature-edit-modal" style="display:none;">
+  <div class="modal">
+    <div class="modal-header">
+      <h3 class="modal-title">Edit Feature</h3>
+      <button class="modal-close" id="feature-edit-modal-close">✕</button>
+    </div>
+    <input type="hidden" id="feature-edit-key">
+    <div class="form-group">
+      <label class="form-label">Feature Key</label>
+      <input type="text" class="form-input" id="feature-edit-key-display" disabled>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Enabled</label>
+      <select class="form-select" id="feature-edit-enabled">
+        <option value="true">Yes</option>
+        <option value="false">No</option>
+      </select>
+    </div>
+    <div class="form-group">
+      <label class="form-label">Settings (JSON)</label>
+      <textarea class="form-textarea" id="feature-edit-settings" style="font-family:var(--font-mono);font-size:0.78rem;"></textarea>
+    </div>
+    <button class="btn btn-cyan" id="feature-save-btn"><i class="fa-solid fa-save"></i> Save Feature</button>
+  </div>
+</div>
+
+<script>
+(function() {
+  const API_BASE = '/api/query';
+  let currentAdminUser = null;
+  let pendingPollInterval = null;
+  let chatPollInterval = null;
+  let currentChatRoom = null;
+  let currentChatUser = null;
+  const loadedTabs = new Set();
+  const featureDataStore = new Map();
+  let cachedSiteSections = null;
+  let cachedSiteSectionsTime = 0;
+
+  function esc(str) {
+    const map = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' };
+    return String(str ?? '').replace(/[&<>"']/g, function(c) { return map[c]; });
+  }
+
+  function toast(msg, type) {
+    type = type || 'success';
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    const icon = type === 'success' ? 'check-circle' : type === 'error' ? 'exclamation-circle' : 'info-circle';
+    el.innerHTML = '<i class="fa-solid fa-' + icon + '"></i> ' + msg;
+    document.body.appendChild(el);
+    setTimeout(function() { el.style.opacity = '0'; setTimeout(function() { el.remove(); }, 300); }, 3500);
+  }
+
+  function closeModal(id) {
+    document.getElementById(id).style.display = 'none';
+  }
+
+  async function apiCall(action, params) {
+    params = params || {};
+    const controller = new AbortController();
+    const timeout = setTimeout(function() { controller.abort(); }, 15000);
+    try {
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        credentials: 'include',
+        body: JSON.stringify(Object.assign({ action: action }, params)),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      const text = await res.text();
+      let json;
+      try { json = JSON.parse(text); } catch (e) { throw new Error('Invalid response: ' + text.slice(0, 120)); }
+      if (!res.ok) throw new Error(json.error || 'HTTP ' + res.status);
+      return json.data !== undefined ? json.data : json;
+    } catch (e) {
+      if (e.name === 'AbortError') throw new Error('Request timed out');
+      throw e;
+    } finally {
+      clearTimeout(timeout);
+    }
+  }
+
+  function filterTable(tableId, query) {
+    const tbody = document.getElementById(tableId);
+    if (!tbody) return;
+    const rows = tbody.querySelectorAll('tr');
+    const q = query.toLowerCase();
+    rows.forEach(function(row) {
+      if (row.querySelector('td[colspan]')) return;
+      const text = row.textContent.toLowerCase();
+      row.style.display = text.includes(q) ? '' : 'none';
+    });
+  }
+
+  async function verifyAdminAccess() {
+    try {
+      const userData = await apiCall('get_user');
+      if (!userData || !userData.user) throw new Error('No session');
+      if (!userData.user.is_admin) throw new Error('Not an admin');
+      currentAdminUser = userData.user;
+      document.getElementById('admin-email-display').textContent = currentAdminUser.email;
+      document.getElementById('admin-role-display').textContent = currentAdminUser.admin_role || 'Admin';
+      document.getElementById('auth-wall').style.display = 'none';
+      document.getElementById('admin-layout').style.display = 'flex';
+      if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+      apiCall('admin_update_presence', { is_online: true, is_busy: false }).catch(function() {});
+      loadDashboard();
+    } catch (e) {
+      document.getElementById('auth-checking').style.display = 'none';
+      document.getElementById('auth-denied').style.display = '';
+      document.getElementById('auth-denied-msg').textContent =
+        e.message === 'Not an admin'
+          ? 'Your account does not have admin privileges.'
+          : 'Session expired or invalid. Please sign in from the homepage.';
+    }
+  }
+
+  window.signOut = async function() {
+    try { await apiCall('signout'); } catch (e) {}
+    if (pendingPollInterval) clearInterval(pendingPollInterval);
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    currentAdminUser = null;
+    window.location.href = '/';
+  };
+
+  function loadTabContent(tabId, force) {
+    if (!force && loadedTabs.has(tabId)) return;
+    loadedTabs.add(tabId);
+    switch(tabId) {
+      case 'dashboard': loadDashboard(); break;
+      case 'resources': loadResources(); break;
+      case 'submissions': loadSubmissions(); break;
+      case 'messages': loadMessages(); break;
+      case 'ratings': loadRatings(); break;
+      case 'chat': loadChatTab(); break;
+      case 'users': loadUsers(); break;
+      case 'newsletter': loadNewsletter(); break;
+      case 'donations': loadDonations(); break;
+      case 'app-features': loadAppFeatures(); break;
+      case 'leaderboard': loadLeaderboard(); break;
+    }
+  }
+
+  document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(function(link) {
+    link.addEventListener('click', function(e) {
+      e.preventDefault();
+      const currentTab = document.querySelector('.sidebar-nav a.active');
+      if (currentTab && currentTab.dataset.tab === 'chat') {
+        if (pendingPollInterval) { clearInterval(pendingPollInterval); pendingPollInterval = null; }
+        if (chatPollInterval) { clearInterval(chatPollInterval); chatPollInterval = null; currentChatRoom = null; }
+      }
+      document.querySelectorAll('.sidebar-nav a').forEach(function(l) { l.classList.remove('active'); });
+      this.classList.add('active');
+      document.querySelectorAll('.tab-content').forEach(function(t) { t.classList.remove('active'); });
+      const tabEl = document.getElementById('tab-' + this.dataset.tab);
+      if (tabEl) tabEl.classList.add('active');
+      loadTabContent(this.dataset.tab);
+    });
+  });
+
+  document.querySelectorAll('#section-tabs .tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#section-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      loadSiteSection(this.dataset.section);
+    });
+  });
+
+  document.querySelectorAll('#user-tabs .tab-btn').forEach(function(btn) {
+    btn.addEventListener('click', function() {
+      document.querySelectorAll('#user-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
+      this.classList.add('active');
+      const tab = this.dataset.userTab;
+      document.getElementById('all-users-panel').style.display = tab === 'all-users' ? '' : 'none';
+      document.getElementById('admin-users-panel').style.display = tab === 'admin-users' ? '' : 'none';
+      if (tab === 'admin-users') loadAdminUsers();
+    });
+  });
+
+  async function loadDashboard() {
+    try {
+      const results = await Promise.all([
+        apiCall('stats').catch(function() { return {}; }),
+        getSiteSections().catch(function() { return {}; }),
+        apiCall('get_all_ratings').catch(function() { return {}; }),
+        apiCall('get_donations').catch(function() { return []; })
+      ]);
+      const stats = results[0];
+      const sections = results[1];
+      const ratings = results[2];
+      const donations = results[3];
+      document.getElementById('stat-resources').textContent = stats.resources !== undefined ? stats.resources : '—';
+      document.getElementById('stat-pending').textContent = stats.pendingSubmissions !== undefined ? stats.pendingSubmissions : '—';
+      document.getElementById('stat-messages').textContent = stats.messages !== undefined ? stats.messages : '—';
+      document.getElementById('stat-users').textContent = (sections && sections.users && sections.users.list ? sections.users.list.length : '—');
+      document.getElementById('stat-ratings').textContent = Object.keys(ratings || {}).length || '—';
+      document.getElementById('stat-donations').textContent = (donations || []).length || '—';
+      const activity = [];
+      if (stats.recentSubmissions && stats.recentSubmissions.length) {
+        stats.recentSubmissions.slice(0, 5).forEach(function(s) {
+          activity.push({ type: 'submission', text: 'New submission: ' + s.title, date: s.created_at });
+        });
+      }
+      if (stats.recentMessages && stats.recentMessages.length) {
+        stats.recentMessages.slice(0, 5).forEach(function(m) {
+          activity.push({ type: 'message', text: 'Message from ' + m.name + ': ' + (m.subject || '').slice(0, 50), date: m.created_at });
+        });
+      }
+      const activityHtml = activity.length 
+        ? activity.sort(function(a, b) { return new Date(b.date) - new Date(a.date); }).slice(0, 10).map(function(a) { 
+            return '<div style="padding:8px 0; border-bottom:1px solid var(--clr-border-glow);"><i class="fa-solid fa-' + (a.type === 'submission' ? 'file' : 'envelope') + '" style="color:var(--clr-cyan);margin-right:8px;"></i>' + esc(a.text) + ' <small style="color:var(--clr-text-muted);float:right;">' + new Date(a.date).toLocaleString() + '</small></div>';
+          }).join('')
+        : '<p class="empty-state">No recent activity</p>';
+      document.getElementById('recent-activity').innerHTML = activityHtml;
+    } catch (e) {
+      ['stat-resources','stat-pending','stat-messages','stat-users','stat-ratings','stat-donations'].forEach(function(id) {
+        document.getElementById(id).textContent = '!';
+      });
+    }
+  }
+
+  async function getSiteSections() {
+    if (cachedSiteSections && Date.now() - cachedSiteSectionsTime < 60000) {
+      return cachedSiteSections;
+    }
+    cachedSiteSections = await apiCall('get_all_site_sections');
+    cachedSiteSectionsTime = Date.now();
+    return cachedSiteSections;
+  }
+
+  async function loadResources(force) {
+    if (force) loadedTabs.delete('resources');
+    const tbody = document.getElementById('resources-table');
+    tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading resources...</td></tr>';
+    try {
+      const results = await Promise.all([
+        apiCall('get_resources', { filters: {} }),
+        apiCall('get_all_ratings').catch(function() { return {}; })
+      ]);
+      const resources = results[0];
+      const ratings = results[1];
+      if (!resources || !resources.length) {
+        tbody.innerHTML = '<tr><td colspan="9" class="empty-state"><i class="fa-solid fa-book"></i> No resources found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = resources.map(function(r) {
+        const ratingData = ratings[r.id];
+        const ratingHtml = ratingData && ratingData.count > 0
+          ? '⭐ ' + ratingData.avg.toFixed(1) + ' <small>(' + ratingData.count + ')</small>'
+          : '<small style="color:var(--clr-text-muted);">No ratings</small>';
+        const fileHtml = r.file_url
+          ? '<a href="' + esc(r.file_url) + '" target="_blank" class="badge badge-info" title="' + esc(r.file_size || 'Unknown size') + '"><i class="fa-solid fa-download"></i> ' + esc(r.file_size || 'Download') + '</a>'
+          : '<span class="badge badge-warning">No file</span>';
+        return '<tr><td><strong>' + esc(r.title || 'Untitled') + '</strong></td><td><span class="badge badge-info">' + esc(r.category || '—') + '</span></td><td>' + esc(r.level || '—') + '</td><td>' + esc(r.author || '—') + '</td><td>' + esc(r.section_type || '—') + '</td><td>' + fileHtml + '</td><td>' + ratingHtml + '</td><td>' + (r.download_count || 0) + '</td><td><div class="action-group"><button class="btn btn-sm btn-outline" data-action="edit" data-id="' + esc(String(r.id)) + '" data-table="biology_notes" title="Edit"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-danger" data-action="delete" data-id="' + esc(String(r.id)) + '" data-table="biology_notes" title="Delete"><i class="fa-solid fa-trash"></i></button></div></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="9" style="text-align:center;color:#e74c3c;"><i class="fa-solid fa-exclamation-triangle"></i> Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadSubmissions(force) {
+    if (force) loadedTabs.delete('submissions');
+    const tbody = document.getElementById('submissions-table');
+    const filter = document.getElementById('submission-filter') ? document.getElementById('submission-filter').value : 'all';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading submissions...</td></tr>';
+    try {
+      let data = await apiCall('submissions');
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-inbox"></i> No submissions found</td></tr>';
+        return;
+      }
+      if (filter !== 'all') data = data.filter(function(s) { return s.status === filter; });
+      tbody.innerHTML = data.map(function(s) {
+        const statusBadge = s.status === 'approved' ? 'badge-success' : s.status === 'rejected' ? 'badge-danger' : 'badge-warning';
+        const actions = [];
+        if (s.status === 'pending') {
+          actions.push('<button class="btn btn-sm btn-cyan" data-action="approve" data-id="' + esc(String(s.id)) + '" title="Approve"><i class="fa-solid fa-check"></i></button>');
+          actions.push('<button class="btn btn-sm btn-danger" data-action="reject" data-id="' + esc(String(s.id)) + '" title="Reject"><i class="fa-solid fa-times"></i></button>');
+        }
+        actions.push('<button class="btn btn-sm btn-outline" data-action="edit" data-id="' + esc(String(s.id)) + '" data-table="resource_submissions" title="Edit"><i class="fa-solid fa-pen"></i></button>');
+        actions.push('<button class="btn btn-sm btn-danger" data-action="delete" data-id="' + esc(String(s.id)) + '" data-table="resource_submissions" title="Delete"><i class="fa-solid fa-trash"></i></button>');
+        return '<tr><td><strong>' + esc(s.title || 'Untitled') + '</strong></td><td>' + esc(s.author || '—') + '</td><td>' + esc(s.category || '—') + '</td><td>' + esc(s.level || '—') + '</td><td><span class="badge ' + statusBadge + '">' + esc(s.status) + '</span></td><td>' + (s.created_at ? new Date(s.created_at).toLocaleDateString() : '—') + '</td><td><div class="action-group">' + actions.join('') + '</div></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;"><i class="fa-solid fa-exclamation-triangle"></i> Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadMessages(force) {
+    if (force) loadedTabs.delete('messages');
+    const tbody = document.getElementById('messages-table');
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading messages...</td></tr>';
+    try {
+      const data = await apiCall('messages');
+      const messages = data && data.messages ? data.messages : [];
+      if (!messages.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-envelope-open"></i> No messages</td></tr>';
+        return;
+      }
+      tbody.innerHTML = messages.map(function(m) {
+        return '<tr><td><strong>' + esc(m.name || '—') + '</strong></td><td><a href="mailto:' + esc(m.email) + '">' + esc(m.email || '—') + '</a></td><td>' + esc(m.subject || '—') + '</td><td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;" title="' + esc(m.message || '') + '">' + esc((m.message || '').substring(0, 100)) + '</td><td>' + (m.created_at ? new Date(m.created_at).toLocaleDateString() : '—') + '</td><td><button class="btn btn-sm btn-outline" data-action="view-message" data-id="' + esc(String(m.id)) + '"><i class="fa-solid fa-eye"></i></button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function submitUpload() {
+    const title = document.getElementById('upload-title').value.trim();
+    if (!title) { toast('Title is required', 'error'); return; }
+    const payload = {
+      title: title,
+      description: document.getElementById('upload-description').value,
+      author: document.getElementById('upload-author').value || 'Admin',
+      category: document.getElementById('upload-category').value,
+      level: document.getElementById('upload-level').value,
+      section_type: document.getElementById('upload-section-type').value,
+      tag: document.getElementById('upload-tags').value,
+      file_url: document.getElementById('upload-file-url').value,
+      file_size: document.getElementById('upload-file-size').value
+    };
+    try {
+      await apiCall('submit_resource', { payload: payload });
+      toast('Resource uploaded successfully!');
+      ['upload-title','upload-description','upload-author','upload-tags','upload-file-url','upload-file-size'].forEach(function(id) {
+        document.getElementById(id).value = '';
+      });
+      document.getElementById('upload-category').value = '';
+      document.getElementById('upload-level').value = '';
+      document.getElementById('upload-section-type').value = '';
+      loadResources(true);
+    } catch (e) { toast('Upload failed: ' + e.message, 'error'); }
+  }
+
+  window.openEdit = async function(id, table) {
+    try {
+      const results = await Promise.all([
+        apiCall('get_resources', { filters: {} }),
+        apiCall('submissions')
+      ]);
+      const allData = results[0] || [];
+      const submissionsData = results[1] || [];
+      const all = allData.concat(submissionsData);
+      const r = all.find(function(item) { return String(item.id) === String(id); });
+      if (!r) { toast('Resource not found', 'error'); return; }
+      document.getElementById('edit-id').value = id;
+      document.getElementById('edit-table').value = table;
+      document.getElementById('edit-title').value = r.title || '';
+      document.getElementById('edit-description').value = r.description || '';
+      document.getElementById('edit-category').value = r.category || '';
+      document.getElementById('edit-level').value = r.level || '';
+      document.getElementById('edit-section-type').value = r.section_type || '';
+      document.getElementById('edit-tags').value = r.tag || '';
+      document.getElementById('edit-file-url').value = r.file_url || '';
+      document.getElementById('edit-file-size').value = r.file_size || '';
+      document.getElementById('edit-modal').style.display = 'flex';
+    } catch (e) { toast('Failed to load: ' + e.message, 'error'); }
+  };
+
+  async function submitEdit() {
+    const payload = {
+      title: document.getElementById('edit-title').value,
+      description: document.getElementById('edit-description').value,
+      category: document.getElementById('edit-category').value,
+      level: document.getElementById('edit-level').value,
+      section_type: document.getElementById('edit-section-type').value,
+      tag: document.getElementById('edit-tags').value,
+      file_url: document.getElementById('edit-file-url').value,
+      file_size: document.getElementById('edit-file-size').value
+    };
+    try {
+      await apiCall('submit_resource', { payload: payload, submissionId: document.getElementById('edit-id').value });
+      toast('Resource updated!');
+      closeModal('edit-modal');
+      loadResources(true);
+      loadSubmissions(true);
+    } catch (e) { toast('Update failed: ' + e.message, 'error'); }
+  }
+
+  window.deleteResource = async function(id, table) {
+    if (!confirm('Permanently delete this ' + (table === 'biology_notes' ? 'resource' : 'submission') + '?')) return;
+    try {
+      await apiCall('approve', { submissionId: id, action: 'delete' });
+      toast('Deleted successfully.');
+      loadResources(true);
+      loadSubmissions(true);
+    } catch (e) { toast('Delete failed: ' + e.message, 'error'); }
+  };
+
+  window.approveSubmission = async function(id) {
+    try {
+      await apiCall('approve', { submissionId: id, action: 'approve' });
+      toast('Submission approved!');
+      loadSubmissions(true);
+      loadDashboard();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.rejectSubmission = async function(id) {
+    try {
+      await apiCall('approve', { submissionId: id, action: 'reject' });
+      toast('Submission rejected.');
+      loadSubmissions(true);
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.viewMessage = function(id) {
+    toast('Message details for ID: ' + id, 'info');
+  };
+
+  async function loadRatings(force) {
+    if (force) loadedTabs.delete('ratings');
+    const tbody = document.getElementById('ratings-table');
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading ratings...</td></tr>';
+    try {
+      const ratings = await apiCall('get_all_ratings');
+      const entries = Object.entries(ratings || {}).sort(function(a, b) { return b[1].avg - a[1].avg; });
+      if (!entries.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-star"></i> No ratings yet</td></tr>';
+        return;
+      }
+      tbody.innerHTML = entries.map(function(entry) {
+        const id = entry[0];
+        const data = entry[1];
+        const distribution = data.distribution
+          ? Object.entries(data.distribution).map(function(d) { return '⭐'.repeat(d[0]) + ': ' + d[1]; }).join(', ')
+          : 'N/A';
+        return '<tr><td><code>' + esc(id) + '</code></td><td>' + esc(data.title || '—') + '</td><td><span class="badge badge-info">⭐ ' + data.avg.toFixed(1) + '</span></td><td>' + data.count + '</td><td><small>' + esc(distribution) + '</small></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadPendingRequests() {
+    const el = document.getElementById('pending-requests-list');
+    try {
+      const data = await apiCall('admin_get_pending_requests');
+      if (!data || !data.length) {
+        el.innerHTML = '<p class="empty-state">No pending requests</p>';
+        return;
+      }
+      el.innerHTML = data.map(function(r) {
+        return '<div style="padding:10px; border-bottom:1px solid var(--clr-border-glow); display:flex; justify-content:space-between; align-items:center;"><div><strong>' + esc(r.user_name) + '</strong><br><small style="color:var(--clr-text-muted);">' + new Date(r.requested_at).toLocaleString() + '</small></div><div class="action-group"><button class="btn btn-sm btn-cyan" data-action="accept-chat" data-room="' + esc(r.id) + '" title="Accept"><i class="fa-solid fa-check"></i></button><button class="btn btn-sm btn-danger" data-action="reject-chat" data-room="' + esc(r.id) + '" title="Reject"><i class="fa-solid fa-times"></i></button></div></div>';
+      }).join('');
+    } catch(e) {
+      el.innerHTML = '<p style="color:#e74c3c;padding:10px;">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function acceptRequest(roomId) {
+    try {
+      await apiCall('admin_accept_chat', { room_id: roomId });
+      toast('Chat request accepted!');
+      loadPendingRequests();
+      loadActiveChats();
+      openChat(roomId);
+    } catch(e) { toast('Error: ' + e.message, 'error'); }
+  }
+
+  async function rejectRequest(roomId) {
+    try {
+      await apiCall('admin_reject_chat', { room_id: roomId });
+      toast('Request rejected.');
+      loadPendingRequests();
+    } catch(e) { toast('Error: ' + e.message, 'error'); }
+  }
+
+  async function loadActiveChats() {
+    const el = document.getElementById('active-chats-list');
+    try {
+      const data = await apiCall('admin_get_active_chats');
+      if (!data || !data.length) {
+        el.innerHTML = '<p class="empty-state">No active chats</p>';
+        return;
+      }
+      el.innerHTML = data.map(function(c) {
+        return '<div style="padding:10px; border-bottom:1px solid var(--clr-border-glow); cursor:pointer; display:flex; justify-content:space-between; align-items:center;" data-action="open-chat" data-room="' + esc(c.id) + '" data-user="' + esc(c.user_name) + '"><div><strong>' + esc(c.user_name) + '</strong> <span class="badge badge-' + (c.status === 'active' ? 'success' : 'warning') + '">' + esc(c.status) + '</span></div><small style="color:var(--clr-text-muted);">' + new Date(c.created_at).toLocaleDateString() + '</small></div>';
+      }).join('');
+    } catch(e) {
+      el.innerHTML = '<p style="color:#e74c3c;padding:10px;">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function openChat(roomId, userName) {
+    if (chatPollInterval) clearInterval(chatPollInterval);
+    currentChatRoom = roomId;
+    currentChatUser = userName || 'User';
+    document.getElementById('chat-header-title').textContent = 'Chat Room #' + roomId.substring(0, 8);
+    document.getElementById('chat-user-name').textContent = currentChatUser;
+    document.getElementById('send-btn').disabled = false;
+    document.getElementById('chat-input').disabled = false;
+    await loadChatMessages(roomId);
+    chatPollInterval = setInterval(function() { loadChatMessages(roomId); }, 3000);
+  }
+
+  async function loadChatMessages(roomId) {
+    const el = document.getElementById('chat-messages');
+    try {
+      const msgs = await apiCall('get_chat_messages', { room_id: roomId });
+      el.innerHTML = msgs.map(function(m) {
+        return '<div style="margin:6px 0; padding:8px; border-radius:10px; background:' + (m.sender_type === 'admin' ? 'rgba(10,181,181,0.1)' : 'rgba(184,135,58,0.1)') + '; text-align:' + (m.sender_type === 'admin' ? 'left' : 'right') + ';"><strong>' + (m.sender_type === 'admin' ? 'You' : esc(currentChatUser || 'User')) + ':</strong> <span>' + esc(m.content) + '</span><div style="font-size:0.6rem; color:var(--clr-text-muted);">' + new Date(m.created_at).toLocaleTimeString() + '</div></div>';
+      }).join('');
+      el.scrollTop = el.scrollHeight;
+    } catch(e) {
+      el.innerHTML = '<p style="color:#e74c3c;text-align:center;">Error: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function sendAdminMessage() {
+    const input = document.getElementById('chat-input');
+    const msg = input.value.trim();
+    if (!msg || !currentChatRoom) return;
+    try {
+      await apiCall('send_chat_message', { room_id: currentChatRoom, message: msg });
+      input.value = '';
+      await loadChatMessages(currentChatRoom);
+    } catch(e) { toast('Error: ' + e.message, 'error'); }
+  }
+
+  function toggleAdminOnline(online) {
+    apiCall('admin_update_presence', { is_online: online, is_busy: online ? false : null }).catch(function() {});
+  }
+
+  function loadChatTab() {
+    loadPendingRequests();
+    loadActiveChats();
+    if (pendingPollInterval) clearInterval(pendingPollInterval);
+    pendingPollInterval = setInterval(loadPendingRequests, 10000);
+  }
+
+  async function loadSiteSection(sectionName) {
+    const editor = document.getElementById('site-section-editor');
+    editor.innerHTML = '<p class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</p>';
+    try {
+      const data = await apiCall('get_all_site_sections');
+      const content = data && data[sectionName] ? data[sectionName] : {};
+      editor.innerHTML = '<div style="margin-top:16px;"><div class="form-group"><label class="form-label">' + sectionName.toUpperCase() + ' Content (JSON)</label><textarea class="form-textarea" id="section-content" style="min-height:300px;font-family:var(--font-mono);font-size:0.78rem;">' + esc(JSON.stringify(content, null, 2)) + '</textarea></div><button class="btn btn-cyan" data-action="save-section" data-section="' + esc(sectionName) + '"><i class="fa-solid fa-save"></i> Save ' + esc(sectionName) + '</button></div>';
+    } catch (e) {
+      editor.innerHTML = '<p style="color:#e74c3c;padding:20px;"><i class="fa-solid fa-exclamation-triangle"></i> Failed: ' + esc(e.message) + '</p>';
+    }
+  }
+
+  async function saveSiteSection(sectionName) {
+    const raw = document.getElementById('section-content').value;
+    let parsed;
+    try { parsed = JSON.parse(raw); } catch (e) { toast('Invalid JSON format', 'error'); return; }
+    try {
+      await apiCall('update_site_section', { section: sectionName, data: parsed });
+      cachedSiteSections = null;
+      cachedSiteSectionsTime = 0;
+      toast(sectionName + ' section updated!');
+    } catch (e) { toast('Save failed: ' + e.message, 'error'); }
+  }
+
+  async function loadQuizTopics() {
+    const tbody = document.getElementById('quiz-topics-table');
+    const level = document.getElementById('quiz-level') ? document.getElementById('quiz-level').value : 'O-Level';
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading topics...</td></tr>';
+    try {
+      const topics = await apiCall('get_quiz_topics', { level: level });
+      if (!topics || !topics.length) {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No topics for ' + esc(level) + '</td></tr>';
+        return;
+      }
+      tbody.innerHTML = topics.map(function(t) {
+        return '<tr><td><strong>' + esc(t.topic_name) + '</strong></td><td>' + esc(level) + '</td><td>' + (t.question_count || 0) + '</td><td><span class="badge badge-success">Active</span></td><td><button class="btn btn-sm btn-outline" data-action="view-quiz" data-topic="' + esc(t.topic_name) + '" data-level="' + esc(level) + '"><i class="fa-solid fa-eye"></i></button><button class="btn btn-sm btn-danger" data-action="delete-topic" data-topic="' + esc(t.topic_name) + '" data-level="' + esc(level) + '"><i class="fa-solid fa-trash"></i></button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function submitQuizBatch() {
+    const level = document.getElementById('quiz-level').value;
+    const topic = document.getElementById('quiz-topic').value.trim();
+    const batchName = document.getElementById('quiz-batch-name').value.trim();
+    if (!level || !topic) { toast('Level and topic are required', 'error'); return; }
+    let questions;
+    try {
+      questions = JSON.parse(document.getElementById('quiz-questions-json').value);
+      if (!Array.isArray(questions) || !questions.length) throw new Error('Empty array');
+    } catch (e) {
+      toast('Invalid JSON format. Please provide a valid array of questions.', 'error');
+      return;
+    }
+    try {
+      await apiCall('add_quiz_questions_batch', { level: level, topic: topic, batch_name: batchName, questions: questions });
+      toast('Added ' + questions.length + ' questions successfully!');
+      document.getElementById('quiz-topic').value = '';
+      document.getElementById('quiz-batch-name').value = '';
+      document.getElementById('quiz-questions-json').value = '';
+      loadQuizTopics();
+    } catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+
+  window.viewQuizQuestions = async function(topic, level) {
+    try {
+      const questions = await apiCall('get_quiz_questions', { topic: topic, level: level });
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.style.display = 'flex';
+      modal.innerHTML = '<div class="modal" style="max-width:800px;"><div class="modal-header"><h3 class="modal-title">Questions: ' + esc(topic) + ' (' + esc(level) + ')</h3><button class="modal-close" onclick="this.closest(\'.modal-overlay\').remove()">✕</button></div><div style="max-height:60vh; overflow-y:auto;">' + ((questions || []).map(function(q, i) { return '<div style="padding:10px; border-bottom:1px solid var(--clr-border-glow);"><strong>Q' + (i+1) + ':</strong> ' + esc(q.question_text) + '<br><small>A: ' + esc(q.option_a) + ' | B: ' + esc(q.option_b) + ' | C: ' + esc(q.option_c) + ' | D: ' + esc(q.option_d) + '</small><br><small style="color:#27ae60;">Correct: ' + esc(q.correct_option) + ' | Difficulty: ' + esc(q.difficulty || 'medium') + '</small></div>'; }).join('') || '<p class="empty-state">No questions found</p>') + '</div></div>';
+      document.body.appendChild(modal);
+      modal.addEventListener('click', function(e) { if (e.target === modal) modal.remove(); });
+    } catch (e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.deleteQuizTopic = async function(topic, level) {
+    if (!confirm('Delete all questions for "' + topic + '" (' + level + ')?')) return;
+    try {
+      await apiCall('delete_quiz_topic', { topic: topic, level: level });
+      toast('Topic deleted.');
+      loadQuizTopics();
+    } catch (e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  async function loadAppFeatures(force) {
+    if (force) loadedTabs.delete('app-features');
+    const tbody = document.getElementById('app-features-table');
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading features...</td></tr>';
+    try {
+      const data = await apiCall('get_app_features', { page_id: 'all' });
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No features found</td></tr>';
+        return;
+      }
+      featureDataStore.clear();
+      tbody.innerHTML = data.map(function(f) {
+        featureDataStore.set(f.feature_key, { enabled: f.is_enabled, settings: f.settings || {} });
+        return '<tr><td><code>' + esc(f.feature_key) + '</code></td><td>' + esc(f.feature_name) + '</td><td><span class="badge badge-info">' + esc(f.page_id) + '</span></td><td>' + esc(f.category) + '</td><td><span class="badge ' + (f.is_enabled ? 'badge-success' : 'badge-danger') + '">' + (f.is_enabled ? 'Yes' : 'No') + '</span></td><td>' + (f.display_order || 0) + '</td><td><button class="btn btn-sm btn-outline" data-action="edit-feature" data-key="' + esc(f.feature_key) + '"><i class="fa-solid fa-pen"></i></button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  window.openFeatureEdit = function(key) {
+    const data = featureDataStore.get(key) || { enabled: true, settings: {} };
+    document.getElementById('feature-edit-key').value = key;
+    document.getElementById('feature-edit-key-display').value = key;
+    document.getElementById('feature-edit-enabled').value = data.enabled ? 'true' : 'false';
+    document.getElementById('feature-edit-settings').value = JSON.stringify(data.settings, null, 2);
+    document.getElementById('feature-edit-modal').style.display = 'flex';
+  };
+
+  async function submitFeatureEdit() {
+    const key = document.getElementById('feature-edit-key').value;
+    const enabled = document.getElementById('feature-edit-enabled').value === 'true';
+    let settings;
+    try { settings = JSON.parse(document.getElementById('feature-edit-settings').value); } catch (e) { toast('Invalid JSON in settings', 'error'); return; }
+    try {
+      await apiCall('update_app_feature', { feature_key: key, is_enabled: enabled, settings: settings });
+      toast('Feature updated!');
+      closeModal('feature-edit-modal');
+      loadAppFeatures(true);
+    } catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+
+  async function loadUsers(force) {
+    if (force) loadedTabs.delete('users');
+    const tbody = document.getElementById('users-table');
+    const filter = document.getElementById('user-role-filter') ? document.getElementById('user-role-filter').value : 'all';
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading users...</td></tr>';
+    try {
+      const data = await getSiteSections();
+      let users = data && data.users && data.users.list ? data.users.list : [];
+      if (filter === 'admin') users = users.filter(function(u) { return u.is_admin; });
+      else if (filter === 'user') users = users.filter(function(u) { return !u.is_admin; });
+      if (!users.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No users found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = users.map(function(u) {
+        const roleLabel = u.admin_role === 'super_admin' ? 'Super Admin' : u.admin_role === 'content_manager' ? 'Content Manager' : u.admin_role === 'resource_manager' ? 'Resource Manager' : u.is_admin ? 'Admin' : 'User';
+        const roleBadge = u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success';
+        const actions = [];
+        if (!u.is_admin) {
+          actions.push('<button class="btn btn-sm btn-cyan" data-action="make-admin" data-id="' + esc(u.id) + '" title="Promote to Admin"><i class="fa-solid fa-user-shield"></i></button>');
+        }
+        actions.push('<button class="btn btn-sm btn-outline" data-action="toggle-lock" data-id="' + esc(u.id) + '" data-lock="' + (!u.is_locked) + '" title="' + (u.is_locked ? 'Unlock' : 'Lock') + '"><i class="fa-solid fa-' + (u.is_locked ? 'unlock' : 'lock') + '"></i></button>');
+        return '<tr><td><strong>' + esc(u.email || '—') + '</strong></td><td>' + esc(u.name || '—') + '</td><td><span class="badge ' + roleBadge + '">' + esc(roleLabel) + '</span></td><td><span class="badge ' + (u.is_locked ? 'badge-danger' : 'badge-success') + '">' + (u.is_locked ? 'Locked' : 'Active') + '</span></td><td>' + (u.quiz_progress || 'N/A') + '</td><td>' + (u.created_at ? new Date(u.created_at).toLocaleDateString() : '—') + '</td><td><div class="action-group">' + actions.join('') + '</div></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadAdminUsers(force) {
+    const tbody = document.getElementById('admin-users-table');
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_admin_users');
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No admin users found</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(a) {
+        return '<tr><td><strong>' + esc(a.admin_email || '—') + '</strong></td><td><span class="badge badge-info">' + esc(a.admin_role || '—') + '</span></td><td style="font-family:var(--font-mono);font-size:0.68rem;">' + esc(JSON.stringify(a.permissions || {})) + '</td><td><span class="badge ' + (a.is_locked ? 'badge-danger' : a.is_active ? 'badge-success' : 'badge-warning') + '">' + (a.is_locked ? 'Locked' : a.is_active ? 'Active' : 'Inactive') + '</span></td><td>' + (a.last_login ? new Date(a.last_login).toLocaleString() : 'Never') + '</td><td><button class="btn btn-sm btn-outline" data-action="toggle-admin-lock" data-id="' + esc(a.admin_id) + '" data-lock="' + (!a.is_locked) + '" title="' + (a.is_locked ? 'Unlock' : 'Lock') + '"><i class="fa-solid fa-' + (a.is_locked ? 'unlock' : 'lock') + '"></i></button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function addAdminUser() {
+    const email = document.getElementById('new-admin-email').value.trim();
+    const role = document.getElementById('new-admin-role').value;
+    if (!email) { toast('Email is required', 'error'); return; }
+    try {
+      await apiCall('update_user_role', { userId: email, role: role });
+      toast('Admin added successfully!');
+      document.getElementById('new-admin-email').value = '';
+      loadAdminUsers(true);
+    } catch (e) { toast('Failed: ' + e.message, 'error'); }
+  }
+
+  window.makeAdmin = async function(id) {
+    try {
+      await apiCall('update_user_role', { userId: id, role: 'admin' });
+      cachedSiteSections = null;
+      cachedSiteSectionsTime = 0;
+      toast('User promoted to admin!');
+      loadUsers(true);
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.toggleLock = async function(id, lock) {
+    const reason = lock ? prompt('Reason for locking this user?') : null;
+    if (lock && !reason) { toast('Lock reason is required', 'error'); return; }
+    try {
+      await apiCall('update_user_lock', { userId: id, lock: lock, reason: reason || 'Unlocked by admin' });
+      cachedSiteSections = null;
+      cachedSiteSectionsTime = 0;
+      toast(lock ? 'User locked. Reason: ' + reason : 'User unlocked.');
+      loadUsers(true);
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  window.toggleAdminLock = async function(id, lock) {
+    const reason = lock ? prompt('Reason for locking this admin?') : null;
+    if (lock && !reason) { toast('Lock reason is required', 'error'); return; }
+    try {
+      await apiCall('update_user_lock', { userId: id, lock: lock, reason: reason || 'Unlocked by super admin' });
+      toast(lock ? 'Admin locked. Reason: ' + reason : 'Admin unlocked.');
+      loadAdminUsers(true);
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  async function loadNewsletter(force) {
+    if (force) loadedTabs.delete('newsletter');
+    const tbody = document.getElementById('newsletter-table');
+    tbody.innerHTML = '<tr><td colspan="4" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_newsletter_subscribers');
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="4" class="empty-state">No subscribers</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(s) {
+        return '<tr><td>' + esc(s.email || '—') + '</td><td><span class="badge ' + (s.is_active ? 'badge-success' : 'badge-danger') + '">' + (s.is_active ? 'Active' : 'Inactive') + '</span></td><td>' + (s.created_at ? new Date(s.created_at).toLocaleDateString() : '—') + '</td><td><button class="btn btn-sm btn-outline" data-action="toggle-subscriber" data-id="' + esc(s.id) + '" data-active="' + (!s.is_active) + '"><i class="fa-solid fa-' + (s.is_active ? 'ban' : 'check') + '"></i> ' + (s.is_active ? 'Deactivate' : 'Activate') + '</button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  window.toggleSubscriber = async function(id, active) {
+    try {
+      await apiCall('update_newsletter_subscriber', { id: id, is_active: active });
+      toast('Subscriber ' + (active ? 'activated' : 'deactivated') + '.');
+      loadNewsletter(true);
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+  };
+
+  async function loadDonations(force) {
+    if (force) loadedTabs.delete('donations');
+    const tbody = document.getElementById('donations-table');
+    tbody.innerHTML = '<tr><td colspan="7" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const data = await apiCall('get_donations');
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="7" class="empty-state">No donations recorded</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(d) {
+        return '<tr><td><strong>' + esc(d.name || 'Anonymous') + '</strong></td><td>' + esc(d.amount || '—') + ' ' + esc(d.currency || '') + '</td><td style="font-family:var(--font-mono);font-size:0.72rem;">' + esc((d.txid || '').substring(0, 20)) + (d.txid && d.txid.length > 20 ? '…' : '') + '</td><td>' + esc(d.provider || '—') + '</td><td><span class="badge ' + (d.status === 'completed' ? 'badge-success' : d.status === 'failed' ? 'badge-danger' : 'badge-warning') + '">' + esc(d.status || '—') + '</span></td><td>' + (d.created_at ? new Date(d.created_at).toLocaleDateString() : '—') + '</td><td><button class="btn btn-sm btn-outline" data-action="view-donation" data-id="' + esc(d.id) + '"><i class="fa-solid fa-eye"></i></button></td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  window.viewDonationDetails = function(id) {
+    toast('Donation details for ID: ' + id, 'info');
+  };
+
+  async function loadLeaderboard(force) {
+    if (force) loadedTabs.delete('leaderboard');
+    const tbody = document.getElementById('leaderboard-table');
+    const level = document.getElementById('leaderboard-level') ? document.getElementById('leaderboard-level').value : '';
+    tbody.innerHTML = '<tr><td colspan="6" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading...</td></tr>';
+    try {
+      const params = { limit: 50 };
+      if (level) params.level = level;
+      const data = await apiCall('get_leaderboard', params);
+      if (!data || !data.length) {
+        tbody.innerHTML = '<tr><td colspan="6" class="empty-state">No leaderboard data available</td></tr>';
+        return;
+      }
+      tbody.innerHTML = data.map(function(e, i) {
+        return '<tr><td><strong>#' + (i + 1) + '</strong> ' + (i < 3 ? ['🥇','🥈','🥉'][i] : '') + '</td><td>' + esc((e.user && (e.user.name || e.user.email)) || 'Anonymous') + '</td><td>' + esc(e.level || '—') + '</td><td>' + esc(e.topic || '—') + '</td><td><span class="badge badge-success">' + (e.percentage || 0) + '%</span></td><td>' + (e.completed_at ? new Date(e.completed_at).toLocaleDateString() : '—') + '</td></tr>';
+      }).join('');
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  async function loadUserStats() {
+    const userId = document.getElementById('stats-user-id').value.trim();
+    if (!userId) { toast('Please enter a user ID or email', 'error'); return; }
+    const tbody = document.getElementById('user-stats-table');
+    tbody.innerHTML = '<tr><td colspan="5" class="empty-state"><i class="fa-solid fa-spinner fa-spin"></i> Loading stats...</td></tr>';
+    try {
+      const results = await Promise.all([
+        apiCall('get_user_stats', { user_id: userId }).catch(function() { return null; }),
+        apiCall('get_user_favorites', { user_id: userId }).catch(function() { return []; }),
+        apiCall('get_user_ratings', { user_id: userId }).catch(function() { return {}; }),
+        apiCall('get_user_achievements', { user_id: userId }).catch(function() { return []; }),
+        apiCall('get_user_streak', { user_id: userId }).catch(function() { return { count: 0 }; })
+      ]);
+      const quizStats = results[0];
+      const favorites = results[1];
+      const userRatings = results[2];
+      const achievements = results[3];
+      const streakData = results[4];
+      if (quizStats) {
+        document.getElementById('user-stats-grid').style.display = 'grid';
+        document.getElementById('ustat-blocks').textContent = quizStats.total_blocks_attempted || 0;
+        document.getElementById('ustat-passed').textContent = quizStats.total_blocks_passed || 0;
+        document.getElementById('ustat-avg').textContent = (quizStats.average_score || 0) + '%';
+        document.getElementById('ustat-best').textContent = (quizStats.best_score || 0) + '%';
+        document.getElementById('ustat-streak').textContent = quizStats.streak || 0;
+        document.getElementById('ustat-topics').textContent = quizStats.topics_attempted || 0;
+        const recent = quizStats.recent_activity || [];
+        if (!recent.length) {
+          tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No quiz activity yet</td></tr>';
+        } else {
+          tbody.innerHTML = recent.map(function(a) {
+            return '<tr><td>' + esc(a.topic || '—') + '</td><td>' + esc(a.level || '—') + '</td><td><span class="badge ' + (a.passed ? 'badge-success' : 'badge-danger') + '">' + (a.percentage || 0) + '%</span></td><td>' + (a.passed ? '✅ Yes' : '❌ No') + '</td><td>' + (a.completed_at ? new Date(a.completed_at).toLocaleDateString() : '—') + '</td></tr>';
+          }).join('');
+        }
+      } else {
+        tbody.innerHTML = '<tr><td colspan="5" class="empty-state">No quiz data found for this user</td></tr>';
+        document.getElementById('user-stats-grid').style.display = 'none';
+      }
+      const favPanel = document.getElementById('panel-favorites');
+      const favTable = document.getElementById('favorites-table');
+      if (favorites && favorites.length) {
+        favPanel.style.display = '';
+        favTable.innerHTML = favorites.map(function(f) { return '<tr><td>' + esc(f.resource_id) + '</td><td>' + esc(f.title || '—') + '</td></tr>'; }).join('');
+      } else { favPanel.style.display = 'none'; }
+      const ratingsPanel = document.getElementById('panel-ratings');
+      const ratingsTable = document.getElementById('user-ratings-table');
+      const ratingEntries = Object.entries(userRatings || {});
+      if (ratingEntries.length) {
+        ratingsPanel.style.display = '';
+        ratingsTable.innerHTML = ratingEntries.map(function(entry) { return '<tr><td>' + esc(entry[0]) + '</td><td>⭐ ' + entry[1] + '</td></tr>'; }).join('');
+      } else { ratingsPanel.style.display = 'none'; }
+      const achPanel = document.getElementById('panel-achievements');
+      const achList = document.getElementById('achievements-list');
+      if (achievements && achievements.length) {
+        achPanel.style.display = '';
+        achList.innerHTML = achievements.map(function(b) { return '<span class="badge badge-info" style="margin:4px;">🏅 ' + esc(b.badge || b) + '</span>'; }).join('');
+      } else { achPanel.style.display = 'none'; }
+      const streakGrid = document.getElementById('streak-grid');
+      if (streakData) {
+        streakGrid.style.display = 'grid';
+        document.getElementById('ustat-daily-streak').textContent = streakData.count || 0;
+      } else { streakGrid.style.display = 'none'; }
+    } catch (e) {
+      tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+  }
+
+  function exportData(type) {
+    toast('Exporting ' + type + ' data...', 'info');
+  }
+
+  document.addEventListener('click', function(e) {
+    const target = e.target.closest('[data-action]');
+    if (!target) return;
+    const action = target.dataset.action;
+    const id = target.dataset.id;
+    const table = target.dataset.table;
+    const room = target.dataset.room;
+    const user = target.dataset.user;
+    const topic = target.dataset.topic;
+    const level = target.dataset.level;
+    const lock = target.dataset.lock === 'true';
+    const active = target.dataset.active === 'true';
+    const key = target.dataset.key;
+    const section = target.dataset.section;
+    switch(action) {
+      case 'edit': window.openEdit(id, table); break;
+      case 'delete': window.deleteResource(id, table); break;
+      case 'approve': window.approveSubmission(id); break;
+      case 'reject': window.rejectSubmission(id); break;
+      case 'view-message': window.viewMessage(id); break;
+      case 'accept-chat': acceptRequest(room); break;
+      case 'reject-chat': rejectRequest(room); break;
+      case 'open-chat': openChat(room, user); break;
+      case 'save-section': saveSiteSection(section); break;
+      case 'view-quiz': window.viewQuizQuestions(topic, level); break;
+      case 'delete-topic': window.deleteQuizTopic(topic, level); break;
+      case 'edit-feature': window.openFeatureEdit(key); break;
+      case 'make-admin': window.makeAdmin(id); break;
+      case 'toggle-lock': window.toggleLock(id, lock); break;
+      case 'toggle-admin-lock': window.toggleAdminLock(id, lock); break;
+      case 'toggle-subscriber': window.toggleSubscriber(id, active); break;
+      case 'view-donation': window.viewDonationDetails(id); break;
+    }
+  });
+
+  document.getElementById('signout-btn').addEventListener('click', window.signOut);
+  document.getElementById('edit-modal-close').addEventListener('click', function() { closeModal('edit-modal'); });
+  document.getElementById('feature-edit-modal-close').addEventListener('click', function() { closeModal('feature-edit-modal'); });
+  document.getElementById('edit-save-btn').addEventListener('click', submitEdit);
+  document.getElementById('feature-save-btn').addEventListener('click', submitFeatureEdit);
+  document.getElementById('upload-submit-btn').addEventListener('click', submitUpload);
+  document.getElementById('quiz-submit-btn').addEventListener('click', submitQuizBatch);
+  document.getElementById('add-admin-btn').addEventListener('click', addAdminUser);
+  document.getElementById('load-stats-btn').addEventListener('click', loadUserStats);
+  document.getElementById('send-btn').addEventListener('click', sendAdminMessage);
+  document.getElementById('chat-input').addEventListener('keydown', function(e) { if (e.key === 'Enter') sendAdminMessage(); });
+  document.getElementById('admin-online-toggle').addEventListener('change', function() { toggleAdminOnline(this.checked); });
+  document.getElementById('resources-search').addEventListener('input', function() { filterTable('resources-table', this.value); });
+  document.getElementById('submission-filter').addEventListener('change', function() { loadSubmissions(); });
+  document.getElementById('user-role-filter').addEventListener('change', function() { loadUsers(); });
+  document.getElementById('quiz-level').addEventListener('change', loadQuizTopics);
+  document.getElementById('leaderboard-level').addEventListener('change', function() { loadedTabs.delete('leaderboard'); loadLeaderboard(); });
+  document.getElementById('refresh-resources-btn').addEventListener('click', function() { loadResources(true); });
+  document.getElementById('refresh-submissions-btn').addEventListener('click', function() { loadSubmissions(true); });
+  document.getElementById('refresh-messages-btn').addEventListener('click', function() { loadMessages(true); });
+  document.getElementById('refresh-ratings-btn').addEventListener('click', function() { loadRatings(true); });
+  document.getElementById('refresh-pending-btn').addEventListener('click', loadPendingRequests);
+  document.getElementById('refresh-active-chats-btn').addEventListener('click', loadActiveChats);
+  document.getElementById('refresh-quiz-topics-btn').addEventListener('click', loadQuizTopics);
+  document.getElementById('refresh-features-btn').addEventListener('click', function() { loadAppFeatures(true); });
+  document.getElementById('refresh-users-btn').addEventListener('click', function() { loadUsers(true); });
+  document.getElementById('refresh-admin-users-btn').addEventListener('click', function() { loadAdminUsers(true); });
+  document.getElementById('refresh-newsletter-btn').addEventListener('click', function() { loadNewsletter(true); });
+  document.getElementById('refresh-donations-btn').addEventListener('click', function() { loadDonations(true); });
+  document.getElementById('refresh-leaderboard-btn').addEventListener('click', function() { loadLeaderboard(true); });
+  document.getElementById('export-resources-btn').addEventListener('click', function() { exportData('resources'); });
+
+  document.addEventListener('click', function(e) {
+    if (e.target.classList.contains('modal-overlay')) {
+      e.target.style.display = 'none';
+    }
+  });
+
+  document.addEventListener('keydown', function(e) {
+    if (e.key === 'Escape') {
+      document.querySelectorAll('.modal-overlay[style*="flex"]').forEach(function(m) { m.style.display = 'none'; });
+    }
+  });
+
+  document.addEventListener('DOMContentLoaded', verifyAdminAccess);
+})();
+</script>
+</body>
+</html>
