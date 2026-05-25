@@ -681,30 +681,7 @@ Aliver<span class="g-text">Biopharm</span>
 <div id="resource-modal-content"></div>
 </div>
 </div>
-<div id="debug-panel" style="position:fixed;bottom:10px;left:10px;z-index:9999;background:rgba(0,0,0,0.9);color:#0f0;font-family:monospace;font-size:11px;padding:10px;border-radius:8px;max-width:400px;max-height:300px;overflow-y:auto;display:none;border:1px solid #0f0;"><div style="display:flex;justify-content:space-between;align-items:center;margin-bottom:5px;"><strong style="color:#0f0;">🐛 Debug Log</strong><button onclick="document.getElementById('debug-panel').style.display='none'" style="background:none;border:none;color:#f00;cursor:pointer;font-size:14px;">✕</button></div><div id="debug-log"></div></div><button id="debug-toggle" style="position:fixed;bottom:10px;left:10px;z-index:9998;background:#333;color:#0f0;border:1px solid #0f0;padding:5px 10px;border-radius:5px;cursor:pointer;font-family:monospace;font-size:11px;">🐛 Debug</button>
  <script>
-const debugLog = [];
-function debug(msg, type) {
-  const entry = { msg, type: type || 'info', time: new Date().toLocaleTimeString() };
-  debugLog.push(entry);
-  if (debugLog.length > 50) debugLog.shift();
-  const logEl = document.getElementById('debug-log');
-  if (logEl) {
-    logEl.innerHTML = debugLog.map(e => {
-      let color = '#aaa';
-      if (e.type === 'error') color = '#f44';
-      else if (e.type === 'warn') color = '#fa0';
-      else if (e.type === 'ok') color = '#0f0';
-      return '<div style="border-bottom:1px solid #333;padding:2px 0;color:' + color + '"><small>' + e.time + '</small> <strong>[' + e.type.toUpperCase() + ']</strong> ' + e.msg + '</div>';
-    }).reverse().join('');
-  }
-}
-document.getElementById('debug-toggle').addEventListener('click', function() {
-  const panel = document.getElementById('debug-panel');
-  panel.style.display = panel.style.display === 'none' ? 'block' : 'none';
-});
-debug('Debug ready', 'info');
-
 const API_BASE = '/api/query';
 let currentUser = null;
 let currentAudio = null;
@@ -734,7 +711,6 @@ function playAudio(btn, url) {
 
 async function apiCall(action, params) {
   params = params || {};
-  debug('→ ' + action + (Object.keys(params).length ? ' ' + JSON.stringify(params).substring(0, 80) : ''), 'info');
   const controller = new AbortController();
   const timeout = setTimeout(function() { controller.abort(); }, 10000);
   try {
@@ -747,19 +723,10 @@ async function apiCall(action, params) {
     });
     clearTimeout(timeout);
     const json = await res.json();
-    if (!res.ok) {
-      debug('✕ ' + action + ' [' + res.status + '] ' + JSON.stringify(json).substring(0, 150), 'error');
-      throw new Error(json.error || 'Request failed (' + res.status + ')');
-    }
-    debug('✓ ' + action + ' [' + res.status + ']', 'ok');
+    if (!res.ok) throw new Error(json.error || 'Request failed');
     return json.data !== undefined ? json.data : json;
   } catch (err) {
     clearTimeout(timeout);
-    if (err.name === 'AbortError') {
-      debug('✕ ' + action + ' TIMEOUT', 'error');
-    } else if (!err.message.includes('Request failed')) {
-      debug('✕ ' + action + ' ' + err.message, 'error');
-    }
     throw err;
   }
 }
@@ -1663,19 +1630,13 @@ document.addEventListener('DOMContentLoaded', async function() {
     const userData = await apiCall('get_user');
     if (userData && userData.user) {
       currentUser = userData.user;
-      debug('User logged in: ' + userData.user.email, 'ok');
-    } else {
-      debug('No user session', 'info');
     }
   } catch (e) {
     currentUser = null;
-    debug('get_user failed: ' + e.message, 'warn');
   }
   updateAuthUI();
   try {
-    debug('Loading site sections...', 'info');
     const sections = await apiCall('get_all_site_sections');
-    debug('Sections loaded: ' + Object.keys(sections || {}).length + ' keys', 'ok');
     if (sections) {
       if (sections.section_headings) {
         const headings = sections.section_headings;
@@ -1816,7 +1777,6 @@ document.addEventListener('DOMContentLoaded', async function() {
       }
     }
   } catch (err) {
-    debug('CRITICAL: sections load failed: ' + err.message, 'error');
     console.error('Section load error:', err);
   }
   await loadFilters();
