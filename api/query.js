@@ -725,6 +725,15 @@ async function handlePost(req, res) {
         result = { ...deck, cards: cards || [] };
         break;
       }
+      
+case 'get_all_site_sections': case 'get_all_sections': {
+  const { data, error } = await supabase.from('site_sections').select('section, data');
+  if (error) throw error;
+  result = {};
+  (data || []).forEach(row => { result[row.section] = row.data; });
+  break;
+}
+        
       case 'create_flashcard_deck': {
         if (!userId) return res.status(401).json({ error: 'Authentication required' });
         const deckTitle = req.body.title || title;
