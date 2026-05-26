@@ -179,6 +179,24 @@
     </a>
   </li>
   <li>
+    <a href="#flashcards" data-tab="flashcards">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="2" width="20" height="20" rx="2" fill="#9b59b6"/><path d="M8 8h8M8 12h8M8 16h5" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        Flashcards
+    </a>
+</li>
+<li>
+    <a href="#weekly-challenge" data-tab="weekly-challenge">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><circle cx="12" cy="12" r="10" fill="#f39c12"/><path d="M12 6v6l4 2" stroke="#fff" stroke-width="2" stroke-linecap="round"/></svg>
+        Weekly Challenge
+    </a>
+</li>
+<li>
+    <a href="#analytics" data-tab="analytics">
+        <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="2" y="12" width="4" height="8" rx="1" fill="#16a085"/><rect x="8" y="8" width="4" height="12" rx="1" fill="#2ecc71"/><rect x="14" y="4" width="4" height="16" rx="1" fill="#3498db"/><rect x="20" y="10" width="4" height="10" rx="1" fill="#9b59b6"/></svg>
+        Analytics
+    </a>
+</li>
+<li>
     <a href="#app-features" data-tab="app-features">
       <svg viewBox="0 0 24 24" fill="none" aria-hidden="true"><rect x="1" y="5" width="22" height="14" rx="7" fill="#00bcd4"/><circle cx="16" cy="12" r="4" fill="#fff"/></svg>
       App Features
@@ -218,16 +236,15 @@
     <div class="sidebar-footer"><div class="admin-email" id="admin-email-display">—</div><button class="btn-signout" onclick="signOut()"><i class="fa-solid fa-right-from-bracket"></i> Sign Out</button></div>
   </aside>
 
-  <main class="main-content">
-    <div class="tab-content active" id="tab-dashboard">
-      <div class="page-header"><h1 class="page-title">Dashboard</h1><p class="page-subtitle">System overview</p></div>
-      <div class="stats-grid">
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(10,181,181,0.12);color:var(--clr-cyan);"><i class="fa-solid fa-file-pdf"></i></div><div class="stat-value" id="stat-resources">—</div><div class="stat-label">Total Resources</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(243,156,18,0.12);color:#f39c12;"><i class="fa-solid fa-inbox"></i></div><div class="stat-value" id="stat-pending">—</div><div class="stat-label">Pending Submissions</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(231,76,60,0.12);color:#e74c3c;"><i class="fa-solid fa-envelope"></i></div><div class="stat-value" id="stat-messages">—</div><div class="stat-label">Messages</div></div>
-        <div class="stat-card"><div class="stat-icon" style="background:rgba(39,174,96,0.12);color:#27ae60;"><i class="fa-solid fa-users"></i></div><div class="stat-value" id="stat-users">—</div><div class="stat-label">Users</div></div>
-      </div>
-    </div>
+ <div class="stats-grid">
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(10,181,181,0.12);color:var(--clr-cyan);"><i class="fa-solid fa-file-pdf"></i></div><div class="stat-value" id="stat-resources">—</div><div class="stat-label">Total Resources</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(243,156,18,0.12);color:#f39c12;"><i class="fa-solid fa-inbox"></i></div><div class="stat-value" id="stat-pending">—</div><div class="stat-label">Pending Submissions</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(231,76,60,0.12);color:#e74c3c;"><i class="fa-solid fa-envelope"></i></div><div class="stat-value" id="stat-messages">—</div><div class="stat-label">Messages</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(39,174,96,0.12);color:#27ae60;"><i class="fa-solid fa-users"></i></div><div class="stat-value" id="stat-users">—</div><div class="stat-label">Users</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(155,89,182,0.12);color:#9b59b6;"><i class="fa-solid fa-layer-group"></i></div><div class="stat-value" id="stat-flashcard-decks">—</div><div class="stat-label">Flashcard Decks</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(52,152,219,0.12);color:#3498db;"><i class="fa-solid fa-chart-line"></i></div><div class="stat-value" id="stat-quiz-attempts">—</div><div class="stat-label">Quiz Attempts</div></div>
+    <div class="stat-card"><div class="stat-icon" style="background:rgba(46,204,113,0.12);color:#2ecc71;"><i class="fa-solid fa-download"></i></div><div class="stat-value" id="stat-downloads">—</div><div class="stat-label">Downloads</div></div>
+</div>
 
     <div class="tab-content" id="tab-resources">
       <div class="page-header"><h1 class="page-title">Resources</h1><p class="page-subtitle">Manage published biology notes</p></div>
@@ -328,6 +345,71 @@
       <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Topic</th><th>Level</th><th>Questions</th><th>Status</th></tr></thead><tbody id="quiz-topics-table"><tr><td colspan="4" style="text-align:center;padding:40px;color:var(--clr-text-muted);">Select a level to view topics</td></tr></tbody></table></div></div></div>
     </div>
 
+<div class="tab-content" id="tab-flashcards">
+    <div class="page-header">
+        <h1 class="page-title">Flashcard Decks</h1>
+        <p class="page-subtitle">Manage all flashcard decks and cards</p>
+    </div>
+    <div class="panel">
+        <div class="panel-header">
+            <span>All Decks</span>
+            <button class="btn btn-cyan btn-sm" onclick="document.getElementById('new-flashcard-modal').style.display='flex'">
+                <i class="fa-solid fa-plus"></i> New Deck
+            </button>
+        </div>
+        <div class="panel-body">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Title</th><th>Category</th><th>Level</th><th>Cards</th><th>Author</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="flashcard-decks-table"><tr><td colspan="6" style="text-align:center;">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content" id="tab-weekly-challenge">
+    <div class="page-header">
+        <h1 class="page-title">Weekly Challenge</h1>
+        <p class="page-subtitle">Set the weekly quiz question</p>
+    </div>
+    <div class="panel" style="max-width:700px;">
+        <div class="panel-header"><span>Challenge Configuration</span></div>
+        <div class="panel-body">
+            <div class="form-group"><label class="form-label">Question</label><input type="text" class="form-input" id="weekly-question" placeholder="What is the powerhouse of the cell?"></div>
+            <div class="form-group"><label class="form-label">Option A</label><input type="text" class="form-input" id="weekly-option-a"></div>
+            <div class="form-group"><label class="form-label">Option B</label><input type="text" class="form-input" id="weekly-option-b"></div>
+            <div class="form-group"><label class="form-label">Option C</label><input type="text" class="form-input" id="weekly-option-c"></div>
+            <div class="form-group"><label class="form-label">Option D</label><input type="text" class="form-input" id="weekly-option-d"></div>
+            <div class="form-group"><label class="form-label">Correct Answer</label><select class="form-select" id="weekly-correct"><option value="">Select...</option><option value="A">A</option><option value="B">B</option><option value="C">C</option><option value="D">D</option></select></div>
+            <div class="form-group"><label class="form-label">Explanation</label><textarea class="form-textarea" id="weekly-explanation" rows="3"></textarea></div>
+            <div class="form-group"><label class="form-label">Start Date</label><input type="date" class="form-input" id="weekly-start-date"></div>
+            <div class="form-group"><label class="form-label">End Date</label><input type="date" class="form-input" id="weekly-end-date"></div>
+            <button class="btn btn-cyan" onclick="saveWeeklyChallenge()"><i class="fa-solid fa-save"></i> Save Challenge</button>
+        </div>
+    </div>
+</div>
+
+<div class="tab-content" id="tab-analytics">
+    <div class="page-header">
+        <h1 class="page-title">Page Activity Analytics</h1>
+        <p class="page-subtitle">Track user behavior across the site</p>
+    </div>
+    <div class="panel">
+        <div class="panel-header"><span>Recent Activity Log</span><button class="btn btn-cyan btn-sm" onclick="loadPageActivity()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+        <div class="panel-body">
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>User</th><th>Page</th><th>Time</th><th>Metadata</th></tr></thead>
+                    <tbody id="page-activity-table"><tr><td colspan="4" style="text-align:center;">Loading...</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
+
     <div class="tab-content" id="tab-app-features">
       <div class="page-header"><h1 class="page-title">App Features</h1><p class="page-subtitle">Manage feature flags for all pages</p></div>
       <div class="panel"><div class="panel-header"><span>All Features</span><button class="btn btn-cyan btn-sm" onclick="loadedTabs.delete('app-features'); loadAppFeatures()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
@@ -410,6 +492,31 @@
   </div>
 </div>
 
+<div class="modal-overlay" id="flashcard-modal" style="display:none;">
+    <div class="modal" style="max-width:800px;">
+        <div class="modal-header"><h3 class="modal-title">Edit Flashcard Deck</h3><button class="modal-close" onclick="document.getElementById('flashcard-modal').style.display='none'">✕</button></div>
+        <input type="hidden" id="edit-deck-id">
+        <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="edit-deck-title"></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="edit-deck-description" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label">Category</label><input type="text" class="form-input" id="edit-deck-category"></div>
+        <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="edit-deck-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Pharmacy</option></select></div>
+        <div class="form-group"><label class="form-label">Cards</label><div id="edit-deck-cards"></div><button class="btn btn-sm btn-outline" onclick="addNewCardToForm('edit-deck-cards')">+ Add Card</button></div>
+        <button class="btn btn-cyan" onclick="saveFlashcardDeck()">Save Deck</button>
+    </div>
+</div>
+
+<div class="modal-overlay" id="new-flashcard-modal" style="display:none;">
+    <div class="modal" style="max-width:800px;">
+        <div class="modal-header"><h3 class="modal-title">Create Flashcard Deck</h3><button class="modal-close" onclick="document.getElementById('new-flashcard-modal').style.display='none'">✕</button></div>
+        <div class="form-group"><label class="form-label">Title</label><input type="text" class="form-input" id="new-deck-title"></div>
+        <div class="form-group"><label class="form-label">Description</label><textarea class="form-textarea" id="new-deck-description" rows="2"></textarea></div>
+        <div class="form-group"><label class="form-label">Category</label><input type="text" class="form-input" id="new-deck-category"></div>
+        <div class="form-group"><label class="form-label">Level</label><select class="form-select" id="new-deck-level"><option value="">Select...</option><option>O-Level</option><option>A-Level</option><option>Pharmacy</option></select></div>
+        <div class="form-group"><label class="form-label">Cards</label><div id="new-deck-cards"></div><button class="btn btn-sm btn-outline" onclick="addNewCardToForm('new-deck-cards')">+ Add Card</button></div>
+        <button class="btn btn-cyan" onclick="createFlashcardDeck()">Create Deck</button>
+    </div>
+</div>
+
 <script>
   const API_BASE = '/api/query';
   let currentAdminUser = null;
@@ -480,7 +587,10 @@
       case 'donations': loadDonations(); break;
       case 'app-features': loadAppFeatures(); break;
       case 'leaderboard': loadLeaderboard(); break;
-    }
+      case 'flashcards': loadFlashcardDecks(); break;
+case 'weekly-challenge': loadWeeklyChallenge(); break;
+case 'analytics': loadPageActivity(); break;
+}
   }
 
   document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(function(link) {
@@ -516,7 +626,7 @@
     return cachedSiteSections;
   }
 
-  async function loadDashboard() {
+   async function loadDashboard() {
     try {
       var data = await apiCall('stats');
       document.getElementById('stat-resources').textContent = data.resources ?? 0;
@@ -528,6 +638,17 @@
       var users = sections?.users?.list || [];
       document.getElementById('stat-users').textContent = users.length;
     } catch (e) { document.getElementById('stat-users').textContent = '?'; }
+    try {
+      var quizStats = await apiCall('get_public_stats');
+      var flashcardStats = await apiCall('get_flashcard_decks');
+      document.getElementById('stat-quiz-attempts').textContent = quizStats?.quiz_attempts || 0;
+      document.getElementById('stat-flashcard-decks').textContent = flashcardStats?.length || 0;
+      document.getElementById('stat-downloads').textContent = quizStats?.downloads_count || 0;
+    } catch(e) {
+      document.getElementById('stat-quiz-attempts').textContent = '?';
+      document.getElementById('stat-flashcard-decks').textContent = '?';
+      document.getElementById('stat-downloads').textContent = '?';
+    }
   }
 
   async function loadResources() {
@@ -664,14 +785,21 @@
     catch (e) { toast('Save failed: ' + e.message, 'error'); }
   }
 
-  async function loadQuizTopics() {
+   async function loadQuizTopics() {
     var tbody = document.getElementById('quiz-topics-table');
     var level = document.getElementById('quiz-level')?.value || 'O-Level';
     tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
     try {
       var topics = await apiCall('get_quiz_topics', { level: level });
       if (!topics || !topics.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">No topics for ' + esc(level) + '</td></tr>'; return; }
-      tbody.innerHTML = topics.map(function(t) { return '<tr><td><strong>' + esc(t.topic_name) + '</strong></td><td>' + esc(level) + '</td><td>' + (t.question_count||0) + '</td><td><span class="badge badge-success">Active</span></td></tr>'; }).join('');
+      tbody.innerHTML = topics.map(function(t) { 
+        return '<tr>' +
+          '<td><strong>' + esc(t.topic_name) + '</strong></td>' +
+          '<td>' + esc(level) + '</td>' +
+          '<td>' + (t.question_count||0) + '</td>' +
+          '<td><button class="btn btn-sm btn-danger" onclick="deleteQuizTopic(\'' + esc(t.topic_name) + '\', \'' + esc(level) + '\')"><i class="fa-solid fa-trash"></i> Delete</button></td>' +
+        '</table>';
+      }).join('');
     } catch (e) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
   }
 
@@ -763,13 +891,19 @@
     try { await apiCall('update_user_lock', { userId: id, lock: lock, reason: lock ? 'Locked by admin' : null }); cachedSiteSections = null; toast(lock ? 'Locked.' : 'Unlocked.'); loadedTabs.delete('users'); loadAdminUsers(); } catch(e) { toast('Failed: ' + e.message, 'error'); }
   };
 
-  async function loadNewsletter() {
+   async function loadNewsletter() {
     var tbody = document.getElementById('newsletter-table');
     tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
     try {
       var data = await apiCall('get_newsletter_subscribers');
       if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">No subscribers.</td></tr>'; return; }
-      tbody.innerHTML = data.map(function(s) { return '<tr><td>' + esc(s.email||'—') + '</td><td><span class="badge ' + (s.is_active?'badge-success':'badge-danger') + '">' + (s.is_active?'Active':'Inactive') + '</span></td><td>' + (s.created_at?new Date(s.created_at).toLocaleDateString():'—') + '</td></tr>'; }).join('');
+      tbody.innerHTML = data.map(function(s) { 
+        return '<tr>' +
+          '<td>' + esc(s.email||'—') + '</td>' +
+          '<td><button class="btn btn-sm ' + (s.is_active ? 'btn-danger' : 'btn-cyan') + '" onclick="toggleNewsletterSubscriber(\'' + esc(s.id) + '\', ' + (s.is_active || false) + ')">' + (s.is_active ? 'Deactivate' : 'Activate') + '</button></td>' +
+          '<td>' + (s.created_at?new Date(s.created_at).toLocaleDateString():'—') + '</td>' +
+        '</tr>';
+      }).join('');
     } catch (e) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
   }
 
@@ -887,14 +1021,17 @@
     } catch(e) { toast('Error: ' + e.message, 'error'); }
   }
 
-  async function loadActiveChats() {
+   async function loadActiveChats() {
     const el = document.getElementById('active-chats-list');
     try {
       const data = await apiCall('admin_get_active_chats');
       if (!data || !data.length) { el.innerHTML = '<p style="color:var(--clr-text-muted)">No active chats.</p>'; return; }
       el.innerHTML = data.map(c => `
-        <div style="padding:8px; border-bottom:1px solid var(--clr-border-glow); cursor:pointer;" onclick="openChat('${c.id}', '${esc(c.user_name)}')">
-          <strong>${esc(c.user_name)}</strong> <span class="badge badge-${c.status==='active'?'success':'warning'}">${c.status}</span>
+        <div style="padding:8px; border-bottom:1px solid var(--clr-border-glow); display:flex; justify-content:space-between; align-items:center;">
+          <div style="cursor:pointer; flex:1;" onclick="openChat('${c.id}', '${esc(c.user_name)}')">
+            <strong>${esc(c.user_name)}</strong> <span class="badge badge-${c.status==='active'?'success':'warning'}">${c.status}</span>
+          </div>
+          <button class="btn btn-sm btn-danger" onclick="closeChatRoom('${c.id}')" style="margin-left:10px;"><i class="fa-solid fa-times"></i> Close</button>
         </div>
       `).join('');
     } catch(e) { el.innerHTML = `<p style="color:#e74c3c;">Error: ${esc(e.message)}</p>`; }
@@ -955,6 +1092,311 @@
     currentAdminUser = null;
     window.location.href = '/';
   };
+
+async function loadFlashcardDecks() {
+    const tbody = document.getElementById('flashcard-decks-table');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+    try {
+        const decks = await apiCall('get_flashcard_decks');
+        if (!decks || !decks.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No flashcard decks found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = decks.map(deck => `
+            <tr>
+                <td><strong>${esc(deck.title)}</strong></td>
+                <td>${esc(deck.category || '—')}</td>
+                <td>${esc(deck.level || '—')}</td>
+                <td>${deck.card_count || 0}</td>
+                <td>${esc(deck.author || '—')}</td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="editFlashcardDeck('${deck.id}')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deleteFlashcardDeck('${deck.id}')"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
+    }
+}
+
+async function deleteFlashcardDeck(deckId) {
+    if (!confirm('Delete this entire flashcard deck? This action cannot be undone.')) return;
+    try {
+        await apiCall('delete_flashcard_deck', { deck_id: deckId });
+        toast('Deck deleted successfully!');
+        loadFlashcardDecks();
+    } catch(e) {
+        toast('Delete failed: ' + e.message, 'error');
+    }
+}
+
+async function editFlashcardDeck(deckId) {
+    try {
+        const deck = await apiCall('get_flashcard_deck', { deck_id: deckId });
+        document.getElementById('edit-deck-id').value = deckId;
+        document.getElementById('edit-deck-title').value = deck.title || '';
+        document.getElementById('edit-deck-description').value = deck.description || '';
+        document.getElementById('edit-deck-category').value = deck.category || '';
+        document.getElementById('edit-deck-level').value = deck.level || '';
+        
+        const cardsContainer = document.getElementById('edit-deck-cards');
+        cardsContainer.innerHTML = '';
+        if (deck.cards && deck.cards.length) {
+            deck.cards.forEach((card, idx) => {
+                cardsContainer.innerHTML += `
+                    <div class="card-item" style="border:1px solid var(--clr-border-glow); padding:10px; margin-bottom:10px; border-radius:8px;">
+                        <input type="hidden" class="card-id" value="${card.id}">
+                        <div class="form-group"><label>Front Text</label><input type="text" class="form-input card-front" value="${esc(card.front_text)}"></div>
+                        <div class="form-group"><label>Back Text</label><textarea class="form-textarea card-back">${esc(card.back_text)}</textarea></div>
+                        <button class="btn btn-sm btn-danger" onclick="this.closest('.card-item').remove()">Remove Card</button>
+                    </div>
+                `;
+            });
+        }
+        document.getElementById('flashcard-modal').style.display = 'flex';
+    } catch(e) {
+        toast('Failed to load deck: ' + e.message, 'error');
+    }
+}
+
+async function saveFlashcardDeck() {
+    const deckId = document.getElementById('edit-deck-id').value;
+    const title = document.getElementById('edit-deck-title').value.trim();
+    if (!title) {
+        toast('Title required', 'error');
+        return;
+    }
+    
+    const cards = [];
+    document.querySelectorAll('#edit-deck-cards .card-item').forEach(item => {
+        const front = item.querySelector('.card-front')?.value.trim();
+        const back = item.querySelector('.card-back')?.value.trim();
+        if (front && back) {
+            cards.push({ front, back });
+        }
+    });
+    
+    if (cards.length === 0) {
+        toast('At least one card required', 'error');
+        return;
+    }
+    
+    try {
+        await apiCall('update_flashcard_deck', {
+            deck_id: deckId,
+            title: title,
+            description: document.getElementById('edit-deck-description').value,
+            category: document.getElementById('edit-deck-category').value,
+            level: document.getElementById('edit-deck-level').value,
+            cards: cards
+        });
+        toast('Deck updated successfully!');
+        document.getElementById('flashcard-modal').style.display = 'none';
+        loadFlashcardDecks();
+    } catch(e) {
+        toast('Save failed: ' + e.message, 'error');
+    }
+}
+
+async function createFlashcardDeck() {
+    const title = document.getElementById('new-deck-title').value.trim();
+    if (!title) {
+        toast('Title required', 'error');
+        return;
+    }
+    
+    const cards = [];
+    document.querySelectorAll('#new-deck-cards .card-item').forEach(item => {
+        const front = item.querySelector('.card-front')?.value.trim();
+        const back = item.querySelector('.card-back')?.value.trim();
+        if (front && back) {
+            cards.push({ front, back });
+        }
+    });
+    
+    if (cards.length === 0) {
+        toast('At least one card required', 'error');
+        return;
+    }
+    
+    try {
+        await apiCall('create_flashcard_deck', {
+            title: title,
+            description: document.getElementById('new-deck-description').value,
+            category: document.getElementById('new-deck-category').value,
+            level: document.getElementById('new-deck-level').value,
+            cards: cards
+        });
+        toast('Deck created successfully!');
+        document.getElementById('new-flashcard-modal').style.display = 'none';
+        document.getElementById('new-deck-title').value = '';
+        document.getElementById('new-deck-description').value = '';
+        document.getElementById('new-deck-category').value = '';
+        document.getElementById('new-deck-level').value = '';
+        document.getElementById('new-deck-cards').innerHTML = '';
+        loadFlashcardDecks();
+    } catch(e) {
+        toast('Creation failed: ' + e.message, 'error');
+    }
+}
+
+function addNewCardToForm(containerId) {
+    const container = document.getElementById(containerId);
+    const cardHtml = `
+        <div class="card-item" style="border:1px solid var(--clr-border-glow); padding:10px; margin-bottom:10px; border-radius:8px;">
+            <div class="form-group"><label>Front Text</label><input type="text" class="form-input card-front" placeholder="Question or term..."></div>
+            <div class="form-group"><label>Back Text</label><textarea class="form-textarea card-back" placeholder="Answer or definition..." rows="2"></textarea></div>
+            <button class="btn btn-sm btn-danger" onclick="this.closest('.card-item').remove()">Remove Card</button>
+        </div>
+    `;
+    container.insertAdjacentHTML('beforeend', cardHtml);
+}
+
+async function loadWeeklyChallenge() {
+    try {
+        const sections = await getSiteSections();
+        const challenge = sections?.weekly_challenge || {};
+        document.getElementById('weekly-question').value = challenge.question || '';
+        document.getElementById('weekly-option-a').value = challenge.options?.A || '';
+        document.getElementById('weekly-option-b').value = challenge.options?.B || '';
+        document.getElementById('weekly-option-c').value = challenge.options?.C || '';
+        document.getElementById('weekly-option-d').value = challenge.options?.D || '';
+        document.getElementById('weekly-correct').value = challenge.correct || '';
+        document.getElementById('weekly-explanation').value = challenge.explanation || '';
+        document.getElementById('weekly-start-date').value = challenge.start_date || '';
+        document.getElementById('weekly-end-date').value = challenge.end_date || '';
+    } catch(e) {
+        toast('Failed to load challenge: ' + e.message, 'error');
+    }
+}
+
+async function saveWeeklyChallenge() {
+    const challengeData = {
+        question: document.getElementById('weekly-question').value.trim(),
+        options: {
+            A: document.getElementById('weekly-option-a').value.trim(),
+            B: document.getElementById('weekly-option-b').value.trim(),
+            C: document.getElementById('weekly-option-c').value.trim(),
+            D: document.getElementById('weekly-option-d').value.trim()
+        },
+        correct: document.getElementById('weekly-correct').value,
+        explanation: document.getElementById('weekly-explanation').value,
+        start_date: document.getElementById('weekly-start-date').value,
+        end_date: document.getElementById('weekly-end-date').value
+    };
+    
+    if (!challengeData.question || !challengeData.options.A || !challengeData.correct) {
+        toast('Question, all options, and correct answer required', 'error');
+        return;
+    }
+    
+    try {
+        await apiCall('update_site_section', { section: 'weekly_challenge', data: challengeData });
+        toast('Weekly challenge saved!');
+    } catch(e) {
+        toast('Save failed: ' + e.message, 'error');
+    }
+}
+
+async function deleteQuizTopic(topic, level) {
+    if (!confirm(`Delete ALL questions for topic "${topic}" (${level})? This cannot be undone.`)) return;
+    try {
+        await apiCall('delete_quiz_topic', { topic: topic, level: level });
+        toast('Topic deleted successfully!');
+        loadQuizTopics();
+    } catch(e) {
+        toast('Delete failed: ' + e.message, 'error');
+    }
+}
+
+async function toggleNewsletterSubscriber(id, currentStatus) {
+    try {
+        await apiCall('update_newsletter_subscriber', { id: id, is_active: !currentStatus });
+        toast(currentStatus ? 'Subscriber deactivated' : 'Subscriber activated');
+        loadNewsletter();
+    } catch(e) {
+        toast('Failed: ' + e.message, 'error');
+    }
+}
+
+async function loadPageActivity() {
+    const tbody = document.getElementById('page-activity-table');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+        const activities = await apiCall('get_page_activity');
+        if (!activities || !activities.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = activities.map(act => `
+            <tr>
+                <td>${act.user_email ? esc(act.user_email) : '<span class="badge badge-info">Anonymous</span>'}</td>
+                <td><span class="badge badge-info">${esc(act.page)}</span></td>
+                <td>${new Date(act.created_at).toLocaleString()}</td>
+                <td><small>${esc(JSON.stringify(act.metadata || {}).substring(0, 100))}</small></td>
+            </tr>
+        `).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
+    }
+}
+
+async function closeChatRoom(roomId) {
+    if (!confirm('Close this chat conversation?')) return;
+    try {
+        await apiCall('admin_reject_chat', { room_id: roomId });
+        toast('Chat closed');
+        if (currentChatRoom === roomId) {
+            if (chatPollInterval) clearInterval(chatPollInterval);
+            currentChatRoom = null;
+            document.getElementById('chat-header-title').textContent = 'Select a conversation';
+            document.getElementById('chat-messages').innerHTML = '<p style="color:var(--clr-text-muted); text-align:center;">Select a chat to view messages</p>';
+            document.getElementById('send-btn').disabled = true;
+            document.getElementById('chat-input').disabled = true;
+        }
+        loadActiveChats();
+        loadPendingRequests();
+    } catch(e) {
+        toast('Failed: ' + e.message, 'error');
+    }
+}
+
+async function exportUserStats(userId) {
+    if (!userId) userId = document.getElementById('stats-user-id').value.trim();
+    if (!userId) {
+        toast('Enter a user ID first', 'error');
+        return;
+    }
+    try {
+        const stats = await apiCall('get_user_stats', { user_id: userId });
+        const dataStr = JSON.stringify(stats, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `user_stats_${userId}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('Stats exported!');
+    } catch(e) {
+        toast('Export failed: ' + e.message, 'error');
+    }
+}
+
+async function loadFullDashboardStats() {
+    try {
+        const quizStats = await apiCall('get_public_stats');
+        const flashcardStats = await apiCall('get_flashcard_decks');
+        document.getElementById('stat-quiz-attempts').textContent = quizStats?.quiz_attempts || 0;
+        document.getElementById('stat-flashcard-decks').textContent = flashcardStats?.length || 0;
+        document.getElementById('stat-downloads').textContent = quizStats?.downloads_count || 0;
+    } catch(e) {
+        console.error('Failed to load extended stats:', e);
+    }
+}
 
   document.addEventListener('DOMContentLoaded', verifyAdminAccess);
 </script>
