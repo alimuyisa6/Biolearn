@@ -4190,38 +4190,49 @@ async function loadContinueLearning() {
   window.speechSynthesis.getVoices();
 }
 
-(function() {
-  let scrollTimeout;
+ (function() {
   let isScrolling = false;
+  let scrollTimeout;
+  
   document.documentElement.style.scrollBehavior = 'smooth';
+  document.body.style.overflow = 'auto';
+  
   window.addEventListener('wheel', function(e) {
+    e.preventDefault();
+    
     if (scrollTimeout) clearTimeout(scrollTimeout);
-    if (!isScrolling) {
-      document.documentElement.style.scrollBehavior = 'smooth';
-      isScrolling = true;
-    }
+    
+    let delta = e.deltaY;
+    if (Math.abs(delta) < 1) delta = delta * 10;
+    
+    window.scrollBy({
+      top: delta,
+      behavior: 'smooth'
+    });
+    
+    isScrolling = true;
     scrollTimeout = setTimeout(function() {
       isScrolling = false;
-    }, 200);
+    }, 50);
+    
   }, { passive: false });
+  
   let touchStartY = 0;
-  let touchStartTime = 0;
   window.addEventListener('touchstart', function(e) {
     touchStartY = e.touches[0].clientY;
-    touchStartTime = Date.now();
-  }, { passive: true });
-  window.addEventListener('touchend', function(e) {
-    const touchEndY = e.changedTouches[0].clientY;
-    const deltaY = touchStartY - touchEndY;
-    const deltaTime = Date.now() - touchStartTime;
-    const velocity = Math.abs(deltaY / deltaTime);
-    if (velocity > 0.3 && Math.abs(deltaY) > 10) {
-      const momentum = deltaY * 1.5;
-      window.scrollBy({ top: momentum, behavior: 'smooth' });
-    }
-  }, { passive: true });
+  }, { passive: false });
+  
+  window.addEventListener('touchmove', function(e) {
+    e.preventDefault();
+    const deltaY = touchStartY - e.touches[0].clientY;
+    window.scrollBy({
+      top: deltaY,
+      behavior: 'smooth'
+    });
+    touchStartY = e.touches[0].clientY;
+  }, { passive: false });
+  
 })();
-
 </script>
 </body>
 </html>
