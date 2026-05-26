@@ -301,7 +301,7 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   flex-shrink: 0;
 }
 
-.theme-toggle,
+ .theme-toggle,
 .mobile-toggle {
   font-family: var(--font-body);
   font-weight: 600;
@@ -309,10 +309,11 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   letter-spacing: 0.01em;
   background: rgba(238, 247, 247, 0.92);
   backdrop-filter: blur(12px);
-   color: var(--clr-cyan);
+  color: var(--clr-cyan);
   padding: 0.42rem 0.75rem;
   cursor: pointer;
-  transition: background var(--transition-fast), color var(--transition-fast), border-color var(--transition-fast);
+  transition: background var(--transition-fast), color var(--transition-fast);
+  border: none;
 }
 
 body.dark-mode .theme-toggle,
@@ -320,14 +321,17 @@ body.dark-mode .mobile-toggle { background: rgba(1, 44, 44, 0.85); }
 
 .theme-toggle:hover { background: var(--clr-cyan); color: #fff; }
 
-.mobile-toggle {
-  border-color: var(--clr-magenta);
+ .mobile-toggle {
   color: var(--clr-magenta);
   display: none;
-  width: 42px; height: 42px;
-  align-items: center; justify-content: center;
-  padding: 0;
+  width: auto;
+  height: auto;
+  align-items: center;
+  justify-content: center;
+  padding: 8px 12px;
   font-size: 1.05rem;
+  border: none;
+  background: transparent;
 }
 
 .mobile-toggle:hover { background: var(--clr-magenta); color: #fff; }
