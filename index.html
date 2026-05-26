@@ -26,22 +26,22 @@
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link rel="preconnect" href="https://pagead2.googlesyndication.com">
 <link rel="preconnect" href="https://www.googletagmanager.com">
- <link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" as="style">
+<link rel="preload" href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" as="style">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" as="style">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" as="style">
 <link rel="preload" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" as="style">
- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css" media="print" onload="this.media='all'">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css" media="print" onload="this.media='all'">
 <noscript>
- <link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Playfair+Display:ital,wght@0,400;0,700;0,900;1,400&family=Inter:wght@300;400;500;600;700&family=DM+Mono:wght@400;500&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/fontawesome.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/solid.min.css">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/brands.min.css">
 </noscript>
 <style>
- :root {
+:root {
   --clr-deep-space: #eef7f7;
   --clr-cyan: #0ab5b5;
   --clr-magenta: #b8873a;
@@ -151,7 +151,7 @@ img { max-width: 100%; height: auto; }
 
 .skip-link:focus { top: 0.75rem; }
 
- .site-header {
+.site-header {
   position: fixed;
   top: 0; left: 0; right: 0;
   z-index: 100;
@@ -159,8 +159,9 @@ img { max-width: 100%; height: auto; }
   backdrop-filter: blur(22px);
   -webkit-backdrop-filter: blur(22px);
   border-bottom: 1px solid var(--clr-border-glow);
-  height: 60px;  
+  height: 60px;
   transition: box-shadow var(--transition-smooth);
+  overflow: visible;
 }
 
 body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
@@ -176,9 +177,10 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   padding: 0 24px;
   width: 100%;
   height: 60px;
+  overflow: visible;
 }
 
- .logo-link {
+.logo-link {
   font-family: var(--font-display);
   font-size: 1.25rem;
   font-weight: 700;
@@ -192,15 +194,30 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   line-height: 1;
   position: relative;
   overflow: visible;
+  z-index: 101;
 }
 
 .logo-link:hover { opacity: 0.88; }
 
-.logo-link img { height: 42px; max-height: 42px; width: auto; object-fit: contain; }
+.logo-link img {
+  height: 70px !important;
+  max-height: 70px !important;
+  width: auto;
+  max-width: 240px;
+  object-fit: contain;
+  display: block;
+  filter: drop-shadow(0 2px 8px rgba(0, 0, 0, 0.15));
+  transition: transform 0.2s ease, filter 0.2s ease;
+}
 
- .logo-icon {
-  width: 52px;
-  height: 52px;
+.logo-link img:hover {
+  transform: scale(1.02);
+  filter: drop-shadow(0 4px 12px rgba(10, 181, 181, 0.3));
+}
+
+.logo-icon {
+  width: 60px;
+  height: 60px;
   border-radius: 50%;
   background: var(--gradient-cyan);
   display: flex;
@@ -208,14 +225,14 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   justify-content: center;
   color: #fff;
   flex-shrink: 0;
-  font-size: 1.6rem;
-  box-shadow: 0 0 0 3px rgba(10, 181, 181, 0.3), 0 4px 12px rgba(0, 0, 0, 0.1);
+  font-size: 2rem;
+  box-shadow: 0 0 0 4px rgba(10, 181, 181, 0.3), 0 6px 16px rgba(0, 0, 0, 0.15);
   transition: all 0.2s ease;
 }
 
 .logo-icon:hover {
   transform: scale(1.05);
-  box-shadow: 0 0 0 4px rgba(10, 181, 181, 0.4), 0 6px 16px rgba(0, 0, 0, 0.15);
+  box-shadow: 0 0 0 5px rgba(10, 181, 181, 0.4), 0 8px 20px rgba(0, 0, 0, 0.2);
 }
 
 .logo-link span:not(.g-text) {
@@ -277,7 +294,7 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
 .main-nav a:hover,
 .main-nav a.active { color: var(--clr-white); }
 
- .nav-actions {
+.nav-actions {
   display: flex;
   gap: 0.5rem;
   align-items: center;
@@ -328,7 +345,7 @@ body.dark-mode .mobile-toggle { background: rgba(1, 44, 44, 0.85); }
   opacity: 0;
   overflow-x: hidden;
   overflow-y: auto;
-box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
 }
 
 body.dark-mode .mobile-nav-panel {
@@ -379,7 +396,7 @@ body.dark-mode .mobile-nav-panel {
 
 .mobile-close-btn:hover { background: var(--clr-magenta); color: #fff; }
 
- .mobile-nav-links {
+.mobile-nav-links {
   display: flex;
   flex-direction: column;
   gap: 0.75rem;
@@ -388,7 +405,7 @@ body.dark-mode .mobile-nav-panel {
   padding: 0.25rem 0;
 }
 
- .mobile-nav-links a {
+.mobile-nav-links a {
   padding: 0.9rem 1rem;
   color: var(--clr-text-dim);
   font-family: var(--font-body);
@@ -2228,6 +2245,11 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   .daily-fact-icon { width: 40px; height: 40px; font-size: 1.4rem; }
   .chat-window { width: 280px; height: 350px; }
   .team-scroll-container .card { min-width: 220px; max-width: 260px; }
+  .logo-link img {
+    height: 58px !important;
+    max-height: 58px !important;
+    max-width: 200px;
+  }
 }
 
 @media (min-width: 769px) {
@@ -2257,6 +2279,11 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   .chat-window { width: 260px; height: 320px; right: 0; }
   .team-scroll-container .card { min-width: 200px; max-width: 240px; }
   .section-title { font-size: clamp(1.3rem, 6vw, 1.75rem); }
+  .logo-link img {
+    height: 52px !important;
+    max-height: 52px !important;
+    max-width: 180px;
+  }
 }
 
 @media (prefers-reduced-motion: reduce) {
@@ -2271,26 +2298,26 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
- <header class="site-header" id="site-header">
+<header class="site-header" id="site-header">
 <div class="header-container">
 <a href="/" class="logo-link" aria-label="AliverBiopharm Home">
-<div class="logo-icon">...</div>
+<div class="logo-icon">🧬</div>
 Aliver<span class="g-text">Biopharm</span>
 </a>
 <nav aria-label="Main navigation">
 <ul class="main-nav" id="main-nav">
-<li><a href="/">...</a></li>
-<li><a href="#courses">...</a></li>
-<li><a href="#contact">...</a></li>
+<li><a href="/">Home</a></li>
+<li><a href="#courses">Courses</a></li>
+<li><a href="#contact">Contact</a></li>
 </ul>
 </nav>
-</div>
 <div class="nav-actions">
 <button class="theme-toggle" id="theme-toggle" aria-label="Toggle dark mode"><i class="fa-solid fa-moon" aria-hidden="true"></i></button>
 <button class="mobile-toggle" id="mobile-toggle" aria-label="Open menu" aria-expanded="false"><i class="fa-solid fa-bars" aria-hidden="true"></i></button>
 </div>
+</div>
 </header>
- <div class="mobile-nav-panel" id="mobile-nav-panel" aria-hidden="true">
+<div class="mobile-nav-panel" id="mobile-nav-panel" aria-hidden="true">
 <div class="mobile-nav-panel-inner">
 <div class="mobile-nav-header">
 <div class="mobile-nav-header-row">
@@ -2320,11 +2347,11 @@ Aliver<span class="g-text">Biopharm</span>
 <div class="mood-section">
 <h3 style="text-align:center;color:var(--clr-white);margin-bottom:.5rem;"><i class="fa-solid fa-face-smile" style="color:var(--clr-magenta);"></i> How are you feeling about your studies?</h3>
 <div class="mood-emojis" id="mood-emojis">
-<button class="mood-emoji" data-mood="struggling" title="Struggling">&#128553;</button>
-<button class="mood-emoji" data-mood="confused" title="Confused">&#129300;</button>
-<button class="mood-emoji" data-mood="okay" title="Okay">&#128528;</button>
-<button class="mood-emoji" data-mood="good" title="Good">&#128522;</button>
-<button class="mood-emoji" data-mood="great" title="Great!">&#128640;</button>
+<button class="mood-emoji" data-mood="struggling" title="Struggling">😭</button>
+<button class="mood-emoji" data-mood="confused" title="Confused">🤔</button>
+<button class="mood-emoji" data-mood="okay" title="Okay">😐</button>
+<button class="mood-emoji" data-mood="good" title="Good">😊</button>
+<button class="mood-emoji" data-mood="great" title="Great!">🚀</button>
 </div>
 <div id="mood-message-form" style="display:none;text-align:center;">
 <textarea id="mood-message" placeholder="Tell us more (optional)..." style="width:100%;max-width:400px;padding:8px;border-radius:10px;border:1px solid var(--clr-border-glow);background:rgba(10,181,181,.05);color:var(--clr-white);resize:vertical;min-height:60px;font-family:var(--font-body);font-size:.85rem;"></textarea>
@@ -2399,7 +2426,7 @@ Aliver<span class="g-text">Biopharm</span>
 <button style="margin-left:auto;" class="shuffle-btn" id="shuffle-btn"><i class="fa-solid fa-shuffle"></i> Shuffle</button>
 </div>
 <div id="flashcards-container"></div>
-<p class="keyboard-hint"><i class="fa-regular fa-keyboard"></i> Keyboard: &#8592; &#8594; navigate | Space flip | 1-3 rate difficulty</p>
+<p class="keyboard-hint"><i class="fa-regular fa-keyboard"></i> Keyboard: ← → navigate | Space flip | 1-3 rate difficulty</p>
 </section>
 <section id="community" class="section alt-bg reveal" aria-label="Community stream">
 <span class="sec-label">COMMUNITY</span>
@@ -2504,7 +2531,7 @@ Aliver<span class="g-text">Biopharm</span>
 <div id="resource-modal-content"></div>
 </div>
 </div>
- <script>
+<script>
 const API_BASE = '/api/query';
 let currentUser = null;
 let currentAudio = null;
@@ -3485,7 +3512,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const applyLogo = function(selector) {
           const el = document.querySelector(selector);
           if (el) {
-            el.innerHTML = '<img src="' + esc(logoUrl) + '" alt="AliverBiopharm" style="height:38px;width:auto;max-width:60vw;object-fit:contain;display:block;" onerror="this.parentElement.innerHTML=\'<div class=\\"logo-icon\\" aria-hidden=\\"true\\"><svg width=\\"18\\" height=\\"18\\" fill=\\"none\\" stroke=\\"#fff\\" stroke-width=\\"2\\" viewBox=\\"0 0 24 24\\"><path stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" d=\\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082\\"/></svg></div>Aliver<span class=\\"g-text\\">Biopharm</span>\';">';
+            el.innerHTML = '<img src="' + esc(logoUrl) + '" alt="AliverBiopharm" style="height:70px;width:auto;max-width:260px;object-fit:contain;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15));" onerror="this.parentElement.innerHTML=\'<div class=\\"logo-icon\\" aria-hidden=\\"true\\"><svg width=\\"28\\" height=\\"28\\" fill=\\"none\\" stroke=\\"#fff\\" stroke-width=\\"2\\" viewBox=\\"0 0 24 24\\"><path stroke-linecap=\\"round\\" stroke-linejoin=\\"round\\" d=\\"M9.75 3.104v5.714a2.25 2.25 0 01-.659 1.591L5 14.5M9.75 3.104c-.251.023-.501.05-.75.082m.75-.082a24.301 24.301 0 014.5 0m0 0v5.714c0 .597.237 1.17.659 1.591L19.8 15M14.25 3.104c.251.023.501.05.75.082\\"/></svg></div>Aliver<span class=\\"g-text\\">Biopharm</span>\';">';
           }
         };
         applyLogo('.site-header .logo-link');
