@@ -4189,53 +4189,6 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
-
- (function () {
-  let currentY = window.scrollY;
-  let targetY = window.scrollY;
-  let isAnimating = false;
-
-  const ease = 0.08; 
-  const wheelMultiplier = 0.9;
-
-  function animateScroll() {
-    isAnimating = true;
-
-    const diff = targetY - currentY;
-
-    currentY += diff * ease;
-
-    if (Math.abs(diff) < 0.5) {
-      currentY = targetY;
-      isAnimating = false;
-      return;
-    }
-
-    window.scrollTo(0, currentY);
-
-    requestAnimationFrame(animateScroll);
-  }
-
-  window.addEventListener(
-    "wheel",
-    function (e) {
-      e.preventDefault();
-
-      targetY += e.deltaY * wheelMultiplier;
-
-      const maxScroll =
-        document.documentElement.scrollHeight - window.innerHeight;
-
-      targetY = Math.max(0, Math.min(targetY, maxScroll));
-
-      if (!isAnimating) {
-        requestAnimationFrame(animateScroll);
-      }
-    },
-    { passive: false }
-  );
-
-})();
 </script>
 </body>
 </html>
