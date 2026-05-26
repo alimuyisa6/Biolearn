@@ -4190,48 +4190,51 @@ async function loadContinueLearning() {
   window.speechSynthesis.getVoices();
 }
 
- (function() {
-  let lastScrollTime = 0;
-  let scrollVelocity = 0;
-  
-  window.addEventListener('wheel', function(e) {
-    const now = Date.now();
-    const timeDiff = now - lastScrollTime;
-    
-    if (timeDiff < 100) {
-      scrollVelocity = e.deltaY * 1.2;
-    } else {
-      scrollVelocity = e.deltaY;
+ (function () {
+  let currentY = window.scrollY;
+  let targetY = window.scrollY;
+  let isAnimating = false;
+
+  const ease = 0.08; 
+  const wheelMultiplier = 0.9;
+
+  function animateScroll() {
+    isAnimating = true;
+
+    const diff = targetY - currentY;
+
+    currentY += diff * ease;
+
+    if (Math.abs(diff) < 0.5) {
+      currentY = targetY;
+      isAnimating = false;
+      return;
     }
-    
-    lastScrollTime = now;
-    
-    let scrollAmount = e.deltaY;
-    if (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 10) {
-      scrollAmount = e.deltaY * 2;
-    }
-    
-    window.scrollBy({
-      top: scrollAmount,
-      behavior: 'smooth'
-    });
-    
-  }, { passive: false });
-  
-  let touchStartY = 0;
-  window.addEventListener('touchstart', function(e) {
-    touchStartY = e.touches[0].clientY;
-  });
-  
-  window.addEventListener('touchmove', function(e) {
-    const deltaY = touchStartY - e.touches[0].clientY;
-    window.scrollBy({
-      top: deltaY * 1.5,
-      behavior: 'smooth'
-    });
-    touchStartY = e.touches[0].clientY;
-  });
-  
+
+    window.scrollTo(0, currentY);
+
+    requestAnimationFrame(animateScroll);
+  }
+
+  window.addEventListener(
+    "wheel",
+    function (e) {
+      e.preventDefault();
+
+      targetY += e.deltaY * wheelMultiplier;
+
+      const maxScroll =
+        document.documentElement.scrollHeight - window.innerHeight;
+
+      targetY = Math.max(0, Math.min(targetY, maxScroll));
+
+      if (!isAnimating) {
+        requestAnimationFrame(animateScroll);
+      }
+    },
+    { passive: false }
+  );
+
 })();
 </script>
 </body>
