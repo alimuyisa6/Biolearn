@@ -2598,12 +2598,12 @@ async function apiCall(action, params) {
   }
 }
 
-function updateMobilePanel(links) {
+ function updateMobilePanel(links) {
   const nav = document.getElementById('mobile-nav-links');
   const footer = document.getElementById('mobile-nav-footer');
   if (!nav || !footer) return;
   nav.innerHTML = (links || []).map(function(l) {
-    return '<a href="' + esc(l.href) + '"><i class="fa-solid fa-chevron-right" aria-hidden="true"></i> ' + esc(l.label) + '</a>';
+    return '<a href="' + esc(l.href) + '">' + esc(l.label) + '</a>';
   }).join('');
 }
 
