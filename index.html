@@ -349,8 +349,14 @@ body.dark-mode .mobile-toggle { background: rgba(1, 44, 44, 0.85); }
   overflow-y: auto;
   border-radius: 20px;
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
+  visibility: hidden;
 }
 
+.mobile-nav-panel.active {
+  right: 0;
+  opacity: 1;
+  visibility: visible;
+}
 body.dark-mode .mobile-nav-panel {
   background: linear-gradient(160deg, #012c2c 0%, #013d3d 45%, #025252 100%);
 }
