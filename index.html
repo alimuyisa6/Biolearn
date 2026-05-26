@@ -1599,9 +1599,11 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   box-shadow: 0 12px 32px rgba(184,135,58,0.08);
 }
 
-.flashcard-face {
-  position: relative; width: 100%;
-  min-height: 200px; max-height: 350px;
+ .flashcard-face {
+  position: relative;
+  width: 100%;
+  min-height: 280px;
+  height: auto;
   border-radius: 14px;
   border: 1.5px solid var(--clr-cyan);
   cursor: pointer;
@@ -1625,22 +1627,41 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   display: flex; flex-direction: column;
 }
 
-.flashcard-face .front { justify-content: flex-start; align-items: stretch; }
+ .flashcard-face .front {
+  justify-content: flex-start;
+  align-items: stretch;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+}
 
 .flashcard-face .front.no-image { justify-content: center; align-items: center; padding: 16px; }
 
-.flashcard-image-wrap {
-  width: 100%; max-height: 120px;
-  flex-shrink: 0; overflow: hidden;
+ .flashcard-image-wrap {
+  width: 100%;
+  height: 40%;
+  flex-shrink: 0;
+  overflow: hidden;
   border-bottom: 1px solid var(--clr-border-glow);
   background: rgba(0,0,0,0.04);
+  position: relative;
 }
 
-.flashcard-image-wrap img { width: 100%; height: 100%; max-height: 120px; object-fit: contain; display: block; }
+ .flashcard-image-wrap img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 0;
+}
 
-.flashcard-question {
-  flex: 1;
-  display: flex; align-items: center; justify-content: center;
+ .flashcard-question {
+  height: 60%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   padding: 14px;
   text-align: center;
   font-family: var(--font-body);
@@ -1651,11 +1672,12 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   color: var(--clr-white);
   overflow-wrap: break-word;
   word-break: break-word;
+  flex-shrink: 0;
 }
 
 .flashcard-question strong { font-weight: 800; }
 
-.flashcard-face .back {
+ .flashcard-face .back {
   transform: rotateY(180deg);
   padding: 16px;
   overflow-y: auto;
@@ -1668,6 +1690,21 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   line-height: var(--lh-relaxed);
   letter-spacing: var(--ls-normal);
   color: var(--clr-text-dim);
+  scrollbar-width: thin;
+}
+
+.flashcard-face .back::-webkit-scrollbar {
+  width: 5px;
+}
+
+.flashcard-face .back::-webkit-scrollbar-track {
+  background: var(--clr-border-glow);
+  border-radius: 10px;
+}
+
+.flashcard-face .back::-webkit-scrollbar-thumb {
+  background: var(--clr-cyan);
+  border-radius: 10px;
 }
 
 .flashcard-face .back::-webkit-scrollbar { width: 4px; }
