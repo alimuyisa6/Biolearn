@@ -2775,6 +2775,50 @@ function playAudio(btn, url) {
   audio.onerror = function() { btn.classList.remove('playing'); currentAudio = null; };
 }
 
+function speakText(text, btn) {
+  if (window.speechSynthesis) {
+    window.speechSynthesis.cancel();
+  }
+
+  document.querySelectorAll('.audio-btn.playing').forEach(b => 
+    b.classList.remove('playing')
+  );
+
+  if (btn) btn.classList.add('playing');
+
+  const cleanText = text.replace(/<[^>]*>/g, '').trim();
+
+  const utterance = new SpeechSynthesisUtterance(cleanText);
+  utterance.rate = 0.85;
+  utterance.pitch = 1.0;
+  utterance.volume = 1;
+
+  const voices = window.speechSynthesis.getVoices();
+
+  const preferredVoice = voices.find(voice =>
+    voice.lang === 'en-US' &&
+    (
+      voice.name.includes('Google') ||
+      voice.name.includes('Samantha') ||
+      voice.name.includes('Female')
+    )
+  );
+
+  if (preferredVoice) {
+    utterance.voice = preferredVoice;
+  }
+
+  utterance.onend = function () {
+    if (btn) btn.classList.remove('playing');
+  };
+
+  utterance.onerror = function () {
+    if (btn) btn.classList.remove('playing');
+  };
+
+  window.speechSynthesis.speak(utterance);
+}
+
 async function apiCall(action, params) {
   params = params || {};
   const controller = new AbortController();
@@ -3438,7 +3482,7 @@ function renderFlashcardHTML(card, isKnown, hasImage, deckName, cardIndex) {
     '<div class="front' + (hasImage ? '' : ' no-image') + '">' +
     (hasImage ? '<div class="flashcard-image-wrap"><img src="' + esc(card.image_url) + '" alt="' + esc(card.front_text || 'Flashcard image') + '" loading="lazy" onerror="this.onerror=null;this.parentElement.style.display=\'none\';this.closest(\'.front\').classList.add(\'no-image\');"></div>' : '') +
     '<div class="flashcard-question"><strong>' + esc(card.front_text || 'No question') + '</strong>' +
-    (card.audio_url ? ' <button class="audio-btn" onclick="event.stopPropagation();playAudio(this,\'' + esc(card.audio_url) + '\')" title="Play pronunciation"><i class="fa-solid fa-volume-high"></i></button>' : '') +
+    (card.audio_url ? ' <button class="audio-btn" onclick="event.stopPropagation();speakText(\'' + esc(card.front_text || card.back_text || 'No text').replace(/'/g, "\\'") + '\', this)" title="Pronounce term"><i class="fa-solid fa-volume-high"></i></button>': '') +
     '</div></div>' +
     '<div class="back">' + esc(card.back_text || 'No answer available.') + '</div></div>' +
     (mode === 'quiz' ? '<div class="quiz-input-container" data-card-id="' + card.id + '"><input type="text" class="quiz-answer-input" placeholder="Type your answer..." data-card-id="' + card.id + '"><button class="quiz-check-btn" onclick="checkQuizAnswer(\'' + card.id + '\', this.previousElementSibling)"><i class="fa-solid fa-check"></i></button></div><div class="quiz-result" id="quiz-result-' + card.id + '" style="display:none;"></div>' : '') +
