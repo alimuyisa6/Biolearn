@@ -1,7 +1,8 @@
- {
+{
   "name": "aliverbiopharm",
   "version": "1.0.0",
   "dependencies": {
-    "@supabase/supabase-js": "^2.39.0"
+    "@supabase/supabase-js": "^2.39.0",
+    "@vercel/analytics": "^2.0.1"
   }
 }
