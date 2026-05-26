@@ -3791,7 +3791,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         const pricingGrid = document.getElementById('pricing-grid');
         if (pricingGrid) {
           pricingGrid.innerHTML = sections.pricing.plans.map(function(pl) {
-            return '<div class="card pricing-card' + (pl.featured ? ' featured' : '') + '"><h3>' + esc(pl.name) + '</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">' + esc(pl.description || '') + '</p><div class="price my-3">' + esc(pl.price) + '<span style="font-size:1rem;color:var(--clr-text-dim);">' + esc(pl.period || '') + '</span></div><ul class="pricing-features">' + (pl.features || []).map(function(f) { return '<li><i class="fa-solid fa-check"></i> ' + esc(f) + '</li>'; }).join('') + '</ul><button class="btn-primary w-full justify-center mt-4">' + esc(pl.cta_text || 'Subscribe') + '</button></div>';
+             return '<div class="card pricing-card' + (pl.featured ? ' featured' : '') + '"><h3>' + esc(pl.name) + '</h3><p style="font-size:0.84rem;color:var(--clr-text-dim);">' + esc(pl.description || '') + '</p><div class="price my-3">' + esc(pl.price) + '<span style="font-size:1rem;color:var(--clr-text-dim);">' + esc(pl.period || '') + '</span></div><ul class="pricing-features">' + (pl.features || []).map(function(f) { return '<li><i class="fa-solid fa-check"></i> ' + esc(f) + '</li>'; }).join('') + '</ul><button class="btn-primary mt-4" style="width:auto; display:inline-flex; margin-left:auto; margin-right:auto;">' + esc(pl.cta_text || 'Subscribe') + '</button></div>';
           }).join('');
         }
       } else {
