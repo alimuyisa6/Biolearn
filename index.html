@@ -648,13 +648,14 @@ body.dark-mode .mobile-nav-panel {
 
 .carousel-next { right: 1.5rem; }
 
-.btn-primary {
+ .btn-primary {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.55rem;
   background: var(--gradient-magenta);
   color: #fff;
-  padding: 14px 34px;
+  padding: 10px 20px;
   border-radius: 50px;
   font-family: var(--font-body);
   font-weight: 700;
@@ -666,6 +667,8 @@ body.dark-mode .mobile-nav-panel {
   box-shadow: var(--shadow-magenta);
   transition: transform var(--transition-fast), box-shadow var(--transition-fast);
   line-height: 1;
+  width: auto;
+  min-width: auto;
 }
 
 .btn-primary:hover {
