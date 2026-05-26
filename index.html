@@ -3457,7 +3457,7 @@ function renderFlashcardHTML(card, isKnown, hasImage, deckName, cardIndex) {
     '<div class="front' + (hasImage ? '' : ' no-image') + '">' +
     (hasImage ? '<div class="flashcard-image-wrap"><img src="' + esc(card.image_url) + '" alt="' + esc(card.front_text || 'Flashcard image') + '" loading="lazy" onerror="this.onerror=null;this.parentElement.style.display=\'none\';this.closest(\'.front\').classList.add(\'no-image\');"></div>' : '') +
     '<div class="flashcard-question"><strong>' + esc(card.front_text || 'No question') + '</strong>' +
-    ' <button class="audio-btn" onclick="event.stopPropagation();speakText(\'' + esc(card.front_text || card.back_text || 'No text').replace(/'/g, "\\'") + '\', this)" title="Pronounce term"><i class="fa-solid fa-volume-high"></i></button>': '') +
+   card.audio_url? ' <button class="audio-btn" onclick="event.stopPropagation();speakText(\'' + esc(card.front_text || card.back_text || 'No text').replace(/'/g, "\\'") + '\', this)" title="Pronounce term"><i class="fa-solid fa-volume-high"></i></button>': '') +
     '</div></div>' +
     '<div class="back">' + esc(card.back_text || 'No answer available.') + '</div></div>' +
     (mode === 'quiz' ? '<div class="quiz-input-container" data-card-id="' + card.id + '"><input type="text" class="quiz-answer-input" placeholder="Type your answer..." data-card-id="' + card.id + '"><button class="quiz-check-btn" onclick="checkQuizAnswer(\'' + card.id + '\', this.previousElementSibling)"><i class="fa-solid fa-check"></i></button></div><div class="quiz-result" id="quiz-result-' + card.id + '" style="display:none;"></div>' : '') +
