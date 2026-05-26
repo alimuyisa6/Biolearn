@@ -4191,46 +4191,46 @@ async function loadContinueLearning() {
 }
 
  (function() {
-  let isScrolling = false;
-  let scrollTimeout;
-  
-  document.documentElement.style.scrollBehavior = 'smooth';
-  document.body.style.overflow = 'auto';
+  let lastScrollTime = 0;
+  let scrollVelocity = 0;
   
   window.addEventListener('wheel', function(e) {
-    e.preventDefault();
+    const now = Date.now();
+    const timeDiff = now - lastScrollTime;
     
-    if (scrollTimeout) clearTimeout(scrollTimeout);
+    if (timeDiff < 100) {
+      scrollVelocity = e.deltaY * 1.2;
+    } else {
+      scrollVelocity = e.deltaY;
+    }
     
-    let delta = e.deltaY;
-    if (Math.abs(delta) < 1) delta = delta * 10;
+    lastScrollTime = now;
+    
+    let scrollAmount = e.deltaY;
+    if (Math.abs(e.deltaY) > 0 && Math.abs(e.deltaY) < 10) {
+      scrollAmount = e.deltaY * 2;
+    }
     
     window.scrollBy({
-      top: delta,
+      top: scrollAmount,
       behavior: 'smooth'
     });
-    
-    isScrolling = true;
-    scrollTimeout = setTimeout(function() {
-      isScrolling = false;
-    }, 50);
     
   }, { passive: false });
   
   let touchStartY = 0;
   window.addEventListener('touchstart', function(e) {
     touchStartY = e.touches[0].clientY;
-  }, { passive: false });
+  });
   
   window.addEventListener('touchmove', function(e) {
-    e.preventDefault();
     const deltaY = touchStartY - e.touches[0].clientY;
     window.scrollBy({
-      top: deltaY,
+      top: deltaY * 1.5,
       behavior: 'smooth'
     });
     touchStartY = e.touches[0].clientY;
-  }, { passive: false });
+  });
   
 })();
 </script>
