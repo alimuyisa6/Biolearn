@@ -334,17 +334,22 @@ body.dark-mode .mobile-toggle { background: rgba(1, 44, 44, 0.85); }
 
 .mobile-toggle:hover { background: var(--clr-magenta); color: #fff; }
 
-.mobile-nav-panel {
+ .mobile-nav-panel {
   position: fixed;
-  top: 0; right: -100%;
-  width: 85%; max-width: 350px;
-  height: 100vh; height: 100dvh;
+  top: 20%;
+  bottom: 20%;
+  right: -100%;
+  left: 10%;
+  width: auto;
+  height: auto;
+  max-width: none;
   background: linear-gradient(160deg, #eef7f7 0%, #d4fafa 45%, #b8f5f5 100%);
   z-index: 200;
   transition: right 0.4s, opacity 0.3s;
   opacity: 0;
   overflow-x: hidden;
   overflow-y: auto;
+  border-radius: 20px;
   box-shadow: -5px 0 25px rgba(0, 0, 0, 0.15);
 }
 
