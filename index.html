@@ -4186,9 +4186,42 @@ async function loadContinueLearning() {
   } catch (e) { currentUser = null; updateAuthUI(); }
 }, 30 * 60 * 1000);
 
- if ('speechSynthesis' in window) {
+  if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
+
+(function() {
+  let scrollTimeout;
+  let isScrolling = false;
+  document.documentElement.style.scrollBehavior = 'smooth';
+  window.addEventListener('wheel', function(e) {
+    if (scrollTimeout) clearTimeout(scrollTimeout);
+    if (!isScrolling) {
+      document.documentElement.style.scrollBehavior = 'smooth';
+      isScrolling = true;
+    }
+    scrollTimeout = setTimeout(function() {
+      isScrolling = false;
+    }, 200);
+  }, { passive: false });
+  let touchStartY = 0;
+  let touchStartTime = 0;
+  window.addEventListener('touchstart', function(e) {
+    touchStartY = e.touches[0].clientY;
+    touchStartTime = Date.now();
+  }, { passive: true });
+  window.addEventListener('touchend', function(e) {
+    const touchEndY = e.changedTouches[0].clientY;
+    const deltaY = touchStartY - touchEndY;
+    const deltaTime = Date.now() - touchStartTime;
+    const velocity = Math.abs(deltaY / deltaTime);
+    if (velocity > 0.3 && Math.abs(deltaY) > 10) {
+      const momentum = deltaY * 1.5;
+      window.scrollBy({ top: momentum, behavior: 'smooth' });
+    }
+  }, { passive: true });
+})();
+
 </script>
 </body>
 </html>
