@@ -662,98 +662,7 @@ async function handleGet(req, res) {
   result = { pdfs: data || [] };
   break;
 }
-
-case 'check_pdf_restriction': {
-  const pdfId = req.body.pdf_id;
-  const restrictionType = req.body.restriction_type;
-  let userId = null;
-  if (token) {
-    const session = await validateSession(token);
-    if (session) userId = session.user_id;
-  }
-  if (!userId) {
-    result = { is_restricted: false };
-    break;
-  }
-  const { data, error } = await supabase
-    .from('pdf_user_restrictions')
-    .select('is_restricted, restriction_reason, expires_at')
-    .eq('user_id', userId)
-    .eq('pdf_id', pdfId)
-    .eq('restriction_type', restrictionType)
-    .gt('expires_at', new Date().toISOString())
-    .maybeSingle();
-  if (error && error.code !== 'PGRST116') throw error;
-  if (data && data.is_restricted) {
-    result = { is_restricted: true, reason: data.restriction_reason || 'Restricted by administrator' };
-  } else {
-    result = { is_restricted: false };
-  }
-  break;
-}
-
-case 'track_pdf_preview': {
-  const pdfId = req.body.pdf_id;
-  let userId = null;
-  if (token) {
-    const session = await validateSession(token);
-    if (session) userId = session.user_id;
-  }
-  if (!userId) return res.status(401).json({ error: 'Authentication required' });
-  const { data: current } = await supabase
-    .from('pdf_resources')
-    .select('preview_count')
-    .eq('id', pdfId)
-    .single();
-  if (current) {
-    await supabase
-      .from('pdf_resources')
-      .update({ preview_count: (current.preview_count || 0) + 1 })
-      .eq('id', pdfId);
-  }
-  await supabase
-    .from('user_interactions')
-    .insert({
-      user_id: userId,
-      interaction_type: 'view',
-      resource_id: pdfId,
-      metadata: { pdf_id: pdfId, action: 'preview' }
-    });
-  result = { success: true };
-  break;
-}
-
-case 'track_pdf_download': {
-  const pdfId = req.body.pdf_id;
-  let userId = null;
-  if (token) {
-    const session = await validateSession(token);
-    if (session) userId = session.user_id;
-  }
-  if (!userId) return res.status(401).json({ error: 'Authentication required' });
-  const { data: current } = await supabase
-    .from('pdf_resources')
-    .select('download_count')
-    .eq('id', pdfId)
-    .single();
-  if (current) {
-    await supabase
-      .from('pdf_resources')
-      .update({ download_count: (current.download_count || 0) + 1 })
-      .eq('id', pdfId);
-  }
-  await supabase
-    .from('user_interactions')
-    .insert({
-      user_id: userId,
-      interaction_type: 'download',
-      resource_id: pdfId,
-      metadata: { pdf_id: pdfId, action: 'download' }
-    });
-  result = { success: true };
-  break;
-}
-     default: result = null;
+default: result = null;
     }
     if (action !== 'get_quiz' && action !== 'get_user_progress' && action !== 'get_app_features') setCachedResponse(cacheKey, result);
     return res.status(200).json(result);
@@ -1836,6 +1745,87 @@ async function handlePost(req, res) {
         result = { block_number: bn, questions: (data || []).sort(() => Math.random() - 0.5), total_in_block: (data || []).length };
         break;
       }
+      case 'check_pdf_restriction': {
+  const pdfId = req.body.pdf_id;
+  const restrictionType = req.body.restriction_type;
+  if (!pdfId || !restrictionType) {
+    return res.status(400).json({ error: 'pdf_id and restriction_type required' });
+  }
+  let targetUserId = userId;
+  if (!targetUserId) {
+    result = { is_restricted: false };
+    break;
+  }
+  const { data, error } = await supabase
+    .from('pdf_user_restrictions')
+    .select('is_restricted, restriction_reason, expires_at')
+    .eq('user_id', targetUserId)
+    .eq('pdf_id', pdfId)
+    .eq('restriction_type', restrictionType)
+    .gt('expires_at', new Date().toISOString())
+    .maybeSingle();
+  if (error && error.code !== 'PGRST116') throw error;
+  if (data && data.is_restricted) {
+    result = { is_restricted: true, reason: data.restriction_reason || 'Restricted by administrator' };
+  } else {
+    result = { is_restricted: false };
+  }
+  break;
+}
+
+case 'track_pdf_preview': {
+  const pdfId = req.body.pdf_id;
+  if (!pdfId) return res.status(400).json({ error: 'pdf_id required' });
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const { data: current } = await supabase
+    .from('pdf_resources')
+    .select('preview_count')
+    .eq('id', pdfId)
+    .single();
+  if (current) {
+    await supabase
+      .from('pdf_resources')
+      .update({ preview_count: (current.preview_count || 0) + 1 })
+      .eq('id', pdfId);
+  }
+  await supabase
+    .from('user_interactions')
+    .insert({
+      user_id: userId,
+      interaction_type: 'view',
+      resource_id: pdfId,
+      metadata: { pdf_id: pdfId, action: 'preview' }
+    });
+  result = { success: true };
+  break;
+}
+
+case 'track_pdf_download': {
+  const pdfId = req.body.pdf_id;
+  if (!pdfId) return res.status(400).json({ error: 'pdf_id required' });
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const { data: current } = await supabase
+    .from('pdf_resources')
+    .select('download_count')
+    .eq('id', pdfId)
+    .single();
+  if (current) {
+    await supabase
+      .from('pdf_resources')
+      .update({ download_count: (current.download_count || 0) + 1 })
+      .eq('id', pdfId);
+  }
+  await supabase
+    .from('user_interactions')
+    .insert({
+      user_id: userId,
+      interaction_type: 'download',
+      resource_id: pdfId,
+      metadata: { pdf_id: pdfId, action: 'download' }
+    });
+  result = { success: true };
+  break;
+}
       default: throw new Error('Unknown action: ' + action);
     }
     responseCache.delete('all_sections'); responseCache.delete('stats');
