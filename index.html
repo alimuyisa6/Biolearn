@@ -2861,6 +2861,94 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   z-index: 1;
   pointer-events: none;
 }
+
+.dynamic-hero-container {
+  text-align: center;
+  margin: 0 auto 1rem;
+  max-width: 1200px;
+}
+
+.dynamic-main-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(4rem, 12vw, 9rem);
+  font-weight: 900;
+  line-height: 1;
+  letter-spacing: -0.03em;
+  margin-bottom: 1.5rem;
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.3em;
+}
+
+.title-word {
+  display: inline-block;
+}
+
+.magenta-word {
+  background: linear-gradient(135deg, #b8873a, #e2c06a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.cyan-word {
+  background: linear-gradient(135deg, #0ab5b5, #0e7070);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.title-sub-line {
+  display: flex;
+  flex-wrap: wrap;
+  justify-content: center;
+  gap: 0.8rem 2rem;
+  margin-top: 1rem;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: clamp(1.2rem, 4vw, 2.2rem);
+  letter-spacing: -0.01em;
+}
+
+.sub-word {
+  display: inline-block;
+  color: var(--clr-white);
+}
+
+.sub-word.magenta-word {
+  background: linear-gradient(135deg, #b8873a, #e2c06a);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+.sub-word.cyan-word {
+  background: linear-gradient(135deg, #0ab5b5, #0e7070);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+}
+
+@media (max-width: 768px) {
+  .dynamic-main-title {
+    gap: 0.15em;
+    margin-bottom: 1rem;
+  }
+  .title-sub-line {
+    gap: 0.4rem 1rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .dynamic-main-title {
+    flex-direction: column;
+    gap: 0;
+  }
+  .dynamic-main-title .title-word {
+    margin: 0;
+  }
+}
  </style>
 </head>
 <body>
@@ -2909,6 +2997,23 @@ Aliver<span class="g-text">Biopharm</span>
 </div>
 </div>
 </section>
+ <section id="hero-title-section" class="section reveal" style="padding-top:20px;padding-bottom:0;" aria-label="AliverBiopharm Hero Title">
+  <div class="dynamic-hero-container" id="dynamic-hero-container">
+    <h1 class="dynamic-main-title" id="dynamic-main-title">
+      <span class="title-word magenta-word">Aliver</span>
+      <span class="title-word cyan-word">Biopharm</span>
+    </h1>
+    <div class="title-sub-line" id="title-sub-line">
+      <span class="sub-word">Advanced</span>
+      <span class="sub-word">Biology</span>
+      <span class="sub-word magenta-word">&</span>
+      <span class="sub-word cyan-word">Pharmacy</span>
+      <span class="sub-word">Learning</span>
+      <span class="sub-word">Platform</span>
+    </div>
+  </div>
+</section>
+
 <section id="daily-fact" class="section reveal" style="padding-top:30px;padding-bottom:30px;" aria-label="Daily fact and weekly challenge"></section>
 <section id="mood-check" class="section reveal" style="padding-top:20px;padding-bottom:20px;" aria-label="How are you feeling?">
 <div class="mood-section">
@@ -3698,6 +3803,42 @@ async function loadDailyAndWeekly(sections) {
 let flashcardState = { mode: 'study', currentDeck: null, currentCardIndex: 0, decks: {}, selectedLevel: '', shuffledDecks: {}, quizAnswered: false, deckProgress: {} };
 let selectedMood = null;
 
+async function loadDynamicHeroTitle() {
+  const titleContainer = document.getElementById('dynamic-hero-container');
+  if (!titleContainer) return;
+  
+  try {
+    const sections = await apiCall('get_all_site_sections');
+    if (sections && sections.hero_title) {
+      const heroData = sections.hero_title;
+      const mainTitle = heroData.main_title || 'Aliver Biopharm';
+      const subLine = heroData.sub_line || 'Advanced Biology & Pharmacy Learning Platform';
+      
+      const words = mainTitle.split(' ');
+      const titleHtml = words.map((word, index) => {
+        const isMagenta = index % 2 === 0;
+        return `<span class="title-word ${isMagenta ? 'magenta-word' : 'cyan-word'}">${esc(word)}</span>`;
+      }).join('');
+      
+      document.getElementById('dynamic-main-title').innerHTML = titleHtml;
+      
+      const subWords = subLine.split(' ');
+      const subHtml = subWords.map((word, index) => {
+        if (word.toLowerCase() === '&') {
+          return `<span class="sub-word magenta-word">${esc(word)}</span>`;
+        } else if (word.toLowerCase() === 'biology' || word.toLowerCase() === 'pharmacy') {
+          return `<span class="sub-word cyan-word">${esc(word)}</span>`;
+        }
+        return `<span class="sub-word">${esc(word)}</span>`;
+      }).join(' ');
+      
+      document.getElementById('title-sub-line').innerHTML = subHtml;
+    }
+  } catch (err) {
+    console.error('Failed to load dynamic hero title:', err);
+  }
+}
+
 function getCurrentDeckCards() {
   const deckName = flashcardState.currentDeck;
   if (!deckName) return null;
@@ -4106,7 +4247,8 @@ document.addEventListener('DOMContentLoaded', async function() {
         applyLogo('.footer-fat .logo-link');
       }
       loadDailyAndWeekly(sections);
-      if (sections.navigation) {
+     loadDynamicHeroTitle(); 
+ if (sections.navigation) {
         const links = sections.navigation.links || [];
         const mainNav = document.getElementById('main-nav');
         if (mainNav) {
