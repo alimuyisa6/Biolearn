@@ -2714,6 +2714,324 @@ margin-bottom; -20px;
     scroll-behavior: auto !important;
   }
 }
+.butterfly-section {
+  position: relative;
+  overflow: hidden;
+  perspective: 1800px;
+}
+
+.butterfly-section .section-content {
+  position: relative;
+  z-index: 2;
+  transform-origin: center center;
+  transition: transform 1s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.8s ease;
+}
+
+.butterfly-section .wing-left,
+.butterfly-section .wing-right {
+  position: absolute;
+  top: 0;
+  width: 52%;
+  height: 100%;
+  z-index: 1;
+  pointer-events: none;
+  transition: transform 1.2s cubic-bezier(0.34, 1.56, 0.64, 1);
+}
+
+.butterfly-section .wing-left {
+  left: 0;
+  transform-origin: right center;
+  transform: rotateY(95deg);
+  background: linear-gradient(135deg, 
+    rgba(10, 181, 181, 0.6) 0%, 
+    rgba(10, 181, 181, 0.8) 15%,
+    rgba(64, 224, 208, 0.7) 30%,
+    rgba(184, 135, 58, 0.5) 50%,
+    rgba(255, 183, 77, 0.6) 65%,
+    rgba(255, 152, 0, 0.5) 80%,
+    rgba(184, 135, 58, 0.4) 100%
+  );
+  border-radius: 0 80% 80% 0 / 0 40% 40% 0;
+  box-shadow: 
+    inset 0 0 60px rgba(255, 255, 255, 0.15),
+    0 0 30px rgba(10, 181, 181, 0.3);
+}
+
+.butterfly-section .wing-right {
+  right: 0;
+  transform-origin: left center;
+  transform: rotateY(-95deg);
+  background: linear-gradient(225deg, 
+    rgba(10, 181, 181, 0.6) 0%, 
+    rgba(10, 181, 181, 0.8) 15%,
+    rgba(64, 224, 208, 0.7) 30%,
+    rgba(184, 135, 58, 0.5) 50%,
+    rgba(255, 183, 77, 0.6) 65%,
+    rgba(255, 152, 0, 0.5) 80%,
+    rgba(184, 135, 58, 0.4) 100%
+  );
+  border-radius: 80% 0 0 80% / 40% 0 0 40%;
+  box-shadow: 
+    inset 0 0 60px rgba(255, 255, 255, 0.15),
+    0 0 30px rgba(10, 181, 181, 0.3);
+}
+
+.butterfly-section .wing-left::before,
+.butterfly-section .wing-right::before {
+  content: '';
+  position: absolute;
+  width: 70%;
+  height: 70%;
+  border-radius: 50%;
+  background: radial-gradient(circle at center, 
+    rgba(255, 255, 255, 0.4) 0%, 
+    rgba(255, 215, 0, 0.3) 20%,
+    rgba(255, 152, 0, 0.2) 40%,
+    rgba(10, 181, 181, 0.15) 60%,
+    transparent 80%
+  );
+  filter: blur(15px);
+}
+
+.butterfly-section .wing-left::before {
+  top: 15%;
+  right: 15%;
+  animation: wingGlowLeft 3s ease-in-out infinite;
+}
+
+.butterfly-section .wing-right::before {
+  top: 15%;
+  left: 15%;
+  animation: wingGlowRight 3s ease-in-out infinite;
+}
+
+.butterfly-section .wing-left::after,
+.butterfly-section .wing-right::after {
+  content: '';
+  position: absolute;
+  width: 45%;
+  height: 45%;
+  border-radius: 50%;
+  border: 3px solid rgba(255, 255, 255, 0.3);
+  background: radial-gradient(circle,
+    rgba(10, 181, 181, 0.4) 0%,
+    rgba(184, 135, 58, 0.3) 40%,
+    transparent 70%
+  );
+}
+
+.butterfly-section .wing-left::after {
+  top: 30%;
+  right: 25%;
+}
+
+.butterfly-section .wing-right::after {
+  top: 30%;
+  left: 25%;
+}
+
+.butterfly-section .wing-left .wing-spot,
+.butterfly-section .wing-right .wing-spot {
+  position: absolute;
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(10, 181, 181, 0.8) 30%,
+    rgba(0, 0, 0, 0.3) 60%,
+    transparent 70%
+  );
+  box-shadow: 
+    0 0 15px rgba(10, 181, 181, 0.6),
+    0 0 30px rgba(184, 135, 58, 0.4),
+    inset 0 0 10px rgba(255, 255, 255, 0.5);
+}
+
+.butterfly-section .wing-spot-1 {
+  width: 50px;
+  height: 50px;
+  top: 20%;
+  left: 30%;
+  animation: spotPulse 2s ease-in-out infinite;
+}
+
+.butterfly-section .wing-spot-2 {
+  width: 35px;
+  height: 35px;
+  top: 45%;
+  left: 45%;
+  animation: spotPulse 2s ease-in-out 0.5s infinite;
+}
+
+.butterfly-section .wing-spot-3 {
+  width: 40px;
+  height: 40px;
+  top: 60%;
+  left: 25%;
+  animation: spotPulse 2s ease-in-out 1s infinite;
+}
+
+.butterfly-section .wing-spot-4 {
+  width: 30px;
+  height: 30px;
+  top: 35%;
+  left: 55%;
+  animation: spotPulse 2s ease-in-out 1.5s infinite;
+}
+
+.butterfly-section .butterfly-body {
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translateX(-50%);
+  width: 4px;
+  height: 100%;
+  background: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(10, 181, 181, 0.9) 10%,
+    rgba(64, 224, 208, 0.8) 30%,
+    rgba(184, 135, 58, 0.7) 50%,
+    rgba(255, 152, 0, 0.6) 70%,
+    rgba(10, 181, 181, 0.5) 90%,
+    transparent 100%
+  );
+  z-index: 1;
+  pointer-events: none;
+  transition: all 0.8s ease;
+  opacity: 0;
+  box-shadow: 
+    0 0 20px rgba(10, 181, 181, 0.5),
+    0 0 40px rgba(184, 135, 58, 0.3);
+}
+
+.butterfly-section .butterfly-body::before,
+.butterfly-section .butterfly-body::after {
+  content: '';
+  position: absolute;
+  left: 50%;
+  transform: translateX(-50%);
+  border-radius: 50%;
+  background: radial-gradient(circle,
+    rgba(255, 255, 255, 0.9) 0%,
+    rgba(10, 181, 181, 0.8) 40%,
+    transparent 70%
+  );
+}
+
+.butterfly-section .butterfly-body::before {
+  width: 12px;
+  height: 12px;
+  top: 8%;
+  box-shadow: 0 0 15px rgba(10, 181, 181, 0.6);
+}
+
+.butterfly-section .butterfly-body::after {
+  width: 10px;
+  height: 10px;
+  top: 12%;
+  box-shadow: 0 0 12px rgba(184, 135, 58, 0.5);
+}
+
+.butterfly-section.opened .wing-left {
+  transform: rotateY(18deg);
+}
+
+.butterfly-section.opened .wing-right {
+  transform: rotateY(-18deg);
+}
+
+.butterfly-section.opened .butterfly-body {
+  opacity: 1;
+}
+
+.butterfly-section .section-content {
+  transform: scale(0.88);
+  opacity: 0;
+  transition: transform 0.9s cubic-bezier(0.34, 1.56, 0.64, 1), opacity 0.6s ease;
+}
+
+.butterfly-section.opened .section-content {
+  transform: scale(1);
+  opacity: 1;
+}
+
+.butterfly-section .sparkles {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  opacity: 0;
+  transition: opacity 2s ease;
+}
+
+.butterfly-section.opened .sparkles {
+  opacity: 1;
+}
+
+.sparkle-particle {
+  position: absolute;
+  border-radius: 50%;
+  animation: sparkleBurst 2.5s ease-out forwards;
+  opacity: 0;
+}
+
+@keyframes sparkleBurst {
+  0% {
+    opacity: 1;
+    transform: translate(0, 0) scale(1.5);
+  }
+  50% {
+    opacity: 0.8;
+  }
+  100% {
+    opacity: 0;
+    transform: translate(var(--sx), var(--sy)) scale(0);
+  }
+}
+
+@keyframes wingGlowLeft {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1) translateX(-5px); }
+}
+
+@keyframes wingGlowRight {
+  0%, 100% { opacity: 0.6; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.1) translateX(5px); }
+}
+
+@keyframes spotPulse {
+  0%, 100% { opacity: 0.7; transform: scale(1); }
+  50% { opacity: 1; transform: scale(1.15); }
+}
+
+body.dark-mode .butterfly-section .wing-left,
+body.dark-mode .butterfly-section .wing-right {
+  box-shadow: 
+    inset 0 0 80px rgba(255, 255, 255, 0.1),
+    0 0 40px rgba(10, 181, 181, 0.5),
+    0 0 80px rgba(184, 135, 58, 0.3);
+}
+
+body.dark-mode .butterfly-section .wing-left::after,
+body.dark-mode .butterfly-section .wing-right::after {
+  border-color: rgba(255, 255, 255, 0.5);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .butterfly-section .wing-left,
+  .butterfly-section .wing-right {
+    transition: none;
+    transform: rotateY(18deg);
+  }
+  .butterfly-section .section-content {
+    transition: none;
+    transform: scale(1);
+    opacity: 1;
+  }
+  .sparkle-particle {
+    animation: none;
+  }
+}
 </style>
 </head>
 <body>
@@ -4268,6 +4586,102 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
+function createSparkles(section) {
+  const sparklesContainer = section.querySelector('.sparkles');
+  if (!sparklesContainer) return;
+  
+  sparklesContainer.innerHTML = '';
+  const colors = ['#0ab5b5', '#b8873a', '#40e0d0', '#ffb74d', '#ff9800', '#ffd700', '#00e5ff', '#ff8f00'];
+  
+  for (let i = 0; i < 25; i++) {
+    const sparkle = document.createElement('div');
+    sparkle.className = 'sparkle-particle';
+    sparkle.style.left = (20 + Math.random() * 60) + '%';
+    sparkle.style.top = (10 + Math.random() * 80) + '%';
+    sparkle.style.setProperty('--sx', (Math.random() - 0.5) * 200 + 'px');
+    sparkle.style.setProperty('--sy', (Math.random() - 0.5) * 200 + 'px');
+    sparkle.style.animationDelay = Math.random() * 1.2 + 's';
+    sparkle.style.animationDuration = (2 + Math.random() * 2) + 's';
+    const size = 3 + Math.random() * 8;
+    sparkle.style.width = size + 'px';
+    sparkle.style.height = size + 'px';
+    sparkle.style.background = colors[Math.floor(Math.random() * colors.length)];
+    sparkle.style.boxShadow = `0 0 ${size * 2}px ${sparkle.style.background}`;
+    sparklesContainer.appendChild(sparkle);
+  }
+}
+
+function createWing(side) {
+  const wing = document.createElement('div');
+  wing.className = `wing-${side}`;
+  
+  for (let i = 1; i <= 4; i++) {
+    const spot = document.createElement('div');
+    spot.className = `wing-spot wing-spot-${i}`;
+    wing.appendChild(spot);
+  }
+  
+  return wing;
+}
+
+function createButterflyBody() {
+  const body = document.createElement('div');
+  body.className = 'butterfly-body';
+  return body;
+}
+
+function createSparklesContainer() {
+  const container = document.createElement('div');
+  container.className = 'sparkles';
+  return container;
+}
+
+function initButterflySections() {
+  const sections = document.querySelectorAll('section[id]');
+  
+  sections.forEach(section => {
+    section.classList.add('butterfly-section');
+    
+    const children = Array.from(section.children);
+    const contentWrapper = document.createElement('div');
+    contentWrapper.className = 'section-content';
+    children.forEach(child => contentWrapper.appendChild(child));
+    
+    section.innerHTML = '';
+    section.appendChild(createWing('left'));
+    section.appendChild(createWing('right'));
+    section.appendChild(createButterflyBody());
+    section.appendChild(createSparklesContainer());
+    section.appendChild(contentWrapper);
+  });
+  
+  const observer = new IntersectionObserver((entries) => {
+    entries.forEach(entry => {
+      const section = entry.target;
+      
+      if (entry.isIntersecting && entry.intersectionRatio > 0.15) {
+        if (!section.classList.contains('opened')) {
+          section.classList.add('opened');
+          createSparkles(section);
+          
+          setTimeout(() => {
+            const sparkles = section.querySelector('.sparkles');
+            if (sparkles) sparkles.innerHTML = '';
+          }, 3500);
+        }
+      }
+    });
+  }, {
+    threshold: [0.15, 0.3],
+    rootMargin: '-30px 0px'
+  });
+  
+  sections.forEach(section => observer.observe(section));
+}
+
+document.addEventListener('DOMContentLoaded', () => {
+  setTimeout(initButterflySections, 800);
+});
 </script>
 </body>
 </html>
