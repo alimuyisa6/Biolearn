@@ -2949,7 +2949,412 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
     margin: 0;
   }
 }
- </style>
+ .pdf-library-section {
+  background: #e67e22;
+  background-image: radial-gradient(circle at 10% 20%, rgba(255,255,255,0.1) 0%, transparent 70%);
+  border-radius: 28px;
+  padding: 32px 24px;
+  position: relative;
+  overflow: hidden;
+}
+
+.pdf-section-header {
+  text-align: center;
+  margin-bottom: 32px;
+}
+
+.pdf-section-header .sec-label {
+  font-family: var(--font-mono);
+  font-size: 0.7rem;
+  letter-spacing: 0.15em;
+  color: rgba(255,255,255,0.8);
+  background: rgba(0,0,0,0.2);
+  display: inline-block;
+  padding: 4px 16px;
+  border-radius: 30px;
+  margin-bottom: 16px;
+}
+
+.pdf-section-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(2.2rem, 6vw, 3.8rem);
+  font-weight: 900;
+  line-height: 1.2;
+  letter-spacing: -0.02em;
+  text-align: center;
+  color: #1a1a1a;
+  margin-bottom: 12px;
+}
+
+body.dark-mode .pdf-section-title {
+  color: #ffffff;
+}
+
+.pdf-section-subtitle {
+  font-family: var(--font-body);
+  font-size: 1rem;
+  font-weight: 400;
+  color: rgba(0,0,0,0.65);
+  text-align: center;
+  max-width: 600px;
+  margin: 0 auto;
+}
+
+body.dark-mode .pdf-section-subtitle {
+  color: rgba(255,255,255,0.65);
+}
+
+.pdf-main-container {
+  background: var(--clr-navy-card);
+  backdrop-filter: blur(8px);
+  border-radius: 20px;
+  overflow: hidden;
+  border: 1px solid var(--clr-border-glow);
+  position: relative;
+  margin-top: 16px;
+}
+
+.pdf-main-container::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 3px;
+  background: linear-gradient(90deg, var(--clr-magenta) 0%, var(--clr-magenta) 33%, var(--clr-cyan) 33%, var(--clr-cyan) 66%, var(--clr-magenta) 66%, var(--clr-magenta) 100%);
+  z-index: 5;
+}
+
+.pdf-main-container::after {
+  content: '';
+  position: absolute;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  width: 3px;
+  background: linear-gradient(180deg, var(--clr-magenta) 0%, var(--clr-cyan) 50%, var(--clr-magenta) 100%);
+  z-index: 5;
+}
+
+.pdf-level-bar {
+  display: flex;
+  justify-content: center;
+  gap: 16px;
+  padding: 20px 20px 16px 20px;
+  border-bottom: 1px solid var(--clr-border-glow);
+  background: rgba(0,0,0,0.02);
+  margin-right: 3px;
+}
+
+.pdf-level-btn {
+  padding: 10px 28px;
+  border-radius: 50px;
+  font-family: var(--font-body);
+  font-weight: 700;
+  font-size: 0.9rem;
+  letter-spacing: 0.02em;
+  background: transparent;
+  border: 2px solid var(--clr-border-glow);
+  color: var(--clr-white);
+  cursor: pointer;
+  transition: all 0.25s ease;
+}
+
+.pdf-level-btn:hover {
+  border-color: var(--clr-cyan);
+  transform: translateY(-2px);
+}
+
+.pdf-level-btn.active {
+  background: var(--gradient-magenta);
+  border-color: transparent;
+  color: #fff;
+  box-shadow: 0 4px 15px rgba(184,135,58,0.35);
+}
+
+.pdf-content-wrapper {
+  display: flex;
+  min-height: 520px;
+}
+
+.pdf-cards-area {
+  flex: 1;
+  padding: 20px;
+  overflow-y: auto;
+  margin-right: 3px;
+  max-height: 600px;
+}
+
+.pdf-subtopics-column {
+  width: 280px;
+  min-width: 280px;
+  background: rgba(0,0,0,0.03);
+  border-left: 1px solid var(--clr-border-glow);
+  display: flex;
+  flex-direction: column;
+}
+
+.pdf-subtopics-header {
+  padding: 18px 16px;
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  letter-spacing: 0.05em;
+  text-transform: uppercase;
+  color: var(--clr-magenta);
+  border-bottom: 2px solid var(--clr-magenta);
+  text-align: center;
+  background: rgba(0,0,0,0.02);
+}
+
+.pdf-subtopics-list {
+  flex: 1;
+  overflow-y: auto;
+  padding: 12px;
+  max-height: 540px;
+}
+
+.pdf-subtopic-item {
+  padding: 14px 12px;
+  margin-bottom: 8px;
+  background: var(--clr-navy-light);
+  border-radius: 14px;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid transparent;
+}
+
+.pdf-subtopic-item:hover {
+  background: rgba(184,135,58,0.15);
+  border-color: var(--clr-magenta);
+  transform: translateX(5px);
+}
+
+.pdf-subtopic-title {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.9rem;
+  color: var(--clr-white);
+  margin-bottom: 5px;
+  word-break: break-word;
+}
+
+.pdf-subtopic-author {
+  font-family: var(--font-body);
+  font-size: 0.7rem;
+  color: var(--clr-text-muted);
+}
+
+.pdf-subtopics-placeholder {
+  text-align: center;
+  color: var(--clr-text-dim);
+  font-size: 0.85rem;
+  padding: 30px 20px;
+}
+
+.pdf-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(8, 1fr);
+  gap: 14px;
+}
+
+.pdf-topic-group {
+  margin-bottom: 28px;
+}
+
+.pdf-topic-group h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1rem;
+  font-weight: 700;
+  color: var(--clr-magenta);
+  margin-bottom: 14px;
+  padding-left: 12px;
+  border-left: 4px solid var(--clr-cyan);
+}
+
+.pdf-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 14px;
+  padding: 12px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid var(--clr-border-glow);
+}
+
+.pdf-card:hover {
+  transform: translateY(-5px);
+  border-color: var(--clr-magenta);
+  background: rgba(184,135,58,0.12);
+}
+
+.pdf-card-icon {
+  font-size: 1.8rem;
+  color: var(--clr-magenta);
+  margin-bottom: 8px;
+}
+
+.pdf-card-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.7rem;
+  font-weight: 600;
+  color: var(--clr-white);
+  line-height: 1.35;
+  word-break: break-word;
+}
+
+.pdf-card-author {
+  font-family: var(--font-body);
+  font-size: 0.6rem;
+  color: var(--clr-text-muted);
+  margin-top: 5px;
+}
+
+.pdf-preview-modal {
+  display: none;
+  position: fixed;
+  inset: 0;
+  z-index: 1000;
+  background: rgba(0,0,0,0.95);
+  align-items: center;
+  justify-content: center;
+}
+
+.pdf-preview-modal.active {
+  display: flex;
+}
+
+.pdf-preview-content {
+  width: 90%;
+  max-width: 1000px;
+  height: 85vh;
+  background: var(--clr-navy-card);
+  backdrop-filter: blur(20px);
+  border-radius: 24px;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  border: 2px solid var(--clr-magenta);
+}
+
+.pdf-preview-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 16px 24px;
+  background: var(--gradient-magenta);
+  color: #fff;
+}
+
+.pdf-preview-header h3 {
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 1.1rem;
+  margin: 0;
+}
+
+.pdf-preview-close {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 1.8rem;
+  cursor: pointer;
+  line-height: 1;
+  opacity: 0.8;
+  transition: opacity 0.2s;
+}
+
+.pdf-preview-close:hover {
+  opacity: 1;
+}
+
+.pdf-preview-body {
+  flex: 1;
+  background: #fff;
+}
+
+.pdf-preview-body iframe {
+  width: 100%;
+  height: 100%;
+}
+
+.pdf-preview-footer {
+  display: flex;
+  gap: 16px;
+  justify-content: center;
+  padding: 16px;
+  border-top: 1px solid var(--clr-border-glow);
+}
+
+.pdf-preview-download-btn, .pdf-preview-back-btn {
+  padding: 10px 28px;
+  border-radius: 40px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.85rem;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: none;
+}
+
+.pdf-preview-download-btn {
+  background: var(--gradient-cyan);
+  color: #fff;
+}
+
+.pdf-preview-download-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 6px 20px rgba(10,181,181,0.4);
+}
+
+.pdf-preview-back-btn {
+  background: transparent;
+  border: 2px solid var(--clr-cyan);
+  color: var(--clr-cyan);
+}
+
+.pdf-preview-back-btn:hover {
+  background: var(--clr-cyan);
+  color: #fff;
+}
+
+.pdf-loading, .pdf-error {
+  text-align: center;
+  padding: 50px;
+  color: var(--clr-text-dim);
+  font-family: var(--font-body);
+}
+
+@media (max-width: 1200px) {
+  .pdf-cards-grid { grid-template-columns: repeat(6, 1fr); }
+}
+
+@media (max-width: 992px) {
+  .pdf-cards-grid { grid-template-columns: repeat(4, 1fr); }
+  .pdf-subtopics-column { width: 250px; min-width: 250px; }
+}
+
+@media (max-width: 768px) {
+  .pdf-library-section { padding: 24px 16px; }
+  .pdf-content-wrapper { flex-direction: column; }
+  .pdf-subtopics-column { width: 100%; min-width: auto; border-left: none; border-top: 1px solid var(--clr-border-glow); max-height: 220px; }
+  .pdf-cards-grid { grid-template-columns: repeat(4, 1fr); gap: 10px; }
+  .pdf-level-bar { gap: 10px; flex-wrap: wrap; }
+  .pdf-level-btn { padding: 6px 18px; font-size: 0.8rem; }
+  .pdf-main-container::after { display: none; }
+  .pdf-cards-area { max-height: 450px; }
+  .pdf-section-title { font-size: clamp(1.8rem, 5vw, 2.5rem); }
+}
+
+@media (max-width: 480px) {
+  .pdf-cards-grid { grid-template-columns: repeat(3, 1fr); gap: 8px; }
+  .pdf-card { padding: 8px 4px; }
+  .pdf-card-icon { font-size: 1.4rem; }
+  .pdf-card-title { font-size: 0.65rem; }
+  .pdf-subtopic-title { font-size: 0.8rem; }
+}
+</style>
 </head>
 <body>
 <a href="#main-content" class="skip-link">Skip to main content</a>
@@ -3100,6 +3505,52 @@ Aliver<span class="g-text">Biopharm</span>
 <div id="flashcards-container"></div>
 <p class="keyboard-hint"><i class="fa-regular fa-keyboard"></i> Keyboard: ← → navigate | Space flip | 1-3 rate difficulty</p>
 </section>
+
+<section id="pdf-library" class="section reveal pdf-library-section" aria-label="PDF Library">
+  <div class="pdf-section-header">
+    <span class="sec-label">PDF RESOURCES</span>
+    <h2 class="pdf-section-title">Study Materials Library</h2>
+    <p class="pdf-section-subtitle">Access comprehensive PDF resources for Biology and Pharmacy. Preview before downloading.</p>
+  </div>
+  
+  <div class="pdf-main-container" id="pdf-main-container">
+    <div class="pdf-level-bar" id="pdf-level-bar">
+      <button class="pdf-level-btn active" data-level="O-Level">O-Level</button>
+      <button class="pdf-level-btn" data-level="A-Level">A-Level</button>
+      <button class="pdf-level-btn" data-level="Pharmacy">Pharmacy</button>
+    </div>
+    
+    <div class="pdf-content-wrapper" id="pdf-content-wrapper">
+      <div class="pdf-cards-area" id="pdf-cards-area">
+        <div class="pdf-loading">Loading PDFs...</div>
+      </div>
+      
+      <div class="pdf-subtopics-column" id="pdf-subtopics-column">
+        <div class="pdf-subtopics-header">Browse Topics</div>
+        <div class="pdf-subtopics-list" id="pdf-subtopics-list">
+          <p class="pdf-subtopics-placeholder">Select a level to view topics</p>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<div id="pdf-preview-modal" class="pdf-preview-modal">
+  <div class="pdf-preview-content">
+    <div class="pdf-preview-header">
+      <h3 id="preview-title">Loading...</h3>
+      <button class="pdf-preview-close" id="pdf-preview-close">&times;</button>
+    </div>
+    <div class="pdf-preview-body" id="pdf-preview-body">
+      <iframe id="pdf-preview-iframe" src="about:blank" frameborder="0"></iframe>
+    </div>
+    <div class="pdf-preview-footer">
+      <button class="pdf-preview-download-btn" id="pdf-preview-download-btn">Download PDF</button>
+      <button class="pdf-preview-back-btn" id="pdf-preview-back-btn">Back to Library</button>
+    </div>
+  </div>
+</div>
+
 <section id="community" class="section alt-bg reveal" aria-label="Community stream">
 <span class="sec-label">COMMUNITY</span>
 <h2 class="section-title">Live Learning Stream</h2>
@@ -4080,6 +4531,265 @@ async function loadFlashcards() {
   }
 }
 
+// ========== PDF LIBRARY FUNCTIONS ==========
+let currentPdfLevel = 'O-Level';
+let currentPdfs = [];
+let currentTopics = [];
+let currentSelectedTopic = null;
+let currentPreviewPdfId = null;
+
+async function loadPdfsByLevel(level) {
+  const cardsArea = document.getElementById('pdf-cards-area');
+  if (!cardsArea) return;
+  
+  cardsArea.innerHTML = '<div class="pdf-loading">Loading PDFs...</div>';
+  
+  try {
+    const data = await apiCall('get_pdfs_by_level', { level: level });
+    currentPdfs = data.pdfs || [];
+    
+    if (currentPdfs.length === 0) {
+      cardsArea.innerHTML = '<div class="pdf-loading">No PDFs available for this level.</div>';
+      const topicsList = document.getElementById('pdf-subtopics-list');
+      if (topicsList) topicsList.innerHTML = '<p class="pdf-subtopics-placeholder">No topics available</p>';
+      return;
+    }
+    
+    const uniqueTopics = [...new Set(currentPdfs.map(p => p.topic).filter(t => t))];
+    currentTopics = uniqueTopics;
+    
+    renderTopicsColumn(uniqueTopics);
+    
+    const groupedByTopic = {};
+    currentPdfs.forEach(pdf => {
+      const topic = pdf.topic || 'General';
+      if (!groupedByTopic[topic]) groupedByTopic[topic] = [];
+      groupedByTopic[topic].push(pdf);
+    });
+    
+    let cardsHtml = '';
+    for (const [topic, pdfs] of Object.entries(groupedByTopic)) {
+      cardsHtml += `<div class="pdf-topic-group" data-topic="${esc(topic)}">`;
+      cardsHtml += `<h4>${esc(topic)}</h4>`;
+      cardsHtml += `<div class="pdf-cards-grid">`;
+      
+      pdfs.forEach(pdf => {
+        cardsHtml += `
+          <div class="pdf-card" data-pdf-id="${pdf.id}" data-pdf-title="${esc(pdf.title)}" data-pdf-author="${esc(pdf.author || 'Unknown')}" data-pdf-url="${esc(pdf.file_url)}" data-pdf-topic="${esc(pdf.topic)}">
+            <div class="pdf-card-icon"><i class="fa-solid fa-file-pdf"></i></div>
+            <div class="pdf-card-title">${esc(pdf.title.length > 45 ? pdf.title.substring(0, 42) + '...' : pdf.title)}</div>
+            <div class="pdf-card-author">${esc(pdf.author || 'Unknown')}</div>
+          </div>
+        `;
+      });
+      
+      cardsHtml += `</div></div>`;
+    }
+    
+    cardsArea.innerHTML = cardsHtml;
+    attachPdfCardEvents();
+    
+  } catch (err) {
+    console.error('Failed to load PDFs:', err);
+    cardsArea.innerHTML = '<div class="pdf-error">Failed to load PDFs. Please refresh and try again.</div>';
+  }
+}
+
+function renderTopicsColumn(topics) {
+  const topicsList = document.getElementById('pdf-subtopics-list');
+  if (!topicsList) return;
+  
+  if (!topics || topics.length === 0) {
+    topicsList.innerHTML = '<p class="pdf-subtopics-placeholder">No topics available</p>';
+    return;
+  }
+  
+  const topicCounts = {};
+  currentPdfs.forEach(pdf => {
+    const topic = pdf.topic || 'General';
+    topicCounts[topic] = (topicCounts[topic] || 0) + 1;
+  });
+  
+  topicsList.innerHTML = topics.map(topic => `
+    <div class="pdf-subtopic-item" data-topic="${esc(topic)}">
+      <div class="pdf-subtopic-title">${esc(topic)}</div>
+      <div class="pdf-subtopic-author">${topicCounts[topic] || 0} resource${topicCounts[topic] !== 1 ? 's' : ''}</div>
+    </div>
+  `).join('');
+  
+  document.querySelectorAll('.pdf-subtopic-item').forEach(item => {
+    item.addEventListener('click', () => {
+      const topic = item.dataset.topic;
+      currentSelectedTopic = topic;
+      document.querySelectorAll('.pdf-subtopic-item').forEach(i => i.style.borderColor = 'transparent');
+      item.style.borderColor = 'var(--clr-magenta)';
+      filterPdfsByTopic(topic);
+    });
+  });
+}
+
+function filterPdfsByTopic(topic) {
+  const cardsArea = document.getElementById('pdf-cards-area');
+  if (!cardsArea) return;
+  
+  const filteredPdfs = currentPdfs.filter(pdf => (pdf.topic || 'General') === topic);
+  
+  if (filteredPdfs.length === 0) {
+    cardsArea.innerHTML = '<div class="pdf-loading">No PDFs in this topic.</div>';
+    return;
+  }
+  
+  let cardsHtml = `<div class="pdf-cards-grid">`;
+  filteredPdfs.forEach(pdf => {
+    cardsHtml += `
+      <div class="pdf-card" data-pdf-id="${pdf.id}" data-pdf-title="${esc(pdf.title)}" data-pdf-author="${esc(pdf.author || 'Unknown')}" data-pdf-url="${esc(pdf.file_url)}">
+        <div class="pdf-card-icon"><i class="fa-solid fa-file-pdf"></i></div>
+        <div class="pdf-card-title">${esc(pdf.title.length > 45 ? pdf.title.substring(0, 42) + '...' : pdf.title)}</div>
+        <div class="pdf-card-author">${esc(pdf.author || 'Unknown')}</div>
+      </div>
+    `;
+  });
+  cardsHtml += `</div>`;
+  
+  cardsArea.innerHTML = cardsHtml;
+  attachPdfCardEvents();
+}
+
+function attachPdfCardEvents() {
+  document.querySelectorAll('.pdf-card').forEach(card => {
+    card.addEventListener('click', (e) => {
+      e.stopPropagation();
+      const pdfId = card.dataset.pdfId;
+      const pdfTitle = card.dataset.pdfTitle;
+      const pdfUrl = card.dataset.pdfUrl;
+      const pdfAuthor = card.dataset.pdfAuthor;
+      handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor);
+    });
+  });
+}
+
+async function handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor) {
+  if (!currentUser) {
+    alert('Please sign in to access PDF resources.');
+    showAuthForm('signin');
+    return;
+  }
+  
+  const userChoice = confirm(`📄 ${pdfTitle}\n✍️ ${pdfAuthor}\n\n✅ OK to Preview\n❌ Cancel to Download`);
+  
+  if (userChoice) {
+    await previewPdf(pdfId, pdfTitle, pdfUrl);
+  } else {
+    await downloadPdf(pdfId, pdfTitle, pdfUrl);
+  }
+}
+
+async function previewPdf(pdfId, pdfTitle, pdfUrl) {
+  try {
+    const restriction = await apiCall('check_pdf_restriction', { pdf_id: pdfId, restriction_type: 'preview' });
+    
+    if (restriction.is_restricted) {
+      alert(`Preview restricted: ${restriction.reason || 'You do not have permission to preview this PDF.'}`);
+      return;
+    }
+    
+    currentPreviewPdfId = pdfId;
+    const modal = document.getElementById('pdf-preview-modal');
+    const iframe = document.getElementById('pdf-preview-iframe');
+    const titleEl = document.getElementById('preview-title');
+    const downloadBtn = document.getElementById('pdf-preview-download-btn');
+    
+    titleEl.textContent = pdfTitle;
+    iframe.src = pdfUrl;
+    modal.classList.add('active');
+    document.body.style.overflow = 'hidden';
+    
+    downloadBtn.onclick = () => {
+      downloadPdf(pdfId, pdfTitle, pdfUrl);
+    };
+    
+    await apiCall('track_pdf_preview', { pdf_id: pdfId });
+    
+  } catch (err) {
+    console.error('Preview failed:', err);
+    alert('Failed to load preview. Please try again.');
+  }
+}
+
+async function downloadPdf(pdfId, pdfTitle, pdfUrl) {
+  try {
+    const restriction = await apiCall('check_pdf_restriction', { pdf_id: pdfId, restriction_type: 'download' });
+    
+    if (restriction.is_restricted) {
+      alert(`Download restricted: ${restriction.reason || 'You do not have permission to download this PDF.'}`);
+      return;
+    }
+    
+    const link = document.createElement('a');
+    link.href = pdfUrl;
+    link.download = pdfTitle.replace(/[^a-z0-9]/gi, '_') + '.pdf';
+    document.body.appendChild(link);
+    link.click();
+    document.body.removeChild(link);
+    
+    await apiCall('track_pdf_download', { pdf_id: pdfId });
+    
+    const modal = document.getElementById('pdf-preview-modal');
+    if (modal.classList.contains('active')) {
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      const iframe = document.getElementById('pdf-preview-iframe');
+      iframe.src = 'about:blank';
+    }
+    
+  } catch (err) {
+    console.error('Download failed:', err);
+    alert('Download failed. Please try again later.');
+  }
+}
+
+function initPdfLibrary() {
+  const levelBtns = document.querySelectorAll('.pdf-level-btn');
+  const backBtn = document.getElementById('pdf-preview-back-btn');
+  const closeBtn = document.getElementById('pdf-preview-close');
+  
+  if (levelBtns.length) {
+    levelBtns.forEach(btn => {
+      btn.addEventListener('click', () => {
+        levelBtns.forEach(b => b.classList.remove('active'));
+        btn.classList.add('active');
+        currentPdfLevel = btn.dataset.level;
+        currentSelectedTopic = null;
+        loadPdfsByLevel(currentPdfLevel);
+      });
+    });
+  }
+  
+  if (backBtn) {
+    backBtn.addEventListener('click', () => {
+      const modal = document.getElementById('pdf-preview-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      const iframe = document.getElementById('pdf-preview-iframe');
+      iframe.src = 'about:blank';
+      currentPreviewPdfId = null;
+    });
+  }
+  
+  if (closeBtn) {
+    closeBtn.addEventListener('click', () => {
+      const modal = document.getElementById('pdf-preview-modal');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+      const iframe = document.getElementById('pdf-preview-iframe');
+      iframe.src = 'about:blank';
+      currentPreviewPdfId = null;
+    });
+  }
+  
+  loadPdfsByLevel('O-Level');
+}
+
 function handleFlashcardKeyboard(e) {
   const deckCards = getCurrentDeckCards();
   if (!deckCards || !deckCards.length) return;
@@ -4361,7 +5071,12 @@ document.addEventListener('DOMContentLoaded', async function() {
   await buildResources();
   loadPublicStats();
   loadFlashcards();
-  loadCommunityActivity();
+ setTimeout(() => {
+  if (document.getElementById('pdf-main-container')) {
+    initPdfLibrary();
+  }
+}, 500);
+ loadCommunityActivity();
   loadContinueLearning();
   document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
   document.getElementById('mood-submit-btn').addEventListener('click', submitMood);
