@@ -649,7 +649,7 @@ async function handleGet(req, res) {
       }
       
       case 'get_pdfs_by_level': {
-  const level = req.body.level;
+   const level = url.searchParams.get('level');
   if (!level) return res.status(400).json({ error: 'Level required' });
   const { data, error } = await supabase
     .from('pdf_resources')
