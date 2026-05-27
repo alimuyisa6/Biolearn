@@ -3723,18 +3723,21 @@ async function apiCall(action, params) {
   }
 }
 
- async function apiCallGet(action, params = {}) {
+  async function apiCallGet(action, params = {}) {
   const url = new URL(API_BASE);
   url.searchParams.append('action', action);
   Object.keys(params).forEach(key => {
     url.searchParams.append(key, params[key]);
   });
+  console.log(`API GET: ${url.toString()}`);
   const res = await fetch(url.toString(), {
     method: 'GET',
     credentials: 'include'
   });
-  if (!res.ok) throw new Error('Request failed');
-  return res.json();
+  const text = await res.text();
+  console.log(`Response:`, text.substring(0, 300));
+  if (!res.ok) throw new Error(text.substring(0, 200));
+  return JSON.parse(text);
 }
 
 function updateMobilePanel(links) {
@@ -4552,7 +4555,7 @@ let currentTopics = [];
 let currentSelectedTopic = null;
 let currentPreviewPdfId = null;
 
-async function loadPdfsByLevel(level) {
+ async function loadPdfsByLevel(level) {
   const cardsArea = document.getElementById('pdf-cards-area');
   if (!cardsArea) return;
   
@@ -4560,10 +4563,37 @@ async function loadPdfsByLevel(level) {
   
   try {
     const data = await apiCallGet('get_pdfs_by_level', { level: level });
+    
+    if (!data) {
+      cardsArea.innerHTML = `
+        <div style="text-align:center; padding:40px; background:#fff3f3; border-radius:16px; border:1px solid #e74c3c;">
+          <i class="fa-solid fa-circle-exclamation" style="font-size:2rem; color:#e74c3c;"></i>
+          <p style="color:#c0392b; margin-top:12px;"><strong>Error:</strong> Server returned empty response</p>
+        </div>
+      `;
+      return;
+    }
+    
+    if (data.error) {
+      cardsArea.innerHTML = `
+        <div style="text-align:center; padding:40px; background:#fff3f3; border-radius:16px; border:1px solid #e74c3c;">
+          <i class="fa-solid fa-database" style="font-size:2rem; color:#e74c3c;"></i>
+          <p style="color:#c0392b; margin-top:12px;"><strong>Database Error:</strong> ${data.error}</p>
+          <p style="color:#7f8c8d; font-size:0.85rem; margin-top:8px;">The pdf_resources table may not exist. Run the SQL migration.</p>
+        </div>
+      `;
+      return;
+    }
+    
     currentPdfs = data.pdfs || [];
     
     if (currentPdfs.length === 0) {
-      cardsArea.innerHTML = '<div class="pdf-loading">No PDFs available for this level.</div>';
+      cardsArea.innerHTML = `
+        <div style="text-align:center; padding:40px;">
+          <i class="fa-solid fa-folder-open" style="font-size:2rem; color:var(--clr-text-muted);"></i>
+          <p style="color:var(--clr-text-dim); margin-top:12px;">No PDFs available for ${level} level.</p>
+        </div>
+      `;
       const topicsList = document.getElementById('pdf-subtopics-list');
       if (topicsList) topicsList.innerHTML = '<p class="pdf-subtopics-placeholder">No topics available</p>';
       return;
@@ -4604,8 +4634,14 @@ async function loadPdfsByLevel(level) {
     attachPdfCardEvents();
     
   } catch (err) {
-    console.error('Failed to load PDFs:', err);
-    cardsArea.innerHTML = '<div class="pdf-error">Failed to load PDFs. Please refresh and try again.</div>';
+    cardsArea.innerHTML = `
+      <div style="text-align:center; padding:40px; background:#fff3f3; border-radius:16px; border:1px solid #e74c3c;">
+        <i class="fa-solid fa-bug" style="font-size:2rem; color:#e74c3c;"></i>
+        <p style="color:#c0392b; margin-top:12px;"><strong>Error:</strong> ${err.message}</p>
+        <p style="color:#7f8c8d; font-size:0.85rem; margin-top:8px;">Check if the backend API is running and the pdf_resources table exists.</p>
+        <button onclick="loadPdfsByLevel('${level}')" style="margin-top:16px; padding:8px 20px; background:var(--clr-cyan); border:none; border-radius:30px; color:#fff; cursor:pointer;">Try Again</button>
+      </div>
+    `;
   }
 }
 
