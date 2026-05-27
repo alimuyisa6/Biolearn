@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -3723,7 +3723,21 @@ async function apiCall(action, params) {
   }
 }
 
- function updateMobilePanel(links) {
+ async function apiCallGet(action, params = {}) {
+  const url = new URL(API_BASE);
+  url.searchParams.append('action', action);
+  Object.keys(params).forEach(key => {
+    url.searchParams.append(key, params[key]);
+  });
+  const res = await fetch(url.toString(), {
+    method: 'GET',
+    credentials: 'include'
+  });
+  if (!res.ok) throw new Error('Request failed');
+  return res.json();
+}
+
+function updateMobilePanel(links) {
   const nav = document.getElementById('mobile-nav-links');
   const footer = document.getElementById('mobile-nav-footer');
   if (!nav || !footer) return;
@@ -4545,7 +4559,7 @@ async function loadPdfsByLevel(level) {
   cardsArea.innerHTML = '<div class="pdf-loading">Loading PDFs...</div>';
   
   try {
-    const data = await apiCall('get_pdfs_by_level', { level: level });
+    const data = await apiCallGet('get_pdfs_by_level', { level: level });
     currentPdfs = data.pdfs || [];
     
     if (currentPdfs.length === 0) {
