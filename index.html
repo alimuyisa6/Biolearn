@@ -4771,17 +4771,42 @@ async function handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor) {
     const iframe = document.getElementById('pdf-preview-iframe');
     const titleEl = document.getElementById('preview-title');
     const downloadBtn = document.getElementById('pdf-preview-download-btn');
+    const previewBody = document.getElementById('pdf-preview-body');
     
     titleEl.textContent = pdfTitle;
-    iframe.src = pdfUrl;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
-    iframe.onerror = function() {
-      alert('PDF file not found. The file may have been moved or deleted.');
-      modal.classList.remove('active');
-      document.body.style.overflow = '';
-    };
+    if (!pdfUrl || pdfUrl === '' || pdfUrl === '/') {
+      previewBody.innerHTML = `
+        <div style="display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; background:#f5f5f5;">
+          <i class="fa-solid fa-file-pdf" style="font-size:4rem; color:#e74c3c;"></i>
+          <h3 style="margin-top:20px; color:#333;">PDF File Not Available</h3>
+          <p style="margin-top:10px; color:#666;">The file URL for this PDF is missing or invalid.</p>
+          <p style="margin-top:5px; color:#999; font-size:0.8rem;">Please contact support to report this issue.</p>
+          <button onclick="document.getElementById('pdf-preview-modal').classList.remove('active')" style="margin-top:20px; padding:10px 24px; background:var(--clr-cyan); border:none; border-radius:30px; color:#fff; cursor:pointer;">Close</button>
+        </div>
+      `;
+      iframe.style.display = 'none';
+    } else {
+      iframe.style.display = 'block';
+      previewBody.innerHTML = '';
+      previewBody.appendChild(iframe);
+      iframe.src = pdfUrl;
+      
+      iframe.onerror = function() {
+        iframe.style.display = 'none';
+        previewBody.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; background:#f5f5f5;">
+            <i class="fa-solid fa-file-pdf" style="font-size:4rem; color:#e74c3c;"></i>
+            <h3 style="margin-top:20px; color:#333;">Cannot Load PDF</h3>
+            <p style="margin-top:10px; color:#666;">The file could not be loaded. It may have been moved or deleted.</p>
+            <p style="margin-top:5px; color:#999; font-size:0.8rem;">URL: ${pdfUrl.substring(0, 80)}...</p>
+            <button onclick="document.getElementById('pdf-preview-modal').classList.remove('active')" style="margin-top:20px; padding:10px 24px; background:var(--clr-cyan); border:none; border-radius:30px; color:#fff; cursor:pointer;">Close</button>
+          </div>
+        `;
+      };
+    }
     
     downloadBtn.onclick = () => {
       downloadPdf(pdfId, pdfTitle, pdfUrl);
