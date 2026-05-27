@@ -2714,6 +2714,150 @@ margin-bottom; -20px;
     scroll-behavior: auto !important;
   }
 }
+.section-wrapper {
+  position: relative;
+  overflow: hidden;
+}
+
+.section-wrapper .section-content {
+  position: relative;
+  z-index: 2;
+}
+
+.faculty-section::before {
+  content: '';
+  position: absolute;
+  top: 0;
+  left: 5%;
+  width: 2px;
+  height: 100%;
+  background: linear-gradient(to bottom, transparent, rgba(10, 181, 181, 0.08), rgba(184, 135, 58, 0.05), transparent);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.resources-section::before {
+  content: '';
+  position: absolute;
+  top: 10%;
+  right: 5%;
+  width: 80px;
+  height: 80px;
+  border: 1px dashed rgba(10, 181, 181, 0.06);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: slowSpin 20s linear infinite;
+}
+
+@keyframes slowSpin {
+  from { transform: rotate(0deg); }
+  to { transform: rotate(360deg); }
+}
+
+.flashcards-section::after {
+  content: '';
+  position: absolute;
+  bottom: 5%;
+  left: 10%;
+  width: 60px;
+  height: 75px;
+  border: 1px solid rgba(10, 181, 181, 0.05);
+  border-radius: 4px;
+  z-index: 1;
+  pointer-events: none;
+  transform: rotate(-3deg);
+}
+
+.testimonials-section::before {
+  content: '"';
+  position: absolute;
+  top: 5%;
+  left: 3%;
+  font-size: 6rem;
+  color: rgba(10, 181, 181, 0.03);
+  font-family: serif;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.pricing-section::after {
+  content: '';
+  position: absolute;
+  top: 15%;
+  right: 8%;
+  width: 30px;
+  height: 30px;
+  border: 2px solid rgba(184, 135, 58, 0.06);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.stats-section::before {
+  content: '';
+  position: absolute;
+  top: 20%;
+  left: 50%;
+  width: 50px;
+  height: 50px;
+  border: 2px solid rgba(10, 181, 181, 0.04);
+  border-radius: 50%;
+  z-index: 1;
+  pointer-events: none;
+  animation: gentlePulse 4s ease-in-out infinite;
+}
+
+@keyframes gentlePulse {
+  0%, 100% { transform: translate(-50%, -50%) scale(1); opacity: 0.5; }
+  50% { transform: translate(-50%, -50%) scale(1.1); opacity: 0.2; }
+}
+
+.blog-section::after {
+  content: '';
+  position: absolute;
+  bottom: 10%;
+  right: 5%;
+  width: 40px;
+  height: 2px;
+  background: rgba(184, 135, 58, 0.06);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.faq-section::before {
+  content: '?';
+  position: absolute;
+  top: 3%;
+  right: 5%;
+  font-size: 5rem;
+  color: rgba(10, 181, 181, 0.025);
+  font-family: serif;
+  z-index: 1;
+  pointer-events: none;
+}
+
+.contact-section::after {
+  content: '';
+  position: absolute;
+  top: 10%;
+  left: 8%;
+  width: 20px;
+  height: 15px;
+  border: 1px solid rgba(10, 181, 181, 0.05);
+  z-index: 1;
+  pointer-events: none;
+}
+
+.community-section::before {
+  content: '';
+  position: absolute;
+  inset: 0;
+  background-image: radial-gradient(circle, rgba(10, 181, 181, 0.03) 1px, transparent 1px);
+  background-size: 40px 40px;
+  z-index: 1;
+  pointer-events: none;
+}
  </style>
 </head>
 <body>
@@ -4268,6 +4412,39 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
+function initSectionAnimations() {
+  var sections = document.querySelectorAll('section[id]');
+  
+  sections.forEach(function(section) {
+    var wrapper = document.createElement('div');
+    wrapper.className = 'section-wrapper';
+    
+    if (section.id.includes('team')) wrapper.classList.add('faculty-section');
+    if (section.id.includes('course')) wrapper.classList.add('resources-section');
+    if (section.id.includes('flashcard')) wrapper.classList.add('flashcards-section');
+    if (section.id.includes('testimonial')) wrapper.classList.add('testimonials-section');
+    if (section.id.includes('pricing')) wrapper.classList.add('pricing-section');
+    if (section.id.includes('stat')) wrapper.classList.add('stats-section');
+    if (section.id.includes('blog')) wrapper.classList.add('blog-section');
+    if (section.id.includes('faq')) wrapper.classList.add('faq-section');
+    if (section.id.includes('contact')) wrapper.classList.add('contact-section');
+    if (section.id.includes('community')) wrapper.classList.add('community-section');
+    
+    var content = document.createElement('div');
+    content.className = 'section-content';
+    
+    while (section.firstChild) {
+      content.appendChild(section.firstChild);
+    }
+    
+    wrapper.appendChild(content);
+    section.appendChild(wrapper);
+  });
+}
+
+document.addEventListener('DOMContentLoaded', function() {
+  initSectionAnimations();
+});
  </script>
 </body>
 </html>
