@@ -4757,7 +4757,7 @@ async function handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor) {
   }
 }
 
-async function previewPdf(pdfId, pdfTitle, pdfUrl) {
+ async function previewPdf(pdfId, pdfTitle, pdfUrl) {
   try {
     const restriction = await apiCall('check_pdf_restriction', { pdf_id: pdfId, restriction_type: 'preview' });
     
@@ -4777,6 +4777,12 @@ async function previewPdf(pdfId, pdfTitle, pdfUrl) {
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
     
+    iframe.onerror = function() {
+      alert('PDF file not found. The file may have been moved or deleted.');
+      modal.classList.remove('active');
+      document.body.style.overflow = '';
+    };
+    
     downloadBtn.onclick = () => {
       downloadPdf(pdfId, pdfTitle, pdfUrl);
     };
@@ -4785,7 +4791,7 @@ async function previewPdf(pdfId, pdfTitle, pdfUrl) {
     
   } catch (err) {
     console.error('Preview failed:', err);
-    alert('Failed to load preview. Please try again.');
+    alert('Failed to load preview: ' + err.message);
   }
 }
 
