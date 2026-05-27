@@ -4795,8 +4795,8 @@ async function handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor) {
     await downloadPdf(pdfId, pdfTitle, pdfUrl);
   }
 }
- 
-    async function previewPdf(pdfId, pdfTitle, pdfUrl) {
+
+  async function previewPdf(pdfId, pdfTitle, pdfUrl) {
   try {
     const restriction = await apiCall('check_pdf_restriction', { pdf_id: pdfId, restriction_type: 'preview' });
     if (restriction.is_restricted) {
@@ -4812,15 +4812,44 @@ async function handlePdfCardClick(pdfId, pdfTitle, pdfUrl, pdfAuthor) {
     titleEl.textContent = pdfTitle;
     modal.classList.add('active');
     document.body.style.overflow = 'hidden';
-    previewBody.innerHTML = '';
-    previewBody.appendChild(iframe);
-    iframe.style.display = 'block';
-    iframe.src = pdfUrl + '?t=' + Date.now();
+    previewBody.innerHTML = `
+      <div style="display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; background:var(--clr-navy-card);">
+        <div class="pdf-loading-spinner">
+          <div class="spinner-dot dot-magenta"></div>
+          <div class="spinner-dot dot-cyan"></div>
+          <div class="spinner-dot dot-orange"></div>
+        </div>
+        <p style="margin-top:24px; color:var(--clr-text-dim); font-family:var(--font-body);">Loading PDF...</p>
+      </div>
+    `;
+    fetch(pdfUrl, { method: 'HEAD' })
+      .then(res => {
+        if (!res.ok) throw new Error('File not found');
+        previewBody.innerHTML = '';
+        previewBody.appendChild(iframe);
+        iframe.style.display = 'block';
+        iframe.src = pdfUrl + '?t=' + Date.now();
+      })
+      .catch(err => {
+        previewBody.innerHTML = `
+          <div style="display:flex; align-items:center; justify-content:center; height:100%; flex-direction:column; padding:20px; text-align:center;">
+            <i class="fa-solid fa-file-pdf" style="font-size:3rem; color:#e74c3c;"></i>
+            <h3 style="margin-top:16px; color:#e74c3c;">Cannot Load PDF</h3>
+            <p style="margin-top:8px; color:var(--clr-text-dim);">The PDF file could not be loaded.</p>
+            <p style="margin-top:4px; color:var(--clr-text-muted); font-size:0.8rem;">URL: ${pdfUrl.substring(0, 60)}...</p>
+            <button onclick="window.open('${pdfUrl}', '_blank')" style="margin-top:20px; padding:10px 20px; background:var(--clr-cyan); border:none; border-radius:30px; color:#fff; cursor:pointer;">
+              Open in Browser
+            </button>
+          </div>
+        `;
+        iframe.style.display = 'none';
+      });
     downloadBtn.onclick = () => {
       downloadPdf(pdfId, pdfTitle, pdfUrl);
     };
     await apiCall('track_pdf_preview', { pdf_id: pdfId });
   } catch (err) {
+    console.error('Preview failed:', err);
     alert('Failed to load preview: ' + err.message);
   }
 }
