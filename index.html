@@ -1449,12 +1449,12 @@ body.dark-mode .footer-fat {
   text-transform: uppercase;
 }
 
-.section-title {
+ .section-title {
   font-family: var(--font-display);
-  font-size: var(--text-h1);
+  font-size: clamp(3rem, 8vw, 5.5rem);
   font-weight: 900;
-  line-height: var(--lh-snug);
-  letter-spacing: var(--ls-snug);
+  line-height: 1.1;
+  letter-spacing: -0.02em;
   text-align: center;
   color: var(--clr-white);
   text-wrap: balance;
@@ -2562,7 +2562,7 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
   .resources-grid { grid-template-columns: 1fr; gap: 14px; }
   .footer-fat { padding: 1.5rem 1rem 1rem; }
   .footer-grid { grid-template-columns: 1fr; gap: 20px; }
-  .section-title { font-size: clamp(1.5rem, 5.5vw, 2.1rem); letter-spacing: -0.01em; }
+ .section-title { font-size: clamp(2rem, 7vw, 3.5rem); letter-spacing: -0.02em; }
   .section-subtitle { font-size: var(--text-base); }
   .header-container { padding: 0 12px; }
   .filter-dropdown { padding: 0.6rem 0.8rem 0.8rem; }
@@ -2617,7 +2617,7 @@ margin-bottom: -25px;
   .footer-grid { grid-template-columns: 1fr; }
   .chat-window { width: 260px; height: 320px; right: 0; }
   .team-scroll-container .card { min-width: 200px; max-width: 240px; }
-  .section-title { font-size: clamp(1.3rem, 6vw, 1.75rem); }
+ .section-title { font-size: clamp(1.8rem, 6vw, 2.5rem); }
   .logo-link img {
     height: 80px !important;
     max-height: 80px !important;
