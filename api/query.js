@@ -88,7 +88,8 @@ async function persistBan(ip, durationMs, reason) {
   'track_page_activity', 'get_page_activity',
   'update_newsletter_subscriber', 'delete_quiz_topic',
   'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download'
-]);
+'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
+ ]);
 
  const PUBLIC_ACTIONS = new Set([
   'get_site_section', 'get_all_site_sections', 'get_all_sections',
@@ -108,7 +109,8 @@ async function persistBan(ip, durationMs, reason) {
   'check_flashcard_answer',
   'get_resource_interactions',
   'get_pdfs_by_level'
-]);
+'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
+ ]);
 
  const CSRF_PROTECTED_ACTIONS = new Set([
   'submit_contact', 'subscribe_newsletter', 'submit_resource',
@@ -131,7 +133,8 @@ async function persistBan(ip, durationMs, reason) {
   'track_page_activity',
   'update_newsletter_subscriber', 'delete_quiz_topic',
   'track_pdf_preview', 'track_pdf_download'
-]);
+'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
+ ]);
 
 const ADMIN_ACTIONS = new Set([
   'approve', 'submissions', 'messages', 'stats',
@@ -509,10 +512,11 @@ const VALIDATORS = {
   get_page_activity: (body) => null,
   update_newsletter_subscriber: (body) => { if (!body.id) return 'id required'; return null; },
    delete_quiz_topic: (body) => { if (!body.topic || !body.level) return 'topic and level required'; return null; },
-  get_pdfs_by_level: (body) => { if (!body.level) return 'Level required'; return null; },
-  check_pdf_restriction: (body) => { if (!body.pdf_id) return 'pdf_id required'; if (!body.restriction_type) return 'restriction_type required'; return null; },
-  track_pdf_preview: (body) => { if (!body.pdf_id) return 'pdf_id required'; return null; },
-  track_pdf_download: (body) => { if (!body.pdf_id) return 'pdf_id required'; return null; }
+   track_pdf_download: (body) => { if (!body.pdf_id) return 'pdf_id required'; return null; },
+  get_notes_structure: (body) => { return null; },
+  get_note_content: (body) => { if (!body.subtopic_id) return 'subtopic_id required'; return null; },
+  toggle_note_reaction: (body) => { if (!body.note_id) return 'note_id required'; if (!body.reaction_type) return 'reaction_type required'; return null; },
+  get_note_reactions: (body) => { if (!body.note_id) return 'note_id required'; return null; }
 };
 
 setInterval(() => {
@@ -1842,7 +1846,85 @@ case 'track_pdf_download': {
   result = { success: true };
   break;
 }
-      default: throw new Error('Unknown action: ' + action);
+    case 'get_notes_structure': {
+  const { data, error } = await supabase
+    .from('notes_structure')
+    .select('*')
+    .order('level_order', { ascending: true })
+    .order('topic_order', { ascending: true })
+    .order('subtopic_order', { ascending: true });
+  if (error) throw error;
+  result = data || [];
+  break;
+}
+
+case 'get_note_content': {
+  const subtopicId = req.body.subtopic_id;
+  const { data, error } = await supabase
+    .from('note_contents')
+    .select('*')
+    .eq('subtopic_id', subtopicId)
+    .single();
+  if (error) throw error;
+  result = data;
+  break;
+}
+
+case 'toggle_note_reaction': {
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const noteId = req.body.note_id;
+  const reactionType = req.body.reaction_type;
+  const { data: existing } = await supabase
+    .from('note_reactions')
+    .select('id, reaction_type')
+    .eq('user_id', userId)
+    .eq('note_id', noteId)
+    .maybeSingle();
+  if (existing) {
+    if (existing.reaction_type === reactionType) {
+      await supabase.from('note_reactions').delete().eq('id', existing.id);
+      result = { reacted: false, reaction_type: null };
+    } else {
+      await supabase.from('note_reactions').update({ reaction_type: reactionType }).eq('id', existing.id);
+      result = { reacted: true, reaction_type: reactionType };
+    }
+  } else {
+    await supabase.from('note_reactions').insert({
+      user_id: userId,
+      note_id: noteId,
+      reaction_type: reactionType
+    });
+    result = { reacted: true, reaction_type: reactionType };
+  }
+  const { count } = await supabase
+    .from('note_reactions')
+    .select('id', { count: 'exact', head: true })
+    .eq('note_id', noteId);
+  result.count = count || 0;
+  break;
+}
+
+case 'get_note_reactions': {
+  const noteId = req.body.note_id;
+  const { data, error } = await supabase
+    .from('note_reactions')
+    .select('reaction_type, user_id, created_at')
+    .eq('note_id', noteId);
+  if (error) throw error;
+  const reactionCounts = { like: 0, love: 0, helpful: 0 };
+  (data || []).forEach(r => {
+    if (reactionCounts[r.reaction_type] !== undefined) reactionCounts[r.reaction_type]++;
+  });
+  let userReaction = null;
+  if (userId) {
+    const userReact = (data || []).find(r => r.user_id === userId);
+    if (userReact) userReaction = userReact.reaction_type;
+  }
+  result = { counts: reactionCounts, user_reaction: userReaction, total: (data || []).length };
+  break;
+}  
+
+default: throw new Error('Unknown action: ' + action);
     }
     responseCache.delete('all_sections'); responseCache.delete('stats');
     return res.status(200).json({ data: result });
