@@ -3609,6 +3609,39 @@ keyframes fadeInOut {
   .notes-content-container { padding:16px; }
   .notes-content-container h1 { font-size:1.4rem; }
 }
+@keyframes fadeInOut {
+  0% { opacity:0; transform:translateY(-10px); }
+  15% { opacity:1; transform:translateY(0); }
+  85% { opacity:1; transform:translateY(0); }
+  100% { opacity:0; transform:translateY(-10px); }
+}
+
+.notes-fullscreen {
+  position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
+  right: 0 !important;
+  bottom: 0 !important;
+  z-index: 1000 !important;
+  background: var(--clr-deep-space) !important;
+  margin: 0 !important;
+  padding: 20px !important;
+  overflow-y: auto !important;
+}
+
+.notes-fullscreen #notes-container {
+  max-height: none !important;
+  height: calc(100vh - 200px);
+}
+
+.level-btn, .topic-btn, .subtopic-btn {
+  transition: all 0.2s ease;
+}
+
+.level-btn:hover, .topic-btn:hover, .subtopic-btn:hover {
+  transform: translateY(-2px);
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+}
 </style>
 </head>
 <body>
@@ -3806,24 +3839,39 @@ Aliver<span class="g-text">Biopharm</span>
   </div>
 </div>
 
-<section id="notes-section" class="section-wrapper notes-section-wrapper" style="position:relative; margin: 40px 20px;">
-  <div style="position:relative; max-width:var(--max-width); margin:0 auto;">
-    <div style="position:absolute; top:-18px; left:30px; background:var(--clr-deep-space); padding:0 20px; z-index:10;">
-      <h2 class="pdf-section-title" style="font-size:clamp(1.8rem,5vw,2.5rem); margin:0; background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); -webkit-background-clip:text; background-clip:text; color:transparent;">Notes Library</h2>
+ <section id="notes-section" class="section-wrapper" style="margin: 60px 0; padding: 0 20px;">
+  <div style="max-width:1400px; margin:0 auto;">
+    <div style="margin-bottom: 30px; padding-left: 20px;">
+      <h2 class="pdf-section-title" style="font-family:'Poppins',sans-serif; font-size:clamp(2rem,5vw,3rem); margin:0; background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); -webkit-background-clip:text; background-clip:text; color:transparent; text-align:left;">Notes Library</h2>
     </div>
-    <div class="notes-rainbow-border" style="border:2px solid transparent; border-image:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); border-image-slice:1; border-radius:20px; background:var(--clr-navy-card); backdrop-filter:blur(12px); overflow:hidden;">
-      <div style="padding:30px 24px 24px 24px;">
-        <div class="notes-control-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
-          <button id="notes-filter-btn" class="btn-primary" style="background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); padding:12px 28px; border-radius:50px; font-weight:800;"><i class="fa-solid fa-filter"></i> Browse Notes by Level</button>
-          <button id="notes-fullscreen-btn" class="btn-primary" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan);"><i class="fa-solid fa-expand"></i> Full Screen</button>
+    
+    <div style="background:var(--clr-navy-card); backdrop-filter:blur(12px); border-radius:20px; overflow:hidden;">
+      <div style="padding:20px 24px;">
+        <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
+          <button id="notes-main-filter-btn" class="btn-primary" style="background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); padding:8px 20px; border-radius:50px; font-weight:700; font-size:0.85rem;"><i class="fa-solid fa-filter"></i> Browse Notes by Level</button>
+          <button id="notes-fullscreen-btn" class="btn-primary" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:8px 20px; border-radius:50px; font-size:0.85rem;"><i class="fa-solid fa-expand"></i> Full Screen</button>
         </div>
-        <div id="notes-wake-message" style="display:none; background:linear-gradient(135deg, #e67e22, #b8873a); color:#fff; padding:10px 20px; border-radius:50px; text-align:center; margin-bottom:16px; font-weight:600; animation:fadeInOut 3s ease;">
+        
+        <div id="notes-wake-message" style="display:none; background:linear-gradient(135deg, #e67e22, #b8873a); color:#fff; padding:8px 16px; border-radius:50px; text-align:center; margin-bottom:16px; font-weight:600; font-size:0.85rem; animation:fadeInOut 3s ease;">
           <i class="fa-solid fa-sun"></i> Screen wake lock activated! Learn freely without interruption.
         </div>
-        <div id="notes-container" style="max-height:600px; overflow-y:auto; transition:all 0.3s ease;">
-          <div style="text-align:center; padding:60px 20px; color:var(--clr-text-dim);">
-            <i class="fa-solid fa-book-open" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
-            Click "Browse Notes by Level" to start learning
+        
+        <div id="notes-filter-area" style="display:none; margin-bottom:20px;">
+          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
+            <button id="notes-hide-filter-btn" class="btn-primary" style="background:rgba(184,135,58,0.2); border:1px solid var(--clr-magenta); color:var(--clr-magenta); padding:6px 16px; border-radius:50px; font-size:0.75rem;"><i class="fa-solid fa-eye-slash"></i> Hide Filter</button>
+            <button id="notes-reset-filter-btn" class="btn-primary" style="background:transparent; border:1px solid var(--clr-cyan); color:var(--clr-cyan); padding:6px 16px; border-radius:50px; font-size:0.75rem;"><i class="fa-solid fa-undo"></i> Reset</button>
+          </div>
+          <div id="notes-level-buttons" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;"></div>
+          <div id="notes-topics-container" style="margin-bottom:20px;"></div>
+          <div id="notes-subtopics-container"></div>
+        </div>
+        
+        <div id="notes-content-area" style="min-height:300px;">
+          <div id="notes-container" style="max-height:600px; overflow-y:auto; transition:all 0.3s ease;">
+            <div style="text-align:center; padding:60px 20px; color:var(--clr-text-dim);">
+              <i class="fa-solid fa-book-open" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
+              Click "Browse Notes by Level" to start learning
+            </div>
           </div>
         </div>
       </div>
@@ -5656,12 +5704,14 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
- let notesWakeLock = null;
+  let notesWakeLock = null;
 let notesCurrentLevel = null;
 let notesCurrentTopic = null;
 let notesCurrentSubtopic = null;
 let notesStructureData = [];
 let notesFullscreenActive = false;
+let notesSelectedLevelData = null;
+let notesSelectedTopicData = null;
 
 async function acquireNotesWakeLock() {
   if ('wakeLock' in navigator && !notesWakeLock) {
@@ -5688,175 +5738,175 @@ async function loadNotesStructure() {
   try {
     const data = await apiCall('get_notes_structure');
     notesStructureData = data || [];
-    renderNotesLevels();
   } catch (err) {
     console.error('Failed to load notes structure:', err);
     document.getElementById('notes-container').innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);">Failed to load notes. Please try again.</div>';
   }
 }
 
-function renderNotesLevels() {
+function showFilterArea() {
+  document.getElementById('notes-filter-area').style.display = 'block';
+  renderLevelButtons();
+}
+
+function hideFilterArea() {
+  document.getElementById('notes-filter-area').style.display = 'none';
+}
+
+function resetFilter() {
+  notesCurrentLevel = null;
+  notesCurrentTopic = null;
+  notesCurrentSubtopic = null;
+  notesSelectedLevelData = null;
+  notesSelectedTopicData = null;
+  renderLevelButtons();
+  document.getElementById('notes-topics-container').innerHTML = '';
+  document.getElementById('notes-subtopics-container').innerHTML = '';
+}
+
+function renderLevelButtons() {
   const levels = {};
   notesStructureData.forEach(item => {
     if (!levels[item.level]) {
-      levels[item.level] = {
-        level_order: item.level_order,
-        topics: {}
-      };
+      levels[item.level] = { level_order: item.level_order, topics: {} };
     }
-    if (!levels[item.level].topics[item.topic]) {
-      levels[item.level].topics[item.topic] = {
-        topic_order: item.topic_order,
-        subtopics: []
-      };
-    }
-    levels[item.level].topics[item.topic].subtopics.push({
-      id: item.subtopic_id,
-      name: item.subtopic_name,
-      order: item.subtopic_order
-    });
-  });
-  Object.values(levels).forEach(level => {
-    Object.values(level.topics).forEach(topic => {
-      topic.subtopics.sort((a,b) => a.order - b.order);
-    });
   });
   const sortedLevels = Object.entries(levels).sort((a,b) => a[1].level_order - b[1].level_order);
-  let html = '<div class="notes-accordion" id="notes-accordion">';
-  sortedLevels.forEach(([levelName, levelData]) => {
-    const levelId = `level-${levelName.replace(/\s+/g, '-')}`;
-    html += `
-      <div class="notes-accordion-item" data-level="${levelName}">
-        <div class="notes-accordion-header" onclick="toggleNotesAccordion('${levelId}')">
-          <div><span class="level-badge" style="background:${getLevelColor(levelName)}"></span><strong>${escapeHtml(levelName)}</strong> <span style="font-size:0.8rem; color:var(--clr-text-muted);">(${Object.keys(levelData.topics).length} topics)</span></div>
-          <i class="fa-solid fa-chevron-down" id="${levelId}-icon"></i>
-        </div>
-        <div class="notes-accordion-content" id="${levelId}">
-    `;
-    const sortedTopics = Object.entries(levelData.topics).sort((a,b) => a[1].topic_order - b[1].topic_order);
-    sortedTopics.forEach(([topicName, topicData]) => {
-      const topicId = `topic-${levelName.replace(/\s+/g, '-')}-${topicName.replace(/\s+/g, '-')}`;
-      html += `
-        <div class="notes-topic-item" data-level="${levelName}" data-topic="${topicName}" onclick="toggleNotesTopic('${topicId}', '${levelName}', '${escapeHtml(topicName)}', event)">
-          <i class="fa-solid fa-folder" style="margin-right:10px; color:var(--clr-magenta);"></i>${escapeHtml(topicName)} <span style="font-size:0.7rem; color:var(--clr-text-muted);">(${topicData.subtopics.length} subtopics)</span>
-          <i class="fa-solid fa-chevron-right" style="float:right; margin-top:3px;" id="${topicId}-icon"></i>
-        </div>
-        <div class="notes-accordion-content" id="${topicId}" style="padding-left:20px;">
-      `;
-      topicData.subtopics.forEach(subtopic => {
-        html += `
-          <div class="notes-subtopic-item" data-level="${levelName}" data-topic="${topicName}" data-subtopic-id="${subtopic.id}" data-subtopic-name="${escapeHtml(subtopic.name)}" onclick="loadNoteContent('${subtopic.id}', '${escapeHtml(levelName)}', '${escapeHtml(topicName)}', '${escapeHtml(subtopic.name)}', event)">
-            <i class="fa-solid fa-file-lines" style="margin-right:10px; color:var(--clr-cyan);"></i>${escapeHtml(subtopic.name)}
-          </div>
-        `;
-      });
-      html += `</div>`;
-    });
-    html += `</div></div>`;
+  
+  let html = '';
+  sortedLevels.forEach(([levelName]) => {
+    const isActive = notesCurrentLevel === levelName;
+    html += `<button class="level-btn" data-level="${levelName}" style="background:${isActive ? 'var(--clr-cyan)' : 'transparent'}; border:2px solid ${getLevelColor(levelName)}; color:${isActive ? '#fff' : 'var(--clr-white)'}; padding:8px 24px; border-radius:50px; cursor:pointer; font-weight:600; transition:all 0.2s;">${escapeHtml(levelName)}</button>`;
   });
-  html += '</div>';
-  document.getElementById('notes-container').innerHTML = html;
+  
+  document.getElementById('notes-level-buttons').innerHTML = html;
+  
+  document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const level = btn.dataset.level;
+      notesCurrentLevel = level;
+      notesCurrentTopic = null;
+      notesCurrentSubtopic = null;
+      notesSelectedLevelData = null;
+      notesSelectedTopicData = null;
+      renderLevelButtons();
+      renderTopicsForLevel(level);
+      document.getElementById('notes-subtopics-container').innerHTML = '';
+    });
+  });
+  
+  if (notesCurrentLevel) {
+    renderTopicsForLevel(notesCurrentLevel);
+  }
 }
 
-function getLevelColor(level) {
-  if (level === 'O-Level') return '#e67e22';
-  if (level === 'A-Level') return '#b8873a';
-  if (level === 'Pharmacy') return '#0ab5b5';
-  return '#888';
-}
-
-function closeAllAccordions() {
-  document.querySelectorAll('.notes-accordion-content.open').forEach(content => {
-    content.classList.remove('open');
-    const parentId = content.id;
-    const icon = document.getElementById(`${parentId}-icon`);
-    if (icon) {
-      if (parentId.startsWith('level-')) {
-        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-      } else if (parentId.startsWith('topic-')) {
-        icon.classList.replace('fa-chevron-up', 'fa-chevron-right');
+function renderTopicsForLevel(level) {
+  const topics = {};
+  notesStructureData.forEach(item => {
+    if (item.level === level) {
+      if (!topics[item.topic]) {
+        topics[item.topic] = { topic_order: item.topic_order, subtopics: [] };
       }
     }
   });
-}
-
-function toggleNotesAccordion(id) {
-  const content = document.getElementById(id);
-  const icon = document.getElementById(`${id}-icon`);
-  if (content.classList.contains('open')) {
-    content.classList.remove('open');
-    if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
-  } else {
-    content.classList.add('open');
-    if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
-  }
-}
-
-function toggleNotesTopic(topicId, level, topic, event) {
-  event.stopPropagation();
-  const content = document.getElementById(topicId);
-  const icon = document.getElementById(`${topicId}-icon`);
-  if (content.classList.contains('open')) {
-    content.classList.remove('open');
-    if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-right');
-  } else {
-    closeAllAccordions();
-    content.classList.add('open');
-    if (icon) icon.classList.replace('fa-chevron-right', 'fa-chevron-up');
-    notesCurrentLevel = level;
-    notesCurrentTopic = topic;
-    document.querySelectorAll('.notes-topic-item').forEach(el => el.classList.remove('active'));
-    event.currentTarget.classList.add('active');
-  }
-}
-
-async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
-  if (event) event.stopPropagation();
-  if (!notesWakeLock) await acquireNotesWakeLock();
-  notesCurrentSubtopic = subtopicId;
-  document.querySelectorAll('.notes-subtopic-item').forEach(el => el.classList.remove('active'));
-  if (event && event.currentTarget) event.currentTarget.classList.add('active');
   
-  closeAllAccordions();
+  const sortedTopics = Object.entries(topics).sort((a,b) => a[1].topic_order - b[1].topic_order);
+  
+  let html = '<h4 style="color:var(--clr-magenta); margin-bottom:12px; font-size:0.9rem;"><i class="fa-solid fa-folder-tree"></i> Topics</h4><div style="display:flex; flex-wrap:wrap; gap:10px;">';
+  sortedTopics.forEach(([topicName]) => {
+    const isActive = notesCurrentTopic === topicName;
+    html += `<button class="topic-btn" data-topic="${escapeHtml(topicName)}" style="background:${isActive ? 'var(--clr-magenta)' : 'rgba(184,135,58,0.15)'}; border:1px solid var(--clr-magenta); color:${isActive ? '#fff' : 'var(--clr-magenta)'}; padding:6px 18px; border-radius:50px; cursor:pointer; font-size:0.85rem; transition:all 0.2s;">${escapeHtml(topicName)}</button>`;
+  });
+  html += '</div>';
+  
+  document.getElementById('notes-topics-container').innerHTML = html;
+  
+  document.querySelectorAll('.topic-btn').forEach(btn => {
+    btn.addEventListener('click', (e) => {
+      const topic = btn.dataset.topic;
+      notesCurrentTopic = topic;
+      notesCurrentSubtopic = null;
+      notesSelectedTopicData = null;
+      renderTopicsForLevel(notesCurrentLevel);
+      renderSubtopicsForTopic(notesCurrentLevel, topic);
+    });
+  });
+  
+  if (notesCurrentTopic) {
+    renderSubtopicsForTopic(level, notesCurrentTopic);
+  }
+}
+
+function renderSubtopicsForTopic(level, topic) {
+  const subtopics = [];
+  notesStructureData.forEach(item => {
+    if (item.level === level && item.topic === topic) {
+      subtopics.push({
+        id: item.subtopic_id,
+        name: item.subtopic_name,
+        order: item.subtopic_order
+      });
+    }
+  });
+  
+  subtopics.sort((a,b) => a.order - b.order);
+  
+  let html = '<h4 style="color:var(--clr-cyan); margin:16px 0 12px 0; font-size:0.9rem;"><i class="fa-solid fa-file-lines"></i> Subtopics</h4><div style="display:flex; flex-wrap:wrap; gap:10px;">';
+  subtopics.forEach(sub => {
+    const isActive = notesCurrentSubtopic === sub.id;
+    html += `<button class="subtopic-btn" data-subtopic-id="${sub.id}" data-subtopic-name="${escapeHtml(sub.name)}" style="background:${isActive ? 'var(--clr-cyan)' : 'rgba(10,181,181,0.1)'}; border:1px solid var(--clr-cyan); color:${isActive ? '#fff' : 'var(--clr-cyan)'}; padding:6px 18px; border-radius:50px; cursor:pointer; font-size:0.85rem; transition:all 0.2s;">${escapeHtml(sub.name)}</button>`;
+  });
+  html += '</div>';
+  
+  document.getElementById('notes-subtopics-container').innerHTML = html;
+  
+  document.querySelectorAll('.subtopic-btn').forEach(btn => {
+    btn.addEventListener('click', async (e) => {
+      const subtopicId = btn.dataset.subtopicId;
+      const subtopicName = btn.dataset.subtopicName;
+      notesCurrentSubtopic = subtopicId;
+      renderSubtopicsForTopic(notesCurrentLevel, notesCurrentTopic);
+      await loadNoteContentDirect(subtopicId, notesCurrentLevel, notesCurrentTopic, subtopicName);
+      hideFilterArea();
+    });
+  });
+}
+
+async function loadNoteContentDirect(subtopicId, level, topic, subtopic) {
+  if (!notesWakeLock) await acquireNotesWakeLock();
   
   const container = document.getElementById('notes-container');
-  const loadingDiv = document.createElement('div');
-  loadingDiv.className = 'notes-content-container';
-  loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading notes...</div>';
-  const existingContent = container.querySelector('.notes-content-container');
-  if (existingContent) existingContent.remove();
-  container.appendChild(loadingDiv);
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading notes...</div>';
   
   try {
     const data = await apiCall('get_note_content', { subtopic_id: subtopicId });
-    if (existingContent) existingContent.remove();
     const contentHtml = `
-      <div class="notes-content-container">
+      <div class="notes-content-container" style="padding:24px; background:var(--clr-navy-card); border-radius:16px; animation:slideIn 0.3s ease;">
         <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
           <div>
             <span style="font-size:0.8rem; color:var(--clr-text-muted);">${escapeHtml(level)} / ${escapeHtml(topic)}</span>
-            <h1 style="margin-top:8px;">${escapeHtml(subtopic)}</h1>
+            <h1 style="font-family:var(--font-display); font-size:1.8rem; color:var(--clr-white); margin-top:8px;">${escapeHtml(subtopic)}</h1>
           </div>
           <div style="display:flex; gap:8px;">
             <button class="btn-download" onclick="downloadNoteAsPDF()" style="background:var(--clr-cyan);"><i class="fa-solid fa-download"></i> Save as PDF</button>
           </div>
         </div>
         <div id="note-rendered-content">${data?.content || '<p>No content available for this note.</p>'}</div>
-        <div class="notes-reaction-bar" data-note-id="${subtopicId}">
-          <button class="reaction-btn" data-reaction="like" onclick="toggleNoteReaction('${subtopicId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count">0</span></button>
-          <button class="reaction-btn" data-reaction="love" onclick="toggleNoteReaction('${subtopicId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count">0</span></button>
-          <button class="reaction-btn" data-reaction="helpful" onclick="toggleNoteReaction('${subtopicId}', 'helpful')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count">0</span></button>
+        <div class="notes-reaction-bar" data-note-id="${subtopicId}" style="display:flex; gap:16px; margin-top:24px; padding-top:20px; border-top:2px solid var(--clr-border-glow);">
+          <button class="reaction-btn" data-reaction="like" onclick="toggleNoteReaction('${subtopicId}', 'like')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count">0</span></button>
+          <button class="reaction-btn" data-reaction="love" onclick="toggleNoteReaction('${subtopicId}', 'love')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-heart"></i> <span class="reaction-count">0</span></button>
+          <button class="reaction-btn" data-reaction="helpful" onclick="toggleNoteReaction('${subtopicId}', 'helpful')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count">0</span></button>
         </div>
-        <div class="comment-section">
-          <div class="comment-input-group">
-            <input type="text" id="comment-input-${subtopicId}" placeholder="Add a comment or question...">
+        <div class="comment-section" style="margin-top:20px;">
+          <div class="comment-input-group" style="display:flex; gap:8px; margin-bottom:16px;">
+            <input type="text" id="comment-input-${subtopicId}" placeholder="Add a comment or question..." style="flex:1; padding:10px 16px; border-radius:30px; border:1px solid var(--clr-border-glow); background:var(--clr-navy-card); color:var(--clr-white);">
             <button class="btn-primary" onclick="submitNoteComment('${subtopicId}')" style="padding:8px 20px;">Post</button>
           </div>
-          <div class="comment-list" id="comments-${subtopicId}"></div>
+          <div class="comment-list" id="comments-${subtopicId}" style="max-height:200px; overflow-y:auto;"></div>
         </div>
       </div>
     `;
-    loadingDiv.outerHTML = contentHtml;
+    container.innerHTML = contentHtml;
     await loadNoteReactions(subtopicId);
     await loadNoteComments(subtopicId);
     if (notesFullscreenActive) {
@@ -5867,7 +5917,7 @@ async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
     }
   } catch (err) {
     console.error('Failed to load note content:', err);
-    loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.<br><small>' + err.message + '</small></div>';
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.</div>';
   }
 }
 
@@ -5876,12 +5926,15 @@ async function loadNoteReactions(noteId) {
     const data = await apiCall('get_note_reactions', { note_id: noteId });
     const reactionBar = document.querySelector(`.notes-reaction-bar[data-note-id="${noteId}"]`);
     if (reactionBar) {
-      reactionBar.querySelector('.reaction-btn[data-reaction="like"] .reaction-count').textContent = data.counts.like || 0;
-      reactionBar.querySelector('.reaction-btn[data-reaction="love"] .reaction-count').textContent = data.counts.love || 0;
-      reactionBar.querySelector('.reaction-btn[data-reaction="helpful"] .reaction-count').textContent = data.counts.helpful || 0;
+      const likeSpan = reactionBar.querySelector('.reaction-btn[data-reaction="like"] .reaction-count');
+      const loveSpan = reactionBar.querySelector('.reaction-btn[data-reaction="love"] .reaction-count');
+      const helpfulSpan = reactionBar.querySelector('.reaction-btn[data-reaction="helpful"] .reaction-count');
+      if (likeSpan) likeSpan.textContent = data.counts.like || 0;
+      if (loveSpan) loveSpan.textContent = data.counts.love || 0;
+      if (helpfulSpan) helpfulSpan.textContent = data.counts.helpful || 0;
       if (data.user_reaction) {
         const activeBtn = reactionBar.querySelector(`.reaction-btn[data-reaction="${data.user_reaction}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
+        if (activeBtn) activeBtn.style.background = 'linear-gradient(135deg, #e67e22, #b8873a)';
       }
     }
   } catch (err) { console.error('Failed to load reactions:', err); }
@@ -5895,15 +5948,7 @@ async function toggleNoteReaction(noteId, reactionType) {
   }
   try {
     const result = await apiCall('toggle_note_reaction', { note_id: noteId, reaction_type: reactionType });
-    const reactionBar = document.querySelector(`.notes-reaction-bar[data-note-id="${noteId}"]`);
-    if (reactionBar) {
-      reactionBar.querySelectorAll('.reaction-btn').forEach(btn => btn.classList.remove('active'));
-      if (result.reacted && result.reaction_type) {
-        const activeBtn = reactionBar.querySelector(`.reaction-btn[data-reaction="${result.reaction_type}"]`);
-        if (activeBtn) activeBtn.classList.add('active');
-      }
-      await loadNoteReactions(noteId);
-    }
+    await loadNoteReactions(noteId);
   } catch (err) { console.error('Failed to toggle reaction:', err); }
 }
 
@@ -5916,8 +5961,8 @@ async function loadNoteComments(noteId) {
         commentList.innerHTML = '<div style="text-align:center; color:var(--clr-text-muted); padding:20px;">No comments yet. Be the first!</div>';
       } else {
         commentList.innerHTML = interactions.comments.map(c => `
-          <div class="comment-item">
-            <strong>${escapeHtml(c.user_name)}</strong> <span style="font-size:0.7rem; color:var(--clr-text-muted);">${new Date(c.created_at).toLocaleDateString()}</span><br>
+          <div class="comment-item" style="padding:10px 0; border-bottom:1px solid var(--clr-border-glow); font-size:0.85rem; color:var(--clr-text-dim);">
+            <strong style="color:var(--clr-cyan);">${escapeHtml(c.user_name)}</strong> <span style="font-size:0.7rem; color:var(--clr-text-muted);">${new Date(c.created_at).toLocaleDateString()}</span><br>
             ${escapeHtml(c.comment)}
           </div>
         `).join('');
@@ -5982,21 +6027,44 @@ function toggleNotesFullscreen() {
   }
 }
 
-document.getElementById('notes-filter-btn').addEventListener('click', () => {
-  const filterBtn = document.getElementById('notes-filter-btn');
+document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
+  e.preventDefault();
   if (notesStructureData.length === 0) {
-    loadNotesStructure();
-  } else {
-    renderNotesLevels();
-    const notesContainer = document.getElementById('notes-container');
-    const existingContent = notesContainer.querySelector('.notes-content-container');
-    if (existingContent) existingContent.remove();
+    await loadNotesStructure();
   }
-  filterBtn.style.transform = 'scale(0.95)';
-  setTimeout(() => { filterBtn.style.transform = ''; }, 200);
+  showFilterArea();
+  if (notesCurrentSubtopic) {
+    renderLevelButtons();
+    renderTopicsForLevel(notesCurrentLevel);
+    renderSubtopicsForTopic(notesCurrentLevel, notesCurrentTopic);
+  } else {
+    resetFilter();
+  }
+});
+
+document.getElementById('notes-hide-filter-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  hideFilterArea();
+});
+
+document.getElementById('notes-reset-filter-btn').addEventListener('click', (e) => {
+  e.preventDefault();
+  resetFilter();
 });
 
 document.getElementById('notes-fullscreen-btn').addEventListener('click', toggleNotesFullscreen);
+
+function getLevelColor(level) {
+  if (level === 'O-Level') return '#e67e22';
+  if (level === 'A-Level') return '#b8873a';
+  if (level === 'Pharmacy') return '#0ab5b5';
+  return '#888';
+}
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
 
 const notesObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
@@ -6010,11 +6078,6 @@ const notesObserver = new IntersectionObserver((entries) => {
 
 const notesSectionElement = document.getElementById('notes-section');
 if (notesSectionElement) notesObserver.observe(notesSectionElement);
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
  </script>
 </body>
 </html>
