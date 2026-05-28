@@ -3642,6 +3642,130 @@ keyframes fadeInOut {
   transform: translateY(-2px);
   box-shadow: 0 4px 12px rgba(0,0,0,0.15);
 }
+
+.pdf-cards-area, #notes-container {
+  scrollbar-width: thin;
+}
+
+.pdf-cards-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(160px, 1fr));
+  gap: 12px;
+}
+
+.pdf-card {
+  background: rgba(255,255,255,0.1);
+  backdrop-filter: blur(4px);
+  border-radius: 12px;
+  padding: 10px 6px;
+  text-align: center;
+  cursor: pointer;
+  transition: all 0.25s ease;
+  border: 1px solid var(--clr-border-glow);
+}
+
+.pdf-card-icon {
+  font-size: 1.5rem;
+  color: var(--clr-magenta);
+  margin-bottom: 6px;
+}
+
+.pdf-card-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.65rem;
+  font-weight: 600;
+  color: var(--clr-white);
+  line-height: 1.3;
+  word-break: break-word;
+}
+
+.pdf-card-author {
+  font-family: var(--font-body);
+  font-size: 0.55rem;
+  color: var(--clr-text-muted);
+  margin-top: 4px;
+}
+
+.pdf-topic-group {
+  margin-bottom: 20px;
+}
+
+.pdf-topic-group h4 {
+  font-family: 'Poppins', sans-serif;
+  font-size: 0.85rem;
+  font-weight: 700;
+  color: var(--clr-magenta);
+  margin-bottom: 10px;
+  padding-left: 10px;
+  border-left: 3px solid var(--clr-cyan);
+}
+
+.notes-content-container {
+  padding: 20px;
+}
+
+#notes-container .notes-content-container h1 {
+  font-size: 1.5rem;
+}
+
+#notes-container .notes-content-container h2 {
+  font-size: 1.2rem;
+}
+
+#notes-container .notes-content-container h3 {
+  font-size: 1rem;
+}
+
+#notes-container .notes-content-container p {
+  font-size: 0.85rem;
+  line-height: 1.6;
+}
+
+@media (max-width: 768px) {
+  .pdf-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(130px, 1fr));
+    gap: 8px;
+  }
+  
+  .pdf-card {
+    padding: 8px 4px;
+  }
+  
+  .pdf-card-icon {
+    font-size: 1.2rem;
+  }
+  
+  .pdf-card-title {
+    font-size: 0.6rem;
+  }
+  
+  .notes-content-container {
+    padding: 12px;
+  }
+  
+  #notes-container .notes-content-container h1 {
+    font-size: 1.2rem;
+  }
+}
+
+@media (max-width: 480px) {
+  .pdf-cards-grid {
+    grid-template-columns: repeat(auto-fill, minmax(100px, 1fr));
+    gap: 6px;
+  }
+  
+  .pdf-card {
+    padding: 6px 3px;
+  }
+  
+  .pdf-card-icon {
+    font-size: 1rem;
+  }
+  
+  .pdf-card-title {
+    font-size: 0.55rem;
+  }
+}
 </style>
 </head>
 <body>
