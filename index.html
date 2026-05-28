@@ -3393,6 +3393,222 @@ body.dark-mode .pdf-section-subtitle {
     opacity: 1;
   }
 }
+
+keyframes fadeInOut {
+  0% { opacity:0; transform:translateY(-10px); }
+  15% { opacity:1; transform:translateY(0); }
+  85% { opacity:1; transform:translateY(0); }
+  100% { opacity:0; transform:translateY(-10px); }
+}
+.notes-fullscreen {
+  position:fixed !important;
+  top:0 !important;
+  left:0 !important;
+  right:0 !important;
+  bottom:0 !important;
+  z-index:1000 !important;
+  background:var(--clr-deep-space) !important;
+  margin:0 !important;
+  padding:20px !important;
+  overflow-y:auto !important;
+}
+.notes-fullscreen .notes-rainbow-border {
+  height:100%;
+  display:flex;
+  flex-direction:column;
+}
+.notes-fullscreen #notes-container {
+  flex:1;
+  overflow-y:auto;
+}
+.notes-accordion-item {
+  margin-bottom:12px;
+  border-radius:16px;
+  background:var(--clr-navy-card);
+  border:1px solid var(--clr-border-glow);
+  overflow:hidden;
+  transition:all 0.3s ease;
+}
+.notes-accordion-header {
+  padding:16px 20px;
+  cursor:pointer;
+  display:flex;
+  justify-content:space-between;
+  align-items:center;
+  font-weight:700;
+  font-size:1rem;
+  background:linear-gradient(90deg, rgba(230,126,34,0.1), rgba(184,135,58,0.05));
+  transition:all 0.2s;
+}
+.notes-accordion-header:hover {
+  background:linear-gradient(90deg, rgba(230,126,34,0.2), rgba(10,181,181,0.1));
+}
+.notes-accordion-header .level-badge {
+  width:8px;
+  height:8px;
+  border-radius:50%;
+  display:inline-block;
+  margin-right:12px;
+}
+.notes-accordion-content {
+  max-height:0;
+  overflow:hidden;
+  transition:max-height 0.4s cubic-bezier(0.4,0,0.2,1);
+}
+.notes-accordion-content.open {
+  max-height:2000px;
+}
+.notes-topic-item, .notes-subtopic-item {
+  padding:12px 20px 12px 48px;
+  cursor:pointer;
+  border-bottom:1px solid var(--clr-border-glow);
+  transition:all 0.2s;
+  position:relative;
+}
+.notes-topic-item:hover, .notes-subtopic-item:hover {
+  background:rgba(10,181,181,0.08);
+  padding-left:52px;
+}
+.notes-topic-item.active, .notes-subtopic-item.active {
+  background:linear-gradient(90deg, rgba(184,135,58,0.15), transparent);
+  border-left:3px solid var(--clr-magenta);
+}
+.notes-subtopic-item {
+  padding-left:64px;
+  font-size:0.9rem;
+}
+.notes-subtopic-item:hover {
+  padding-left:68px;
+}
+.notes-content-container {
+  padding:24px;
+  background:var(--clr-navy-card);
+  border-radius:16px;
+  margin-top:16px;
+  animation:slideIn 0.3s ease;
+}
+@keyframes slideIn {
+  from { opacity:0; transform:translateY(-10px); }
+  to { opacity:1; transform:translateY(0); }
+}
+.notes-content-container h1 {
+  font-family:var(--font-display);
+  font-size:1.8rem;
+  color:var(--clr-white);
+  margin-bottom:16px;
+}
+.notes-content-container h2 {
+  font-family:var(--font-display);
+  font-size:1.4rem;
+  color:var(--clr-cyan);
+  margin:20px 0 12px 0;
+}
+.notes-content-container h3 {
+  font-family:var(--font-display);
+  font-size:1.2rem;
+  color:var(--clr-magenta);
+  margin:16px 0 10px 0;
+}
+.notes-content-container p {
+  line-height:1.8;
+  margin-bottom:16px;
+  color:var(--clr-text-dim);
+}
+.notes-content-container ul, .notes-content-container ol {
+  margin:12px 0 12px 24px;
+  color:var(--clr-text-dim);
+}
+.notes-content-container li {
+  margin:6px 0;
+  line-height:1.6;
+}
+.notes-content-container img {
+  max-width:100%;
+  border-radius:12px;
+  margin:16px 0;
+}
+.notes-content-container pre {
+  background:rgba(0,0,0,0.3);
+  padding:16px;
+  border-radius:12px;
+  overflow-x:auto;
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+  margin:16px 0;
+}
+.notes-content-container code {
+  background:rgba(10,181,181,0.2);
+  padding:2px 6px;
+  border-radius:6px;
+  font-family:var(--font-mono);
+  font-size:0.85rem;
+}
+.notes-reaction-bar {
+  display:flex;
+  gap:16px;
+  margin-top:24px;
+  padding-top:20px;
+  border-top:2px solid var(--clr-border-glow);
+}
+.reaction-btn {
+  background:none;
+  border:none;
+  font-size:1.2rem;
+  cursor:pointer;
+  padding:8px 16px;
+  border-radius:40px;
+  transition:all 0.2s;
+  display:flex;
+  align-items:center;
+  gap:8px;
+  font-family:var(--font-body);
+  font-weight:500;
+  color:var(--clr-text-dim);
+}
+.reaction-btn:hover {
+  transform:scale(1.05);
+  background:rgba(184,135,58,0.1);
+}
+.reaction-btn.active {
+  background:linear-gradient(135deg, #e67e22, #b8873a);
+  color:#fff;
+}
+.comment-section {
+  margin-top:20px;
+}
+.comment-input-group {
+  display:flex;
+  gap:8px;
+  margin-bottom:16px;
+}
+.comment-input-group input {
+  flex:1;
+  padding:10px 16px;
+  border-radius:30px;
+  border:1px solid var(--clr-border-glow);
+  background:var(--clr-navy-card);
+  color:var(--clr-white);
+  font-family:var(--font-body);
+}
+.comment-list {
+  max-height:200px;
+  overflow-y:auto;
+}
+.comment-item {
+  padding:10px 0;
+  border-bottom:1px solid var(--clr-border-glow);
+  font-size:0.85rem;
+  color:var(--clr-text-dim);
+}
+.comment-item strong {
+  color:var(--clr-cyan);
+}
+@media (max-width:768px) {
+  .notes-subtopic-item { padding-left:40px; }
+  .notes-topic-item { padding-left:32px; }
+  .notes-content-container { padding:16px; }
+  .notes-content-container h1 { font-size:1.4rem; }
+}
 </style>
 </head>
 <body>
@@ -3589,6 +3805,31 @@ Aliver<span class="g-text">Biopharm</span>
     </div>
   </div>
 </div>
+
+<section id="notes-section" class="section-wrapper notes-section-wrapper" style="position:relative; margin: 40px 20px;">
+  <div style="position:relative; max-width:var(--max-width); margin:0 auto;">
+    <div style="position:absolute; top:-18px; left:30px; background:var(--clr-deep-space); padding:0 20px; z-index:10;">
+      <h2 class="pdf-section-title" style="font-size:clamp(1.8rem,5vw,2.5rem); margin:0; background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); -webkit-background-clip:text; background-clip:text; color:transparent;">Notes Library</h2>
+    </div>
+    <div class="notes-rainbow-border" style="border:2px solid transparent; border-image:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); border-image-slice:1; border-radius:20px; background:var(--clr-navy-card); backdrop-filter:blur(12px); overflow:hidden;">
+      <div style="padding:30px 24px 24px 24px;">
+        <div class="notes-control-bar" style="display:flex; justify-content:space-between; align-items:center; margin-bottom:24px; flex-wrap:wrap; gap:12px;">
+          <button id="notes-filter-btn" class="btn-primary" style="background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); padding:12px 28px; border-radius:50px; font-weight:800;"><i class="fa-solid fa-filter"></i> Browse Notes by Level</button>
+          <button id="notes-fullscreen-btn" class="btn-primary" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan);"><i class="fa-solid fa-expand"></i> Full Screen</button>
+        </div>
+        <div id="notes-wake-message" style="display:none; background:linear-gradient(135deg, #e67e22, #b8873a); color:#fff; padding:10px 20px; border-radius:50px; text-align:center; margin-bottom:16px; font-weight:600; animation:fadeInOut 3s ease;">
+          <i class="fa-solid fa-sun"></i> Screen wake lock activated! Learn freely without interruption.
+        </div>
+        <div id="notes-container" style="max-height:600px; overflow-y:auto; transition:all 0.3s ease;">
+          <div style="text-align:center; padding:60px 20px; color:var(--clr-text-dim);">
+            <i class="fa-solid fa-book-open" style="font-size:3rem; margin-bottom:16px; display:block;"></i>
+            Click "Browse Notes by Level" to start learning
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+</section>
 
 <section id="community" class="section alt-bg reveal" aria-label="Community stream">
 <span class="sec-label">COMMUNITY</span>
@@ -5415,7 +5656,350 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
+let notesWakeLock = null;
+let notesCurrentLevel = null;
+let notesCurrentTopic = null;
+let notesCurrentSubtopic = null;
+let notesStructureData = [];
+let notesFullscreenActive = false;
 
+async function acquireNotesWakeLock() {
+  if ('wakeLock' in navigator && !notesWakeLock) {
+    try {
+      notesWakeLock = await navigator.wakeLock.request('screen');
+      const msgDiv = document.getElementById('notes-wake-message');
+      if (msgDiv) {
+        msgDiv.style.display = 'block';
+        setTimeout(() => { msgDiv.style.display = 'none'; }, 3000);
+      }
+      notesWakeLock.addEventListener('release', () => { notesWakeLock = null; });
+    } catch (err) { console.log('Wake lock error:', err); }
+  }
+}
+
+function releaseNotesWakeLock() {
+  if (notesWakeLock) {
+    notesWakeLock.release();
+    notesWakeLock = null;
+  }
+}
+
+async function loadNotesStructure() {
+  try {
+    const data = await apiCall('get_notes_structure');
+    notesStructureData = data || [];
+    renderNotesLevels();
+  } catch (err) {
+    console.error('Failed to load notes structure:', err);
+    document.getElementById('notes-container').innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);">Failed to load notes. Please try again.</div>';
+  }
+}
+
+function renderNotesLevels() {
+  const levels = {};
+  notesStructureData.forEach(item => {
+    if (!levels[item.level]) {
+      levels[item.level] = {
+        level_order: item.level_order,
+        topics: {}
+      };
+    }
+    if (!levels[item.level].topics[item.topic]) {
+      levels[item.level].topics[item.topic] = {
+        topic_order: item.topic_order,
+        subtopics: []
+      };
+    }
+    levels[item.level].topics[item.topic].subtopics.push({
+      id: item.subtopic_id,
+      name: item.subtopic_name,
+      order: item.subtopic_order
+    });
+  });
+  Object.values(levels).forEach(level => {
+    Object.values(level.topics).forEach(topic => {
+      topic.subtopics.sort((a,b) => a.order - b.order);
+    });
+  });
+  const sortedLevels = Object.entries(levels).sort((a,b) => a[1].level_order - b[1].level_order);
+  let html = '<div class="notes-accordion" id="notes-accordion">';
+  sortedLevels.forEach(([levelName, levelData]) => {
+    const levelId = `level-${levelName.replace(/\s+/g, '-')}`;
+    html += `
+      <div class="notes-accordion-item" data-level="${levelName}">
+        <div class="notes-accordion-header" onclick="toggleNotesAccordion('${levelId}')">
+          <div><span class="level-badge" style="background:${getLevelColor(levelName)}"></span><strong>${escapeHtml(levelName)}</strong> <span style="font-size:0.8rem; color:var(--clr-text-muted);">(${Object.keys(levelData.topics).length} topics)</span></div>
+          <i class="fa-solid fa-chevron-down" id="${levelId}-icon"></i>
+        </div>
+        <div class="notes-accordion-content" id="${levelId}">
+    `;
+    const sortedTopics = Object.entries(levelData.topics).sort((a,b) => a[1].topic_order - b[1].topic_order);
+    sortedTopics.forEach(([topicName, topicData]) => {
+      const topicId = `topic-${levelName.replace(/\s+/g, '-')}-${topicName.replace(/\s+/g, '-')}`;
+      html += `
+        <div class="notes-topic-item" data-level="${levelName}" data-topic="${topicName}" onclick="toggleNotesTopic('${topicId}', '${levelName}', '${escapeHtml(topicName)}', event)">
+          <i class="fa-solid fa-folder" style="margin-right:10px; color:var(--clr-magenta);"></i>${escapeHtml(topicName)} <span style="font-size:0.7rem; color:var(--clr-text-muted);">(${topicData.subtopics.length} subtopics)</span>
+          <i class="fa-solid fa-chevron-right" style="float:right; margin-top:3px;" id="${topicId}-icon"></i>
+        </div>
+        <div class="notes-accordion-content" id="${topicId}" style="padding-left:20px;">
+      `;
+      topicData.subtopics.forEach(subtopic => {
+        html += `
+          <div class="notes-subtopic-item" data-level="${levelName}" data-topic="${topicName}" data-subtopic-id="${subtopic.id}" data-subtopic-name="${escapeHtml(subtopic.name)}" onclick="loadNoteContent('${subtopic.id}', '${escapeHtml(levelName)}', '${escapeHtml(topicName)}', '${escapeHtml(subtopic.name)}', event)">
+            <i class="fa-solid fa-file-lines" style="margin-right:10px; color:var(--clr-cyan);"></i>${escapeHtml(subtopic.name)}
+          </div>
+        `;
+      });
+      html += `</div>`;
+    });
+    html += `</div></div>`;
+  });
+  html += '</div>';
+  document.getElementById('notes-container').innerHTML = html;
+}
+
+function getLevelColor(level) {
+  if (level === 'O-Level') return '#e67e22';
+  if (level === 'A-Level') return '#b8873a';
+  if (level === 'Pharmacy') return '#0ab5b5';
+  return '#888';
+}
+
+function toggleNotesAccordion(id) {
+  const content = document.getElementById(id);
+  const icon = document.getElementById(`${id}-icon`);
+  if (content.classList.contains('open')) {
+    content.classList.remove('open');
+    if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+  } else {
+    content.classList.add('open');
+    if (icon) icon.classList.replace('fa-chevron-down', 'fa-chevron-up');
+  }
+}
+
+function toggleNotesTopic(topicId, level, topic, event) {
+  event.stopPropagation();
+  const content = document.getElementById(topicId);
+  const icon = document.getElementById(`${topicId}-icon`);
+  if (content.classList.contains('open')) {
+    content.classList.remove('open');
+    if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-right');
+  } else {
+    document.querySelectorAll('.notes-accordion-content.open').forEach(el => {
+      if (el.id !== topicId) el.classList.remove('open');
+    });
+    document.querySelectorAll('.notes-accordion-header + .notes-accordion-content.open').forEach(el => {
+      if (el.id !== topicId && !el.id.startsWith('topic-')) el.classList.remove('open');
+    });
+    content.classList.add('open');
+    if (icon) icon.classList.replace('fa-chevron-right', 'fa-chevron-up');
+    notesCurrentLevel = level;
+    notesCurrentTopic = topic;
+    document.querySelectorAll('.notes-topic-item').forEach(el => el.classList.remove('active'));
+    event.currentTarget.classList.add('active');
+  }
+}
+
+async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
+  if (event) event.stopPropagation();
+  if (!notesWakeLock) await acquireNotesWakeLock();
+  notesCurrentSubtopic = subtopicId;
+  document.querySelectorAll('.notes-subtopic-item').forEach(el => el.classList.remove('active'));
+  if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  const container = document.getElementById('notes-container');
+  const loadingDiv = document.createElement('div');
+  loadingDiv.className = 'notes-content-container';
+  loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading notes...</div>';
+  const existingContent = container.querySelector('.notes-content-container');
+  if (existingContent) existingContent.remove();
+  container.appendChild(loadingDiv);
+  try {
+    const data = await apiCall('get_note_content', { subtopic_id: subtopicId });
+    if (existingContent) existingContent.remove();
+    const contentHtml = `
+      <div class="notes-content-container">
+        <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
+          <div>
+            <span style="font-size:0.8rem; color:var(--clr-text-muted);">${escapeHtml(level)} / ${escapeHtml(topic)}</span>
+            <h1 style="margin-top:8px;">${escapeHtml(subtopic)}</h1>
+          </div>
+          <div style="display:flex; gap:8px;">
+            <button class="btn-download" onclick="downloadNoteAsPDF()" style="background:var(--clr-cyan);"><i class="fa-solid fa-download"></i> Save as PDF</button>
+          </div>
+        </div>
+        <div id="note-rendered-content">${data?.content || '<p>No content available for this note.</p>'}</div>
+        <div class="notes-reaction-bar" data-note-id="${subtopicId}">
+          <button class="reaction-btn" data-reaction="like" onclick="toggleNoteReaction('${subtopicId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count">0</span></button>
+          <button class="reaction-btn" data-reaction="love" onclick="toggleNoteReaction('${subtopicId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count">0</span></button>
+          <button class="reaction-btn" data-reaction="helpful" onclick="toggleNoteReaction('${subtopicId}', 'helpful')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count">0</span></button>
+        </div>
+        <div class="comment-section">
+          <div class="comment-input-group">
+            <input type="text" id="comment-input-${subtopicId}" placeholder="Add a comment or question...">
+            <button class="btn-primary" onclick="submitNoteComment('${subtopicId}')" style="padding:8px 20px;">Post</button>
+          </div>
+          <div class="comment-list" id="comments-${subtopicId}"></div>
+        </div>
+      </div>
+    `;
+    loadingDiv.outerHTML = contentHtml;
+    await loadNoteReactions(subtopicId);
+    await loadNoteComments(subtopicId);
+    if (notesFullscreenActive) {
+      const fullscreenContainer = document.querySelector('.notes-fullscreen #notes-container');
+      if (fullscreenContainer) fullscreenContainer.scrollTop = 0;
+    } else {
+      document.getElementById('notes-container').scrollTop = 0;
+    }
+  } catch (err) {
+    console.error('Failed to load note content:', err);
+    loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.</div>';
+  }
+}
+
+async function loadNoteReactions(noteId) {
+  try {
+    const data = await apiCall('get_note_reactions', { note_id: noteId });
+    const reactionBar = document.querySelector(`.notes-reaction-bar[data-note-id="${noteId}"]`);
+    if (reactionBar) {
+      reactionBar.querySelector('.reaction-btn[data-reaction="like"] .reaction-count').textContent = data.counts.like || 0;
+      reactionBar.querySelector('.reaction-btn[data-reaction="love"] .reaction-count').textContent = data.counts.love || 0;
+      reactionBar.querySelector('.reaction-btn[data-reaction="helpful"] .reaction-count').textContent = data.counts.helpful || 0;
+      if (data.user_reaction) {
+        const activeBtn = reactionBar.querySelector(`.reaction-btn[data-reaction="${data.user_reaction}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+    }
+  } catch (err) { console.error('Failed to load reactions:', err); }
+}
+
+async function toggleNoteReaction(noteId, reactionType) {
+  if (!currentUser) {
+    alert('Please sign in to react to notes.');
+    showAuthForm('signin');
+    return;
+  }
+  try {
+    const result = await apiCall('toggle_note_reaction', { note_id: noteId, reaction_type: reactionType });
+    const reactionBar = document.querySelector(`.notes-reaction-bar[data-note-id="${noteId}"]`);
+    if (reactionBar) {
+      reactionBar.querySelectorAll('.reaction-btn').forEach(btn => btn.classList.remove('active'));
+      if (result.reacted && result.reaction_type) {
+        const activeBtn = reactionBar.querySelector(`.reaction-btn[data-reaction="${result.reaction_type}"]`);
+        if (activeBtn) activeBtn.classList.add('active');
+      }
+      await loadNoteReactions(noteId);
+    }
+  } catch (err) { console.error('Failed to toggle reaction:', err); }
+}
+
+async function loadNoteComments(noteId) {
+  try {
+    const interactions = await apiCall('get_resource_interactions', { resource_id: noteId });
+    const commentList = document.getElementById(`comments-${noteId}`);
+    if (commentList && interactions.comments) {
+      if (interactions.comments.length === 0) {
+        commentList.innerHTML = '<div style="text-align:center; color:var(--clr-text-muted); padding:20px;">No comments yet. Be the first!</div>';
+      } else {
+        commentList.innerHTML = interactions.comments.map(c => `
+          <div class="comment-item">
+            <strong>${escapeHtml(c.user_name)}</strong> <span style="font-size:0.7rem; color:var(--clr-text-muted);">${new Date(c.created_at).toLocaleDateString()}</span><br>
+            ${escapeHtml(c.comment)}
+          </div>
+        `).join('');
+      }
+    }
+  } catch (err) { console.error('Failed to load comments:', err); }
+}
+
+async function submitNoteComment(noteId) {
+  if (!currentUser) {
+    alert('Please sign in to comment.');
+    showAuthForm('signin');
+    return;
+  }
+  const input = document.getElementById(`comment-input-${noteId}`);
+  const comment = input.value.trim();
+  if (!comment) return;
+  try {
+    await apiCall('comment_resource', { resource_id: noteId, comment: comment });
+    input.value = '';
+    await loadNoteComments(noteId);
+  } catch (err) { console.error('Failed to submit comment:', err); }
+}
+
+function downloadNoteAsPDF() {
+  const contentDiv = document.getElementById('note-rendered-content');
+  if (!contentDiv) return;
+  const originalContent = contentDiv.innerHTML;
+  const win = window.open();
+  win.document.write(`
+    <html>
+    <head>
+      <title>${document.querySelector('.notes-content-container h1')?.innerText || 'Note'}</title>
+      <style>
+        body { font-family: 'Inter', sans-serif; padding: 40px; line-height: 1.6; max-width: 900px; margin: 0 auto; }
+        h1 { color: #0ab5b5; }
+        h2 { color: #b8873a; margin-top: 20px; }
+        img { max-width: 100%; }
+        pre { background: #f4f4f4; padding: 10px; overflow-x: auto; }
+        code { background: #f4f4f4; padding: 2px 5px; border-radius: 3px; }
+      </style>
+    </head>
+    <body>${contentDiv.innerHTML}</body>
+    </html>
+  `);
+  win.document.close();
+  win.print();
+}
+
+function toggleNotesFullscreen() {
+  const notesSection = document.getElementById('notes-section');
+  const fullscreenBtn = document.getElementById('notes-fullscreen-btn');
+  if (!notesFullscreenActive) {
+    notesSection.classList.add('notes-fullscreen');
+    fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i> Exit Full Screen';
+    notesFullscreenActive = true;
+    document.body.style.overflow = 'hidden';
+  } else {
+    notesSection.classList.remove('notes-fullscreen');
+    fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i> Full Screen';
+    notesFullscreenActive = false;
+    document.body.style.overflow = '';
+  }
+}
+
+document.getElementById('notes-filter-btn').addEventListener('click', () => {
+  const filterBtn = document.getElementById('notes-filter-btn');
+  const existingContainer = document.getElementById('notes-container');
+  if (notesStructureData.length === 0) {
+    loadNotesStructure();
+  } else {
+    renderNotesLevels();
+  }
+  filterBtn.style.transform = 'scale(0.95)';
+  setTimeout(() => { filterBtn.style.transform = ''; }, 200);
+});
+
+document.getElementById('notes-fullscreen-btn').addEventListener('click', toggleNotesFullscreen);
+
+const observer = new IntersectionObserver((entries) => {
+  entries.forEach(entry => {
+    if (entry.isIntersecting && notesCurrentSubtopic) {
+      acquireNotesWakeLock();
+    } else if (!entry.isIntersecting && notesWakeLock) {
+      releaseNotesWakeLock();
+    }
+  });
+}, { threshold: 0.3 });
+
+const notesSection = document.getElementById('notes-section');
+if (notesSection) observer.observe(notesSection);
+
+function escapeHtml(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
  </script>
 </body>
 </html>
