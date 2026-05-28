@@ -3794,29 +3794,31 @@ Aliver<span class="g-text">Biopharm</span>
 <p class="keyboard-hint"><i class="fa-regular fa-keyboard"></i> Keyboard: ← → navigate | Space flip | 1-3 rate difficulty</p>
 </section>
 
-<section id="pdf-library" class="section reveal pdf-library-section" aria-label="PDF Library">
-  <div class="pdf-section-header">
-    <span class="sec-label">PDF RESOURCES</span>
-    <h2 class="pdf-section-title">Study Materials Library</h2>
-    <p class="pdf-section-subtitle">Access comprehensive PDF resources for Biology and Pharmacy. Preview before downloading.</p>
-  </div>
-  
-  <div class="pdf-main-container" id="pdf-main-container">
-    <div class="pdf-level-bar" id="pdf-level-bar">
-      <button class="pdf-level-btn active" data-level="O-Level">O-Level</button>
-      <button class="pdf-level-btn" data-level="A-Level">A-Level</button>
-      <button class="pdf-level-btn" data-level="Pharmacy">Pharmacy</button>
+ <section id="pdf-library" class="section reveal" aria-label="PDF Library" style="margin: 60px 0; padding: 0 20px;">
+  <div style="max-width:1400px; margin:0 auto;">
+    <div style="margin-bottom: 30px; padding-left: 20px;">
+      <span class="sec-label" style="text-align:left; margin-bottom:8px; display:block;">PDF RESOURCES</span>
+      <h2 class="pdf-section-title" style="font-family:'Poppins',sans-serif; font-size:clamp(2rem,5vw,3rem); margin:0; background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); -webkit-background-clip:text; background-clip:text; color:transparent; text-align:left;">Study Materials Library</h2>
+      <p class="section-subtitle" style="text-align:left; margin:8px 0 0 0; max-width:600px;">Access comprehensive PDF resources for Biology and Pharmacy. Preview before downloading.</p>
     </div>
     
-    <div class="pdf-content-wrapper" id="pdf-content-wrapper">
-      <div class="pdf-cards-area" id="pdf-cards-area">
-        <div class="pdf-loading">Loading PDFs...</div>
+    <div class="pdf-main-container" id="pdf-main-container" style="background:var(--clr-navy-card); backdrop-filter:blur(12px); border-radius:20px; overflow:hidden;">
+      <div class="pdf-level-bar" id="pdf-level-bar" style="display:flex; justify-content:center; gap:16px; padding:20px 20px 16px 20px; border-bottom:1px solid var(--clr-border-glow); background:rgba(0,0,0,0.02);">
+        <button class="pdf-level-btn active" data-level="O-Level" style="padding:10px 28px; border-radius:50px; font-family:var(--font-body); font-weight:700; font-size:0.9rem; background:var(--gradient-magenta); border:none; color:#fff; cursor:pointer;">O-Level</button>
+        <button class="pdf-level-btn" data-level="A-Level" style="padding:10px 28px; border-radius:50px; font-family:var(--font-body); font-weight:700; font-size:0.9rem; background:transparent; border:2px solid var(--clr-border-glow); color:var(--clr-white); cursor:pointer;">A-Level</button>
+        <button class="pdf-level-btn" data-level="Pharmacy" style="padding:10px 28px; border-radius:50px; font-family:var(--font-body); font-weight:700; font-size:0.9rem; background:transparent; border:2px solid var(--clr-border-glow); color:var(--clr-white); cursor:pointer;">Pharmacy</button>
       </div>
       
-      <div class="pdf-subtopics-column" id="pdf-subtopics-column">
-        <div class="pdf-subtopics-header">Browse Topics</div>
-        <div class="pdf-subtopics-list" id="pdf-subtopics-list">
-          <p class="pdf-subtopics-placeholder">Select a level to view topics</p>
+      <div class="pdf-content-wrapper" id="pdf-content-wrapper" style="display:flex; min-height:520px;">
+        <div class="pdf-cards-area" id="pdf-cards-area" style="flex:1; padding:20px; overflow-y:auto; max-height:600px;">
+          <div class="pdf-loading">Loading PDFs...</div>
+        </div>
+        
+        <div class="pdf-subtopics-column" id="pdf-subtopics-column" style="width:280px; min-width:280px; background:rgba(0,0,0,0.03); border-left:1px solid var(--clr-border-glow); display:flex; flex-direction:column;">
+          <div class="pdf-subtopics-header" style="padding:18px 16px; font-family:'Poppins',sans-serif; font-size:0.85rem; font-weight:700; letter-spacing:0.05em; text-transform:uppercase; color:var(--clr-magenta); border-bottom:2px solid var(--clr-magenta); text-align:center; background:rgba(0,0,0,0.02);">Browse Topics</div>
+          <div class="pdf-subtopics-list" id="pdf-subtopics-list" style="flex:1; overflow-y:auto; padding:12px; max-height:540px;">
+            <p class="pdf-subtopics-placeholder" style="text-align:center; color:var(--clr-text-dim); font-size:0.85rem; padding:30px 20px;">Select a level to view topics</p>
+          </div>
         </div>
       </div>
     </div>
