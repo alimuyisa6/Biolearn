@@ -87,7 +87,7 @@ async function persistBan(ip, durationMs, reason) {
   'get_category_suggestions',
   'track_page_activity', 'get_page_activity',
   'update_newsletter_subscriber', 'delete_quiz_topic',
-  'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download'
+  'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download',
 'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
  ]);
 
@@ -108,7 +108,7 @@ async function persistBan(ip, durationMs, reason) {
   'get_section_headings',
   'check_flashcard_answer',
   'get_resource_interactions',
-  'get_pdfs_by_level'
+  'get_pdfs_by_level',
 'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
  ]);
 
@@ -132,7 +132,7 @@ async function persistBan(ip, durationMs, reason) {
   'like_resource', 'comment_resource', 'submit_mood',
   'track_page_activity',
   'update_newsletter_subscriber', 'delete_quiz_topic',
-  'track_pdf_preview', 'track_pdf_download'
+  'track_pdf_preview', 'track_pdf_download',
 'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
  ]);
 
