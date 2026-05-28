@@ -1620,21 +1620,37 @@ async function handlePost(req, res) {
         result = { success: true };
         break;
       }
-      case 'get_public_stats': {
-        const ck = 'public_stats'; const cached = getCachedResponse(ck);
-        if (cached) { result = cached; break; }
-        try {
-          const [resCount, downCount, quizCount, usersCount] = await Promise.all([
-            supabase.from('biology_notes').select('id', { count: 'exact', head: true }),
-            supabase.from('user_interactions').select('id', { count: 'exact', head: true }).eq('interaction_type', 'download'),
-            supabase.from('user_quiz_activity').select('id', { count: 'exact', head: true }),
-            supabase.from('user_interactions').select('user_id', { count: 'exact', head: true, distinct: true })
-          ]);
-          result = { resources_count: resCount.count || 0, downloads_count: downCount.count || 0, quiz_attempts: quizCount.count || 0, users_count: usersCount.count || 0 };
-          setCachedResponse(ck, result);
-        } catch (err) { result = { resources_count: 0, downloads_count: 0, quiz_attempts: 0, users_count: 0 }; }
-        break;
-      }
+       case 'get_public_stats': {
+  const ck = 'public_stats'; const cached = getCachedResponse(ck);
+  if (cached) { result = cached; break; }
+  try {
+    const [resCount, downCount, quizCount, resourcesUsers, authUsers] = await Promise.all([
+      supabase.from('biology_notes').select('id', { count: 'exact', head: true }),
+      supabase.from('user_interactions').select('id', { count: 'exact', head: true }).eq('interaction_type', 'download'),
+      supabase.from('user_quiz_activity').select('id', { count: 'exact', head: true }),
+      supabase.from('user_interactions').select('user_id').eq('interaction_type', 'download'),
+      supabase.auth.admin.listUsers()
+    ]);
+    const uniqueUsers = new Set();
+    if (resourcesUsers.data) {
+      resourcesUsers.data.forEach(item => {
+        if (item.user_id) uniqueUsers.add(item.user_id);
+      });
+    }
+    const totalRegisteredUsers = authUsers.data?.users?.length || 0;
+    result = {
+      resources_count: resCount.count || 0,
+      downloads_count: downCount.count || 0,
+      quiz_attempts: quizCount.count || 0,
+      users_count: totalRegisteredUsers
+    };
+    setCachedResponse(ck, result);
+  } catch (err) {
+    console.error('Stats error:', err);
+    result = { resources_count: 0, downloads_count: 0, quiz_attempts: 0, users_count: 0 };
+  }
+  break;
+       }
       case 'check_admin_online': {
         const { data } = await supabase.from('admin_master').select('is_online, is_busy').eq('is_active', true).limit(1).maybeSingle();
         result = data ? { online: data.is_online, busy: data.is_busy } : { online: false, busy: false };
