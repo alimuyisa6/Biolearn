@@ -5656,7 +5656,7 @@ async function loadContinueLearning() {
   if ('speechSynthesis' in window) {
   window.speechSynthesis.getVoices();
 }
-let notesWakeLock = null;
+ let notesWakeLock = null;
 let notesCurrentLevel = null;
 let notesCurrentTopic = null;
 let notesCurrentSubtopic = null;
@@ -5765,6 +5765,21 @@ function getLevelColor(level) {
   return '#888';
 }
 
+function closeAllAccordions() {
+  document.querySelectorAll('.notes-accordion-content.open').forEach(content => {
+    content.classList.remove('open');
+    const parentId = content.id;
+    const icon = document.getElementById(`${parentId}-icon`);
+    if (icon) {
+      if (parentId.startsWith('level-')) {
+        icon.classList.replace('fa-chevron-up', 'fa-chevron-down');
+      } else if (parentId.startsWith('topic-')) {
+        icon.classList.replace('fa-chevron-up', 'fa-chevron-right');
+      }
+    }
+  });
+}
+
 function toggleNotesAccordion(id) {
   const content = document.getElementById(id);
   const icon = document.getElementById(`${id}-icon`);
@@ -5785,12 +5800,7 @@ function toggleNotesTopic(topicId, level, topic, event) {
     content.classList.remove('open');
     if (icon) icon.classList.replace('fa-chevron-up', 'fa-chevron-right');
   } else {
-    document.querySelectorAll('.notes-accordion-content.open').forEach(el => {
-      if (el.id !== topicId) el.classList.remove('open');
-    });
-    document.querySelectorAll('.notes-accordion-header + .notes-accordion-content.open').forEach(el => {
-      if (el.id !== topicId && !el.id.startsWith('topic-')) el.classList.remove('open');
-    });
+    closeAllAccordions();
     content.classList.add('open');
     if (icon) icon.classList.replace('fa-chevron-right', 'fa-chevron-up');
     notesCurrentLevel = level;
@@ -5806,6 +5816,9 @@ async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
   notesCurrentSubtopic = subtopicId;
   document.querySelectorAll('.notes-subtopic-item').forEach(el => el.classList.remove('active'));
   if (event && event.currentTarget) event.currentTarget.classList.add('active');
+  
+  closeAllAccordions();
+  
   const container = document.getElementById('notes-container');
   const loadingDiv = document.createElement('div');
   loadingDiv.className = 'notes-content-container';
@@ -5813,6 +5826,7 @@ async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
   const existingContent = container.querySelector('.notes-content-container');
   if (existingContent) existingContent.remove();
   container.appendChild(loadingDiv);
+  
   try {
     const data = await apiCall('get_note_content', { subtopic_id: subtopicId });
     if (existingContent) existingContent.remove();
@@ -5853,7 +5867,7 @@ async function loadNoteContent(subtopicId, level, topic, subtopic, event) {
     }
   } catch (err) {
     console.error('Failed to load note content:', err);
-    loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.</div>';
+    loadingDiv.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.<br><small>' + err.message + '</small></div>';
   }
 }
 
@@ -5931,7 +5945,6 @@ async function submitNoteComment(noteId) {
 function downloadNoteAsPDF() {
   const contentDiv = document.getElementById('note-rendered-content');
   if (!contentDiv) return;
-  const originalContent = contentDiv.innerHTML;
   const win = window.open();
   win.document.write(`
     <html>
@@ -5971,11 +5984,13 @@ function toggleNotesFullscreen() {
 
 document.getElementById('notes-filter-btn').addEventListener('click', () => {
   const filterBtn = document.getElementById('notes-filter-btn');
-  const existingContainer = document.getElementById('notes-container');
   if (notesStructureData.length === 0) {
     loadNotesStructure();
   } else {
     renderNotesLevels();
+    const notesContainer = document.getElementById('notes-container');
+    const existingContent = notesContainer.querySelector('.notes-content-container');
+    if (existingContent) existingContent.remove();
   }
   filterBtn.style.transform = 'scale(0.95)';
   setTimeout(() => { filterBtn.style.transform = ''; }, 200);
@@ -5983,7 +5998,7 @@ document.getElementById('notes-filter-btn').addEventListener('click', () => {
 
 document.getElementById('notes-fullscreen-btn').addEventListener('click', toggleNotesFullscreen);
 
-const observer = new IntersectionObserver((entries) => {
+const notesObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {
     if (entry.isIntersecting && notesCurrentSubtopic) {
       acquireNotesWakeLock();
@@ -5993,8 +6008,8 @@ const observer = new IntersectionObserver((entries) => {
   });
 }, { threshold: 0.3 });
 
-const notesSection = document.getElementById('notes-section');
-if (notesSection) observer.observe(notesSection);
+const notesSectionElement = document.getElementById('notes-section');
+if (notesSectionElement) notesObserver.observe(notesSectionElement);
 
 function escapeHtml(str) {
   if (!str) return '';
