@@ -956,51 +956,47 @@ async function handlePost(req, res) {
         else { result = { user: null }; }
         break;
       }
-      case 'signin': {
-        if(!rateLimit(ip,'signin'))return res.status(429).json({error:'Please wait a moment.'});
-        const userEmail = (email || '').trim().toLowerCase();
-        const userPassword = password || '';
-        
-        const { data: existingUser, error: userError } = await supabase
-          .from('users')
-          .select('id')
-          .eq('email', userEmail)
-          .maybeSingle();
-        
-        if (existingUser) {
-          const { data: restriction } = await supabase
-            .from('user_restrictions')
-            .select('restriction_type, lock_reason, expires_at')
-            .eq('user_id', existingUser.id)
-            .maybeSingle();
-          
-          if (restriction) {
-            if (restriction.restriction_type === 'disabled') {
-              return res.status(403).json({ error: 'Your account has been permanently disabled. Contact support.' });
-            }
-            if (restriction.restriction_type === 'suspended') {
-              return res.status(403).json({ error: restriction.lock_reason || 'Your account has been suspended. Contact support.' });
-            }
-            if (restriction.restriction_type === 'locked') {
-              if (restriction.expires_at && new Date(restriction.expires_at) > new Date()) {
-                const hoursLeft = Math.ceil((new Date(restriction.expires_at) - new Date()) / (1000 * 60 * 60));
-                return res.status(403).json({ error: `Your account is locked. Try again in ${hoursLeft} hours.` });
-              } else {
-                await supabase.from('user_restrictions').delete().eq('user_id', existingUser.id);
-              }
-            }
-          }
-        }
-        
-        const {data,error:signinErr}=await supabase.auth.signInWithPassword({email:userEmail,password:userPassword});
-        if(signinErr){const banned=trackFailedAuth(ip,userEmail);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw signinErr;}
-        resetFailedAuth(ip,userEmail);
-        const session = await createUserSession(data.user.id, data.user.email, ip, req.headers['user-agent']);
-        const cookieValue = `session=${session.access_token}; HttpOnly; Secure; SameSite=Strict; Max-Age=${7 * 24 * 60 * 60}; Path=/`;
-        res.setHeader('Set-Cookie', cookieValue);
-        result = { user: { id: data.user.id, email: data.user.email } };
-        break;
+        case 'signin': {
+  if(!rateLimit(ip,'signin'))return res.status(429).json({error:'Please wait a moment.'});
+  const userEmail = (email || '').trim().toLowerCase();
+  const userPassword = password || '';
+  
+  const {data,error:signinErr}=await supabase.auth.signInWithPassword({email:userEmail,password:userPassword});
+  if(signinErr){const banned=trackFailedAuth(ip,userEmail);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw signinErr;}
+  resetFailedAuth(ip,userEmail);
+  
+  const userId = data.user.id;
+  const { data: restriction } = await supabase
+    .from('user_restrictions')
+    .select('restriction_type, lock_reason, expires_at')
+    .eq('user_id', userId)
+    .maybeSingle();
+  
+  if (restriction) {
+    if (restriction.restriction_type === 'disabled') {
+      try { await supabase.auth.admin.updateUserById(userId, { ban_duration: '1000y' }); } catch(e) {}
+      return res.status(403).json({ error: 'Your account has been permanently disabled. Contact support.' });
+    }
+    if (restriction.restriction_type === 'suspended') {
+      try { await supabase.auth.admin.updateUserById(userId, { ban_duration: '1000y' }); } catch(e) {}
+      return res.status(403).json({ error: restriction.lock_reason || 'Your account has been suspended. Contact support.' });
+    }
+    if (restriction.restriction_type === 'locked') {
+      if (restriction.expires_at && new Date(restriction.expires_at) > new Date()) {
+        const hoursLeft = Math.ceil((new Date(restriction.expires_at) - new Date()) / (1000 * 60 * 60));
+        return res.status(403).json({ error: `Your account is locked. Try again in ${hoursLeft} hours.` });
+      } else {
+        await supabase.from('user_restrictions').delete().eq('user_id', userId);
       }
+    }
+  }
+  
+  const session = await createUserSession(data.user.id, data.user.email, ip, req.headers['user-agent']);
+  const cookieValue = `session=${session.access_token}; HttpOnly; Secure; SameSite=Strict; Max-Age=${7 * 24 * 60 * 60}; Path=/`;
+  res.setHeader('Set-Cookie', cookieValue);
+  result = { user: { id: data.user.id, email: data.user.email } };
+  break;
+}
       case 'signout': {
         if (token) { const ht = hashToken(token); await supabase.from('user_sessions').update({ is_active: false }).eq('session_token_hash', ht); }
         res.setHeader('Set-Cookie', 'session=; HttpOnly; Secure; SameSite=Strict; Max-Age=0; Path=/');
