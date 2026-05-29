@@ -222,48 +222,7 @@ body.dark-mode .site-header { background: rgba(1, 44, 44, 0.85); }
   filter: drop-shadow(0 4px 12px rgba(10, 181, 181, 0.3));
 }
 
-.logo-icon {
-  width: 60px;
-  height: 60px;
-  border-radius: 50%;
-  background: var(--gradient-cyan);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: #fff;
-  flex-shrink: 0;
-  font-size: 2rem;
-  box-shadow: 0 0 0 4px rgba(10, 181, 181, 0.3), 0 6px 16px rgba(0, 0, 0, 0.15);
-  transition: all 0.2s ease;
-}
-
-.logo-icon:hover {
-  transform: scale(1.05);
-  box-shadow: 0 0 0 5px rgba(10, 181, 181, 0.4), 0 8px 20px rgba(0, 0, 0, 0.2);
-}
-
-.logo-link span:not(.g-text) {
-  font-size: 1.35rem;
-  font-weight: 800;
-  background: linear-gradient(135deg, var(--clr-white) 0%, var(--clr-cyan) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.logo-link .g-text {
-  font-size: 1.45rem;
-  font-weight: 800;
-}
-
-.g-text {
-  background: linear-gradient(130deg, var(--clr-cyan) 0%, var(--clr-magenta) 100%);
-  -webkit-background-clip: text;
-  -webkit-text-fill-color: transparent;
-  background-clip: text;
-}
-
-.main-nav {
+ .main-nav {
   display: flex;
   gap: 32px;
   list-style: none;
@@ -3784,10 +3743,7 @@ keyframes fadeInOut {
 <a href="#main-content" class="skip-link">Skip to main content</a>
 <header class="site-header" id="site-header">
 <div class="header-container">
-<a href="/" class="logo-link" aria-label="AliverBiopharm Home">
-<div class="logo-icon">🧬</div>
-Aliver<span class="g-text">Biopharm</span>
-</a>
+<a href="/" class="logo-link" aria-label="AliverBiopharm Home"></a>
 <nav aria-label="Main navigation">
 <ul class="main-nav" id="main-nav">
 <li><a href="/">Home</a></li>
