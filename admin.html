@@ -587,10 +587,7 @@ let featureDataStore = new Map();
 let loadedTabs = new Set();
 let cachedSiteSections = null;
 let cachedSiteSectionsTime = 0;
-let currentChatRoom = null;
-let currentChatUser = null;
-let chatPollInterval = null;
-
+ 
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
 
