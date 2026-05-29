@@ -5045,7 +5045,6 @@ async function loadFlashcards() {
   }
 }
 
-// ========== PDF LIBRARY FUNCTIONS ==========
 let currentPdfLevel = 'O-Level';
 let currentPdfs = [];
 let currentTopics = [];
@@ -5645,17 +5644,21 @@ document.addEventListener('DOMContentLoaded', async function() {
   } catch (err) {
     console.error('Section load error:', err);
   }
-  await loadFilters();
-  await buildResources();
-  loadPublicStats();
-  loadFlashcards();
- setTimeout(() => {
-  if (document.getElementById('pdf-main-container')) {
-    initPdfLibrary();
+   function lazyLoad(selector, fn) {
+    var el = document.querySelector(selector);
+    if (!el) return;
+    var obs = new IntersectionObserver(function(entries) {
+      if (entries[0].isIntersecting) { fn(); obs.disconnect(); }
+    }, { rootMargin: '200px' });
+    obs.observe(el);
   }
-}, 500);
- loadCommunityActivity();
-  loadContinueLearning();
+
+  lazyLoad('#resources',         function() { loadFilters(); buildResources(); });
+  lazyLoad('#flashcards',        function() { loadFlashcards(); });
+  lazyLoad('#pdf-library',       function() { if (document.getElementById('pdf-main-container')) initPdfLibrary(); });
+  lazyLoad('#stats',             function() { loadPublicStats(); });
+  lazyLoad('#community',         function() { loadCommunityActivity(); });
+  lazyLoad('#continue-learning', function() { loadContinueLearning(); });
   document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
   document.getElementById('mood-submit-btn').addEventListener('click', submitMood);
   document.querySelectorAll('.mood-emoji').forEach(function(emoji) {
