@@ -591,7 +591,7 @@ let cachedSiteSectionsTime = 0;
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
 
-    async function apiCall(action, params) {
+     async function apiCall(action, params) {
     params = params || {};
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -612,6 +612,15 @@ let cachedSiteSectionsTime = 0;
         throw err;
     }
 }
+async function apiCallGet(action, params = {}) {
+    const url = new URL(API_BASE, window.location.origin);
+    url.searchParams.append('action', action);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    const res = await fetch(url.toString(), { method: 'GET', credentials: 'include' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return json.data !== undefined ? json.data : json;
+}
     
 async function apiCallGet(action, params = {}) {
     const url = new URL(API_BASE, window.location.origin);
@@ -623,29 +632,47 @@ async function apiCallGet(action, params = {}) {
     return json.data !== undefined ? json.data : json;
 }
    
-     async function verifyAdminAccess() {
+      async function verifyAdminAccess() {
+    const checkingDiv = document.getElementById('auth-checking');
+    const deniedDiv = document.getElementById('auth-denied');
+    const deniedMsg = document.getElementById('auth-denied-msg');
+    checkingDiv.style.display = 'block';
+    deniedDiv.style.display = 'none';
     try {
         const userData = await apiCall('get_user');
-        if (!userData || !userData.user) throw new Error('No session');
-        if (!userData.user.is_admin) throw new Error('Not an admin');
+        if (!userData || !userData.user) {
+            throw new Error('No session found');
+        }
+        if (!userData.user.is_admin) {
+            deniedMsg.textContent = 'Your account does not have admin privileges. Please contact support.';
+            checkingDiv.style.display = 'none';
+            deniedDiv.style.display = 'block';
+            return;
+        }
         currentAdminUser = userData.user;
         document.getElementById('admin-email-display').textContent = currentAdminUser.email;
         document.getElementById('auth-wall').style.display = 'none';
         document.getElementById('admin-layout').style.display = 'flex';
-        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-        apiCall('admin_update_presence', { is_online: true, is_busy: false }).catch(() => {});
+        if (localStorage.getItem('theme') === 'dark') {
+            document.body.classList.add('dark-mode');
+        }
+        try {
+            await apiCall('admin_update_presence', { is_online: true, is_busy: false });
+        } catch(e) {}
         loadDashboard();
         loadFullDashboardStats();
     } catch (e) {
-        document.getElementById('auth-checking').style.display = 'none';
-        document.getElementById('auth-denied').style.display = '';
-        document.getElementById('auth-denied-msg').textContent =
-            e.message === 'Not an admin'
-                ? 'Your account does not have admin privileges.'
-                : 'Session expired or invalid. Please sign in from the homepage.';
+        console.error('Admin verification error:', e);
+        checkingDiv.style.display = 'none';
+        deniedDiv.style.display = 'block';
+        if (e.message.includes('403') || e.message.includes('denied')) {
+            deniedMsg.innerHTML = 'Access denied. Please <a href="/" style="color:var(--clr-cyan);">go to homepage</a> and sign in first, then return to this page.';
+        } else {
+            deniedMsg.textContent = e.message || 'Session expired or invalid. Please sign in from the homepage.';
+        }
     }
 }
-
+      
   function loadTabContent(tabId, force) {
     if (!force && loadedTabs.has(tabId)) return;
     loadedTabs.add(tabId);
