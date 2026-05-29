@@ -594,7 +594,7 @@ let chatPollInterval = null;
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
 
-   async function apiCall(action, params) {
+    async function apiCall(action, params) {
     params = params || {};
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -615,6 +615,7 @@ let chatPollInterval = null;
         throw err;
     }
 }
+    
 async function apiCallGet(action, params = {}) {
     const url = new URL(API_BASE, window.location.origin);
     url.searchParams.append('action', action);
@@ -625,36 +626,26 @@ async function apiCallGet(action, params = {}) {
     return json.data !== undefined ? json.data : json;
 }
    
-    async function verifyAdminAccess() {
-    const checkingDiv = document.getElementById('auth-checking');
-    const deniedDiv = document.getElementById('auth-denied');
-    const deniedMsg = document.getElementById('auth-denied-msg');
+     async function verifyAdminAccess() {
     try {
         const userData = await apiCall('get_user');
-        if (!userData || !userData.user) {
-            throw new Error('No session found. Please sign in first.');
-        }
-        if (!userData.user.is_admin) {
-            deniedMsg.innerHTML = 'Your account does not have admin privileges.<br><br><a href="/" style="color:var(--clr-cyan);">← Go to Homepage</a>';
-            checkingDiv.style.display = 'none';
-            deniedDiv.style.display = 'block';
-            return;
-        }
+        if (!userData || !userData.user) throw new Error('No session');
+        if (!userData.user.is_admin) throw new Error('Not an admin');
         currentAdminUser = userData.user;
         document.getElementById('admin-email-display').textContent = currentAdminUser.email;
         document.getElementById('auth-wall').style.display = 'none';
         document.getElementById('admin-layout').style.display = 'flex';
         if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-        try {
-            await apiCall('admin_update_presence', { is_online: true, is_busy: false });
-        } catch(e) {}
+        apiCall('admin_update_presence', { is_online: true, is_busy: false }).catch(() => {});
         loadDashboard();
         loadFullDashboardStats();
     } catch (e) {
-        console.error('Admin verification error:', e);
-        checkingDiv.style.display = 'none';
-        deniedDiv.style.display = 'block';
-        deniedMsg.innerHTML = 'Error: ' + (e.message || 'Connection failed') + '<br><br><a href="/" style="color:var(--clr-cyan);">← Go to Homepage and sign in first</a>';
+        document.getElementById('auth-checking').style.display = 'none';
+        document.getElementById('auth-denied').style.display = '';
+        document.getElementById('auth-denied-msg').textContent =
+            e.message === 'Not an admin'
+                ? 'Your account does not have admin privileges.'
+                : 'Session expired or invalid. Please sign in from the homepage.';
     }
 }
 
