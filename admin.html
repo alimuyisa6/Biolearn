@@ -1,4 +1,4 @@
- <!DOCTYPE html>
+  <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8" />
@@ -111,6 +111,30 @@
     .msg-admin { background:rgba(10,181,181,0.1); text-align:left; }
     .msg-user { background:rgba(184,135,58,0.1); text-align:right; }
  
+ .online-user {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    padding: 8px 12px;
+    border-bottom: 1px solid var(--clr-border-glow);
+}
+.online-dot {
+    width: 10px;
+    height: 10px;
+    background-color: #2ecc71;
+    border-radius: 50%;
+    display: inline-block;
+    box-shadow: 0 0 5px #2ecc71;
+    animation: pulse 1.5s infinite;
+}
+@keyframes pulse {
+    0%, 100% { opacity: 1; transform: scale(1); }
+    50% { opacity: 0.6; transform: scale(1.2); }
+}
+.btn-sm { padding: 5px 12px; font-size: 0.7rem; margin: 0 2px; }
+.text-muted { color: var(--clr-text-muted); }
+.btn-info { background: #3498db; color: #fff; border: none; }
+.btn-info:hover { background: #2980b9; }
   </style>
 </head>
 <body>
@@ -416,13 +440,51 @@
       <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Feature Key</th><th>Name</th><th>Page</th><th>Category</th><th>Enabled</th><th>Order</th><th>Actions</th></tr></thead><tbody id="app-features-table"><tr><td colspan="7" style="text-align:center;padding:40px;color:var(--clr-text-muted);">Loading…</td></tr></tbody></table></div></div></div>
     </div>
 
-    <div class="tab-content" id="tab-users">
-      <div class="page-header"><h1 class="page-title">Users</h1><p class="page-subtitle">Manage registered users and admins</p></div>
-      <div class="panel"><div class="panel-header"><span>All Users</span><button class="btn btn-cyan btn-sm" onclick="loadedTabs.delete('users'); loadUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
-      <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Email</th><th>Role</th><th>Status</th><th>Created</th><th>Actions</th></tr></thead><tbody id="users-table"><tr><td colspan="5" style="text-align:center;padding:40px;color:var(--clr-text-muted);">Loading…</td></tr></tbody></table></div></div></div>
-      <div class="panel"><div class="panel-header"><span>Admin Users</span><button class="btn btn-cyan btn-sm" onclick="loadedTabs.delete('users'); loadAdminUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
-      <div class="panel-body"><div class="table-wrap"><table><thead><tr><th>Email</th><th>Role</th><th>Permissions</th><th>Status</th><th>Actions</th></tr></thead><tbody id="admin-users-table"><tr><td colspan="5" style="text-align:center;padding:40px;color:var(--clr-text-muted);">Loading…</td></tr></tbody></table></div></div></div>
+   <div class="tab-content" id="tab-users">
+    <div class="page-header">
+        <h1 class="page-title">Users</h1>
+        <p class="page-subtitle">Manage registered users - Lock, Suspend, Disable accounts</p>
     </div>
+    <div class="panel">
+        <div class="panel-header">
+            <span>🟢 Users Online Now</span>
+            <button class="btn btn-cyan btn-sm" onclick="loadOnlineUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+        </div>
+        <div class="panel-body" id="online-users-container">
+            <p style="color:var(--clr-text-muted);">Loading online users...</p>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header">
+            <span>All Registered Users</span>
+            <div>
+                <button class="btn btn-cyan btn-sm" onclick="loadedTabs.delete('users'); loadUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button>
+                <button class="btn btn-outline btn-sm" onclick="exportAllUserStats()"><i class="fa-solid fa-download"></i> Export All Stats</button>
+            </div>
+        </div>
+        <div class="panel-body">
+            <div class="table-wrap">
+                <table>
+                    <thead>
+                        <tr><th>Email</th><th>Role</th><th>Status</th><th>Last Active</th><th>Created</th><th>Actions</th></tr>
+                    </thead>
+                    <tbody id="users-table"><tr><td colspan="6" style="text-align:center;padding:40px;color:var(--clr-text-muted);">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    <div class="panel">
+        <div class="panel-header"><span>Admin Users</span><button class="btn btn-cyan btn-sm" onclick="loadedTabs.delete('users'); loadAdminUsers()"><i class="fa-solid fa-rotate"></i> Refresh</button></div>
+        <div class="panel-body">
+            <div class="table-wrap">
+                <table>
+                    <thead><tr><th>Email</th><th>Role</th><th>Permissions</th><th>Status</th><th>Actions</th></tr></thead>
+                    <tbody id="admin-users-table"><tr><td colspan="5" style="text-align:center;padding:40px;">Loading…</td></tr></tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+</div>
 
     <div class="tab-content" id="tab-newsletter">
       <div class="page-header"><h1 class="page-title">Newsletter</h1><p class="page-subtitle">View subscribers</p></div>
@@ -519,58 +581,72 @@
 
 <script>
   const API_BASE = '/api/query';
-  let currentAdminUser = null;
-  var pendingPollInterval = null;
-  var featureDataStore = new Map();
-  var loadedTabs = new Set();
-  var cachedSiteSections = null;
-  var cachedSiteSectionsTime = 0;
+let currentAdminUser = null;
+let pendingPollInterval = null;
+let featureDataStore = new Map();
+let loadedTabs = new Set();
+let cachedSiteSections = null;
+let cachedSiteSectionsTime = 0;
+let currentChatRoom = null;
+let currentChatUser = null;
+let chatPollInterval = null;
 
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
 
-  async function apiCall(action, params) {
+   async function apiCall(action, params) {
     params = params || {};
-    var controller = new AbortController();
-    var tid = setTimeout(function() { controller.abort(); }, 15000);
+    const controller = new AbortController();
+    const timeout = setTimeout(() => controller.abort(), 15000);
     try {
-      var res = await fetch(API_BASE, {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/json' },
-        credentials: 'include',
-        body: JSON.stringify(Object.assign({ action: action }, params)),
-        signal: controller.signal
-      });
-      clearTimeout(tid);
-      var text = await res.text();
-      var json;
-      try { json = JSON.parse(text); } catch (e) { throw new Error(text.slice(0, 120)); }
-      if (!res.ok) throw new Error(json.error || 'HTTP ' + res.status);
-      return json.data !== undefined ? json.data : json;
-    } finally { clearTimeout(tid); }
-  }
-
-  async function verifyAdminAccess() {
-    try {
-      var userData = await apiCall('get_user');
-      if (!userData || !userData.user) throw new Error('No session');
-      if (!userData.user.is_admin) throw new Error('Not an admin');
-      currentAdminUser = userData.user;
-      document.getElementById('admin-email-display').textContent = currentAdminUser.email;
-      document.getElementById('auth-wall').style.display = 'none';
-      document.getElementById('admin-layout').style.display = 'flex';
-      if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
-      apiCall('admin_update_presence', { is_online: true, is_busy: false }).catch(function() {});
-      loadDashboard();
-    } catch (e) {
-      document.getElementById('auth-checking').style.display = 'none';
-      document.getElementById('auth-denied').style.display = '';
-      document.getElementById('auth-denied-msg').textContent =
-        e.message === 'Not an admin'
-          ? 'Your account does not have admin privileges.'
-          : 'Session expired or invalid. Please sign in from the homepage.';
+        const res = await fetch(API_BASE, {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            credentials: 'include',
+            body: JSON.stringify({ action: action, ...params }),
+            signal: controller.signal
+        });
+        clearTimeout(timeout);
+        const json = await res.json();
+        if (!res.ok) throw new Error(json.error || 'Request failed');
+        return json.data !== undefined ? json.data : json;
+    } catch (err) {
+        clearTimeout(timeout);
+        throw err;
     }
-  }
+}
+async function apiCallGet(action, params = {}) {
+    const url = new URL(API_BASE, window.location.origin);
+    url.searchParams.append('action', action);
+    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
+    const res = await fetch(url.toString(), { method: 'GET', credentials: 'include' });
+    if (!res.ok) throw new Error(`HTTP ${res.status}`);
+    const json = await res.json();
+    return json.data !== undefined ? json.data : json;
+}
+   
+   async function verifyAdminAccess() {
+    try {
+        const userData = await apiCall('get_user');
+        if (!userData || !userData.user) throw new Error('No session');
+        if (!userData.user.is_admin) throw new Error('Not an admin');
+        currentAdminUser = userData.user;
+        document.getElementById('admin-email-display').textContent = currentAdminUser.email;
+        document.getElementById('auth-wall').style.display = 'none';
+        document.getElementById('admin-layout').style.display = 'flex';
+        if (localStorage.getItem('theme') === 'dark') document.body.classList.add('dark-mode');
+        apiCall('admin_update_presence', { is_online: true, is_busy: false }).catch(() => {});
+        loadDashboard();
+        loadFullDashboardStats();
+    } catch (e) {
+        document.getElementById('auth-checking').style.display = 'none';
+        document.getElementById('auth-denied').style.display = '';
+        document.getElementById('auth-denied-msg').textContent =
+            e.message === 'Not an admin'
+                ? 'Your account does not have admin privileges.'
+                : 'Session expired or invalid. Please sign in from the homepage.';
+    }
+}
 
   function loadTabContent(tabId, force) {
     if (!force && loadedTabs.has(tabId)) return;
@@ -651,20 +727,55 @@ case 'analytics': loadPageActivity(); break;
     }
   }
 
-  async function loadResources() {
-    var tbody = document.getElementById('resources-table');
+   async function loadResources() {
+    const tbody = document.getElementById('resources-table');
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
     try {
-      var [resources, ratings] = await Promise.all([ apiCall('get_resources', { filters: {} }), apiCall('get_all_ratings').catch(() => ({})) ]);
-      if (!resources || !resources.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No resources.</td></tr>'; return; }
-      tbody.innerHTML = resources.map(function(r) {
-        var ratingData = ratings[r.id];
-        var ratingHtml = '—';
-        if (ratingData && ratingData.count > 0) ratingHtml = '⭐ ' + ratingData.avg.toFixed(1) + ' <small>(' + ratingData.count + ')</small>';
-        return '<tr><td><strong>' + esc(r.title||'Untitled') + '</strong></td><td><span class="badge badge-info">' + esc(r.category||'—') + '</span></td><td>' + esc(r.level||'—') + '</td><td>' + esc(r.author||'—') + '</td><td>' + esc(r.section_type||'—') + '</td><td>' + ratingHtml + '</td><td><button class="btn btn-sm btn-outline" onclick="openEdit(\'' + esc(String(r.id)) + '\',\'biology_notes\')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-danger" onclick="deleteResource(\'' + esc(String(r.id)) + '\',\'biology_notes\')"><i class="fa-solid fa-trash"></i></button></td></tr>';
-      }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
-  }
+        const [resources, ratings, pdfs] = await Promise.all([
+            apiCall('get_resources', { filters: {} }),
+            apiCall('get_all_ratings').catch(() => ({})),
+            apiCall('get_pdfs_by_level', { level: 'all' }).catch(() => ({ pdfs: [] }))
+        ]);
+        let allItems = [...(resources || [])];
+        if (pdfs.pdfs && pdfs.pdfs.length) {
+            pdfs.pdfs.forEach(pdf => {
+                allItems.push({
+                    id: `pdf_${pdf.id}`,
+                    title: pdf.title,
+                    category: pdf.topic || 'PDF Resource',
+                    level: pdf.level,
+                    author: pdf.author || 'Admin',
+                    section_type: 'PDF Library',
+                    is_pdf: true,
+                    pdf_id: pdf.id
+                });
+            });
+        }
+        if (!allItems.length) {
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No resources found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = allItems.map(function(r) {
+            const ratingData = ratings[r.id];
+            const ratingHtml = ratingData && ratingData.count > 0 ? '⭐ ' + ratingData.avg.toFixed(1) + ' <small>(' + ratingData.count + ')</small>' : '—';
+            const deleteAction = r.is_pdf 
+                ? `<button class="btn btn-sm btn-danger" onclick="deletePdf('${r.pdf_id}')"><i class="fa-solid fa-trash"></i></button>`
+                : `<button class="btn btn-sm btn-outline" onclick="openEdit('${esc(String(r.id))}','biology_notes')"><i class="fa-solid fa-pen"></i></button>
+                   <button class="btn btn-sm btn-danger" onclick="deleteResource('${esc(String(r.id))}','biology_notes')"><i class="fa-solid fa-trash"></i></button>`;
+            return `<tr>
+                <td><strong>${esc(r.title || 'Untitled')}</strong>${r.is_pdf ? '<br><small class="badge badge-info">PDF</small>' : ''}</td>
+                <td><span class="badge badge-info">${esc(r.category || '—')}</span></td>
+                <td>${esc(r.level || '—')}</td>
+                <td>${esc(r.author || '—')}</td>
+                <td>${esc(r.section_type || '—')}</td>
+                <td>${ratingHtml}</td>
+                <td>${deleteAction}</td>
+            </tr>`;
+        }).join('');
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+}
 
   async function loadRatings() {
     var tbody = document.getElementById('ratings-table');
@@ -856,20 +967,46 @@ case 'analytics': loadPageActivity(); break;
     } catch (e) { toast('Failed: ' + e.message, 'error'); }
   }
 
-  async function loadUsers() {
-    var tbody = document.getElementById('users-table');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+   async function loadUsers() {
+    const tbody = document.getElementById('users-table');
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
     try {
-      var data = await getSiteSections();
-      var users = data?.users?.list || [];
-      if (!users.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No users found.</td></tr>'; return; }
-      tbody.innerHTML = users.map(function(u) {
-        var roleLabel = u.admin_role === 'super_admin' ? 'Super Admin' : u.admin_role === 'content_manager' ? 'Content Manager' : u.admin_role === 'resource_manager' ? 'Resource Manager' : u.is_admin ? 'Admin' : 'User';
-        var roleBadge = u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success';
-        return '<tr><td><strong>' + esc(u.email||'—') + '</strong></td><td><span class="badge ' + roleBadge + '">' + esc(roleLabel) + '</span></td><td><span class="badge ' + (u.is_locked?'badge-danger':'badge-success') + '">' + (u.is_locked?'Locked':'Active') + '</span></td><td>' + (u.created_at?new Date(u.created_at).toLocaleDateString():'—') + '</td><td>' + (!u.is_admin?'<button class="btn btn-sm btn-cyan" onclick="makeAdmin(\'' + esc(u.id) + '\')"><i class="fa-solid fa-user-shield"></i></button>':'') + '<button class="btn btn-sm btn-outline" onclick="toggleLock(\'' + esc(u.id) + '\',' + (!u.is_locked) + ')"><i class="fa-solid fa-' + (u.is_locked?'unlock':'lock') + '"></i></button></td></tr>';
-      }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
-  }
+        const data = await getSiteSections();
+        const users = data?.users?.list || [];
+        if (!users.length) {
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No users found.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = users.map(function(u) {
+            const roleLabel = u.admin_role === 'super_admin' ? 'Super Admin' : u.admin_role === 'content_manager' ? 'Content Manager' : u.admin_role === 'resource_manager' ? 'Resource Manager' : u.is_admin ? 'Admin' : 'User';
+            const roleBadge = u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success';
+            const statusBadge = u.is_locked ? 'badge-danger' : 'badge-success';
+            const statusText = u.is_locked ? 'Locked' : u.is_disabled ? 'Disabled' : 'Active';
+            return `<tr>
+                <td><strong>${esc(u.email || '—')}</strong></td>
+                <td><span class="badge ${roleBadge}">${esc(roleLabel)}</span></td>
+                <td><span class="badge ${statusBadge}">${statusText}</span></td>
+                <td>${u.last_active ? new Date(u.last_active).toLocaleString() : '—'}</td>
+                <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
+                <td>
+                    ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')" title="Make Admin"><i class="fa-solid fa-user-shield"></i></button>` : ''}
+                    <button class="btn btn-sm btn-outline" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})" title="${u.is_locked ? 'Unlock' : 'Lock'}">
+                        <i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i>
+                    </button>
+                    <button class="btn btn-sm btn-danger" onclick="suspendUser('${esc(u.id)}', 'Suspended by admin')" title="Suspend">
+                        <i class="fa-solid fa-ban"></i>
+                    </button>
+                    <button class="btn btn-sm btn-info" onclick="loadUserStatsById('${esc(u.id)}')" title="View Stats">
+                        <i class="fa-solid fa-chart-line"></i>
+                    </button>
+                </td>
+            </tr>`;
+        }).join('');
+        loadOnlineUsers();
+    } catch (e) {
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+    }
+}
 
   async function loadAdminUsers() {
     var tbody = document.getElementById('admin-users-table');
@@ -1399,6 +1536,255 @@ async function loadFullDashboardStats() {
 }
 
   document.addEventListener('DOMContentLoaded', verifyAdminAccess);
+async function loadPdfResources() {
+    try {
+        const pdfs = await apiCall('get_pdfs_by_level', { level: 'all' });
+        const container = document.getElementById('resources-table');
+        if (!container) return;
+        const pdfRows = (pdfs?.pdfs || []).map(pdf => `
+            <tr>
+                <td><strong>${esc(pdf.title)}</strong><br><small class="badge badge-info">PDF</small></td>
+                <td>${esc(pdf.topic || '—')}</td>
+                <td>${esc(pdf.level || '—')}</td>
+                <td>${esc(pdf.author || 'Admin')}</td>
+                <td><span class="badge badge-success">PDF Library</span></td>
+                <td>—</td>
+                <td>
+                    <button class="btn btn-sm btn-outline" onclick="editPdf('${pdf.id}')"><i class="fa-solid fa-pen"></i></button>
+                    <button class="btn btn-sm btn-danger" onclick="deletePdf('${pdf.id}')"><i class="fa-solid fa-trash"></i></button>
+                </td>
+            </tr>
+        `).join('');
+        if (pdfRows) {
+            container.innerHTML += pdfRows;
+        }
+    } catch(e) { console.error('Failed to load PDFs:', e); }
+}
+async function editPdf(pdfId) {
+    try {
+        const pdfs = await apiCall('get_pdfs_by_level', { level: 'all' });
+        const pdf = (pdfs?.pdfs || []).find(p => p.id == pdfId);
+        if (!pdf) { toast('PDF not found', 'error'); return; }
+        document.getElementById('edit-id').value = pdfId;
+        document.getElementById('edit-table').value = 'pdf_resources';
+        document.getElementById('edit-title').value = pdf.title || '';
+        document.getElementById('edit-description').value = pdf.description || '';
+        document.getElementById('edit-category').value = pdf.topic || '';
+        document.getElementById('edit-level').value = pdf.level || '';
+        document.getElementById('edit-section-type').value = 'PDF Library';
+        document.getElementById('edit-tags').value = pdf.tags || '';
+        document.getElementById('edit-modal').style.display = 'flex';
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+async function deletePdf(pdfId) {
+    if (!confirm('Delete this PDF permanently?')) return;
+    try {
+        await apiCall('delete_pdf', { pdf_id: pdfId });
+        toast('PDF deleted!');
+        loadResources();
+    } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
+}
+async function loadNotesStructure() {
+    try {
+        const notes = await apiCall('get_notes_structure');
+        return notes || [];
+    } catch(e) {
+        console.error('Failed to load notes:', e);
+        return [];
+    }
+}
+async function editNote(subtopicId) {
+    try {
+        const content = await apiCall('get_note_content', { subtopic_id: subtopicId });
+        if (!content) { toast('Note not found', 'error'); return; }
+        const modalHtml = `
+            <div class="modal-overlay" id="note-edit-modal" style="display:flex;">
+                <div class="modal" style="max-width:800px;">
+                    <div class="modal-header">
+                        <h3 class="modal-title">Edit Note Content</h3>
+                        <button class="modal-close" onclick="document.getElementById('note-edit-modal').remove()">✕</button>
+                    </div>
+                    <input type="hidden" id="edit-note-id" value="${subtopicId}">
+                    <div class="form-group">
+                        <label class="form-label">Content (HTML/Markdown)</label>
+                        <textarea class="form-textarea" id="edit-note-content" style="min-height:400px; font-family:monospace;">${esc(content.content || '')}</textarea>
+                    </div>
+                    <button class="btn btn-cyan" onclick="saveNoteContent()">Save Changes</button>
+                </div>
+            </div>
+        `;
+        document.body.insertAdjacentHTML('beforeend', modalHtml);
+    } catch(e) { toast('Failed to load note: ' + e.message, 'error'); }
+}
+async function saveNoteContent() {
+    const subtopicId = document.getElementById('edit-note-id').value;
+    const content = document.getElementById('edit-note-content').value;
+    try {
+        await apiCall('update_note_content', { subtopic_id: subtopicId, content: content });
+        toast('Note saved!');
+        document.getElementById('note-edit-modal')?.remove();
+    } catch(e) { toast('Save failed: ' + e.message, 'error'); }
+}
+async function suspendUser(userId, reason) {
+    if (!confirm(`Suspend user ${userId}? Reason: ${reason || 'No reason provided'}`)) return;
+    try {
+        await apiCall('update_user_lock', { userId: userId, lock: true, reason: reason || 'Suspended by admin' });
+        toast('User suspended!');
+        cachedSiteSections = null;
+        loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+async function unsuspendUser(userId) {
+    if (!confirm(`Unsuspend user?`)) return;
+    try {
+        await apiCall('update_user_lock', { userId: userId, lock: false });
+        toast('User unsuspended!');
+        cachedSiteSections = null;
+        loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+async function disableUserAccount(userId) {
+    if (!confirm(`⚠️ DISABLE ACCOUNT: This will prevent the user from logging in. Continue?`)) return;
+    try {
+        await apiCall('update_user_lock', { userId: userId, lock: true, reason: 'Account disabled by admin' });
+        toast('Account disabled!');
+        cachedSiteSections = null;
+        loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+async function enableUserAccount(userId) {
+    if (!confirm(`Enable account for this user?`)) return;
+    try {
+        await apiCall('update_user_lock', { userId: userId, lock: false });
+        toast('Account enabled!');
+        cachedSiteSections = null;
+        loadUsers();
+    } catch(e) { toast('Failed: ' + e.message, 'error'); }
+}
+async function loadOnlineUsers() {
+    try {
+        const online = await apiCall('get_online_users');
+        const container = document.getElementById('online-users-container');
+        if (container) {
+            if (!online || !online.length) {
+                container.innerHTML = '<p class="text-muted">No users online</p>';
+            } else {
+                container.innerHTML = online.map(u => `
+                    <div class="online-user">
+                        <span class="online-dot"></span>
+                        ${esc(u.email || u.name || 'User')}
+                        <small>${u.current_page || 'Unknown page'}</small>
+                    </div>
+                `).join('');
+            }
+        }
+    } catch(e) { console.error('Failed to load online users:', e); }
+}
+async function exportAllUserStats() {
+    try {
+        const sections = await getSiteSections();
+        const users = sections?.users?.list || [];
+        const allStats = [];
+        for (const user of users) {
+            try {
+                const stats = await apiCall('get_user_stats', { user_id: user.id });
+                allStats.push({ user: user.email, stats: stats });
+            } catch(e) { }
+        }
+        const dataStr = JSON.stringify(allStats, null, 2);
+        const blob = new Blob([dataStr], { type: 'application/json' });
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement('a');
+        a.href = url;
+        a.download = `all_users_stats_${new Date().toISOString().slice(0,10)}.json`;
+        a.click();
+        URL.revokeObjectURL(url);
+        toast('Exported stats for ' + allStats.length + ' users');
+    } catch(e) { toast('Export failed: ' + e.message, 'error'); }
+}
+async function loadUserStatsById(userId) {
+    document.getElementById('stats-user-id').value = userId;
+    await loadUserStats();
+    document.querySelector('a[data-tab="user-stats"]').click();
+}
+async function loadFullDashboardStats() {
+    try {
+        const quizStats = await apiCall('get_public_stats');
+        const flashcardStats = await apiCall('get_flashcard_decks');
+        document.getElementById('stat-quiz-attempts').textContent = quizStats?.quiz_attempts || 0;
+        document.getElementById('stat-flashcard-decks').textContent = flashcardStats?.length || 0;
+        document.getElementById('stat-downloads').textContent = quizStats?.downloads_count || 0;
+    } catch(e) {
+        console.error('Failed to load extended stats:', e);
+    }
+}
+async function toggleNewsletterSubscriber(id, currentStatus) {
+    try {
+        await apiCall('update_newsletter_subscriber', { id: id, is_active: !currentStatus });
+        toast(currentStatus ? 'Subscriber deactivated' : 'Subscriber activated');
+        loadNewsletter();
+    } catch(e) {
+        toast('Failed: ' + e.message, 'error');
+    }
+}
+async function loadPageActivity() {
+    const tbody = document.getElementById('page-activity-table');
+    if (!tbody) return;
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    try {
+        const activities = await apiCall('get_page_activity');
+        if (!activities || !activities.length) {
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded yet.</td></tr>';
+            return;
+        }
+        tbody.innerHTML = activities.map(act => `
+            <tr>
+                <td>${act.user_email ? esc(act.user_email) : '<span class="badge badge-info">Anonymous</span>'}</td>
+                <td><span class="badge badge-info">${esc(act.page)}</span></td>
+                <td>${new Date(act.created_at).toLocaleString()}</td>
+                <td><small>${esc(JSON.stringify(act.metadata || {}).substring(0, 100))}</small></td>
+            </tr>
+        `).join('');
+    } catch(e) {
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
+    }
+}
+async function closeChatRoom(roomId) {
+    if (!confirm('Close this chat conversation?')) return;
+    try {
+        await apiCall('admin_reject_chat', { room_id: roomId });
+        toast('Chat closed');
+        if (currentChatRoom === roomId) {
+            if (chatPollInterval) clearInterval(chatPollInterval);
+            currentChatRoom = null;
+            document.getElementById('chat-header-title').textContent = 'Select a conversation';
+            document.getElementById('chat-messages').innerHTML = '<p style="color:var(--clr-text-muted); text-align:center;">Select a chat to view messages</p>';
+            document.getElementById('send-btn').disabled = true;
+            document.getElementById('chat-input').disabled = true;
+        }
+        loadActiveChats();
+        loadPendingRequests();
+    } catch(e) {
+        toast('Failed: ' + e.message, 'error');
+    }
+}
+function esc(str) {
+    if (!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+}
+function toast(msg, type) {
+    type = type || 'success';
+    const el = document.createElement('div');
+    el.className = 'toast ' + type;
+    el.textContent = msg;
+    document.body.appendChild(el);
+    setTimeout(() => el.remove(), 3500);
+}
+setInterval(() => {
+    if (currentAdminUser) {
+        apiCall('admin_update_presence', { is_online: true }).catch(() => {});
+    }
+}, 30000);
 </script>
 </body>
 </html>
