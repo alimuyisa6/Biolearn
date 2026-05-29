@@ -717,13 +717,31 @@ async function handlePost(req, res) {
     let result;
     const { section, filters, formData, email, password, payload, submissionId, prompt, mode, name, amount, txid, room_id, message, is_online, is_busy, feature_key, is_enabled, settings, level, topic, questions, batch_name, deck_id, title, description, category, cards, card_id, difficulty, resource_id, rating, comment, badge, week_start, selected_option, flashcard_id, user_answer, user_id, page, metadata } = req.body;
     switch (action) {
-      case 'get_all_site_sections': case 'get_all_sections': {
-        const { data, error } = await supabase.from('site_sections').select('section, data');
-        if (error) throw error;
-        result = {};
-        (data || []).forEach(row => { result[row.section] = row.data; });
-        break;
-      }
+       case 'get_all_site_sections': case 'get_all_sections': {
+  const { data, error } = await supabase.from('site_sections').select('section, data');
+  if (error) throw error;
+  result = {};
+  (data || []).forEach(row => { result[row.section] = row.data; });
+  
+  const { data: authUsers, error: authError } = await supabase.auth.admin.listUsers();
+  if (!authError && authUsers?.users) {
+    result.users = {
+      list: authUsers.users.map(u => ({
+        id: u.id,
+        email: u.email,
+        is_admin: false,
+        is_locked: false,
+        is_disabled: false,
+        admin_role: null,
+        created_at: u.created_at,
+        last_active: u.last_sign_in_at || u.updated_at
+      }))
+    };
+  } else {
+    result.users = { list: [] };
+  }
+  break;
+       }
       case 'get_category_suggestions': {
         const [resources, flashcardDecks, quizTopics] = await Promise.all([
           supabase.from('biology_notes').select('category, level, section_type').limit(500),
