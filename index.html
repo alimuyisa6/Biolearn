@@ -5495,6 +5495,19 @@ document.addEventListener('DOMContentLoaded', async function() {
   try {
     const sections = await apiCall('get_all_site_sections');
     if (sections) {
+     
+ if (sections.site_config && sections.site_config.logo_url) {
+        const logoUrl = sections.site_config.logo_url;
+        const applyLogo = function(selector) {
+          const el = document.querySelector(selector);
+          if (el) {
+            el.innerHTML = '<img src="' + esc(logoUrl) + '" fetchpriority="high" loading="eager" style="height:70px;width:auto;max-width:260px;object-fit:contain;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15));" onerror="this.style.display=\'none\';">';
+          }
+        };
+        applyLogo('.site-header .logo-link');
+        applyLogo('.mobile-nav-header .logo-link');
+        applyLogo('.footer-fat .logo-link');
+      }
       if (sections.section_headings) {
         const headings = sections.section_headings;
         const setHeading = function(id, title, subtitle) {
@@ -5514,18 +5527,7 @@ document.addEventListener('DOMContentLoaded', async function() {
         setHeading('contact', headings.contact_title, headings.contact_subtitle);
         setHeading('blog', headings.blog_title, headings.blog_subtitle);
       }
-      if (sections.site_config && sections.site_config.logo_url) {
-        const logoUrl = sections.site_config.logo_url;
-        const applyLogo = function(selector) {
-          const el = document.querySelector(selector);
-          if (el) {
-            el.innerHTML = '<img src="' + esc(logoUrl) + '" style="height:70px;width:auto;max-width:260px;object-fit:contain;display:block;filter:drop-shadow(0 2px 8px rgba(0,0,0,0.15));" onerror="this.style.display=\'none\';">';
-          }
-        };
-        applyLogo('.site-header .logo-link');
-        applyLogo('.mobile-nav-header .logo-link');
-        applyLogo('.footer-fat .logo-link');
-      }
+  
       loadDailyAndWeekly(sections);
      loadDynamicHeroTitle(); 
  if (sections.navigation) {
