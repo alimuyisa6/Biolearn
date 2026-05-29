@@ -1,9 +1,20 @@
 const crypto = require('crypto');
 const { createClient } = require('@supabase/supabase-js');
 
-const supabase = createClient(
+ const supabase = createClient(
   process.env.SUPABASE_URL,
   process.env.SUPABASE_SERVICE_ROLE_KEY
+);
+
+const supabaseAdmin = createClient(
+  process.env.SUPABASE_URL,
+  process.env.SUPABASE_SERVICE_ROLE_KEY,
+  {
+    auth: {
+      autoRefreshToken: false,
+      persistSession: false
+    }
+  }
 );
 
 const REQUIRED_ENV_VARS = ['SUPABASE_URL', 'SUPABASE_SERVICE_ROLE_KEY'];
@@ -965,12 +976,11 @@ async function handlePost(req, res) {
   if(signinErr){const banned=trackFailedAuth(ip,userEmail);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw signinErr;}
   resetFailedAuth(ip,userEmail);
   
-  const userId = data.user.id;
-  const { data: restriction } = await supabase
-    .from('user_restrictions')
-    .select('restriction_type, lock_reason, expires_at')
-    .eq('user_id', userId)
-    .maybeSingle();
+   const { data: restriction } = await supabase
+  .from('user_restrictions')
+  .select('restriction_type, lock_reason, expires_at')
+  .eq('user_id', userId)
+  .maybeSingle();
   
   if (restriction) {
     if (restriction.restriction_type === 'disabled') {
