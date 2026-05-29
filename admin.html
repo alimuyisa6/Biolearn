@@ -579,7 +579,7 @@
     </div>
 </div>
 
-<script>
+ <script>
   const API_BASE = '/api/query';
 let currentAdminUser = null;
 let pendingPollInterval = null;
@@ -587,11 +587,14 @@ let featureDataStore = new Map();
 let loadedTabs = new Set();
 let cachedSiteSections = null;
 let cachedSiteSectionsTime = 0;
- 
+let currentChatRoom = null;
+let currentChatUser = null;
+let chatPollInterval = null;
+
   function esc(t) { const m = { '&': '&amp;', '<': '&lt;', '>': '&gt;', '"': '&quot;', "'": '&#039;' }; return String(t ?? '').replace(/[&<>"']/g, c => m[c]); }
   function toast(msg, type) { type = type || 'success'; var el = document.createElement('div'); el.className = 'toast ' + type; el.textContent = msg; document.body.appendChild(el); setTimeout(function() { el.remove(); }, 3500); }
 
-     async function apiCall(action, params) {
+  async function apiCall(action, params) {
     params = params || {};
     const controller = new AbortController();
     const timeout = setTimeout(() => controller.abort(), 15000);
@@ -611,8 +614,9 @@ let cachedSiteSectionsTime = 0;
         clearTimeout(timeout);
         throw err;
     }
-}
-async function apiCallGet(action, params = {}) {
+  }
+
+  async function apiCallGet(action, params = {}) {
     const url = new URL(API_BASE, window.location.origin);
     url.searchParams.append('action', action);
     Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
@@ -620,19 +624,9 @@ async function apiCallGet(action, params = {}) {
     if (!res.ok) throw new Error(`HTTP ${res.status}`);
     const json = await res.json();
     return json.data !== undefined ? json.data : json;
-}
-    
-async function apiCallGet(action, params = {}) {
-    const url = new URL(API_BASE, window.location.origin);
-    url.searchParams.append('action', action);
-    Object.keys(params).forEach(key => url.searchParams.append(key, params[key]));
-    const res = await fetch(url.toString(), { method: 'GET', credentials: 'include' });
-    if (!res.ok) throw new Error(`HTTP ${res.status}`);
-    const json = await res.json();
-    return json.data !== undefined ? json.data : json;
-}
-   
-      async function verifyAdminAccess() {
+  }
+
+  async function verifyAdminAccess() {
     const checkingDiv = document.getElementById('auth-checking');
     const deniedDiv = document.getElementById('auth-denied');
     const deniedMsg = document.getElementById('auth-denied-msg');
@@ -671,8 +665,8 @@ async function apiCallGet(action, params = {}) {
             deniedMsg.textContent = e.message || 'Session expired or invalid. Please sign in from the homepage.';
         }
     }
-}
-      
+  }
+
   function loadTabContent(tabId, force) {
     if (!force && loadedTabs.has(tabId)) return;
     loadedTabs.add(tabId);
@@ -689,9 +683,9 @@ async function apiCallGet(action, params = {}) {
       case 'app-features': loadAppFeatures(); break;
       case 'leaderboard': loadLeaderboard(); break;
       case 'flashcards': loadFlashcardDecks(); break;
-case 'weekly-challenge': loadWeeklyChallenge(); break;
-case 'analytics': loadPageActivity(); break;
-}
+      case 'weekly-challenge': loadWeeklyChallenge(); break;
+      case 'analytics': loadPageActivity(); break;
+    }
   }
 
   document.querySelectorAll('.sidebar-nav a[data-tab]').forEach(function(link) {
@@ -710,6 +704,7 @@ case 'analytics': loadPageActivity(); break;
       loadTabContent(this.dataset.tab);
     });
   });
+
   document.querySelectorAll('#section-tabs .tab-btn').forEach(function(btn) {
     btn.addEventListener('click', function() {
       document.querySelectorAll('#section-tabs .tab-btn').forEach(function(b) { b.classList.remove('active'); });
@@ -727,7 +722,7 @@ case 'analytics': loadPageActivity(); break;
     return cachedSiteSections;
   }
 
-   async function loadDashboard() {
+  async function loadDashboard() {
     try {
       var data = await apiCall('stats');
       document.getElementById('stat-resources').textContent = data.resources ?? 0;
@@ -752,7 +747,7 @@ case 'analytics': loadPageActivity(); break;
     }
   }
 
-   async function loadResources() {
+  async function loadResources() {
     const tbody = document.getElementById('resources-table');
     tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
     try {
@@ -777,7 +772,7 @@ case 'analytics': loadPageActivity(); break;
             });
         }
         if (!allItems.length) {
-            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No resources found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No resources found.快</tbody>';
             return;
         }
         tbody.innerHTML = allItems.map(function(r) {
@@ -798,9 +793,9 @@ case 'analytics': loadPageActivity(); break;
             </tr>`;
         }).join('');
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>';
     }
-}
+  }
 
   async function loadRatings() {
     var tbody = document.getElementById('ratings-table');
@@ -808,19 +803,19 @@ case 'analytics': loadPageActivity(); break;
     try {
       var ratings = await apiCall('get_all_ratings');
       var entries = Object.entries(ratings || {}).sort((a,b) => b[1].avg - a[1].avg);
-      if (!entries.length) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">No ratings yet.</td></tr>'; return; }
-      tbody.innerHTML = entries.map(function([id, data]) { return '<tr><td>' + esc(id) + '</td><td><span class="badge badge-info">⭐ ' + data.avg.toFixed(1) + '</span></td><td>' + data.count + '</td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+      if (!entries.length) { tbody.innerHTML = '</table><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">No ratings yet.快</tbody>'; return; }
+      tbody.innerHTML = entries.map(function([id, data]) { return '<tr><td>' + esc(id) + '<tr><td><span class="badge badge-info">⭐ ' + data.avg.toFixed(1) + '</span></td><td>' + data.count + '</td></tr>'; }).join('');
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function loadSubmissions() {
     var tbody = document.getElementById('submissions-table');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('submissions');
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No submissions.</td></tr>'; return; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No submissions.快</tbody>'; return; }
       tbody.innerHTML = data.map(function(s) { return '<tr><td><strong>' + esc(s.title||'Untitled') + '</strong></td><td>' + esc(s.author||'—') + '</td><td>' + esc(s.category||'—') + '</td><td>' + esc(s.level||'—') + '</td><td><span class="badge ' + (s.status==='approved'?'badge-success':s.status==='rejected'?'badge-danger':'badge-warning') + '">' + esc(s.status) + '</span></td><td>' + (s.created_at?new Date(s.created_at).toLocaleDateString():'—') + '</td><td>' + (s.status==='pending'?'<button class="btn btn-sm btn-cyan" onclick="approveSubmission(\'' + esc(String(s.id)) + '\')"><i class="fa-solid fa-check"></i></button><button class="btn btn-sm btn-danger" onclick="rejectSubmission(\'' + esc(String(s.id)) + '\')"><i class="fa-solid fa-times"></i></button>':'') + '<button class="btn btn-sm btn-outline" onclick="openEdit(\'' + esc(String(s.id)) + '\',\'resource_submissions\')"><i class="fa-solid fa-pen"></i></button><button class="btn btn-sm btn-danger" onclick="deleteResource(\'' + esc(String(s.id)) + '\',\'resource_submissions\')"><i class="fa-solid fa-trash"></i></button></td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   window.approveSubmission = async function(id) { try { await apiCall('approve', { submissionId: id, action: 'approve' }); toast('Approved!'); loadSubmissions(); } catch(e) { toast('Failed: ' + e.message, 'error'); } };
@@ -828,13 +823,13 @@ case 'analytics': loadPageActivity(); break;
 
   async function loadMessages() {
     var tbody = document.getElementById('messages-table');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('messages');
       var messages = data?.messages || [];
-      if (!messages.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No messages.</td></tr>'; return; }
+      if (!messages.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No messages.快</tbody>'; return; }
       tbody.innerHTML = messages.map(function(m) { return '<tr><td><strong>' + esc(m.name||'—') + '</strong></td><td>' + esc(m.email||'—') + '</td><td>' + esc(m.subject||'—') + '</td><td style="max-width:280px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap;">' + esc((m.message||'').substring(0,100)) + '</td><td>' + (m.created_at?new Date(m.created_at).toLocaleDateString():'—') + '</td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function submitUpload() {
@@ -921,22 +916,22 @@ case 'analytics': loadPageActivity(); break;
     catch (e) { toast('Save failed: ' + e.message, 'error'); }
   }
 
-   async function loadQuizTopics() {
+  async function loadQuizTopics() {
     var tbody = document.getElementById('quiz-topics-table');
     var level = document.getElementById('quiz-level')?.value || 'O-Level';
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var topics = await apiCall('get_quiz_topics', { level: level });
-      if (!topics || !topics.length) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">No topics for ' + esc(level) + '</td></tr>'; return; }
+      if (!topics || !topics.length) { tbody.innerHTML = '<td><td colspan="4" style="text-align:center;color:var(--clr-text-muted);">No topics for ' + esc(level) + '快</tbody>'; return; }
       tbody.innerHTML = topics.map(function(t) { 
         return '<tr>' +
           '<td><strong>' + esc(t.topic_name) + '</strong></td>' +
           '<td>' + esc(level) + '</td>' +
           '<td>' + (t.question_count||0) + '</td>' +
           '<td><button class="btn btn-sm btn-danger" onclick="deleteQuizTopic(\'' + esc(t.topic_name) + '\', \'' + esc(level) + '\')"><i class="fa-solid fa-trash"></i> Delete</button></td>' +
-        '</table>';
+        '</tr>';
       }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function submitQuizBatch() {
@@ -958,16 +953,16 @@ case 'analytics': loadPageActivity(); break;
 
   async function loadAppFeatures() {
     var tbody = document.getElementById('app-features-table');
-    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('get_app_features', { page_id: 'all' });
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No features found.</td></tr>'; return; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:var(--clr-text-muted);">No features found.快</tbody>'; return; }
       featureDataStore.clear();
       tbody.innerHTML = data.map(function(f) {
         featureDataStore.set(f.feature_key, { enabled: f.is_enabled, settings: f.settings || {} });
         return '<tr><td><strong>' + esc(f.feature_key) + '</strong></td><td>' + esc(f.feature_name) + '</td><td><span class="badge badge-info">' + esc(f.page_id) + '</span></td><td>' + esc(f.category) + '</td><td><span class="badge ' + (f.is_enabled?'badge-success':'badge-danger') + '">' + (f.is_enabled?'Yes':'No') + '</span></td><td>' + (f.display_order||0) + '</td><td><button class="btn btn-sm btn-outline" onclick="openFeatureEdit(\'' + esc(f.feature_key) + '\')"><i class="fa-solid fa-pen"></i></button></td></tr>';
       }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '</table><td colspan="7" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   window.openFeatureEdit = function(key) {
@@ -992,21 +987,37 @@ case 'analytics': loadPageActivity(); break;
     } catch (e) { toast('Failed: ' + e.message, 'error'); }
   }
 
-   async function loadUsers() {
+  async function loadUsers() {
     const tbody = document.getElementById('users-table');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
         const data = await getSiteSections();
         const users = data?.users?.list || [];
         if (!users.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No users found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No users found.快</tbody>';
             return;
         }
         tbody.innerHTML = users.map(function(u) {
             const roleLabel = u.admin_role === 'super_admin' ? 'Super Admin' : u.admin_role === 'content_manager' ? 'Content Manager' : u.admin_role === 'resource_manager' ? 'Resource Manager' : u.is_admin ? 'Admin' : 'User';
             const roleBadge = u.admin_role === 'super_admin' ? 'badge-warning' : u.is_admin ? 'badge-info' : 'badge-success';
-            const statusBadge = u.is_locked ? 'badge-danger' : 'badge-success';
-            const statusText = u.is_locked ? 'Locked' : u.is_disabled ? 'Disabled' : 'Active';
+            let statusBadge = 'badge-success';
+            let statusText = 'Active';
+            if (u.restriction_type === 'disabled') {
+                statusBadge = 'badge-danger';
+                statusText = 'Disabled';
+            } else if (u.restriction_type === 'suspended') {
+                statusBadge = 'badge-warning';
+                statusText = 'Suspended';
+            } else if (u.restriction_type === 'locked') {
+                statusBadge = 'badge-warning';
+                statusText = 'Locked';
+                if (u.restriction_expires_at) {
+                    const expires = new Date(u.restriction_expires_at);
+                    if (expires > new Date()) {
+                        statusText += ` (until ${expires.toLocaleDateString()})`;
+                    }
+                }
+            }
             return `<tr>
                 <td><strong>${esc(u.email || '—')}</strong></td>
                 <td><span class="badge ${roleBadge}">${esc(roleLabel)}</span></td>
@@ -1015,11 +1026,17 @@ case 'analytics': loadPageActivity(); break;
                 <td>${u.created_at ? new Date(u.created_at).toLocaleDateString() : '—'}</td>
                 <td>
                     ${!u.is_admin ? `<button class="btn btn-sm btn-cyan" onclick="makeAdmin('${esc(u.id)}')" title="Make Admin"><i class="fa-solid fa-user-shield"></i></button>` : ''}
-                    <button class="btn btn-sm btn-outline" onclick="toggleLock('${esc(u.id)}', ${!u.is_locked})" title="${u.is_locked ? 'Unlock' : 'Lock'}">
-                        <i class="fa-solid fa-${u.is_locked ? 'unlock' : 'lock'}"></i>
+                    <button class="btn btn-sm btn-warning" onclick="applyUserRestriction('${esc(u.id)}', 'locked', 24, 'Temporary lock for 24 hours')" title="Lock for 24 hours" style="background:#f39c12;color:#fff;border:none;">
+                        <i class="fa-solid fa-clock"></i> Lock 24h
                     </button>
-                    <button class="btn btn-sm btn-danger" onclick="suspendUser('${esc(u.id)}', 'Suspended by admin')" title="Suspend">
-                        <i class="fa-solid fa-ban"></i>
+                    <button class="btn btn-sm btn-danger" onclick="applyUserRestriction('${esc(u.id)}', 'suspended', 0, 'Account suspended by admin')" title="Suspend indefinitely" style="background:#e74c3c;color:#fff;border:none;">
+                        <i class="fa-solid fa-ban"></i> Suspend
+                    </button>
+                    <button class="btn btn-sm btn-dark" onclick="applyUserRestriction('${esc(u.id)}', 'disabled', 0, 'Account permanently disabled')" title="Permanently disable" style="background:#34495e;color:#fff;border:none;">
+                        <i class="fa-solid fa-trash-alt"></i> Disable
+                    </button>
+                    <button class="btn btn-sm btn-success" onclick="applyUserRestriction('${esc(u.id)}', 'remove', 0, '')" title="Remove all restrictions" style="background:#27ae60;color:#fff;border:none;">
+                        <i class="fa-solid fa-check"></i> Remove
                     </button>
                     <button class="btn btn-sm btn-info" onclick="loadUserStatsById('${esc(u.id)}')" title="View Stats">
                         <i class="fa-solid fa-chart-line"></i>
@@ -1029,36 +1046,75 @@ case 'analytics': loadPageActivity(); break;
         }).join('');
         loadOnlineUsers();
     } catch (e) {
-        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>';
+        tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>';
     }
-}
+  }
+
+  async function applyUserRestriction(userId, restrictionType, durationHours, reason) {
+    let confirmMessage = '';
+    switch(restrictionType) {
+        case 'locked':
+            confirmMessage = `Lock this user for ${durationHours} hours? They will not be able to login until the time expires.`;
+            break;
+        case 'suspended':
+            confirmMessage = `SUSPEND this user? They will not be able to login until you manually remove the suspension.`;
+            break;
+        case 'disabled':
+            confirmMessage = `⚠️ PERMANENTLY DISABLE this user? This action CANNOT be undone. The user will never be able to login again.`;
+            break;
+        case 'remove':
+            confirmMessage = `Remove all restrictions from this user? They will be able to login normally.`;
+            break;
+        default:
+            confirmMessage = `Apply ${restrictionType} to this user?`;
+    }
+    if (!confirm(confirmMessage)) return;
+    try {
+        await apiCall('update_user_restriction', { 
+            userId: userId, 
+            restriction_type: restrictionType, 
+            duration_hours: durationHours,
+            reason: reason 
+        });
+        let successMessage = '';
+        switch(restrictionType) {
+            case 'locked': successMessage = 'User locked successfully!'; break;
+            case 'suspended': successMessage = 'User suspended successfully!'; break;
+            case 'disabled': successMessage = 'User permanently disabled!'; break;
+            case 'remove': successMessage = 'Restrictions removed successfully!'; break;
+            default: successMessage = 'Action completed successfully!';
+        }
+        toast(successMessage);
+        cachedSiteSections = null;
+        loadUsers();
+    } catch(e) {
+        toast('Failed: ' + e.message, 'error');
+    }
+  }
 
   async function loadAdminUsers() {
     var tbody = document.getElementById('admin-users-table');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('get_admin_users');
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No admin users.</td></tr>'; return; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No admin users.快</tbody>'; return; }
       tbody.innerHTML = data.map(function(a) { return '<tr><td><strong>' + esc(a.admin_email||'—') + '</strong></td><td><span class="badge badge-info">' + esc(a.admin_role||'—') + '</span></td><td style="font-family:var(--font-mono);font-size:0.68rem;">' + esc(JSON.stringify(a.permissions||{})) + '</td><td><span class="badge ' + (a.is_locked?'badge-danger':a.is_active?'badge-success':'badge-warning') + '">' + (a.is_locked?'Locked':a.is_active?'Active':'Inactive') + '</span></td><td><button class="btn btn-sm btn-outline" onclick="toggleAdminLock(\'' + esc(a.admin_id) + '\',' + (!a.is_locked) + ')"><i class="fa-solid fa-' + (a.is_locked?'unlock':'lock') + '"></i></button></td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   window.makeAdmin = async function(id) {
     try { await apiCall('update_user_role', { userId: id, role: 'admin' }); cachedSiteSections = null; toast('Promoted!'); loadedTabs.delete('users'); loadUsers(); } catch(e) { toast('Failed: ' + e.message, 'error'); }
   };
-  window.toggleLock = async function(id, lock) {
-    try { await apiCall('update_user_lock', { userId: id, lock: lock, reason: lock ? 'Locked by admin' : null }); cachedSiteSections = null; toast(lock ? 'Locked.' : 'Unlocked.'); loadedTabs.delete('users'); loadUsers(); } catch(e) { toast('Failed: ' + e.message, 'error'); }
-  };
   window.toggleAdminLock = async function(id, lock) {
     try { await apiCall('update_user_lock', { userId: id, lock: lock, reason: lock ? 'Locked by admin' : null }); cachedSiteSections = null; toast(lock ? 'Locked.' : 'Unlocked.'); loadedTabs.delete('users'); loadAdminUsers(); } catch(e) { toast('Failed: ' + e.message, 'error'); }
   };
 
-   async function loadNewsletter() {
+  async function loadNewsletter() {
     var tbody = document.getElementById('newsletter-table');
-    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('get_newsletter_subscribers');
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">No subscribers.</td></tr>'; return; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:var(--clr-text-muted);">No subscribers.快</tbody>'; return; }
       tbody.innerHTML = data.map(function(s) { 
         return '<tr>' +
           '<td>' + esc(s.email||'—') + '</td>' +
@@ -1066,37 +1122,37 @@ case 'analytics': loadPageActivity(); break;
           '<td>' + (s.created_at?new Date(s.created_at).toLocaleDateString():'—') + '</td>' +
         '</tr>';
       }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="3" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function loadDonations() {
     var tbody = document.getElementById('donations-table');
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var data = await apiCall('get_donations');
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No donations.</td></tr>'; return; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No donations.快</tbody>'; return; }
       tbody.innerHTML = data.map(function(d) { return '<tr><td><strong>' + esc(d.name||'Anonymous') + '</strong></td><td>' + esc(d.amount||'—') + '</td><td style="font-family:var(--font-mono);font-size:0.72rem;">' + esc((d.txid||'').substring(0,20)) + '…</td><td>' + esc(d.provider||'—') + '</td><td><span class="badge ' + (d.status==='completed'?'badge-success':d.status==='failed'?'badge-danger':'badge-warning') + '">' + esc(d.status||'—') + '</span></td><td>' + (d.created_at?new Date(d.created_at).toLocaleDateString():'—') + '</td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function loadLeaderboard() {
     var tbody = document.getElementById('leaderboard-table');
     var level = document.getElementById('leaderboard-level')?.value || '';
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<td><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
       var params = { limit: 20 };
       if (level) params.level = level;
       var data = await apiCall('get_leaderboard', params);
-      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No data.</td></tr>'; return; }
-      tbody.innerHTML = data.map(function(e, i) { return '<tr><td><strong>#' + (i+1) + '</strong></td><td>' + esc(e.user?.name||'User') + '</td><td>' + esc(e.level||'—') + '</td><td>' + esc(e.topic||'—') + '</td><td><span class="badge badge-success">' + (e.percentage||0) + '%</span></td><td>' + (e.completed_at?new Date(e.completed_at).toLocaleDateString():'—') + '</td></tr>'; }).join('');
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+      if (!data || !data.length) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:var(--clr-text-muted);">No data.快</tbody>'; return; }
+      tbody.innerHTML = data.map(function(e, i) { return '<tr><td><strong>#' + (i+1) + '</strong></td><td>' + esc(e.user?.name||'User') + '</td><td>' + esc(e.level||'—') + '</td><td>' + esc(e.topic||'—') + '</td><td><span class="badge badge-success">' + (e.percentage||0) + '%</span></td><td>' + (e.completed_at?new Date(e.completed_at).toLocaleDateString():'—') + '</td></table>'; }).join('');
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
 
   async function loadUserStats() {
     var userId = document.getElementById('stats-user-id').value.trim();
     if (!userId) { toast('Enter a user ID', 'error'); return; }
     var tbody = document.getElementById('user-stats-table');
-    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">Loading…快</tbody>';
     try {
        var [quizStats, favorites, userRatings, achievements, streakData] = await Promise.all([
   apiCall('get_user_stats', { user_id: userId }).catch(() => null),
@@ -1114,9 +1170,9 @@ case 'analytics': loadPageActivity(); break;
         document.getElementById('ustat-streak').textContent = quizStats.streak || 0;
         document.getElementById('ustat-topics').textContent = quizStats.topics_attempted || 0;
         var recent = quizStats.recent_activity || [];
-        if (!recent.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No activity.</td></tr>'; }
+        if (!recent.length) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No activity.快</tbody>'; }
         else { tbody.innerHTML = recent.map(function(a) { return '<tr><td>' + esc(a.topic||'—') + '</td><td>' + esc(a.level||'—') + '</td><td><span class="badge ' + (a.passed?'badge-success':'badge-danger') + '">' + (a.percentage||0) + '%</span></td><td>' + (a.passed?'<span class="badge badge-success">Yes</span>':'<span class="badge badge-danger">No</span>') + '</td><td>' + (a.completed_at?new Date(a.completed_at).toLocaleDateString():'—') + '</td></tr>'; }).join(''); }
-      } else { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No quiz data.</td></tr>'; }
+      } else { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:var(--clr-text-muted);">No quiz data.快</tbody>'; }
       var favTable = document.getElementById('favorites-table');
       var favPanel = document.getElementById('panel-favorites');
       if (favorites && favorites.length) {
@@ -1141,12 +1197,8 @@ case 'analytics': loadPageActivity(); break;
         streakGrid.style.display = 'grid';
         document.getElementById('ustat-daily-streak').textContent = streakData.count || 0;
       } else { streakGrid.style.display = 'none'; }
-    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '</td></tr>'; }
+    } catch (e) { tbody.innerHTML = '<tr><td colspan="5" style="text-align:center;color:#e74c3c;">Failed: ' + esc(e.message) + '快</tbody>'; }
   }
-
-  let currentChatRoom = null;
-  let currentChatUser = null;
-  let chatPollInterval = null;
 
   async function loadPendingRequests() {
     const el = document.getElementById('pending-requests-list');
@@ -1183,7 +1235,7 @@ case 'analytics': loadPageActivity(); break;
     } catch(e) { toast('Error: ' + e.message, 'error'); }
   }
 
-   async function loadActiveChats() {
+  async function loadActiveChats() {
     const el = document.getElementById('active-chats-list');
     try {
       const data = await apiCall('admin_get_active_chats');
@@ -1215,6 +1267,10 @@ case 'analytics': loadPageActivity(); break;
     const el = document.getElementById('chat-messages');
     try {
       const msgs = await apiCall('get_chat_messages', { room_id: roomId });
+      if (!msgs || !msgs.length) {
+        el.innerHTML = '<p style="color:var(--clr-text-muted); text-align:center;">No messages yet.</p>';
+        return;
+      }
       el.innerHTML = msgs.map(m => `
         <div class="chat-msg ${m.sender_type === 'admin' ? 'msg-admin' : 'msg-user'}">
           <strong>${m.sender_type === 'admin' ? 'You' : esc(currentChatUser||'User')}:</strong> ${esc(m.content)}
@@ -1255,14 +1311,14 @@ case 'analytics': loadPageActivity(); break;
     window.location.href = '/';
   };
 
-async function loadFlashcardDecks() {
+  async function loadFlashcardDecks() {
     const tbody = document.getElementById('flashcard-decks-table');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">Loading...快</tbody>';
     try {
         const decks = await apiCall('get_flashcard_decks');
         if (!decks || !decks.length) {
-            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No flashcard decks found.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="6" style="text-align:center;">No flashcard decks found.快</tbody>';
             return;
         }
         tbody.innerHTML = decks.map(deck => `
@@ -1279,11 +1335,11 @@ async function loadFlashcardDecks() {
             </tr>
         `).join('');
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="6" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="6" style="color:#e74c3c;">Error: ${esc(e.message)}快</tbody>`;
     }
-}
+  }
 
-async function deleteFlashcardDeck(deckId) {
+  async function deleteFlashcardDeck(deckId) {
     if (!confirm('Delete this entire flashcard deck? This action cannot be undone.')) return;
     try {
         await apiCall('delete_flashcard_deck', { deck_id: deckId });
@@ -1292,9 +1348,9 @@ async function deleteFlashcardDeck(deckId) {
     } catch(e) {
         toast('Delete failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function editFlashcardDeck(deckId) {
+  async function editFlashcardDeck(deckId) {
     try {
         const deck = await apiCall('get_flashcard_deck', { deck_id: deckId });
         document.getElementById('edit-deck-id').value = deckId;
@@ -1321,9 +1377,9 @@ async function editFlashcardDeck(deckId) {
     } catch(e) {
         toast('Failed to load deck: ' + e.message, 'error');
     }
-}
+  }
 
-async function saveFlashcardDeck() {
+  async function saveFlashcardDeck() {
     const deckId = document.getElementById('edit-deck-id').value;
     const title = document.getElementById('edit-deck-title').value.trim();
     if (!title) {
@@ -1360,9 +1416,9 @@ async function saveFlashcardDeck() {
     } catch(e) {
         toast('Save failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function createFlashcardDeck() {
+  async function createFlashcardDeck() {
     const title = document.getElementById('new-deck-title').value.trim();
     if (!title) {
         toast('Title required', 'error');
@@ -1402,9 +1458,9 @@ async function createFlashcardDeck() {
     } catch(e) {
         toast('Creation failed: ' + e.message, 'error');
     }
-}
+  }
 
-function addNewCardToForm(containerId) {
+  function addNewCardToForm(containerId) {
     const container = document.getElementById(containerId);
     const cardHtml = `
         <div class="card-item" style="border:1px solid var(--clr-border-glow); padding:10px; margin-bottom:10px; border-radius:8px;">
@@ -1414,9 +1470,9 @@ function addNewCardToForm(containerId) {
         </div>
     `;
     container.insertAdjacentHTML('beforeend', cardHtml);
-}
+  }
 
-async function loadWeeklyChallenge() {
+  async function loadWeeklyChallenge() {
     try {
         const sections = await getSiteSections();
         const challenge = sections?.weekly_challenge || {};
@@ -1432,9 +1488,9 @@ async function loadWeeklyChallenge() {
     } catch(e) {
         toast('Failed to load challenge: ' + e.message, 'error');
     }
-}
+  }
 
-async function saveWeeklyChallenge() {
+  async function saveWeeklyChallenge() {
     const challengeData = {
         question: document.getElementById('weekly-question').value.trim(),
         options: {
@@ -1460,9 +1516,9 @@ async function saveWeeklyChallenge() {
     } catch(e) {
         toast('Save failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function deleteQuizTopic(topic, level) {
+  async function deleteQuizTopic(topic, level) {
     if (!confirm(`Delete ALL questions for topic "${topic}" (${level})? This cannot be undone.`)) return;
     try {
         await apiCall('delete_quiz_topic', { topic: topic, level: level });
@@ -1471,9 +1527,9 @@ async function deleteQuizTopic(topic, level) {
     } catch(e) {
         toast('Delete failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function toggleNewsletterSubscriber(id, currentStatus) {
+  async function toggleNewsletterSubscriber(id, currentStatus) {
     try {
         await apiCall('update_newsletter_subscriber', { id: id, is_active: !currentStatus });
         toast(currentStatus ? 'Subscriber deactivated' : 'Subscriber activated');
@@ -1481,16 +1537,16 @@ async function toggleNewsletterSubscriber(id, currentStatus) {
     } catch(e) {
         toast('Failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function loadPageActivity() {
+  async function loadPageActivity() {
     const tbody = document.getElementById('page-activity-table');
     if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
+    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...快</tbody>';
     try {
         const activities = await apiCall('get_page_activity');
         if (!activities || !activities.length) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded yet.</td></tr>';
+            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded yet.快</tbody>';
             return;
         }
         tbody.innerHTML = activities.map(act => `
@@ -1502,11 +1558,11 @@ async function loadPageActivity() {
             </tr>
         `).join('');
     } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
+        tbody.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;">Error: ${esc(e.message)}快</tbody>`;
     }
-}
+  }
 
-async function closeChatRoom(roomId) {
+  async function closeChatRoom(roomId) {
     if (!confirm('Close this chat conversation?')) return;
     try {
         await apiCall('admin_reject_chat', { room_id: roomId });
@@ -1524,9 +1580,9 @@ async function closeChatRoom(roomId) {
     } catch(e) {
         toast('Failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function exportUserStats(userId) {
+  async function exportUserStats(userId) {
     if (!userId) userId = document.getElementById('stats-user-id').value.trim();
     if (!userId) {
         toast('Enter a user ID first', 'error');
@@ -1546,9 +1602,9 @@ async function exportUserStats(userId) {
     } catch(e) {
         toast('Export failed: ' + e.message, 'error');
     }
-}
+  }
 
-async function loadFullDashboardStats() {
+  async function loadFullDashboardStats() {
     try {
         const quizStats = await apiCall('get_public_stats');
         const flashcardStats = await apiCall('get_flashcard_decks');
@@ -1558,10 +1614,9 @@ async function loadFullDashboardStats() {
     } catch(e) {
         console.error('Failed to load extended stats:', e);
     }
-}
+  }
 
-  document.addEventListener('DOMContentLoaded', verifyAdminAccess);
-async function loadPdfResources() {
+  async function loadPdfResources() {
     try {
         const pdfs = await apiCall('get_pdfs_by_level', { level: 'all' });
         const container = document.getElementById('resources-table');
@@ -1584,8 +1639,9 @@ async function loadPdfResources() {
             container.innerHTML += pdfRows;
         }
     } catch(e) { console.error('Failed to load PDFs:', e); }
-}
-async function editPdf(pdfId) {
+  }
+
+  async function editPdf(pdfId) {
     try {
         const pdfs = await apiCall('get_pdfs_by_level', { level: 'all' });
         const pdf = (pdfs?.pdfs || []).find(p => p.id == pdfId);
@@ -1600,16 +1656,18 @@ async function editPdf(pdfId) {
         document.getElementById('edit-tags').value = pdf.tags || '';
         document.getElementById('edit-modal').style.display = 'flex';
     } catch(e) { toast('Failed: ' + e.message, 'error'); }
-}
-async function deletePdf(pdfId) {
+  }
+
+  async function deletePdf(pdfId) {
     if (!confirm('Delete this PDF permanently?')) return;
     try {
         await apiCall('delete_pdf', { pdf_id: pdfId });
         toast('PDF deleted!');
         loadResources();
     } catch(e) { toast('Delete failed: ' + e.message, 'error'); }
-}
-async function loadNotesStructure() {
+  }
+
+  async function loadNotesStructure() {
     try {
         const notes = await apiCall('get_notes_structure');
         return notes || [];
@@ -1617,8 +1675,9 @@ async function loadNotesStructure() {
         console.error('Failed to load notes:', e);
         return [];
     }
-}
-async function editNote(subtopicId) {
+  }
+
+  async function editNote(subtopicId) {
     try {
         const content = await apiCall('get_note_content', { subtopic_id: subtopicId });
         if (!content) { toast('Note not found', 'error'); return; }
@@ -1640,8 +1699,9 @@ async function editNote(subtopicId) {
         `;
         document.body.insertAdjacentHTML('beforeend', modalHtml);
     } catch(e) { toast('Failed to load note: ' + e.message, 'error'); }
-}
-async function saveNoteContent() {
+  }
+
+  async function saveNoteContent() {
     const subtopicId = document.getElementById('edit-note-id').value;
     const content = document.getElementById('edit-note-content').value;
     try {
@@ -1649,44 +1709,9 @@ async function saveNoteContent() {
         toast('Note saved!');
         document.getElementById('note-edit-modal')?.remove();
     } catch(e) { toast('Save failed: ' + e.message, 'error'); }
-}
-async function suspendUser(userId, reason) {
-    if (!confirm(`Suspend user ${userId}? Reason: ${reason || 'No reason provided'}`)) return;
-    try {
-        await apiCall('update_user_lock', { userId: userId, lock: true, reason: reason || 'Suspended by admin' });
-        toast('User suspended!');
-        cachedSiteSections = null;
-        loadUsers();
-    } catch(e) { toast('Failed: ' + e.message, 'error'); }
-}
-async function unsuspendUser(userId) {
-    if (!confirm(`Unsuspend user?`)) return;
-    try {
-        await apiCall('update_user_lock', { userId: userId, lock: false });
-        toast('User unsuspended!');
-        cachedSiteSections = null;
-        loadUsers();
-    } catch(e) { toast('Failed: ' + e.message, 'error'); }
-}
-async function disableUserAccount(userId) {
-    if (!confirm(`⚠️ DISABLE ACCOUNT: This will prevent the user from logging in. Continue?`)) return;
-    try {
-        await apiCall('update_user_lock', { userId: userId, lock: true, reason: 'Account disabled by admin' });
-        toast('Account disabled!');
-        cachedSiteSections = null;
-        loadUsers();
-    } catch(e) { toast('Failed: ' + e.message, 'error'); }
-}
-async function enableUserAccount(userId) {
-    if (!confirm(`Enable account for this user?`)) return;
-    try {
-        await apiCall('update_user_lock', { userId: userId, lock: false });
-        toast('Account enabled!');
-        cachedSiteSections = null;
-        loadUsers();
-    } catch(e) { toast('Failed: ' + e.message, 'error'); }
-}
-async function loadOnlineUsers() {
+  }
+
+  async function loadOnlineUsers() {
     try {
         const online = await apiCall('get_online_users');
         const container = document.getElementById('online-users-container');
@@ -1697,15 +1722,16 @@ async function loadOnlineUsers() {
                 container.innerHTML = online.map(u => `
                     <div class="online-user">
                         <span class="online-dot"></span>
-                        ${esc(u.email || u.name || 'User')}
-                        <small>${u.current_page || 'Unknown page'}</small>
+                        ${esc(u.name || 'User')}
+                        <small>Last seen: ${new Date(u.last_seen).toLocaleString()}</small>
                     </div>
                 `).join('');
             }
         }
     } catch(e) { console.error('Failed to load online users:', e); }
-}
-async function exportAllUserStats() {
+  }
+
+  async function exportAllUserStats() {
     try {
         const sections = await getSiteSections();
         const users = sections?.users?.list || [];
@@ -1726,90 +1752,21 @@ async function exportAllUserStats() {
         URL.revokeObjectURL(url);
         toast('Exported stats for ' + allStats.length + ' users');
     } catch(e) { toast('Export failed: ' + e.message, 'error'); }
-}
-async function loadUserStatsById(userId) {
+  }
+
+  async function loadUserStatsById(userId) {
     document.getElementById('stats-user-id').value = userId;
     await loadUserStats();
     document.querySelector('a[data-tab="user-stats"]').click();
-}
-async function loadFullDashboardStats() {
-    try {
-        const quizStats = await apiCall('get_public_stats');
-        const flashcardStats = await apiCall('get_flashcard_decks');
-        document.getElementById('stat-quiz-attempts').textContent = quizStats?.quiz_attempts || 0;
-        document.getElementById('stat-flashcard-decks').textContent = flashcardStats?.length || 0;
-        document.getElementById('stat-downloads').textContent = quizStats?.downloads_count || 0;
-    } catch(e) {
-        console.error('Failed to load extended stats:', e);
-    }
-}
-async function toggleNewsletterSubscriber(id, currentStatus) {
-    try {
-        await apiCall('update_newsletter_subscriber', { id: id, is_active: !currentStatus });
-        toast(currentStatus ? 'Subscriber deactivated' : 'Subscriber activated');
-        loadNewsletter();
-    } catch(e) {
-        toast('Failed: ' + e.message, 'error');
-    }
-}
-async function loadPageActivity() {
-    const tbody = document.getElementById('page-activity-table');
-    if (!tbody) return;
-    tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">Loading...</td></tr>';
-    try {
-        const activities = await apiCall('get_page_activity');
-        if (!activities || !activities.length) {
-            tbody.innerHTML = '<tr><td colspan="4" style="text-align:center;">No activity recorded yet.</td></tr>';
-            return;
-        }
-        tbody.innerHTML = activities.map(act => `
-            <tr>
-                <td>${act.user_email ? esc(act.user_email) : '<span class="badge badge-info">Anonymous</span>'}</td>
-                <td><span class="badge badge-info">${esc(act.page)}</span></td>
-                <td>${new Date(act.created_at).toLocaleString()}</td>
-                <td><small>${esc(JSON.stringify(act.metadata || {}).substring(0, 100))}</small></td>
-            </tr>
-        `).join('');
-    } catch(e) {
-        tbody.innerHTML = `<tr><td colspan="4" style="color:#e74c3c;">Error: ${esc(e.message)}</td></tr>`;
-    }
-}
-async function closeChatRoom(roomId) {
-    if (!confirm('Close this chat conversation?')) return;
-    try {
-        await apiCall('admin_reject_chat', { room_id: roomId });
-        toast('Chat closed');
-        if (currentChatRoom === roomId) {
-            if (chatPollInterval) clearInterval(chatPollInterval);
-            currentChatRoom = null;
-            document.getElementById('chat-header-title').textContent = 'Select a conversation';
-            document.getElementById('chat-messages').innerHTML = '<p style="color:var(--clr-text-muted); text-align:center;">Select a chat to view messages</p>';
-            document.getElementById('send-btn').disabled = true;
-            document.getElementById('chat-input').disabled = true;
-        }
-        loadActiveChats();
-        loadPendingRequests();
-    } catch(e) {
-        toast('Failed: ' + e.message, 'error');
-    }
-}
-function esc(str) {
-    if (!str) return '';
-    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
-}
-function toast(msg, type) {
-    type = type || 'success';
-    const el = document.createElement('div');
-    el.className = 'toast ' + type;
-    el.textContent = msg;
-    document.body.appendChild(el);
-    setTimeout(() => el.remove(), 3500);
-}
-setInterval(() => {
+  }
+
+  setInterval(() => {
     if (currentAdminUser) {
         apiCall('admin_update_presence', { is_online: true }).catch(() => {});
     }
-}, 30000);
+  }, 30000);
+
+  document.addEventListener('DOMContentLoaded', verifyAdminAccess);
 </script>
 </body>
 </html>
