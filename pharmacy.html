@@ -617,7 +617,7 @@ function hidePreparingMessage() {
   if (redirectTimeout) clearTimeout(redirectTimeout);
 }
 
-function renderNotes(notes) {
+ function renderNotes(notes) {
   const container = document.getElementById('notes-grid');
   if (!notes || notes.length === 0) {
     container.innerHTML = `<div class="no-results"><i class="fa-solid fa-search" style="font-size:3rem;"></i><p>No notes found matching "${esc(currentSearchTerm)}".</p></div>`;
@@ -657,31 +657,32 @@ function renderNotes(notes) {
     backButtonsContainer.insertBefore(levelLink, backButtonsContainer.firstChild);
   }
   
-   const fromNote = sessionStorage.getItem('fromNote');
-if (fromNote === 'true') {
-  sessionStorage.removeItem('fromNote');
-  if (targetSubtopicId) {
-    const targetElement = document.getElementById(`subtopic-${targetSubtopicId}`);
-    if (targetElement) {
-      targetElement.classList.add('highlight');
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+  const fromNote = sessionStorage.getItem('fromNote');
+  if (fromNote === 'true') {
+    sessionStorage.removeItem('fromNote');
+    if (targetSubtopicId) {
+      const targetElement = document.getElementById(`subtopic-${targetSubtopicId}`);
+      if (targetElement) {
+        targetElement.classList.add('highlight');
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      }
     }
+  } else if (targetSubtopicId) {
+    setTimeout(() => {
+      const targetElement = document.getElementById(`subtopic-${targetSubtopicId}`);
+      if (targetElement) {
+        targetElement.classList.add('highlight');
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showPreparingMessage(targetSubtopicTitle);
+        if (redirectTimeout) clearTimeout(redirectTimeout);
+        redirectTimeout = setTimeout(() => {
+          const note = notes.find(n => String(n.id) === String(targetSubtopicId));
+          if (note) goToNoteViewer(note.id, note.title);
+          else hidePreparingMessage();
+        }, 6000);
+      }
+    }, 100);
   }
-} else if (targetSubtopicId) {
-  setTimeout(() => {
-    const targetElement = document.getElementById(`subtopic-${targetSubtopicId}`);
-    if (targetElement) {
-      targetElement.classList.add('highlight');
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      showPreparingMessage(targetSubtopicTitle);
-      if (redirectTimeout) clearTimeout(redirectTimeout);
-      redirectTimeout = setTimeout(() => {
-        const note = notes.find(n => String(n.id) === String(targetSubtopicId));
-        if (note) goToNoteViewer(note.id, note.title);
-        else hidePreparingMessage();
-      }, 6000);
-    }
-  }, 100);
 }
 
 async function loadNotes() {
