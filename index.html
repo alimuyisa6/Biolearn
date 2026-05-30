@@ -5960,7 +5960,7 @@ function renderTopicsForLevel(level) {
             <strong style="font-size:1rem; color:var(--clr-white);">${escapeHtml(sub.name)}</strong>
             <p style="font-size:0.7rem; color:var(--clr-text-muted); margin-top:4px;"><i class="fa-regular fa-clock"></i> ~5 min read</p>
           </div>
-          <button class="subtopic-readmore-btn" data-id="${sub.id}" data-name="${escapeHtml(sub.name)}" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:8px 24px; border-radius:40px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+          <button class="subtopic-readmore-btn" data-id="${sub.id}" data-name="${escapeHtml(sub.name)}" data-level="${level}" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:8px 24px; border-radius:40px; font-weight:700; cursor:pointer; transition:all 0.2s;">
             Read More <i class="fa-solid fa-arrow-right"></i>
           </button>
         </div>
@@ -5980,12 +5980,19 @@ function renderTopicsForLevel(level) {
       btn.style.background = 'transparent';
       btn.style.color = 'var(--clr-cyan)';
     });
-    btn.addEventListener('click', async () => {
+    btn.addEventListener('click', async (e) => {
       const subId = btn.dataset.id;
       const subName = btn.dataset.name;
-      notesCurrentSubtopic = subId;
-      await loadNoteContentDirect(subId, notesCurrentLevel, notesCurrentTopic, subName);
-      hideFilterArea();
+      const subLevel = btn.dataset.level;
+      
+      let levelPath = '';
+      if (subLevel === 'O-Level') levelPath = 'olevel';
+      else if (subLevel === 'A-Level') levelPath = 'alevel';
+      else if (subLevel === 'Pharmacy') levelPath = 'pharmacy';
+      else levelPath = subLevel.toLowerCase().replace('-', '');
+      
+      const redirectUrl = `${levelPath}.html?subtopic=${encodeURIComponent(subId)}&title=${encodeURIComponent(subName)}`;
+      window.location.href = redirectUrl;
     });
   });
 }
@@ -6014,7 +6021,7 @@ function renderTopicsForLevel(level) {
         <h2 style="font-family:Poppins,sans-serif; font-size:1.5rem; margin-top:12px;">${escapeHtml(subtopic)}</h2>
         <p style="color:var(--clr-text-dim); line-height:1.8; margin:20px 0; padding:16px 0; border-top:1px solid var(--clr-border-glow); border-bottom:1px solid var(--clr-border-glow);">${escapeHtml(preview)}</p>
         <div style="display:flex; justify-content:center;">
-          <a href="/notes/${levelPath}.html?subtopic=${subtopicId}&title=${encodeURIComponent(subtopic)}" class="btn-primary" style="padding:12px 28px; text-decoration:none;">Read Full Note →</a>
+          <a href="${levelPath}.html?subtopic=${subtopicId}&title=${encodeURIComponent(subtopic)}" class="btn-primary" style="padding:12px 28px; text-decoration:none;">Read Full Note →</a>
         </div>
         <p style="text-align:center; font-size:0.7rem; color:var(--clr-text-muted); margin-top:16px;">${readTime} min read · Sign in for full content</p>
       </div>
