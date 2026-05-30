@@ -79,20 +79,24 @@ body {
   transition: color 0.2s;
 }
 .main-nav a:hover { color: var(--clr-magenta); }
+
+/* Progress bar container - placed right above note card, full width of card */
+.progress-wrapper {
+  max-width: var(--max-width);
+  margin: 90px auto 0 auto;
+  padding: 0 24px;
+  position: relative;
+  z-index: 95;
+}
 .progress-container {
-  position: fixed;
-  top: 65px;
-  left: 50%;
-  transform: translateX(-50%);
-  width: 70%;
-  max-width: 600px;
-  height: 10px;
+  width: 100%;
+  height: 12px;
   background: var(--clr-border-glow);
   border-radius: 20px;
   border: 2px solid var(--clr-magenta);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
-  z-index: 100;
+  backdrop-filter: blur(4px);
 }
 .progress-bar-fill {
   height: 100%;
@@ -101,13 +105,23 @@ body {
   background-size: 300% 100%;
   border-radius: 20px;
   animation: waveMove 2s ease infinite;
-  transition: width 0.1s linear;
+  transition: width 0.2s cubic-bezier(0.2, 0.9, 0.4, 1.1);
 }
 @keyframes waveMove {
   0% { background-position: 0% 0%; }
   50% { background-position: 100% 0%; }
   100% { background-position: 0% 0%; }
 }
+.progress-percentage {
+  text-align: right;
+  font-size: 0.7rem;
+  font-family: 'DM Mono', monospace;
+  font-weight: 600;
+  color: var(--clr-magenta);
+  margin-top: 6px;
+  letter-spacing: 0.5px;
+}
+
 .resume-prompt {
   position: fixed;
   bottom: 30px;
@@ -136,7 +150,7 @@ body {
 .note-container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 100px 24px 60px;
+  padding: 20px 24px 60px;
 }
 .note-header { margin-bottom: 40px; text-align: center; }
 .level-badge {
@@ -286,7 +300,8 @@ body {
   .table-of-contents { padding: 12px 16px; }
   .key-points { padding: 12px 16px; }
   .related-grid { grid-template-columns: 1fr; }
-  .progress-container { width: 85%; height: 8px; top: 70px; }
+  .progress-wrapper { padding: 0 16px; margin-top: 78px; }
+  .progress-container { height: 8px; }
 }
 .reaction-bar {
   display: flex;
@@ -415,7 +430,7 @@ body {
 @media (max-width: 768px) {
   .note-content { padding: 24px; }
   .main-nav { display: none; }
-  .note-container { padding: 80px 16px 40px; }
+  .note-container { padding: 20px 16px 40px; }
   .home-fab { top: 72px; right: 16px; width: 40px; height: 40px; }
   .comment-input-group { gap: 8px; }
   .comment-submit { padding: 0 16px; font-size: 0.85rem; }
@@ -431,21 +446,24 @@ body {
     <nav><ul class="main-nav" id="main-nav"></ul></nav>
   </div>
 </header>
-<div class="progress-container" id="progress-container">
-  <div class="progress-bar-fill" id="progress-bar-fill"></div>
+
+<div class="progress-wrapper" id="progress-wrapper">
+  <div class="progress-container" id="progress-container">
+    <div class="progress-bar-fill" id="progress-bar-fill"></div>
+  </div>
+  <div class="progress-percentage" id="progress-percentage">0% read</div>
 </div>
+
 <main id="app-content"></main>
 <footer class="footer-fat" id="footer"></footer>
+
 <script>
 const API_BASE = '/api/query';
 let currentUser = null;
-let currentNoteId = null;
 let currentLevel = null;
-let saveProgressInterval = null;
-let lastScrollPercentage = 0;
-let startTime = Date.now();
 let maxScrollPercentage = 0;
 let finalPercentageSaved = false;
+let scrollHandlerActive = false;
 
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('id');
@@ -501,25 +519,27 @@ function showContent() {
   loadNote();
 }
 
-function updateProgressBar() {
+function updateProgressBarUI(percentage) {
+  const fillEl = document.getElementById('progress-bar-fill');
+  const percentText = document.getElementById('progress-percentage');
+  if (fillEl) fillEl.style.width = percentage + '%';
+  if (percentText) percentText.innerText = Math.floor(percentage) + '% read';
+}
+
+function updateProgressFromScroll() {
   const winScroll = document.documentElement.scrollTop;
   const height = document.documentElement.scrollHeight - window.innerHeight;
+  if (height <= 0) return;
   const currentPercentage = (winScroll / height) * 100;
   
   if (currentPercentage > maxScrollPercentage) {
     maxScrollPercentage = currentPercentage;
-  }
-  
-  const progressBar = document.getElementById('progress-bar-fill');
-  if (progressBar) {
-    progressBar.style.width = maxScrollPercentage + '%';
+    updateProgressBarUI(maxScrollPercentage);
   }
   
   if (maxScrollPercentage >= 95 && !finalPercentageSaved) {
     saveFinalPercentage();
   }
-  
-  return Math.floor(maxScrollPercentage);
 }
 
 function saveFinalPercentage() {
@@ -535,36 +555,38 @@ function saveFinalPercentage() {
 }
 
 function showResumePrompt(savedPercentage) {
-  if (savedPercentage && savedPercentage > 10 && savedPercentage < 95) {
-    const existing = document.querySelector('.resume-prompt');
-    if (existing) existing.remove();
-    const prompt = document.createElement('div');
-    prompt.className = 'resume-prompt';
-    prompt.innerHTML = `<i class="fa-solid fa-rotate-left"></i> Resume from ${savedPercentage}%`;
-    prompt.onclick = () => {
-      const height = document.documentElement.scrollHeight - window.innerHeight;
-      const targetPosition = (savedPercentage / 100) * height;
-      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
-      prompt.remove();
-    };
-    document.body.appendChild(prompt);
-    setTimeout(() => {
-      if (prompt.parentNode) prompt.remove();
-    }, 8000);
-  }
+  if (!savedPercentage || savedPercentage <= 10 || savedPercentage >= 95) return;
+  const existing = document.querySelector('.resume-prompt');
+  if (existing) existing.remove();
+  const prompt = document.createElement('div');
+  prompt.className = 'resume-prompt';
+  prompt.innerHTML = `<i class="fa-solid fa-rotate-left"></i> Resume from ${Math.floor(savedPercentage)}%`;
+  prompt.onclick = () => {
+    const height = document.documentElement.scrollHeight - window.innerHeight;
+    const targetPosition = (savedPercentage / 100) * height;
+    window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+    prompt.remove();
+  };
+  document.body.appendChild(prompt);
+  setTimeout(() => {
+    if (prompt.parentNode) prompt.remove();
+  }, 10000);
 }
 
-async function loadSavedProgress() {
-  if (!currentUser) return null;
+async function loadSavedProgressAndResume() {
+  if (!currentUser) return;
   try {
     const progress = await apiCall('get_reading_progress', { note_id: noteId });
     if (progress && progress.scroll_percentage > 10 && progress.scroll_percentage < 95) {
       showResumePrompt(progress.scroll_percentage);
+      // also pre-fill the bar to respect previous max progress visually
+      if (progress.scroll_percentage > maxScrollPercentage) {
+        maxScrollPercentage = progress.scroll_percentage;
+        updateProgressBarUI(maxScrollPercentage);
+      }
     }
-    return progress;
   } catch(e) {
     console.error('Failed to load progress:', e);
-    return null;
   }
 }
 
@@ -647,7 +669,6 @@ async function loadNote() {
   const app = document.getElementById('app-content');
   try {
     const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
-    
     document.title = `${note.title || noteTitle} | AliverBiopharm ${currentLevel} Notes`;
     
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
@@ -660,10 +681,10 @@ async function loadNote() {
     const shareButtons = addShareButtons();
     const relatedNotes = await loadRelatedNotes(noteId, currentLevel, note.topic || '');
     
+    // reset progress variables
     maxScrollPercentage = 0;
     finalPercentageSaved = false;
-    lastScrollPercentage = 0;
-    startTime = Date.now();
+    updateProgressBarUI(0);
     
     app.innerHTML = `
   <div class="note-container">
@@ -710,15 +731,21 @@ async function loadNote() {
     });
     await loadReactions();
     await loadComments();
-    await loadSavedProgress();
-    updateProgressBar();
-    window.addEventListener('scroll', updateProgressBar);
+    await loadSavedProgressAndResume();
+    
+    // Attach scroll handler
+    if (scrollHandlerActive) window.removeEventListener('scroll', updateProgressFromScroll);
+    window.addEventListener('scroll', updateProgressFromScroll);
+    scrollHandlerActive = true;
+    updateProgressFromScroll(); // initial sync
+    
     window.addEventListener('beforeunload', () => {
       if (maxScrollPercentage >= 10 && !finalPercentageSaved) {
         saveFinalPercentage();
       }
     });
   } catch (err) {
+    console.error(err);
     app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
   }
 }
