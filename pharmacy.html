@@ -395,19 +395,75 @@ body {
   box-shadow: 0 25px 50px rgba(0,0,0,0.3);
   animation: pulse 1.5s infinite;
 }
+ 
 .preparing-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
   margin-bottom: 28px;
+  min-height: 200px;
 }
-.spinner-logo {
-  width: 120px;
-  height: 120px;
-  max-width: 30vw;
-  max-height: 30vw;
-  object-fit: contain;
-  animation: spinPulse 1.5s ease-in-out infinite;
+.logo-wrapper {
+  position: relative;
+  width: 200px;
+  height: 200px;
+  margin: 0 auto;
+}
+.fragment {
+  position: absolute;
+  width: 100px;
+  height: 100px;
+  background-size: 200px 200px;
+  transition: all 0.3s;
+}
+.f1 {
+  top: 0;
+  left: 0;
+  background-position: 0 0;
+  animation: split1 1.5s ease-in-out infinite;
+}
+.f2 {
+  top: 0;
+  right: 0;
+  background-position: -100px 0;
+  animation: split2 1.5s ease-in-out infinite;
+}
+.f3 {
+  bottom: 0;
+  left: 0;
+  background-position: 0 -100px;
+  animation: split3 1.5s ease-in-out infinite;
+}
+.f4 {
+  bottom: 0;
+  right: 0;
+  background-position: -100px -100px;
+  animation: split4 1.5s ease-in-out infinite;
+}
+@keyframes split1 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(-60px, -70px) rotate(-30deg); opacity: 1; }
+  60% { transform: translate(-30px, -100px) rotate(-60deg); opacity: 0.6; }
+  85% { transform: translate(-10px, -30px) rotate(-15deg); opacity: 0.9; }
+}
+@keyframes split2 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(60px, -70px) rotate(30deg); opacity: 1; }
+  60% { transform: translate(30px, -100px) rotate(60deg); opacity: 0.6; }
+  85% { transform: translate(10px, -30px) rotate(15deg); opacity: 0.9; }
+}
+@keyframes split3 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(-60px, 70px) rotate(30deg); opacity: 1; }
+  60% { transform: translate(-30px, 100px) rotate(60deg); opacity: 0.6; }
+  85% { transform: translate(-10px, 30px) rotate(15deg); opacity: 0.9; }
+}
+@keyframes split4 {
+  0%, 100% { transform: translate(0, 0) rotate(0deg); opacity: 1; }
+  30% { transform: translate(60px, 70px) rotate(-30deg); opacity: 1; }
+  60% { transform: translate(30px, 100px) rotate(-60deg); opacity: 0.6; }
+  85% { transform: translate(10px, 30px) rotate(-15deg); opacity: 0.9; }
+}
 }
 .preparing-message h3 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; font-weight: 700; color: var(--clr-white); margin-bottom: 12px; }
 .preparing-message p { color: var(--clr-text-dim); margin-bottom: 20px; }
@@ -583,7 +639,7 @@ function onNoteCardClick(noteId, title) {
   }, 6000);
 }
 
-function showPreparingMessage(title) {
+ function showPreparingMessage(title) {
   const existing = document.querySelector('.preparing-message');
   if (existing) existing.remove();
   
@@ -593,8 +649,13 @@ function showPreparingMessage(title) {
   overlay.className = 'preparing-message';
   overlay.innerHTML = `
     <div class="content">
-      <div class="preparing-spinner">
-        <img src="${logoUrl}" alt="AliverBiopharm" class="spinner-logo">
+      <div class="preparing-spinner" id="split-container">
+        <div class="logo-wrapper">
+          <div class="fragment f1"></div>
+          <div class="fragment f2"></div>
+          <div class="fragment f3"></div>
+          <div class="fragment f4"></div>
+        </div>
       </div>
       <h3>Preparing Your Lesson</h3>
       <p>Loading "<span class="preparing-title">${esc(title || 'your note')}</span>"</p>
@@ -603,6 +664,13 @@ function showPreparingMessage(title) {
     </div>
   `;
   document.body.appendChild(overlay);
+  
+  const fragments = document.querySelectorAll('.fragment');
+  fragments.forEach(f => {
+    f.style.backgroundImage = `url('${logoUrl}')`;
+    f.style.backgroundSize = '200px 200px';
+    f.style.backgroundRepeat = 'no-repeat';
+  });
   
   const progressBar = document.querySelector('.preparing-progress .progress-bar');
   if (progressBar) {
