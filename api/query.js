@@ -99,8 +99,8 @@ const ACTION_WHITELIST = new Set([
   'track_page_activity', 'get_page_activity',
   'update_newsletter_subscriber', 'delete_quiz_topic',
   'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download',
-  'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions',
-  'update_user_restriction'
+   'get_notes_structure', 'get_note_content', 'get_note_preview', 'toggle_note_reaction', 'get_note_reactions',
+ 'update_user_restriction'
 ]);
 
 const PUBLIC_ACTIONS = new Set([
@@ -121,7 +121,7 @@ const PUBLIC_ACTIONS = new Set([
   'check_flashcard_answer',
   'get_resource_interactions',
   'get_pdfs_by_level',
-  'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions'
+ 'get_notes_structure', 'get_note_content', 'get_note_preview', 'toggle_note_reaction', 'get_note_reactions',
 ]);
 
 const CSRF_PROTECTED_ACTIONS = new Set([
@@ -534,7 +534,7 @@ const VALIDATORS = {
   delete_quiz_topic: (body) => { if (!body.topic || !body.level) return 'topic and level required'; return null; },
   track_pdf_download: (body) => { if (!body.pdf_id) return 'pdf_id required'; return null; },
   get_notes_structure: (body) => { return null; },
-  get_note_content: (body) => { if (!body.subtopic_id) return 'subtopic_id required'; return null; },
+   get_note_preview: (body) => { if (!body.subtopic_id) return 'subtopic_id required'; return null; },
   toggle_note_reaction: (body) => { if (!body.note_id) return 'note_id required'; if (!body.reaction_type) return 'reaction_type required'; return null; },
   get_note_reactions: (body) => { if (!body.note_id) return 'note_id required'; return null; }
 };
