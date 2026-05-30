@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -79,10 +79,50 @@ body {
   transition: color 0.2s;
 }
 .main-nav a:hover { color: var(--clr-magenta); }
+.progress-container {
+  position: fixed;
+  top: 65px;
+  left: 0;
+  width: 100%;
+  height: 4px;
+  background: var(--clr-border-glow);
+  z-index: 100;
+}
+.progress-bar-fill {
+  height: 100%;
+  background: #e67e22;
+  width: 0%;
+  transition: width 0.2s ease;
+}
+.resume-prompt {
+  position: fixed;
+  bottom: 30px;
+  right: 30px;
+  background: var(--gradient-magenta);
+  color: #fff;
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-weight: 600;
+  font-size: 0.85rem;
+  cursor: pointer;
+  z-index: 100;
+  box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  animation: slideIn 0.3s ease;
+}
+.resume-prompt:hover {
+  transform: translateY(-2px);
+}
+@keyframes slideIn {
+  from { transform: translateX(100%); opacity: 0; }
+  to { transform: translateX(0); opacity: 1; }
+}
 .note-container {
   max-width: var(--max-width);
   margin: 0 auto;
-  padding: 100px 0 60px;
+  padding: 100px 24px 60px;
 }
 .note-header { margin-bottom: 40px; text-align: center; }
 .level-badge {
@@ -120,11 +160,118 @@ body {
 .note-content h3 { font-size: 1.2rem; color: var(--clr-magenta); }
 .note-content p { margin-bottom: 20px; color: var(--clr-text-dim); line-height: 1.8; }
 .note-content ul, .note-content ol { margin: 16px 0 16px 32px; }
+.table-of-contents {
+  background: var(--clr-navy-light);
+  border-radius: 16px;
+  padding: 20px 24px;
+  margin: 0 0 30px 0;
+  border-left: 4px solid var(--clr-magenta);
+}
+.table-of-contents h3 {
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+  color: var(--clr-magenta);
+}
+.table-of-contents ul {
+  list-style: none;
+  margin: 0;
+}
+.table-of-contents li {
+  margin: 8px 0;
+}
+.table-of-contents a {
+  color: var(--clr-text-dim);
+  text-decoration: none;
+  font-size: 0.85rem;
+  transition: color 0.2s;
+}
+.table-of-contents a:hover {
+  color: var(--clr-magenta);
+  padding-left: 5px;
+}
+.key-points {
+  background: rgba(184, 135, 58, 0.08);
+  border-left: 4px solid var(--clr-magenta);
+  padding: 20px 24px;
+  margin: 30px 0;
+  border-radius: 12px;
+}
+.key-points h3 {
+  font-size: 1rem;
+  margin: 0 0 12px 0;
+  color: var(--clr-magenta);
+}
+.key-points ul {
+  margin: 0 0 0 20px;
+}
+.key-points li {
+  margin: 8px 0;
+  color: var(--clr-text-dim);
+}
+.share-actions {
+  display: flex;
+  gap: 12px;
+  justify-content: flex-end;
+  margin-bottom: 20px;
+}
+.share-action {
+  background: none;
+  border: 1px solid var(--clr-border-glow);
+  border-radius: 40px;
+  padding: 6px 14px;
+  font-size: 0.75rem;
+  cursor: pointer;
+  color: var(--clr-text-dim);
+  transition: all 0.2s;
+}
+.share-action:hover {
+  border-color: var(--clr-cyan);
+  color: var(--clr-cyan);
+}
+.related-notes {
+  margin: 40px 0 20px;
+  padding-top: 30px;
+  border-top: 2px solid var(--clr-border-glow);
+}
+.related-notes h3 {
+  color: var(--clr-cyan);
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
+.related-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+  gap: 16px;
+}
+.related-card {
+  background: var(--clr-navy-light);
+  padding: 16px;
+  border-radius: 12px;
+  text-decoration: none;
+  transition: all 0.2s;
+  border: 1px solid transparent;
+}
+.related-card:hover {
+  border-color: var(--clr-magenta);
+  transform: translateY(-3px);
+}
+.related-card strong {
+  color: var(--clr-white);
+  font-size: 0.9rem;
+}
+.related-card p {
+  font-size: 0.7rem;
+  color: var(--clr-text-muted);
+  margin-top: 6px;
+}
 @media (max-width: 768px) {
   .note-content { padding: 20px; font-size: 0.85rem; }
   .note-content h1 { font-size: 1.4rem; }
   .note-content h2 { font-size: 1.2rem; }
   .note-content h3 { font-size: 1rem; }
+  .table-of-contents { padding: 12px 16px; }
+  .key-points { padding: 12px 16px; }
+  .related-grid { grid-template-columns: 1fr; }
 }
 .reaction-bar {
   display: flex;
@@ -134,7 +281,7 @@ body {
 }
 .reaction-btn {
   background: none;
-  border: none;
+  border: 1.5px solid var(--clr-border-glow);
   border-radius: 40px;
   padding: 6px 16px;
   font-weight: 500;
@@ -146,7 +293,7 @@ body {
   color: var(--clr-text-dim);
   transition: all 0.2s;
 }
-.reaction-btn:hover { background: var(--clr-navy-light); transform: translateY(-2px); }
+.reaction-btn:hover { border-color: var(--clr-cyan); transform: translateY(-2px); }
 .reaction-btn.active { background: var(--gradient-cyan); border-color: transparent; color: #fff; }
 .comment-section { 
   margin-top: 20px;
@@ -229,13 +376,36 @@ body {
 .signin-btn { background: transparent; border: 2px solid var(--clr-cyan); color: var(--clr-cyan); }
 .signup-btn { background: var(--gradient-cyan); border: none; color: #fff; }
 .loading-spinner { text-align: center; padding: 80px; }
+.home-fab {
+  position: fixed;
+  top: 80px;
+  right: 24px;
+  background: var(--clr-cyan);
+  color: #fff;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  text-decoration: none;
+  box-shadow: 0 4px 12px rgba(0,0,0,0.15);
+  z-index: 99;
+  transition: transform 0.2s, background 0.2s;
+}
+.home-fab:hover {
+  transform: scale(1.05);
+  background: #0c6e6e;
+}
 @media (max-width: 768px) {
   .note-content { padding: 24px; }
   .main-nav { display: none; }
-  .note-container { padding: 80px 0 40px; }
+  .note-container { padding: 80px 16px 40px; }
+  .home-fab { top: 72px; right: 16px; width: 40px; height: 40px; }
   .comment-input-group { gap: 8px; }
   .comment-submit { padding: 0 16px; font-size: 0.85rem; }
   .reaction-btn { padding: 5px 12px; font-size: 0.8rem; }
+  .resume-prompt { bottom: 20px; right: 20px; padding: 8px 16px; font-size: 0.75rem; }
 }
 </style>
 </head>
@@ -246,16 +416,19 @@ body {
     <nav><ul class="main-nav" id="main-nav"></ul></nav>
   </div>
 </header>
-
+<div class="progress-container" id="progress-container">
+  <div class="progress-bar-fill" id="progress-bar-fill"></div>
+</div>
 <main id="app-content"></main>
-
 <footer class="footer-fat" id="footer"></footer>
-
 <script>
 const API_BASE = '/api/query';
 let currentUser = null;
 let currentNoteId = null;
 let currentLevel = null;
+let saveProgressInterval = null;
+let lastScrollPercentage = 0;
+let startTime = Date.now();
 
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('id');
@@ -311,6 +484,141 @@ function showContent() {
   loadNote();
 }
 
+function updateProgressBar() {
+  const winScroll = document.documentElement.scrollTop;
+  const height = document.documentElement.scrollHeight - window.innerHeight;
+  const scrolled = (winScroll / height) * 100;
+  const progressBar = document.getElementById('progress-bar-fill');
+  if (progressBar) {
+    progressBar.style.width = scrolled + '%';
+  }
+  return Math.floor(scrolled);
+}
+
+function saveReadingProgress() {
+  if (!currentUser) return;
+  const percentage = updateProgressBar();
+  if (percentage === lastScrollPercentage) return;
+  lastScrollPercentage = percentage;
+  const timeSpent = Math.floor((Date.now() - startTime) / 1000);
+  apiCall('save_reading_progress', {
+    note_id: noteId,
+    scroll_percentage: percentage,
+    scroll_position: window.scrollY,
+    time_spent: timeSpent,
+    completed: percentage >= 95
+  }).catch(e => console.error('Save progress failed:', e));
+}
+
+function showResumePrompt(savedPercentage) {
+  if (savedPercentage && savedPercentage > 10 && savedPercentage < 95) {
+    const existing = document.querySelector('.resume-prompt');
+    if (existing) existing.remove();
+    const prompt = document.createElement('div');
+    prompt.className = 'resume-prompt';
+    prompt.innerHTML = `<i class="fa-solid fa-rotate-left"></i> Resume from ${savedPercentage}%`;
+    prompt.onclick = () => {
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      const targetPosition = (savedPercentage / 100) * height;
+      window.scrollTo({ top: targetPosition, behavior: 'smooth' });
+      prompt.remove();
+    };
+    document.body.appendChild(prompt);
+    setTimeout(() => {
+      if (prompt.parentNode) prompt.remove();
+    }, 8000);
+  }
+}
+
+async function loadSavedProgress() {
+  if (!currentUser) return null;
+  try {
+    const progress = await apiCall('get_reading_progress', { note_id: noteId });
+    if (progress && progress.scroll_percentage > 10 && progress.scroll_percentage < 95) {
+      showResumePrompt(progress.scroll_percentage);
+    }
+    return progress;
+  } catch(e) {
+    console.error('Failed to load progress:', e);
+    return null;
+  }
+}
+
+function generateTableOfContents(contentHtml) {
+  const headingMatches = contentHtml.match(/<h2[^>]*>.*?<\/h2>/gi);
+  if (!headingMatches || headingMatches.length < 2) return '';
+  let tocHtml = '<div class="table-of-contents"><h3><i class="fa-solid fa-list"></i> Contents</h3><ul>';
+  headingMatches.forEach((heading, idx) => {
+    const title = heading.replace(/<[^>]*>/g, '');
+    const id = `section-${idx}`;
+    tocHtml += `<li><a href="#${id}">${esc(title)}</a></li>`;
+  });
+  tocHtml += '</ul></div>';
+  return tocHtml;
+}
+
+function addHeadingIds(contentHtml) {
+  let idx = 0;
+  return contentHtml.replace(/<h2>/gi, () => `<h2 id="section-${idx++}">`);
+}
+
+function extractKeyPoints(contentHtml) {
+  const strongMatches = contentHtml.match(/<strong>([^<]+)<\/strong>/g);
+  if (!strongMatches || strongMatches.length < 3) {
+    const sentences = contentHtml.match(/<p>.*?<\/p>/g);
+    if (sentences && sentences.length > 2) {
+      let points = '';
+      for (let i = 0; i < Math.min(4, sentences.length); i++) {
+        const text = sentences[i].replace(/<[^>]*>/g, '').substring(0, 100);
+        if (text.length > 10) points += `<li>${esc(text)}...</li>`;
+      }
+      if (points) {
+        return `<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Takeaways</h3><ul>${points}</ul></div>`;
+      }
+    }
+    return '';
+  }
+  let points = '';
+  for (let i = 0; i < Math.min(6, strongMatches.length); i++) {
+    const term = strongMatches[i].replace(/<[^>]*>/g, '');
+    if (term.length > 3 && term.length < 60) {
+      points += `<li>${esc(term)}</li>`;
+    }
+  }
+  if (!points) return '';
+  return `<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Terms to Remember</h3><ul>${points}</ul></div>`;
+}
+
+function addShareButtons() {
+  return `<div class="share-actions">
+    <button class="share-action" id="copy-link-btn"><i class="fa-regular fa-copy"></i> Copy Link</button>
+    <button class="share-action" id="share-note-btn"><i class="fa-regular fa-share-from-square"></i> Share</button>
+  </div>`;
+}
+
+async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
+  try {
+    const allNotes = await apiCall('get_notes_by_level', { level: currentLevel });
+    if (!allNotes || !allNotes.length) return '';
+    const related = allNotes.filter(n => n.id !== currentNoteId && n.topic === currentTopic).slice(0, 3);
+    if (related.length === 0) return '';
+    return `<div class="related-notes">
+      <h3><i class="fa-solid fa-link"></i> Related Notes</h3>
+      <div class="related-grid">
+        ${related.map(n => `
+          <a href="note.html?id=${n.id}&level=${currentLevel}&title=${encodeURIComponent(n.title)}" class="related-card">
+            <strong>${esc(n.title)}</strong>
+            <p>${esc(n.preview ? n.preview.substring(0, 80) : 'Click to read')}...</p>
+          </a>
+        `).join('')}
+      </div>
+    </div>`;
+  } catch(e) {
+    console.error('Failed to load related notes:', e);
+    return '';
+  }
+}
+
 async function loadNote() {
   const app = document.getElementById('app-content');
   try {
@@ -320,16 +628,26 @@ async function loadNote() {
     
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
     const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
-    const levelPath = { 'O-Level': 'olevel', 'A-Level': 'alevel', 'Pharmacy': 'pharmacy' };
     
-     app.innerHTML = `
+    let processedContent = note.content || '<p>No content available for this note.</p>';
+    const toc = generateTableOfContents(processedContent);
+    const keyPoints = extractKeyPoints(processedContent);
+    processedContent = addHeadingIds(processedContent);
+    const shareButtons = addShareButtons();
+    const relatedNotes = await loadRelatedNotes(noteId, currentLevel, note.topic || '');
+    
+    app.innerHTML = `
   <div class="note-container">
+    <a href="/" class="home-fab" aria-label="Home"><i class="fa-solid fa-home"></i></a>
     <div class="note-header">
       <div class="level-badge"><i class="fa-solid ${levelIcon[currentLevel]}"></i> ${levelDisplay[currentLevel]}</div>
       <h1 class="note-title">${esc(note.title || noteTitle)}</h1>
     </div>
     <div class="note-content">
-      ${note.content || '<p>No content available for this note.</p>'}
+      ${shareButtons}
+      ${toc}
+      ${processedContent}
+      ${keyPoints}
       <div class="reaction-bar" data-note-id="${noteId}">
         <button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button>
         <button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button>
@@ -342,14 +660,36 @@ async function loadNote() {
         </div>
         <div class="comments-list" id="comments-list"></div>
       </div>
+      ${relatedNotes}
       <div style="margin-top:30px;">
         <a href="${backLinkUrl}" class="back-link" onclick="sessionStorage.setItem('fromNote', 'true')"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
       </div>
     </div>
   </div>
 `;
+    document.getElementById('copy-link-btn')?.addEventListener('click', () => {
+      navigator.clipboard.writeText(window.location.href);
+      alert('Link copied to clipboard!');
+    });
+    document.getElementById('share-note-btn')?.addEventListener('click', () => {
+      if (navigator.share) {
+        navigator.share({ title: document.title, url: window.location.href });
+      } else {
+        navigator.clipboard.writeText(window.location.href);
+        alert('Link copied to clipboard!');
+      }
+    });
     await loadReactions();
     await loadComments();
+    await loadSavedProgress();
+    updateProgressBar();
+    if (saveProgressInterval) clearInterval(saveProgressInterval);
+    saveProgressInterval = setInterval(saveReadingProgress, 5000);
+    window.addEventListener('scroll', updateProgressBar);
+    window.addEventListener('beforeunload', () => {
+      saveReadingProgress();
+      if (saveProgressInterval) clearInterval(saveProgressInterval);
+    });
   } catch (err) {
     app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
   }
