@@ -2579,7 +2579,7 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
 }
 
 @media (max-width: 768px) {
- .hero-carousel { min-height: 358px; max-height: 60vh; margin-top: 60px; }
+ .hero-carousel { min-height: 362px; max-height:calc(60vh + 4px); margin-top: 60px; }
   .hero-title {
     font-size: clamp(1.5rem, 5vw, 2.1rem);
     letter-spacing: -0.02em;
@@ -2638,7 +2638,7 @@ body.dark-mode .alt-bg { background: rgba(1, 61, 61, 0.3); }
 @media (max-width: 480px) {
   section { padding: 30px 12px; }
   .section { padding: 30px 12px; }
- .hero-carousel { min-height: 300px; max-height: 50vh; }
+ .hero-carousel { min-height: 304px; max-height: calc(50vh + 4px); }
   .hero-title {
     font-size: clamp(1.25rem, 6vw, 1.75rem);
     letter-spacing: -0.015em;
