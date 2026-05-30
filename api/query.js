@@ -1997,7 +1997,7 @@ async function handlePost(req, res) {
         result = data;
         break;
       }
-      case 'get_note_preview': {
+ case 'get_note_preview': {
   const subtopicId = req.body.subtopic_id;
   if (!subtopicId) return res.status(400).json({ error: 'subtopic_id required' });
   
@@ -2019,7 +2019,7 @@ async function handlePost(req, res) {
     read_time: Math.ceil(plainText.split(/\s+/).length / 200)
   };
   break;
-}
+ }
      case 'toggle_note_reaction': {
         if (!userId) return res.status(401).json({ error: 'Authentication required' });
         const noteId = req.body.note_id;
