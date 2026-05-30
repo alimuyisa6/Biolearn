@@ -100,7 +100,8 @@ const ACTION_WHITELIST = new Set([
   'update_newsletter_subscriber', 'delete_quiz_topic',
   'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download',
    'get_notes_structure', 'get_note_content', 'get_note_preview', 'toggle_note_reaction', 'get_note_reactions',
- 'update_user_restriction'
+ 'update_user_restriction',
+  'get_notes_by_level'
 ]);
 
 const PUBLIC_ACTIONS = new Set([
@@ -146,7 +147,8 @@ const CSRF_PROTECTED_ACTIONS = new Set([
   'update_newsletter_subscriber', 'delete_quiz_topic',
   'track_pdf_preview', 'track_pdf_download',
   'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions',
-  'update_user_restriction'
+  'update_user_restriction',
+  'get_notes_by_level'
 ]);
 
 const ADMIN_ACTIONS = new Set([
@@ -1997,7 +1999,35 @@ async function handlePost(req, res) {
         result = data;
         break;
       }
- case 'get_note_preview': {
+ case 'get_notes_by_level': {
+  if (!userId) return res.status(401).json({ error: 'Please sign in to access notes.' });
+  
+  const level = req.body.level;
+  if (!level) return res.status(400).json({ error: 'Level required' });
+  
+  const { data, error } = await supabase
+    .from('notes_structure')
+    .select('subtopic_id, subtopic_name, topic, level, content_preview, read_time, word_count')
+    .eq('level', level)
+    .order('topic_order', { ascending: true })
+    .order('subtopic_order', { ascending: true });
+  
+  if (error) throw error;
+  
+  const notes = (data || []).map(item => ({
+    id: item.subtopic_id,
+    title: item.subtopic_name,
+    topic: item.topic,
+    level: item.level,
+    preview: item.content_preview || '',
+    read_time: item.read_time || '5 min read',
+    word_count: item.word_count || 800
+  }));
+  
+  result = notes;
+  break;
+}
+     case 'get_note_preview': {
   const subtopicId = req.body.subtopic_id;
   if (!subtopicId) return res.status(400).json({ error: 'subtopic_id required' });
   
