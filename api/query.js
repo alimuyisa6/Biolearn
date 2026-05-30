@@ -1999,7 +1999,8 @@ async function handlePost(req, res) {
         result = data;
         break;
       }
- case 'get_notes_by_level': {
+  
+  case 'get_notes_by_level': {
   if (!userId) return res.status(401).json({ error: 'Please sign in to access notes.' });
   
   const level = req.body.level;
@@ -2007,22 +2008,34 @@ async function handlePost(req, res) {
   
   const { data, error } = await supabase
     .from('notes_structure')
-    .select('subtopic_id, subtopic_name, topic, level, content_preview, read_time, word_count')
+    .select('subtopic_id, subtopic_name, topic, level, read_time, word_count')
     .eq('level', level)
     .order('topic_order', { ascending: true })
     .order('subtopic_order', { ascending: true });
   
   if (error) throw error;
   
-  const notes = (data || []).map(item => ({
-    id: item.subtopic_id,
-    title: item.subtopic_name,
-    topic: item.topic,
-    level: item.level,
-    preview: item.content_preview || '',
-    read_time: item.read_time || '5 min read',
-    word_count: item.word_count || 800
-  }));
+  const notes = [];
+  for (const item of (data || [])) {
+    const { data: contentData } = await supabase
+      .from('note_contents')
+      .select('content')
+      .eq('subtopic_id', item.subtopic_id)
+      .maybeSingle();
+    
+    const plainText = contentData?.content?.replace(/<[^>]*>/g, '') || '';
+    const preview = plainText.substring(0, 120) + (plainText.length > 120 ? '...' : '');
+    
+    notes.push({
+      id: item.subtopic_id,
+      title: item.subtopic_name,
+      topic: item.topic,
+      level: item.level,
+      preview: preview,
+      read_time: item.read_time || Math.ceil(plainText.split(/\s+/).length / 200) + ' min read',
+      word_count: item.word_count || plainText.split(/\s+/).length
+    });
+  }
   
   result = notes;
   break;
