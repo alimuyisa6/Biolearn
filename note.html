@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -121,18 +121,7 @@ body {
   margin-top: 6px;
   letter-spacing: 0.5px;
 }
-.debug-error {
-  background: #fff3cd;
-  border: 1px solid #ffc107;
-  color: #856404;
-  padding: 12px 16px;
-  border-radius: 12px;
-  margin: 16px 24px;
-  font-size: 0.85rem;
-  font-family: monospace;
-  white-space: pre-wrap;
-  word-break: break-word;
-}
+
 .resume-prompt {
   position: fixed;
   bottom: 30px;
@@ -494,22 +483,6 @@ if (returnTo && returnSubtopic) {
   else if (returnTo === 'pharmacy') backLinkUrl = `/pharmacy.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
 }
 
-function showDebugError(message, details) {
-  const existing = document.querySelector('.debug-error');
-  if (existing) existing.remove();
-  const errorDiv = document.createElement('div');
-  errorDiv.className = 'debug-error';
-  errorDiv.innerHTML = `<strong>⚠️ DEBUG ERROR:</strong><br>${escapeHtml(message)}${details ? '<br><br><strong>Details:</strong><br>' + escapeHtml(details) : ''}`;
-  const wrapper = document.getElementById('progress-wrapper');
-  if (wrapper) wrapper.insertAdjacentElement('afterend', errorDiv);
-  setTimeout(() => { if (errorDiv.parentNode) errorDiv.remove(); }, 15000);
-}
-
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
 function esc(str) {
   if (!str) return '';
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
@@ -523,7 +496,7 @@ async function apiCall(action, params) {
     body: JSON.stringify({ action, ...params })
   });
   const json = await res.json();
-  if (!res.ok) throw new Error(json.error || `HTTP ${res.status}`);
+  if (!res.ok) throw new Error(json.error);
   return json.data !== undefined ? json.data : json;
 }
 
@@ -558,8 +531,10 @@ function updateProgressBarUI(percentage) {
 function saveCurrentProgress() {
   if (!currentUser) return;
   if (finalPercentageSaved) return;
+  
   const percentage = Math.floor(maxScrollPercentage);
   const percentageSinceLastSave = Math.abs(percentage - lastSavedPercentage);
+  
   if (percentage >= 10 && percentageSinceLastSave >= 5) {
     lastSavedPercentage = percentage;
     apiCall('save_reading_progress', {
@@ -568,10 +543,7 @@ function saveCurrentProgress() {
       scroll_position: document.documentElement.scrollTop,
       time_spent: 0,
       completed: false
-    }).catch(err => {
-      console.error('Save progress error:', err);
-      showDebugError('Failed to save reading progress', err.message);
-    });
+    }).catch(e => console.error('Failed to save progress:', e));
   }
 }
 
@@ -580,33 +552,36 @@ function updateProgressFromScroll() {
   const height = document.documentElement.scrollHeight - window.innerHeight;
   if (height <= 0) return;
   const currentPercentage = (winScroll / height) * 100;
+  
   if (currentPercentage > maxScrollPercentage) {
     maxScrollPercentage = currentPercentage;
     updateProgressBarUI(maxScrollPercentage);
   }
+  
   if (maxScrollPercentage >= 95 && !finalPercentageSaved) {
     if (saveProgressTimer) clearTimeout(saveProgressTimer);
     saveFinalPercentage();
   } else if (maxScrollPercentage >= 10 && maxScrollPercentage < 95) {
     if (saveProgressTimer) clearTimeout(saveProgressTimer);
-    saveProgressTimer = setTimeout(() => { saveCurrentProgress(); }, 1500);
+    saveProgressTimer = setTimeout(() => {
+      saveCurrentProgress();
+    }, 1500);
   }
 }
 
 function saveFinalPercentage() {
   if (!currentUser || finalPercentageSaved) return;
   finalPercentageSaved = true;
+  
   if (saveProgressTimer) clearTimeout(saveProgressTimer);
+  
   apiCall('save_reading_progress', {
     note_id: noteId,
     scroll_percentage: Math.floor(maxScrollPercentage),
     scroll_position: document.documentElement.scrollTop,
     time_spent: 0,
     completed: maxScrollPercentage >= 95
-  }).catch(err => {
-    console.error('Final save error:', err);
-    showDebugError('Failed to save final reading progress', err.message);
-  });
+  }).catch(e => console.error('Failed to save final progress:', e));
 }
 
 function showResumePrompt(savedPercentage) {
@@ -623,7 +598,9 @@ function showResumePrompt(savedPercentage) {
     prompt.remove();
   };
   document.body.appendChild(prompt);
-  setTimeout(() => { if (prompt.parentNode) prompt.remove(); }, 10000);
+  setTimeout(() => {
+    if (prompt.parentNode) prompt.remove();
+  }, 10000);
 }
 
 async function loadSavedProgressAndResume() {
@@ -642,9 +619,8 @@ async function loadSavedProgressAndResume() {
       maxScrollPercentage = progress.scroll_percentage;
       updateProgressBarUI(maxScrollPercentage);
     }
-  } catch(err) {
-    console.error('Load progress error:', err);
-    showDebugError('Failed to load saved reading progress', err.message);
+  } catch(e) {
+    console.error('Failed to load progress:', e);
   }
 }
 
@@ -731,17 +707,22 @@ async function loadNote() {
     finalPercentageSaved = false;
     lastSavedPercentage = 0;
     saveProgressTimer = null;
+    
     const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
     document.title = `${note.title || noteTitle} | AliverBiopharm ${currentLevel} Notes`;
+    
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
     const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
+    
     let processedContent = note.content || '<p>No content available for this note.</p>';
     const toc = generateTableOfContents(processedContent);
     const keyPoints = extractKeyPoints(processedContent);
     processedContent = addHeadingIds(processedContent);
     const shareButtons = addShareButtons();
     const relatedNotes = await loadRelatedNotes(noteId, currentLevel, note.topic || '');
+    
     updateProgressBarUI(0);
+    
     app.innerHTML = `
   <div class="note-container">
     <a href="/" class="home-fab" aria-label="Home"><i class="fa-solid fa-home"></i></a>
@@ -788,10 +769,12 @@ async function loadNote() {
     await loadReactions();
     await loadComments();
     await loadSavedProgressAndResume();
+    
     if (scrollHandlerActive) window.removeEventListener('scroll', updateProgressFromScroll);
     window.addEventListener('scroll', updateProgressFromScroll);
     scrollHandlerActive = true;
     updateProgressFromScroll();
+    
     window.addEventListener('beforeunload', () => {
       if (maxScrollPercentage >= 10 && !finalPercentageSaved) {
         saveCurrentProgress();
@@ -799,7 +782,7 @@ async function loadNote() {
     });
   } catch (err) {
     console.error(err);
-    app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note: ${esc(err.message)}</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
+    app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
   }
 }
 
@@ -936,7 +919,7 @@ async function loadNavigationAndFooter() {
         }
       }
     }
-  } catch (err) { console.error('Failed to load navigation:', err); }
+  } catch (err) { console.error('Failed to load:', err); }
 }
 
 document.addEventListener('DOMContentLoaded', async () => {
