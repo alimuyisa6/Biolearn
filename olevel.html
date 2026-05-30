@@ -393,6 +393,8 @@ body {
 .preparing-progress { width: 100%; height: 4px; background: var(--clr-border-glow); border-radius: 4px; overflow: hidden; margin: 20px 0; }
 .preparing-progress .progress-bar { width: 0%; height: 100%; background: linear-gradient(90deg, var(--clr-cyan), var(--clr-magenta)); border-radius: 4px; transition: width 6s linear; }
 .preparing-tip { font-size: 0.8rem; color: var(--clr-text-muted); }
+.back-buttons-container { display: flex; gap: 16px; justify-content: center; margin-top: 30px; flex-wrap: wrap; }
+.back-buttons-container .back-link { margin-top: 0; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
 @keyframes bounce { from { transform: translateY(0); } to { transform: translateY(-15px); } }
@@ -505,6 +507,9 @@ function showContent() {
         </div>
         <div class="notes-grid" id="notes-grid" style="display:none;"></div>
       </div>
+      <div class="back-buttons-container">
+        <a href="/" class="back-link" style="background:var(--gradient-cyan); color:#fff; border-color:var(--clr-cyan);"><i class="fa-solid fa-home"></i> Back to Homepage</a>
+      </div>
     </section>
   `;
   
@@ -606,6 +611,22 @@ function renderNotes(notes) {
       </div>
     </div>
   `).join('');
+  
+  const backButtonsContainer = document.querySelector('.back-buttons-container');
+  if (backButtonsContainer && !backButtonsContainer.querySelector('.back-level-link')) {
+    const levelLink = document.createElement('a');
+    levelLink.href = '#';
+    levelLink.className = 'back-link back-level-link';
+    levelLink.style.background = 'transparent';
+    levelLink.style.border = '2px solid var(--clr-cyan)';
+    levelLink.style.color = 'var(--clr-cyan)';
+    levelLink.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Back to Level Notes';
+    levelLink.addEventListener('click', (e) => {
+      e.preventDefault();
+      window.scrollTo({ top: 0, behavior: 'smooth' });
+    });
+    backButtonsContainer.insertBefore(levelLink, backButtonsContainer.firstChild);
+  }
   
   setTimeout(() => {
     if (targetSubtopicId) {
