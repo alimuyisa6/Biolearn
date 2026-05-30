@@ -591,7 +591,7 @@ function renderNotes(notes) {
   }
   
   container.innerHTML = notes.map(note => `
-    <div class="note-card" data-note-id="${note.id}" data-note-title="${esc(note.title)}">
+    <div class="note-card" id="subtopic-${note.id}" data-note-id="${note.id}" data-note-title="${esc(note.title)}">
       <div class="card-inner">
         <span class="topic-badge"><i class="fa-solid fa-tag"></i> ${esc(note.topic || 'Pharmacy')}</span>
         <h3 class="note-title">${esc(note.title)}</h3>
@@ -607,20 +607,22 @@ function renderNotes(notes) {
     </div>
   `).join('');
   
-  if (targetSubtopicId) {
-    const targetElement = document.querySelector(`.note-card[data-note-id="${targetSubtopicId}"]`);
-    if (targetElement) {
-      targetElement.classList.add('highlight');
-      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-      showPreparingMessage(targetSubtopicTitle);
-      if (redirectTimeout) clearTimeout(redirectTimeout);
-      redirectTimeout = setTimeout(() => {
-        const note = notes.find(n => String(n.id) === String(targetSubtopicId));
-        if (note) goToNoteViewer(note.id, note.title);
-        else hidePreparingMessage();
-      }, 6000);
+  setTimeout(() => {
+    if (targetSubtopicId) {
+      const targetElement = document.getElementById(`subtopic-${targetSubtopicId}`);
+      if (targetElement) {
+        targetElement.classList.add('highlight');
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        showPreparingMessage(targetSubtopicTitle);
+        if (redirectTimeout) clearTimeout(redirectTimeout);
+        redirectTimeout = setTimeout(() => {
+          const note = notes.find(n => String(n.id) === String(targetSubtopicId));
+          if (note) goToNoteViewer(note.id, note.title);
+          else hidePreparingMessage();
+        }, 6000);
+      }
     }
-  }
+  }, 100);
 }
 
 async function loadNotes() {
