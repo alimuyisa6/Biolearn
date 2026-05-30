@@ -2197,7 +2197,76 @@ case 'get_reading_progress':
   } : null;
   break;
 
-case 'get_continue_reading':
+case 'save_reading_progress': {
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const { note_id: noteIdParam, scroll_percentage, scroll_position, time_spent, completed } = req.body;
+  const { data: existing } = await supabase
+    .from('user_interactions')
+    .select('id, metadata, value')
+    .eq('user_id', userId)
+    .eq('resource_id', noteIdParam)
+    .eq('interaction_type', 'reading_progress')
+    .maybeSingle();
+  if (existing) {
+    const currentTimeSpent = (existing.metadata?.time_spent || 0) + (time_spent || 0);
+    await supabase
+      .from('user_interactions')
+      .update({
+        value: scroll_percentage,
+        metadata: {
+          scroll_position: scroll_position || existing.metadata?.scroll_position || 0,
+          time_spent: currentTimeSpent,
+          completed: completed || false,
+          last_updated: new Date().toISOString()
+        },
+        created_at: new Date().toISOString()
+      })
+      .eq('id', existing.id);
+  } else {
+    await supabase
+      .from('user_interactions')
+      .insert({
+        user_id: userId,
+        interaction_type: 'reading_progress',
+        resource_id: noteIdParam,
+        value: scroll_percentage,
+        metadata: {
+          scroll_position: scroll_position || 0,
+          time_spent: time_spent || 0,
+          completed: completed || false,
+          started_at: new Date().toISOString()
+        }
+      });
+  }
+  result = { success: true };
+  break;
+}
+
+case 'get_reading_progress': {
+  if (!userId) {
+    result = null;
+    break;
+  }
+  const { note_id: noteIdParam } = req.body;
+  const { data, error } = await supabase
+    .from('user_interactions')
+    .select('value, metadata, created_at')
+    .eq('user_id', userId)
+    .eq('resource_id', noteIdParam)
+    .eq('interaction_type', 'reading_progress')
+    .maybeSingle();
+  if (error) throw error;
+  result = data ? {
+    scroll_percentage: data.value || 0,
+    scroll_position: data.metadata?.scroll_position || 0,
+    completed: data.metadata?.completed || false,
+    last_accessed: data.created_at,
+    time_spent: data.metadata?.time_spent || 0
+  } : null;
+  break;
+}
+
+case 'get_continue_reading': {
   if (!userId) {
     result = [];
     break;
@@ -2233,6 +2302,8 @@ case 'get_continue_reading':
   }
   result = notes;
   break;
+}
+ 
      default: throw new Error('Unknown action: ' + action);
     }
     responseCache.delete('all_sections'); responseCache.delete('stats');
