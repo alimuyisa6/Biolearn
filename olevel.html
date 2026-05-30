@@ -1,0 +1,766 @@
+ <!DOCTYPE html>
+<html lang="en">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
+<title>O-Level Biology Notes | AliverBiopharm</title>
+<meta name="description" content="Comprehensive O-Level Biology study notes covering cell biology, genetics, ecology, human physiology, and plant science. Expert-written for secondary students.">
+<meta name="keywords" content="O-Level biology, IGCSE biology, GCSE biology, secondary biology, biology notes">
+<meta name="author" content="AliverBiopharm">
+<meta name="robots" content="index, follow, max-image-preview:large">
+<link rel="canonical" href="https://aliverbiopharm.com/notes/olevel">
+<meta property="og:title" content="O-Level Biology Notes | AliverBiopharm">
+<meta property="og:description" content="Expert-written O-Level Biology notes covering the complete syllabus.">
+<meta property="og:type" content="website">
+<meta property="og:url" content="https://aliverbiopharm.com/notes/olevel">
+<meta name="twitter:card" content="summary_large_image">
+<meta name="twitter:title" content="O-Level Biology Notes | AliverBiopharm">
+<meta name="theme-color" content="#0a7e7e">
+<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+<style>
+:root {
+  --clr-deep-space: #eef7f7;
+  --clr-cyan: #0a7e7e;
+  --clr-magenta: #b8873a;
+  --clr-navy-card: rgba(255, 255, 255, 0.85);
+  --clr-navy-light: rgba(10, 129, 129, 0.08);
+  --clr-white: #0d2e2e;
+  --clr-text-dim: #2d5c5c;
+  --clr-text-muted: #4a6f6f;
+  --clr-border-glow: rgba(10, 129, 129, 0.15);
+  --shadow-card: 0 4px 16px rgba(10, 110, 110, 0.06);
+  --max-width: 1300px;
+  --radius-lg: 1.4rem;
+  --gradient-cyan: linear-gradient(135deg, #0a7e7e, #0a5f5f);
+  --gradient-magenta: linear-gradient(135deg, #b8873a, #c28b2c);
+}
+* { margin: 0; padding: 0; box-sizing: border-box; }
+body {
+  background: var(--clr-deep-space);
+  color: var(--clr-white);
+  font-family: 'Inter', sans-serif;
+  line-height: 1.65;
+}
+.site-header {
+  position: fixed; top: 0; left: 0; right: 0;
+  z-index: 100;
+  background: rgba(238, 247, 247, 0.92);
+  backdrop-filter: blur(22px);
+  border-bottom: 3px solid var(--clr-magenta);
+  height: 70px;
+}
+.header-container {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding: 0 24px;
+  height: 70px;
+}
+.logo-link img { height: 48px; width: auto; }
+.main-nav { display: flex; gap: 36px; list-style: none; }
+.main-nav a {
+  color: var(--clr-text-dim);
+  text-decoration: none;
+  font-weight: 600;
+  font-size: 0.9rem;
+  transition: color 0.2s;
+}
+.main-nav a:hover, .main-nav a.active { color: var(--clr-magenta); }
+.nav-actions { display: flex; gap: 12px; }
+.mobile-toggle {
+  background: rgba(10, 129, 129, 0.1);
+  border: 1.5px solid var(--clr-cyan);
+  color: var(--clr-cyan);
+  padding: 8px 16px;
+  border-radius: 40px;
+  cursor: pointer;
+  display: none;
+}
+.mobile-nav-panel {
+  position: fixed; top: 0; right: -100%;
+  width: 80%; max-width: 320px;
+  height: 100%;
+  background: linear-gradient(160deg, #eef7f7 0%, #d4fafa 45%, #b8f5f5 100%);
+  z-index: 200;
+  transition: right 0.3s;
+}
+.mobile-nav-panel.active { right: 0; }
+.mobile-nav-panel-inner { padding: 1.5rem; height: 100%; overflow-y: auto; }
+.mobile-nav-header-row { display: flex; justify-content: flex-end; margin-bottom: 1.5rem; }
+.mobile-close-btn {
+  background: rgba(184, 135, 58, 0.15);
+  border: 1.5px solid var(--clr-magenta);
+  color: var(--clr-magenta);
+  width: 36px; height: 36px;
+  border-radius: 8px;
+  cursor: pointer;
+}
+.mobile-nav-links { display: flex; flex-direction: column; gap: 0.75rem; }
+.mobile-nav-links a {
+  padding: 0.8rem 1rem;
+  background: var(--clr-navy-card);
+  border-radius: 12px;
+  text-decoration: none;
+  color: var(--clr-white);
+  font-weight: 600;
+  border: 1px solid var(--clr-border-glow);
+}
+.mobile-nav-links a:hover, .mobile-nav-links a.active { background: var(--clr-magenta); color: #fff; }
+.mobile-nav-overlay {
+  position: fixed; inset: 0;
+  background: rgba(0,0,0,0.6);
+  z-index: 150;
+  opacity: 0;
+  pointer-events: none;
+}
+.mobile-nav-overlay.active { opacity: 1; pointer-events: auto; }
+.hero-section {
+  margin-top: 70px;
+  padding: 80px 24px 60px;
+  text-align: center;
+  background: linear-gradient(135deg, rgba(10, 129, 129, 0.05), rgba(184, 135, 58, 0.03));
+}
+.hero-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(3.5rem, 10vw, 6rem);
+  font-weight: 900;
+  letter-spacing: -0.02em;
+  line-height: 1.1;
+  margin-bottom: 24px;
+}
+.hero-title .accent { color: var(--clr-cyan); }
+.hero-subtitle {
+  font-family: 'Poppins', sans-serif;
+  font-size: clamp(1.2rem, 3vw, 1.8rem);
+  font-weight: 600;
+  color: var(--clr-text-dim);
+}
+.level-badge {
+  display: inline-block;
+  background: var(--gradient-magenta);
+  color: #fff;
+  padding: 8px 28px;
+  border-radius: 60px;
+  font-family: 'Poppins', sans-serif;
+  font-weight: 700;
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  margin-bottom: 30px;
+}
+.auth-wall {
+  max-width: 500px;
+  margin: 100px auto;
+  padding: 50px;
+  text-align: center;
+  background: var(--clr-navy-card);
+  border-radius: var(--radius-lg);
+  border: 2px solid var(--clr-cyan);
+}
+.auth-wall i { font-size: 4rem; color: var(--clr-cyan); margin-bottom: 20px; }
+.auth-wall h2 { font-family: 'Poppins', sans-serif; margin-bottom: 12px; }
+.auth-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 24px; }
+.signin-btn, .signup-btn {
+  padding: 12px 28px;
+  border-radius: 40px;
+  font-weight: 700;
+  cursor: pointer;
+}
+.signin-btn { background: transparent; border: 2px solid var(--clr-cyan); color: var(--clr-cyan); }
+.signup-btn { background: var(--gradient-cyan); border: none; color: #fff; }
+.search-section {
+  max-width: 800px;
+  margin: 40px auto 0;
+  padding: 0 20px;
+}
+.search-container {
+  background: var(--clr-navy-card);
+  border-radius: 60px;
+  border: 2px solid var(--clr-cyan);
+  display: flex;
+  align-items: center;
+  padding: 6px 6px 6px 20px;
+}
+.search-icon { color: var(--clr-cyan); }
+.search-input {
+  flex: 1;
+  padding: 14px 12px;
+  border: none;
+  background: transparent;
+  font-size: 1rem;
+  color: var(--clr-white);
+  outline: none;
+}
+.search-clear {
+  background: none;
+  border: none;
+  color: var(--clr-text-muted);
+  padding: 0 16px;
+  cursor: pointer;
+  display: none;
+}
+.search-clear.visible { display: block; }
+.search-stats {
+  text-align: center;
+  margin-top: 12px;
+  font-size: 0.8rem;
+  color: var(--clr-text-muted);
+}
+.preparing-message {
+  position: fixed;
+  top: 0; left: 0; right: 0; bottom: 0;
+  background: rgba(0,0,0,0.85);
+  z-index: 1000;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  backdrop-filter: blur(8px);
+}
+.preparing-message .content {
+  max-width: 450px;
+  padding: 40px;
+  text-align: center;
+  background: var(--clr-navy-card);
+  border-radius: 24px;
+  border: 2px solid var(--clr-magenta);
+  animation: pulse 1.5s infinite;
+}
+.preparing-message i { font-size: 3rem; color: var(--clr-magenta); margin-bottom: 16px; }
+.preparing-message h3 { font-family: 'Poppins', sans-serif; font-size: 1.5rem; margin-bottom: 8px; }
+@keyframes pulse {
+  0%, 100% { opacity: 1; transform: scale(1); }
+  50% { opacity: 0.8; transform: scale(0.98); }
+}
+.notes-section {
+  max-width: var(--max-width);
+  margin: 0 auto;
+  padding: 50px 24px 80px;
+}
+.section-header { text-align: center; margin-bottom: 40px; }
+.section-header h2 { font-family: 'Poppins', sans-serif; font-size: 2rem; font-weight: 700; color: var(--clr-white); }
+.notes-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+.note-card {
+  background: var(--clr-navy-card);
+  border-radius: 20px;
+  border: 1px solid var(--clr-border-glow);
+  overflow: hidden;
+  transition: all 0.3s ease;
+  cursor: pointer;
+}
+.note-card:hover { transform: translateY(-6px); border-color: var(--clr-magenta); box-shadow: 0 20px 35px rgba(184, 135, 58, 0.12); }
+.note-card.highlight {
+  border: 3px solid var(--clr-magenta);
+  box-shadow: 0 0 0 4px rgba(184, 135, 58, 0.2);
+  animation: highlightPulse 0.5s ease;
+}
+@keyframes highlightPulse {
+  0% { transform: scale(1); }
+  50% { transform: scale(1.02); }
+  100% { transform: scale(1); }
+}
+.card-inner { padding: 28px; }
+.topic-badge {
+  display: inline-block;
+  background: rgba(184, 135, 58, 0.12);
+  color: var(--clr-magenta);
+  padding: 4px 14px;
+  border-radius: 30px;
+  font-size: 0.7rem;
+  font-weight: 700;
+  text-transform: uppercase;
+  margin-bottom: 16px;
+}
+.note-title {
+  font-family: 'Poppins', sans-serif;
+  font-size: 1.4rem;
+  font-weight: 700;
+  margin-bottom: 12px;
+}
+.note-preview {
+  color: var(--clr-text-dim);
+  font-size: 0.9rem;
+  line-height: 1.6;
+  margin-bottom: 20px;
+  display: -webkit-box;
+  -webkit-line-clamp: 3;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+.note-meta {
+  display: flex;
+  gap: 16px;
+  margin-bottom: 20px;
+  padding-top: 12px;
+  border-top: 1px solid var(--clr-border-glow);
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
+.read-more-btn {
+  width: 100%;
+  background: transparent;
+  border: 2px solid var(--clr-cyan);
+  color: var(--clr-cyan);
+  padding: 12px 20px;
+  border-radius: 50px;
+  font-weight: 700;
+  cursor: pointer;
+  transition: all 0.2s;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 8px;
+}
+.read-more-btn:hover { background: var(--clr-cyan); color: #fff; }
+.no-results { grid-column: 1/-1; text-align: center; padding: 60px; background: var(--clr-navy-card); border-radius: 20px; }
+.skeleton-grid {
+  display: grid;
+  grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+  gap: 30px;
+}
+.skeleton-card { background: var(--clr-navy-card); border-radius: 20px; padding: 28px; }
+.skeleton-title, .skeleton-text, .skeleton-btn {
+  background: linear-gradient(90deg, var(--clr-border-glow), var(--clr-navy-light), var(--clr-border-glow));
+  background-size: 200% 100%;
+  animation: shimmer 1.5s infinite;
+  border-radius: 8px;
+}
+.skeleton-title { height: 28px; width: 70%; margin-bottom: 16px; }
+.skeleton-text { height: 80px; margin-bottom: 20px; }
+.skeleton-btn { height: 48px; border-radius: 50px; }
+@keyframes shimmer {
+  0% { background-position: 200% 0; }
+  100% { background-position: -200% 0; }
+}
+.footer-fat {
+  background: rgba(255, 255, 255, 0.92);
+  border-top: 1px solid var(--clr-border-glow);
+  padding: 50px 24px 30px;
+  margin-top: 60px;
+}
+.footer-grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: 40px;
+  max-width: var(--max-width);
+  margin: 0 auto;
+}
+.footer-fat h4 { font-family: 'Poppins', sans-serif; font-size: 1rem; font-weight: 700; margin-bottom: 1rem; color: var(--clr-white); }
+.footer-fat ul { list-style: none; }
+.footer-fat a { color: var(--clr-text-dim); text-decoration: none; font-size: 0.85rem; transition: color 0.2s; }
+.footer-fat a:hover { color: var(--clr-cyan); }
+.footer-social { display: flex; gap: 12px; margin-top: 16px; }
+.footer-social a {
+  width: 36px; height: 36px;
+  border-radius: 50%;
+  border: 1.5px solid var(--clr-cyan);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  color: var(--clr-cyan);
+  transition: all 0.2s;
+}
+.footer-social a:hover { background: var(--clr-magenta); border-color: var(--clr-magenta); color: #fff; }
+.footer-bottom {
+  max-width: var(--max-width);
+  margin: 40px auto 0;
+  padding-top: 24px;
+  border-top: 1px solid var(--clr-border-glow);
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
+.back-to-top {
+  position: fixed; bottom: 24px; right: 24px;
+  width: 44px; height: 44px;
+  border-radius: 50%;
+  background: var(--gradient-cyan);
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  opacity: 0;
+  visibility: hidden;
+  transition: all 0.3s;
+  z-index: 90;
+}
+.back-to-top.visible { opacity: 1; visibility: visible; }
+@media (max-width: 768px) {
+  .main-nav { display: none; }
+  .mobile-toggle { display: block; }
+  .notes-grid { grid-template-columns: 1fr; }
+  .hero-title { font-size: clamp(2.5rem, 8vw, 4rem); }
+  .footer-grid { grid-template-columns: 1fr; gap: 30px; }
+}
+</style>
+</head>
+<body>
+<header class="site-header">
+  <div class="header-container">
+    <a href="/" class="logo-link" id="logo-link">Aliver<span style="color:var(--clr-magenta);">Biopharm</span></a>
+    <nav><ul class="main-nav" id="main-nav"></ul></nav>
+    <div class="nav-actions">
+      <button class="mobile-toggle" id="mobile-toggle"><i class="fa-solid fa-bars"></i></button>
+    </div>
+  </div>
+</header>
+<div class="mobile-nav-panel" id="mobile-nav-panel">
+  <div class="mobile-nav-panel-inner">
+    <div class="mobile-nav-header-row">
+      <button class="mobile-close-btn" id="mobile-close-btn"><i class="fa-solid fa-xmark"></i></button>
+    </div>
+    <nav class="mobile-nav-links" id="mobile-nav-links"></nav>
+  </div>
+</div>
+<div class="mobile-nav-overlay" id="mobile-nav-overlay"></div>
+
+<main id="app-content"></main>
+
+<footer class="footer-fat" id="footer"></footer>
+<button class="back-to-top" id="back-to-top"><i class="fa-solid fa-arrow-up"></i></button>
+
+<script>
+const API_BASE = '/api/query';
+let currentUser = null;
+let allNotes = [];
+let currentSearchTerm = '';
+let targetSubtopicId = null;
+let targetSubtopicTitle = '';
+let redirectTimeout = null;
+const CURRENT_LEVEL = 'O-Level';
+
+function esc(str) {
+  if (!str) return '';
+  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
+}
+
+async function apiCall(action, params) {
+  const res = await fetch(API_BASE, {
+    method: 'POST',
+    headers: { 'Content-Type': 'application/json' },
+    credentials: 'include',
+    body: JSON.stringify({ action, ...params })
+  });
+  const json = await res.json();
+  if (!res.ok) throw new Error(json.error);
+  return json.data !== undefined ? json.data : json;
+}
+
+// Get URL parameters
+const urlParams = new URLSearchParams(window.location.search);
+targetSubtopicId = urlParams.get('subtopic');
+targetSubtopicTitle = urlParams.get('title') || '';
+
+function showAuthWall() {
+  const app = document.getElementById('app-content');
+  app.innerHTML = `
+    <div class="auth-wall">
+      <i class="fa-solid fa-lock"></i>
+      <h2>Access O-Level Biology Notes</h2>
+      <p>Sign in or create an account to access our complete library of study notes, interactive flashcards, and learning resources.</p>
+      <div class="auth-buttons">
+        <button class="signin-btn" onclick="window.showAuthForm('signin')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
+        <button class="signup-btn" onclick="window.showAuthForm('signup')"><i class="fa-solid fa-user-plus"></i> Create Account</button>
+      </div>
+    </div>
+  `;
+}
+
+function showContent() {
+  const app = document.getElementById('app-content');
+  app.innerHTML = `
+    <section class="hero-section">
+      <div class="level-badge"><i class="fa-solid fa-leaf"></i> O-LEVEL BIOLOGY</div>
+      <h1 class="hero-title">Master <span class="accent">O-Level Biology</span></h1>
+      <p class="hero-subtitle">Comprehensive study notes covering cell biology, genetics, ecology, human physiology, and plant science</p>
+      <div class="search-section">
+        <div class="search-container">
+          <div class="search-icon"><i class="fa-solid fa-search"></i></div>
+          <input type="text" class="search-input" id="note-search" placeholder="Search O-Level Biology notes by topic, keyword, or subtopic...">
+          <button class="search-clear" id="search-clear"><i class="fa-solid fa-times-circle"></i></button>
+        </div>
+        <div class="search-stats" id="search-stats"></div>
+      </div>
+    </section>
+    <section class="notes-section">
+      <div class="section-header">
+        <h2><i class="fa-solid fa-book-open"></i> O-Level Biology Notes Library</h2>
+        <p>Browse all available notes. Click on any card to view the complete content.</p>
+      </div>
+      <div id="notes-grid-container">
+        <div class="skeleton-grid" id="skeleton-loader">
+          <div class="skeleton-card"><div class="skeleton-title"></div><div class="skeleton-text"></div><div class="skeleton-btn"></div></div>
+          <div class="skeleton-card"><div class="skeleton-title"></div><div class="skeleton-text"></div><div class="skeleton-btn"></div></div>
+          <div class="skeleton-card"><div class="skeleton-title"></div><div class="skeleton-text"></div><div class="skeleton-btn"></div></div>
+        </div>
+        <div class="notes-grid" id="notes-grid" style="display:none;"></div>
+      </div>
+    </section>
+  `;
+  
+  const searchInput = document.getElementById('note-search');
+  const searchClear = document.getElementById('search-clear');
+  const searchStats = document.getElementById('search-stats');
+  
+  function filterAndRender() {
+    const term = searchInput?.value.toLowerCase().trim() || '';
+    currentSearchTerm = term;
+    if (searchClear) searchClear.classList.toggle('visible', term.length > 0);
+    const filtered = term === '' ? allNotes : allNotes.filter(note => 
+      note.title?.toLowerCase().includes(term) ||
+      note.topic?.toLowerCase().includes(term) ||
+      note.preview?.toLowerCase().includes(term)
+    );
+    if (searchStats) {
+      searchStats.textContent = filtered.length === allNotes.length ? 
+        `📚 Showing all ${allNotes.length} notes` : 
+        `🔍 Found ${filtered.length} note${filtered.length !== 1 ? 's' : ''} matching "${term}"`;
+    }
+    renderNotes(filtered);
+  }
+  
+  searchInput?.addEventListener('input', filterAndRender);
+  searchClear?.addEventListener('click', () => {
+    if (searchInput) searchInput.value = '';
+    filterAndRender();
+    searchInput?.focus();
+  });
+  
+  loadNotes();
+}
+
+function goToNoteViewer(noteId, title) {
+  window.location.href = `/note.html?id=${noteId}&level=${CURRENT_LEVEL}&title=${encodeURIComponent(title)}`;
+}
+
+function onNoteCardClick(noteId, title) {
+  goToNoteViewer(noteId, title);
+}
+
+function showPreparingMessage(title) {
+  const existing = document.querySelector('.preparing-message');
+  if (existing) existing.remove();
+  const overlay = document.createElement('div');
+  overlay.className = 'preparing-message';
+  overlay.innerHTML = `
+    <div class="content">
+      <i class="fa-solid fa-spinner fa-spin"></i>
+      <h3>Preparing Your Lesson</h3>
+      <p>Loading "${esc(title || 'your note')}"...</p>
+      <p style="font-size:0.8rem; margin-top:16px;">You will be redirected automatically</p>
+    </div>
+  `;
+  document.body.appendChild(overlay);
+}
+
+function hidePreparingMessage() {
+  const overlay = document.querySelector('.preparing-message');
+  if (overlay) overlay.remove();
+}
+
+function renderNotes(notes) {
+  const container = document.getElementById('notes-grid');
+  if (!notes || notes.length === 0) {
+    container.innerHTML = `<div class="no-results"><i class="fa-solid fa-search" style="font-size:3rem;"></i><p>No notes found matching "${esc(currentSearchTerm)}".</p></div>`;
+    return;
+  }
+  
+  container.innerHTML = notes.map(note => `
+    <div class="note-card" data-note-id="${note.id}" data-note-title="${esc(note.title)}" ${targetSubtopicId && String(note.id) === String(targetSubtopicId) ? 'id="target-note"' : ''}>
+      <div class="card-inner">
+        <span class="topic-badge"><i class="fa-solid fa-tag"></i> ${esc(note.topic || 'Biology')}</span>
+        <h3 class="note-title">${esc(note.title)}</h3>
+        <p class="note-preview">${esc(note.preview || note.content?.substring(0, 120) + '...')}</p>
+        <div class="note-meta">
+          <span><i class="fa-regular fa-clock"></i> ${note.read_time || '5 min read'}</span>
+          <span><i class="fa-regular fa-file-lines"></i> ${note.word_count ? Math.round(note.word_count / 100) * 100 : '~800'} words</span>
+        </div>
+        <button class="read-more-btn" onclick="onNoteCardClick('${note.id}', '${esc(note.title).replace(/'/g, "\\'")}')">
+          <i class="fa-solid fa-book-open-reader"></i> Read Full Note
+        </button>
+      </div>
+    </div>
+  `).join('');
+  
+  if (targetSubtopicId) {
+    const targetElement = document.getElementById('target-note');
+    if (targetElement) {
+      showPreparingMessage(targetSubtopicTitle);
+      setTimeout(() => {
+        targetElement.classList.add('highlight');
+        targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+        if (redirectTimeout) clearTimeout(redirectTimeout);
+        redirectTimeout = setTimeout(() => {
+          const note = notes.find(n => String(n.id) === String(targetSubtopicId));
+          if (note) goToNoteViewer(note.id, note.title);
+          else hidePreparingMessage();
+        }, 1500);
+      }, 500);
+    }
+  }
+}
+
+async function loadNotes() {
+  const skeleton = document.getElementById('skeleton-loader');
+  const container = document.getElementById('notes-grid');
+  if (skeleton) skeleton.style.display = 'grid';
+  if (container) container.style.display = 'none';
+  try {
+    const notes = await apiCall('get_notes_by_level', { level: CURRENT_LEVEL });
+    allNotes = notes || [];
+    if (skeleton) skeleton.style.display = 'none';
+    if (container) {
+      container.style.display = 'grid';
+      renderNotes(allNotes);
+    }
+  } catch (err) {
+    console.error('Failed to load notes:', err);
+    if (skeleton) skeleton.style.display = 'none';
+    if (container) {
+      container.style.display = 'grid';
+      container.innerHTML = '<div class="no-results"><i class="fa-solid fa-database"></i><p>Failed to load notes. Please refresh the page.</p></div>';
+    }
+    hidePreparingMessage();
+  }
+}
+
+async function loadNavigationAndFooter() {
+  try {
+    const sections = await apiCall('get_all_site_sections');
+    if (sections) {
+      if (sections.site_config?.logo_url) {
+        document.querySelectorAll('.logo-link').forEach(link => {
+          link.innerHTML = `<img src="${esc(sections.site_config.logo_url)}" alt="AliverBiopharm" style="height:48px;width:auto;">`;
+        });
+      }
+      if (sections.navigation?.links) {
+        const mainNav = document.getElementById('main-nav');
+        const mobileNav = document.getElementById('mobile-nav-links');
+        if (mainNav) {
+          mainNav.innerHTML = sections.navigation.links.map(link => {
+            let active = (link.href.includes('olevel')) ? 'class="active"' : '';
+            return `<li><a href="${esc(link.href)}" ${active}>${esc(link.label)}</a></li>`;
+          }).join('');
+        }
+        if (mobileNav) {
+          mobileNav.innerHTML = sections.navigation.links.map(link => {
+            let active = (link.href.includes('olevel')) ? 'class="active"' : '';
+            return `<a href="${esc(link.href)}" ${active}>${esc(link.label)}</a>`;
+          }).join('');
+        }
+      }
+      if (sections.footer) {
+        const fd = sections.footer;
+        const footer = document.getElementById('footer');
+        if (footer) {
+          footer.innerHTML = `
+            <div style="max-width:var(--max-width);margin:0 auto;">
+              <div class="footer-grid">
+                ${(fd.columns || []).map(col => `<div><h4>${esc(col.heading)}</h4><ul>${(col.items || []).map(item => `<li><a href="${esc(item.href)}">${esc(item.label)}</a></li>`).join('')}</ul></div>`).join('')}
+                <div><h4>Follow Us</h4><div class="footer-social">${(fd.social_links || []).map(s => `<a href="${esc(s.url)}" target="_blank"><i class="${esc(s.icon)}"></i></a>`).join('')}</div></div>
+              </div>
+              <div class="footer-bottom">
+                <p>&copy; ${new Date().getFullYear()} AliverBiopharm. All rights reserved.</p>
+                <div style="display:flex;gap:24px;">
+                  <a href="/privacy">Privacy Policy</a>
+                  <a href="/terms">Terms of Use</a>
+                </div>
+              </div>
+            </div>
+          `;
+        }
+      }
+    }
+  } catch (err) { console.error('Failed to load navigation:', err); }
+}
+
+window.showAuthForm = function(mode) {
+  const existing = document.getElementById('auth-modal');
+  if (existing) existing.remove();
+  const modal = document.createElement('div');
+  modal.id = 'auth-modal';
+  modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
+  modal.innerHTML = `
+    <div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:20px;padding:2rem;max-width:380px;width:90%;position:relative;">
+      <button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;">✕</button>
+      <h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
+      <form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;">
+        <input type="email" id="auth-email" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Email" required>
+        <input type="password" id="auth-password" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Password" required>
+        <button type="submit" style="background:var(--gradient-cyan);border:none;padding:12px;border-radius:40px;color:#fff;font-weight:700;cursor:pointer;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
+      </form>
+      <p style="text-align:center;margin-top:1rem;font-size:0.85rem;">${mode === 'signin' ? "No account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign up</a>" : "Have account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign in</a>"}</p>
+      <p id="auth-error" style="color:#e74c3c;text-align:center;margin-top:0.5rem;display:none;"></p>
+    </div>
+  `;
+  document.body.appendChild(modal);
+  document.getElementById('close-auth').onclick = () => modal.remove();
+  document.getElementById('switch-mode')?.addEventListener('click', (e) => {
+    e.preventDefault(); modal.remove(); showAuthForm(mode === 'signin' ? 'signup' : 'signin');
+  });
+  document.getElementById('auth-form').onsubmit = async (e) => {
+    e.preventDefault();
+    const email = document.getElementById('auth-email').value.trim();
+    const password = document.getElementById('auth-password').value;
+    const errEl = document.getElementById('auth-error');
+    errEl.style.display = 'none';
+    try {
+      const action = mode === 'signin' ? 'signin' : 'signup';
+      const data = await apiCall(action, { email, password });
+      if (data.user) {
+        currentUser = data.user;
+        modal.remove();
+        showContent();
+      } else if (mode === 'signup') {
+        errEl.textContent = 'Check your email to confirm signup.';
+        errEl.style.display = 'block';
+      }
+    } catch (err) {
+      errEl.textContent = err.message;
+      errEl.style.display = 'block';
+    }
+  };
+};
+
+// Mobile menu
+const mobileToggle = document.getElementById('mobile-toggle');
+const mobilePanel = document.getElementById('mobile-nav-panel');
+const mobileOverlay = document.getElementById('mobile-nav-overlay');
+const mobileClose = document.getElementById('mobile-close-btn');
+mobileToggle?.addEventListener('click', () => mobilePanel.classList.add('active'));
+mobileClose?.addEventListener('click', () => mobilePanel.classList.remove('active'));
+mobileOverlay?.addEventListener('click', () => mobilePanel.classList.remove('active'));
+
+// Back to top
+const backBtn = document.getElementById('back-to-top');
+window.addEventListener('scroll', () => backBtn.classList.toggle('visible', window.scrollY > 400));
+backBtn?.addEventListener('click', () => window.scrollTo({ top: 0, behavior: 'smooth' }));
+
+// Initialize
+document.addEventListener('DOMContentLoaded', async () => {
+  await loadNavigationAndFooter();
+  try {
+    const userData = await apiCall('get_user');
+    if (userData?.user) {
+      currentUser = userData.user;
+      showContent();
+    } else {
+      showAuthWall();
+    }
+  } catch(e) {
+    showAuthWall();
+  }
+});
+</script>
+</body>
+</html>

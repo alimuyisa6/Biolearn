@@ -5937,7 +5937,7 @@ function renderTopicsForLevel(level) {
   }
 }
 
-function renderSubtopicsForTopic(level, topic) {
+ function renderSubtopicsForTopic(level, topic) {
   const subtopics = [];
   notesStructureData.forEach(item => {
     if (item.level === level && item.topic === topic) {
@@ -5951,64 +5951,67 @@ function renderSubtopicsForTopic(level, topic) {
   
   subtopics.sort((a,b) => a.order - b.order);
   
-  let html = '<h4 style="color:var(--clr-cyan); margin:16px 0 12px 0; font-size:0.9rem;"><i class="fa-solid fa-file-lines"></i> Subtopics</h4><div style="display:flex; flex-wrap:wrap; gap:10px;">';
+  let html = '<h4 style="color:var(--clr-cyan); margin:16px 0 12px 0; font-size:0.9rem;"><i class="fa-solid fa-file-lines"></i> Subtopics</h4><div style="display:flex; flex-direction:column; gap:12px;">';
   subtopics.forEach(sub => {
-    const isActive = notesCurrentSubtopic === sub.id;
-    html += `<button class="subtopic-btn" data-subtopic-id="${sub.id}" data-subtopic-name="${escapeHtml(sub.name)}" style="background:${isActive ? 'var(--clr-cyan)' : 'rgba(10,181,181,0.1)'}; border:1px solid var(--clr-cyan); color:${isActive ? '#fff' : 'var(--clr-cyan)'}; padding:6px 18px; border-radius:50px; cursor:pointer; font-size:0.85rem; transition:all 0.2s;">${escapeHtml(sub.name)}</button>`;
+    html += `
+      <div style="background:var(--clr-navy-card); border-radius:16px; padding:16px; border:1px solid var(--clr-border-glow);">
+        <div style="display:flex; justify-content:space-between; align-items:center; flex-wrap:wrap; gap:12px;">
+          <div>
+            <strong style="font-size:1rem; color:var(--clr-white);">${escapeHtml(sub.name)}</strong>
+            <p style="font-size:0.7rem; color:var(--clr-text-muted); margin-top:4px;"><i class="fa-regular fa-clock"></i> ~5 min read</p>
+          </div>
+          <button class="subtopic-readmore-btn" data-id="${sub.id}" data-name="${escapeHtml(sub.name)}" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:8px 24px; border-radius:40px; font-weight:700; cursor:pointer; transition:all 0.2s;">
+            Read More <i class="fa-solid fa-arrow-right"></i>
+          </button>
+        </div>
+      </div>
+    `;
   });
   html += '</div>';
   
   document.getElementById('notes-subtopics-container').innerHTML = html;
   
-  document.querySelectorAll('.subtopic-btn').forEach(btn => {
-    btn.addEventListener('click', async (e) => {
-      const subtopicId = btn.dataset.subtopicId;
-      const subtopicName = btn.dataset.subtopicName;
-      notesCurrentSubtopic = subtopicId;
-      renderSubtopicsForTopic(notesCurrentLevel, notesCurrentTopic);
-      await loadNoteContentDirect(subtopicId, notesCurrentLevel, notesCurrentTopic, subtopicName);
+  document.querySelectorAll('.subtopic-readmore-btn').forEach(btn => {
+    btn.addEventListener('mouseenter', () => {
+      btn.style.background = 'var(--clr-cyan)';
+      btn.style.color = '#fff';
+    });
+    btn.addEventListener('mouseleave', () => {
+      btn.style.background = 'transparent';
+      btn.style.color = 'var(--clr-cyan)';
+    });
+    btn.addEventListener('click', async () => {
+      const subId = btn.dataset.id;
+      const subName = btn.dataset.name;
+      notesCurrentSubtopic = subId;
+      await loadNoteContentDirect(subId, notesCurrentLevel, notesCurrentTopic, subName);
       hideFilterArea();
     });
   });
 }
 
-async function loadNoteContentDirect(subtopicId, level, topic, subtopic) {
+   async function loadNoteContentDirect(subtopicId, level, topic, subtopic) {
   if (!notesWakeLock) await acquireNotesWakeLock();
   
   const container = document.getElementById('notes-container');
-  container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading notes...</div>';
+  container.innerHTML = '<div style="text-align:center;padding:40px;"><i class="fa-solid fa-spinner fa-spin"></i> Loading preview...</div>';
   
   try {
-    const data = await apiCall('get_note_content', { subtopic_id: subtopicId });
-    const contentHtml = `
-      <div class="notes-content-container" style="padding:24px; background:var(--clr-navy-card); border-radius:16px; animation:slideIn 0.3s ease;">
-        <div style="display:flex; justify-content:space-between; align-items:start; flex-wrap:wrap; gap:12px; margin-bottom:16px;">
-          <div>
-            <span style="font-size:0.8rem; color:var(--clr-text-muted);">${escapeHtml(level)} / ${escapeHtml(topic)}</span>
-            <h1 style="font-family:var(--font-display); font-size:1.8rem; color:var(--clr-white); margin-top:8px;">${escapeHtml(subtopic)}</h1>
-          </div>
-          <div style="display:flex; gap:8px;">
-            <button class="btn-download" onclick="downloadNoteAsPDF()" style="background:var(--clr-cyan);"><i class="fa-solid fa-download"></i> Save as PDF</button>
-          </div>
+    const previewData = await apiCall('get_note_preview', { subtopic_id: subtopicId });
+    const levelPath = level.toLowerCase().replace('-', '');
+    
+    container.innerHTML = `
+      <div style="background:var(--clr-navy-card); border-radius:20px; padding:28px; border:1px solid var(--clr-border-glow);">
+        <span style="font-size:0.7rem; background:rgba(10,129,129,0.1); padding:4px 12px; border-radius:20px;">${escapeHtml(level)} / ${escapeHtml(topic)}</span>
+        <h2 style="font-family:Poppins,sans-serif; font-size:1.5rem; margin-top:12px;">${escapeHtml(subtopic)}</h2>
+        <p style="color:var(--clr-text-dim); line-height:1.8; margin:20px 0; padding:16px 0; border-top:1px solid var(--clr-border-glow); border-bottom:1px solid var(--clr-border-glow);">${escapeHtml(previewData.preview)}</p>
+        <div style="display:flex; justify-content:center;">
+          <a href="/notes/${levelPath}.html?subtopic=${subtopicId}&title=${encodeURIComponent(subtopic)}" class="btn-primary" style="padding:12px 28px; text-decoration:none;">Read Full Note →</a>
         </div>
-        <div id="note-rendered-content">${data?.content || '<p>No content available for this note.</p>'}</div>
-        <div class="notes-reaction-bar" data-note-id="${subtopicId}" style="display:flex; gap:16px; margin-top:24px; padding-top:20px; border-top:2px solid var(--clr-border-glow);">
-          <button class="reaction-btn" data-reaction="like" onclick="toggleNoteReaction('${subtopicId}', 'like')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count">0</span></button>
-          <button class="reaction-btn" data-reaction="love" onclick="toggleNoteReaction('${subtopicId}', 'love')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-heart"></i> <span class="reaction-count">0</span></button>
-          <button class="reaction-btn" data-reaction="helpful" onclick="toggleNoteReaction('${subtopicId}', 'helpful')" style="background:none; border:none; font-size:1.2rem; cursor:pointer; padding:8px 16px; border-radius:40px; display:flex; align-items:center; gap:8px; color:var(--clr-text-dim);"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count">0</span></button>
-        </div>
-        <div class="comment-section" style="margin-top:20px;">
-          <div class="comment-input-group" style="display:flex; gap:8px; margin-bottom:16px;">
-            <input type="text" id="comment-input-${subtopicId}" placeholder="Add a comment or question..." style="flex:1; padding:10px 16px; border-radius:30px; border:1px solid var(--clr-border-glow); background:var(--clr-navy-card); color:var(--clr-white);">
-            <button class="btn-primary" onclick="submitNoteComment('${subtopicId}')" style="padding:8px 20px;">Post</button>
-          </div>
-          <div class="comment-list" id="comments-${subtopicId}" style="max-height:200px; overflow-y:auto;"></div>
-        </div>
+        <p style="text-align:center; font-size:0.7rem; color:var(--clr-text-muted); margin-top:16px;">${previewData.read_time || '5'} min read · Sign in for full content</p>
       </div>
     `;
-    container.innerHTML = contentHtml;
-    await loadNoteReactions(subtopicId);
-    await loadNoteComments(subtopicId);
+    
     if (notesFullscreenActive) {
       const fullscreenContainer = document.querySelector('.notes-fullscreen #notes-container');
       if (fullscreenContainer) fullscreenContainer.scrollTop = 0;
@@ -6016,11 +6019,10 @@ async function loadNoteContentDirect(subtopicId, level, topic, subtopic) {
       document.getElementById('notes-container').scrollTop = 0;
     }
   } catch (err) {
-    console.error('Failed to load note content:', err);
-    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load note content. Please try again.</div>';
+    console.error('Failed to load preview:', err);
+    container.innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);"><i class="fa-solid fa-exclamation-triangle"></i> Failed to load preview. Please try again.</div>';
   }
 }
-
 async function loadNoteReactions(noteId) {
   try {
     const data = await apiCall('get_note_reactions', { note_id: noteId });
