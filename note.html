@@ -88,11 +88,13 @@ body {
   font-weight: 800;
   margin-bottom: 16px;
 }
-.note-content {
+ .note-content {
   background: var(--clr-navy-card);
   border-radius: 24px;
   padding: 48px;
   border: 1px solid var(--clr-border-glow);
+  font-size: 0.95rem;
+  line-height: 1.7;
 }
 .note-content h1, .note-content h2, .note-content h3 {
   font-family: 'Poppins', sans-serif;
@@ -103,6 +105,12 @@ body {
 .note-content h3 { font-size: 1.2rem; color: var(--clr-magenta); }
 .note-content p { margin-bottom: 20px; color: var(--clr-text-dim); line-height: 1.8; }
 .note-content ul, .note-content ol { margin: 16px 0 16px 32px; }
+@media (max-width: 768px) {
+  .note-content { padding: 20px; font-size: 0.85rem; }
+  .note-content h1 { font-size: 1.4rem; }
+  .note-content h2 { font-size: 1.2rem; }
+  .note-content h3 { font-size: 1rem; }
+}
 .reaction-bar {
   display: flex;
   gap: 20px;
@@ -282,31 +290,33 @@ async function loadNote() {
     const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
     const levelPath = { 'O-Level': 'olevel', 'A-Level': 'alevel', 'Pharmacy': 'pharmacy' };
     
-    app.innerHTML = `
-      <div class="note-container">
-        <div class="note-header">
-          <div class="level-badge"><i class="fa-solid ${levelIcon[currentLevel]}"></i> ${levelDisplay[currentLevel]}</div>
-          <h1 class="note-title">${esc(note.title || noteTitle)}</h1>
-        </div>
-        <div class="note-content">
-          ${note.content || '<p>No content available for this note.</p>'}
-          <div class="reaction-bar" data-note-id="${noteId}">
-            <button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button>
-            <button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button>
-            <button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction('${noteId}', 'helpful')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count helpful-count">0</span></button>
-          </div>
-          <div class="comment-section">
-            <div class="comment-input-group">
-              <input type="text" id="comment-input" placeholder="Add a comment or question...">
-              <button class="comment-submit" onclick="submitComment()">Post</button>
-            </div>
-            <div class="comments-list" id="comments-list"></div>
-          </div>
-          <a href="${backLinkUrl}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
-          <a href="/" class="back-link" style="margin-left:12px;"><i class="fa-solid fa-home"></i> Homepage</a>
-        </div>
+     app.innerHTML = `
+  <div class="note-container">
+    <a href="/" style="position:fixed; top:80px; right:20px; background:var(--clr-cyan); color:#fff; width:40px; height:40px; border-radius:50%; display:flex; align-items:center; justify-content:center; text-decoration:none; box-shadow:0 2px 10px rgba(0,0,0,0.2); z-index:99;"><i class="fa-solid fa-home"></i></a>
+    <div class="note-header">
+      <div class="level-badge"><i class="fa-solid ${levelIcon[currentLevel]}"></i> ${levelDisplay[currentLevel]}</div>
+      <h1 class="note-title">${esc(note.title || noteTitle)}</h1>
+    </div>
+    <div class="note-content">
+      ${note.content || '<p>No content available for this note.</p>'}
+      <div class="reaction-bar" data-note-id="${noteId}">
+        <button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button>
+        <button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button>
+        <button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction('${noteId}', 'helpful')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count helpful-count">0</span></button>
       </div>
-    `;
+      <div class="comment-section">
+        <div class="comment-input-group">
+          <input type="text" id="comment-input" placeholder="Add a comment or question...">
+          <button class="comment-submit" onclick="submitComment()">Post</button>
+        </div>
+        <div class="comments-list" id="comments-list"></div>
+      </div>
+      <div style="margin-top:30px;">
+        <a href="${backLinkUrl}" class="back-link" onclick="sessionStorage.setItem('fromNote', 'true')" style="display:inline-flex; align-items:center; gap:8px; background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:10px 20px; border-radius:50px; text-decoration:none; font-weight:600; transition:all 0.2s;"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
+      </div>
+    </div>
+  </div>
+`;
     await loadReactions();
     await loadComments();
   } catch (err) {
