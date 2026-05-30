@@ -597,8 +597,8 @@ function renderNotes(notes) {
         <h3 class="note-title">${esc(note.title)}</h3>
         <p class="note-preview">${esc(note.preview || (note.content ? note.content.substring(0, 120) + '...' : 'No preview available'))}</p>
         <div class="note-meta">
-          <span><i class="fa-regular fa-clock"></i> ${note.read_time || (note.content ? Math.max(1, Math.ceil(note.content.replace(/<[^>]*>/g,'').split(/\s+/).length / 200)) + ' min read' : '5 min read')}</span>
-          <span><i class="fa-regular fa-file-lines"></i> ${note.word_count ? Math.round(note.word_count / 100) * 100 : (note.content ? Math.round(note.content.replace(/<[^>]*>/g,'').split(/\s+/).length / 100) * 100 : 800)} words</span>
+          <span><i class="fa-regular fa-clock"></i> ${note.read_time || '5 min read'}</span>
+          <span><i class="fa-regular fa-file-lines"></i> ${note.word_count ? Math.round(note.word_count / 100) * 100 : '~800'} words</span>
         </div>
         <button class="read-more-btn" onclick="onNoteCardClick('${note.id}', '${esc(note.title).replace(/'/g, "\\'")}')">
           <i class="fa-solid fa-book-open-reader"></i> Read Full Note
@@ -608,35 +608,18 @@ function renderNotes(notes) {
   `).join('');
   
   if (targetSubtopicId) {
-    // Use requestAnimationFrame to ensure DOM is painted before scrolling
-    requestAnimationFrame(() => {
-      const targetElement = document.querySelector(\`.note-card[data-note-id="${targetSubtopicId}"]\`);
-      if (targetElement) {
-        targetElement.classList.add('highlight');
-        // Small delay so the grid is fully visible before scrolling
-        setTimeout(() => {
-          targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
-        }, 100);
-        showPreparingMessage(targetSubtopicTitle || targetElement.dataset.noteTitle || '');
-        if (redirectTimeout) clearTimeout(redirectTimeout);
-        redirectTimeout = setTimeout(() => {
-          const note = notes.find(n => String(n.id) === String(targetSubtopicId));
-          if (note) goToNoteViewer(note.id, note.title);
-          else {
-            // Fallback: redirect using the URL params directly
-            goToNoteViewer(targetSubtopicId, targetSubtopicTitle);
-          }
-        }, 6000);
-      } else {
-        // Note card not found - still redirect if we have a targetSubtopicId
-        // This handles the case where the note exists but wasn't in the filtered list
-        showPreparingMessage(targetSubtopicTitle);
-        if (redirectTimeout) clearTimeout(redirectTimeout);
-        redirectTimeout = setTimeout(() => {
-          goToNoteViewer(targetSubtopicId, targetSubtopicTitle);
-        }, 6000);
-      }
-    });
+    const targetElement = document.querySelector(`.note-card[data-note-id="${targetSubtopicId}"]`);
+    if (targetElement) {
+      targetElement.classList.add('highlight');
+      targetElement.scrollIntoView({ behavior: 'smooth', block: 'center' });
+      showPreparingMessage(targetSubtopicTitle);
+      if (redirectTimeout) clearTimeout(redirectTimeout);
+      redirectTimeout = setTimeout(() => {
+        const note = notes.find(n => String(n.id) === String(targetSubtopicId));
+        if (note) goToNoteViewer(note.id, note.title);
+        else hidePreparingMessage();
+      }, 6000);
+    }
   }
 }
 
@@ -651,10 +634,7 @@ async function loadNotes() {
     if (skeleton) skeleton.style.display = 'none';
     if (container) {
       container.style.display = 'grid';
-      // Ensure container is visible/painted before renderNotes tries to scroll
-      requestAnimationFrame(() => {
-        renderNotes(allNotes);
-      });
+      renderNotes(allNotes);
     }
   } catch (err) {
     console.error('Failed to load notes:', err);

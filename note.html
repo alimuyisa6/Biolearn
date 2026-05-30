@@ -226,20 +226,11 @@ const returnSubtopic = urlParams.get('return_subtopic');
 const returnTitle = urlParams.get('return_title');
 currentLevel = level;
 
-// Build the back link URL
-// Priority: explicit return_to params > infer from level > homepage
 let backLinkUrl = '/';
-const levelToPage = { 'O-Level': 'olevel', 'A-Level': 'alevel', 'Pharmacy': 'pharmacy' };
-
 if (returnTo && returnSubtopic) {
-  // Explicit return params (coming from level page)
   if (returnTo === 'olevel') backLinkUrl = `/olevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
   else if (returnTo === 'alevel') backLinkUrl = `/alevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
   else if (returnTo === 'pharmacy') backLinkUrl = `/pharmacy.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
-} else if (level && noteId && levelToPage[level]) {
-  // Infer return URL from level + noteId (handles coming from homepage or direct links)
-  const pageName = levelToPage[level];
-  backLinkUrl = `/${pageName}.html?subtopic=${noteId}&title=${encodeURIComponent(noteTitle || '')}`;
 }
 
 function esc(str) {
