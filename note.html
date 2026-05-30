@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
 <meta charset="UTF-8">
@@ -181,6 +181,7 @@ body {
   border: 2px solid var(--clr-cyan);
 }
 .auth-wall i { font-size: 4rem; color: var(--clr-cyan); margin-bottom: 20px; }
+.auth-wall h2 { font-family: 'Poppins', sans-serif; margin-bottom: 12px; }
 .auth-buttons { display: flex; gap: 16px; justify-content: center; margin-top: 24px; }
 .signin-btn, .signup-btn {
   padding: 12px 28px;
@@ -220,7 +221,17 @@ const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('id');
 const level = urlParams.get('level') || 'O-Level';
 const noteTitle = urlParams.get('title') || 'Study Note';
+const returnTo = urlParams.get('return_to');
+const returnSubtopic = urlParams.get('return_subtopic');
+const returnTitle = urlParams.get('return_title');
 currentLevel = level;
+
+let backLinkUrl = '/';
+if (returnTo && returnSubtopic) {
+  if (returnTo === 'olevel') backLinkUrl = `/olevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
+  else if (returnTo === 'alevel') backLinkUrl = `/alevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
+  else if (returnTo === 'pharmacy') backLinkUrl = `/pharmacy.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
+}
 
 function esc(str) {
   if (!str) return '';
@@ -291,14 +302,15 @@ async function loadNote() {
             </div>
             <div class="comments-list" id="comments-list"></div>
           </div>
-          <a href="/notes/${levelPath[currentLevel]}.html" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
+          <a href="${backLinkUrl}" class="back-link"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
+          <a href="/" class="back-link" style="margin-left:12px;"><i class="fa-solid fa-home"></i> Homepage</a>
         </div>
       </div>
     `;
     await loadReactions();
     await loadComments();
   } catch (err) {
-    app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="/notes/${currentLevel.toLowerCase().replace('-', '')}.html" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
+    app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="/${backLinkUrl !== '/' ? backLinkUrl : ''}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
   }
 }
 
