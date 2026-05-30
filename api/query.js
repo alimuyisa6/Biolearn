@@ -984,7 +984,7 @@ async function handlePost(req, res) {
         else { result = { user: null }; }
         break;
       }
-        case 'signin': {
+ case 'signin': {
   if(!rateLimit(ip,'signin'))return res.status(429).json({error:'Please wait a moment.'});
   const userEmail = (email || '').trim().toLowerCase();
   const userPassword = password || '';
@@ -993,19 +993,19 @@ async function handlePost(req, res) {
   if(signinErr){const banned=trackFailedAuth(ip,userEmail);if(banned)return res.status(429).json({error:'Too many failed attempts. Account locked for 15 minutes.'});throw signinErr;}
   resetFailedAuth(ip,userEmail);
   
-   const { data: restriction } = await supabase
-  .from('user_restrictions')
-  .select('restriction_type, lock_reason, expires_at')
-  .eq('user_id', userId)
-  .maybeSingle();
+  const { data: restriction } = await supabase
+    .from('user_restrictions')
+    .select('restriction_type, lock_reason, expires_at')
+    .eq('user_id', data.user.id)
+    .maybeSingle();
   
   if (restriction) {
     if (restriction.restriction_type === 'disabled') {
-      try { await supabase.auth.admin.updateUserById(userId, { ban_duration: '1000y' }); } catch(e) {}
+      try { await supabase.auth.admin.updateUserById(data.user.id, { ban_duration: '1000y' }); } catch(e) {}
       return res.status(403).json({ error: 'Your account has been permanently disabled. Contact support.' });
     }
     if (restriction.restriction_type === 'suspended') {
-      try { await supabase.auth.admin.updateUserById(userId, { ban_duration: '1000y' }); } catch(e) {}
+      try { await supabase.auth.admin.updateUserById(data.user.id, { ban_duration: '1000y' }); } catch(e) {}
       return res.status(403).json({ error: restriction.lock_reason || 'Your account has been suspended. Contact support.' });
     }
     if (restriction.restriction_type === 'locked') {
@@ -1013,7 +1013,7 @@ async function handlePost(req, res) {
         const hoursLeft = Math.ceil((new Date(restriction.expires_at) - new Date()) / (1000 * 60 * 60));
         return res.status(403).json({ error: `Your account is locked. Try again in ${hoursLeft} hours.` });
       } else {
-        await supabase.from('user_restrictions').delete().eq('user_id', userId);
+        await supabase.from('user_restrictions').delete().eq('user_id', data.user.id);
       }
     }
   }
@@ -2130,9 +2130,14 @@ async function handlePost(req, res) {
         result = { counts: reactionCounts, user_reaction: userReaction, total: (data || []).length };
         break;
       }
- case 'save_reading_progress': {
+  case 'save_reading_progress': {
   if (!userId) return res.status(401).json({ error: 'Authentication required' });
   const { note_id, scroll_percentage, scroll_position, time_spent, completed } = req.body;
+  
+  const numericNoteId = parseInt(note_id, 10);
+  if (isNaN(numericNoteId)) {
+    return res.status(400).json({ error: 'Invalid note_id: must be a number' });
+  }
   
   const { data: existing } = await supabase
     .from('user_interactions')
@@ -2164,7 +2169,7 @@ async function handlePost(req, res) {
       .insert({
         user_id: userId,
         interaction_type: 'reading_progress',
-        resource_id: 0,
+        resource_id: numericNoteId,
         value: scroll_percentage,
         metadata: {
           note_id: note_id,
@@ -2177,8 +2182,8 @@ async function handlePost(req, res) {
   }
   result = { success: true };
   break;
-}
-     case 'get_reading_progress': {
+  }
+ case 'get_reading_progress': {
   if (!userId) {
     result = null;
     break;
@@ -2202,7 +2207,7 @@ async function handlePost(req, res) {
     time_spent: data.metadata?.time_spent || 0
   } : null;
   break;
-} 
+ }
 
 case 'get_continue_reading': {
   if (!userId) {
