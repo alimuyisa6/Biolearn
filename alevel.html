@@ -397,12 +397,57 @@ body {
   box-shadow: 0 25px 50px rgba(0,0,0,0.3);
   animation: pulse 1.5s infinite;
 }
-.preparing-spinner {
+ .preparing-spinner {
   display: flex;
   justify-content: center;
   align-items: center;
+  gap: 12px;
   margin-bottom: 28px;
+  min-height: 120px;
+  position: relative;
 }
+.fountain-logo {
+  width: 45px;
+  height: 45px;
+  object-fit: contain;
+  animation: fountainBurst 1.5s ease-in-out infinite;
+  opacity: 0;
+  position: relative;
+}
+.fountain-logo[data-pos="0"] { animation-delay: 0s; }
+.fountain-logo[data-pos="1"] { animation-delay: 0.1s; }
+.fountain-logo[data-pos="2"] { animation-delay: 0.2s; }
+.fountain-logo[data-pos="3"] { animation-delay: 0.3s; }
+.fountain-logo[data-pos="4"] { animation-delay: 0.4s; }
+.fountain-logo[data-pos="5"] { animation-delay: 0.5s; }
+
+@keyframes fountainBurst {
+  0% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+  20% {
+    transform: translateY(-60px) translateX(calc(var(--x-offset, 0) * 1px)) rotate(calc(var(--rot, 0) * 1deg)) scale(1.2);
+    opacity: 0.9;
+  }
+  40% {
+    transform: translateY(-100px) translateX(calc(var(--x-offset, 0) * 2px)) rotate(calc(var(--rot, 0) * 2deg)) scale(0.7);
+    opacity: 0.5;
+  }
+  60% {
+    transform: translateY(-60px) translateX(calc(var(--x-offset, 0) * 1px)) rotate(calc(var(--rot, 0) * 1deg)) scale(0.9);
+    opacity: 0.7;
+  }
+  80% {
+    transform: translateY(-20px) translateX(0) rotate(0deg) scale(1.1);
+    opacity: 0.9;
+  }
+  100% {
+    transform: translateY(0) translateX(0) rotate(0deg) scale(1);
+    opacity: 1;
+  }
+}
+
 .spinner-logo {
   width: 120px;
   height: 120px;
@@ -421,11 +466,7 @@ body {
 .back-buttons-container .back-link { margin-top: 0; }
 @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
 @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.01); } }
-@keyframes spinPulse {
-  0% { transform: rotate(0deg) scale(0.95); opacity: 0.7; }
-  50% { transform: rotate(180deg) scale(1.15); opacity: 1; }
-  100% { transform: rotate(360deg) scale(0.95); opacity: 0.7; }
-}
+ 
  @media (max-width: 768px) {
   .main-nav { display: none; }
   .mobile-toggle { display: block; }
@@ -584,7 +625,7 @@ function onNoteCardClick(noteId, title) {
   }, 6000);
 }
 
-function showPreparingMessage(title) {
+ function showPreparingMessage(title) {
   const existing = document.querySelector('.preparing-message');
   if (existing) existing.remove();
   
@@ -594,8 +635,13 @@ function showPreparingMessage(title) {
   overlay.className = 'preparing-message';
   overlay.innerHTML = `
     <div class="content">
-      <div class="preparing-spinner">
-        <img src="${logoUrl}" alt="AliverBiopharm" class="spinner-logo">
+      <div class="preparing-spinner" id="fountain-container">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="0">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="1">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="2">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="3">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="4">
+        <img src="${logoUrl}" class="fountain-logo" data-pos="5">
       </div>
       <h3>Preparing Your Lesson</h3>
       <p>Loading "<span class="preparing-title">${esc(title || 'your note')}</span>"</p>
@@ -604,6 +650,14 @@ function showPreparingMessage(title) {
     </div>
   `;
   document.body.appendChild(overlay);
+  
+  const logos = document.querySelectorAll('.fountain-logo');
+  logos.forEach((logo, i) => {
+    const xOffset = (i - 2.5) * 15;
+    const rotation = (i - 2.5) * 20;
+    logo.style.setProperty('--x-offset', xOffset);
+    logo.style.setProperty('--rot', rotation);
+  });
   
   const progressBar = document.querySelector('.preparing-progress .progress-bar');
   if (progressBar) {
