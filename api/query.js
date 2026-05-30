@@ -101,7 +101,8 @@ const ACTION_WHITELIST = new Set([
   'get_pdfs_by_level', 'check_pdf_restriction', 'track_pdf_preview', 'track_pdf_download',
    'get_notes_structure', 'get_note_content', 'get_note_preview', 'toggle_note_reaction', 'get_note_reactions',
  'update_user_restriction',
-  'get_notes_by_level'
+  'get_notes_by_level',
+'save_reading_progress', 'get_reading_progress', 'get_continue_reading'
 ]);
 
 const PUBLIC_ACTIONS = new Set([
@@ -148,7 +149,8 @@ const CSRF_PROTECTED_ACTIONS = new Set([
   'track_pdf_preview', 'track_pdf_download',
   'get_notes_structure', 'get_note_content', 'toggle_note_reaction', 'get_note_reactions',
   'update_user_restriction',
-  'get_notes_by_level'
+  'get_notes_by_level',
+'save_reading_progress'
 ]);
 
 const ADMIN_ACTIONS = new Set([
@@ -538,7 +540,20 @@ const VALIDATORS = {
   get_notes_structure: (body) => { return null; },
    get_note_preview: (body) => { if (!body.subtopic_id) return 'subtopic_id required'; return null; },
   toggle_note_reaction: (body) => { if (!body.note_id) return 'note_id required'; if (!body.reaction_type) return 'reaction_type required'; return null; },
-  get_note_reactions: (body) => { if (!body.note_id) return 'note_id required'; return null; }
+  get_note_reactions: (body) => { if (!body.note_id) return 'note_id required'; return null; },
+save_reading_progress: (body) => {
+  if (!body.note_id) return 'note_id required';
+  if (typeof body.scroll_percentage !== 'number') return 'scroll_percentage required';
+  if (body.scroll_percentage < 0 || body.scroll_percentage > 100) return 'scroll_percentage must be between 0 and 100';
+  return null;
+},
+get_reading_progress: (body) => {
+  if (!body.note_id) return 'note_id required';
+  return null;
+},
+get_continue_reading: (body) => {
+  return null;
+}
 };
 
 setInterval(() => {
@@ -2115,7 +2130,110 @@ async function handlePost(req, res) {
         result = { counts: reactionCounts, user_reaction: userReaction, total: (data || []).length };
         break;
       }
-      default: throw new Error('Unknown action: ' + action);
+      case 'save_reading_progress':
+  if (!userId) return res.status(401).json({ error: 'Authentication required' });
+  const { note_id, scroll_percentage, scroll_position, time_spent, completed } = req.body;
+  const { data: existing } = await supabase
+    .from('user_interactions')
+    .select('id, metadata, value')
+    .eq('user_id', userId)
+    .eq('resource_id', note_id)
+    .eq('interaction_type', 'reading_progress')
+    .maybeSingle();
+  if (existing) {
+    const currentTimeSpent = (existing.metadata?.time_spent || 0) + (time_spent || 0);
+    await supabase
+      .from('user_interactions')
+      .update({
+        value: scroll_percentage,
+        metadata: {
+          scroll_position: scroll_position || existing.metadata?.scroll_position || 0,
+          time_spent: currentTimeSpent,
+          completed: completed || false,
+          last_updated: new Date().toISOString()
+        },
+        created_at: new Date().toISOString()
+      })
+      .eq('id', existing.id);
+  } else {
+    await supabase
+      .from('user_interactions')
+      .insert({
+        user_id: userId,
+        interaction_type: 'reading_progress',
+        resource_id: note_id,
+        value: scroll_percentage,
+        metadata: {
+          scroll_position: scroll_position || 0,
+          time_spent: time_spent || 0,
+          completed: completed || false,
+          started_at: new Date().toISOString()
+        }
+      });
+  }
+  result = { success: true };
+  break;
+
+case 'get_reading_progress':
+  if (!userId) {
+    result = null;
+    break;
+  }
+  const { note_id } = req.body;
+  const { data, error } = await supabase
+    .from('user_interactions')
+    .select('value, metadata, created_at')
+    .eq('user_id', userId)
+    .eq('resource_id', note_id)
+    .eq('interaction_type', 'reading_progress')
+    .maybeSingle();
+  if (error) throw error;
+  result = data ? {
+    scroll_percentage: data.value || 0,
+    scroll_position: data.metadata?.scroll_position || 0,
+    completed: data.metadata?.completed || false,
+    last_accessed: data.created_at,
+    time_spent: data.metadata?.time_spent || 0
+  } : null;
+  break;
+
+case 'get_continue_reading':
+  if (!userId) {
+    result = [];
+    break;
+  }
+  const { limit = 10 } = req.body;
+  const { data, error } = await supabase
+    .from('user_interactions')
+    .select('resource_id, value, metadata, created_at')
+    .eq('user_id', userId)
+    .eq('interaction_type', 'reading_progress')
+    .neq('value', 100)
+    .gt('value', 5)
+    .order('created_at', { ascending: false })
+    .limit(limit);
+  if (error) throw error;
+  const notes = [];
+  for (const item of (data || [])) {
+    const { data: noteData } = await supabase
+      .from('notes_structure')
+      .select('subtopic_name, topic, level')
+      .eq('subtopic_id', item.resource_id)
+      .maybeSingle();
+    if (noteData) {
+      notes.push({
+        note_id: item.resource_id,
+        title: noteData.subtopic_name,
+        topic: noteData.topic,
+        level: noteData.level,
+        progress_percentage: item.value,
+        last_accessed: item.created_at
+      });
+    }
+  }
+  result = notes;
+  break;
+     default: throw new Error('Unknown action: ' + action);
     }
     responseCache.delete('all_sections'); responseCache.delete('stats');
     return res.status(200).json({ data: result });
