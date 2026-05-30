@@ -2130,21 +2130,18 @@ async function handlePost(req, res) {
         result = { counts: reactionCounts, user_reaction: userReaction, total: (data || []).length };
         break;
       }
- 
-     case 'save_reading_progress': {
+ case 'save_reading_progress': {
   if (!userId) return res.status(401).json({ error: 'Authentication required' });
   const { note_id, scroll_percentage, scroll_position, time_spent, completed } = req.body;
-  const numericNoteId = parseInt(note_id, 10);
-  if (isNaN(numericNoteId)) {
-    return res.status(400).json({ error: 'Invalid note_id: must be a number' });
-  }
+  
   const { data: existing } = await supabase
     .from('user_interactions')
     .select('id, metadata, value')
     .eq('user_id', userId)
-    .eq('resource_id', numericNoteId)
     .eq('interaction_type', 'reading_progress')
+    .filter('metadata->>note_id', 'eq', note_id)
     .maybeSingle();
+  
   if (existing) {
     const currentTimeSpent = (existing.metadata?.time_spent || 0) + (time_spent || 0);
     await supabase
@@ -2152,6 +2149,7 @@ async function handlePost(req, res) {
       .update({
         value: scroll_percentage,
         metadata: {
+          note_id: note_id,
           scroll_position: scroll_position || existing.metadata?.scroll_position || 0,
           time_spent: currentTimeSpent,
           completed: completed || false,
@@ -2166,9 +2164,10 @@ async function handlePost(req, res) {
       .insert({
         user_id: userId,
         interaction_type: 'reading_progress',
-        resource_id: numericNoteId,
+        resource_id: 0,
         value: scroll_percentage,
         metadata: {
+          note_id: note_id,
           scroll_position: scroll_position || 0,
           time_spent: time_spent || 0,
           completed: completed || false,
@@ -2179,25 +2178,21 @@ async function handlePost(req, res) {
   result = { success: true };
   break;
 }
-
- case 'get_reading_progress': {
+     case 'get_reading_progress': {
   if (!userId) {
     result = null;
     break;
   }
   const { note_id } = req.body;
-  const numericNoteId = parseInt(note_id, 10);
-  if (isNaN(numericNoteId)) {
-    result = null;
-    break;
-  }
+  
   const { data, error } = await supabase
     .from('user_interactions')
     .select('value, metadata, created_at')
     .eq('user_id', userId)
-    .eq('resource_id', numericNoteId)
     .eq('interaction_type', 'reading_progress')
+    .filter('metadata->>note_id', 'eq', note_id)
     .maybeSingle();
+  
   if (error) throw error;
   result = data ? {
     scroll_percentage: data.value || 0,
@@ -2207,7 +2202,7 @@ async function handlePost(req, res) {
     time_spent: data.metadata?.time_spent || 0
   } : null;
   break;
-}
+} 
 
 case 'get_continue_reading': {
   if (!userId) {
