@@ -3,7 +3,7 @@
 <head>
 <meta charset="UTF-8">
 <meta name="viewport" content="width=device-width,initial-scale=1,viewport-fit=cover">
-<title id="page-title">Loading Note... | AliverBiopharm</title>
+<title id="page-title">AliverBiopharm | Secure Study Notes</title>
 <meta name="description" id="meta-description" content="Expert-written study notes for biology and pharmacy students.">
 <meta name="robots" content="index, follow">
 <link rel="canonical" id="canonical-url" href="https://aliverbiopharm.com/">
@@ -31,11 +31,15 @@
   --gradient-magenta: linear-gradient(135deg, #b8873a, #c28b2c);
 }
 * { margin: 0; padding: 0; box-sizing: border-box; }
+html, body { min-height: 100vh; }
 body {
   background: var(--clr-deep-space);
   color: var(--clr-white);
   font-family: 'Inter', sans-serif;
   line-height: 1.7;
+  display: flex;
+  flex-direction: column;
+  min-height: 100vh;
 }
 .site-header {
   position: fixed; top: 0; left: 0; right: 0;
@@ -78,9 +82,6 @@ body {
   transition: color 0.2s;
 }
 .main-nav a:hover { color: var(--clr-magenta); }
-
-svg { flex-shrink: 0; vertical-align: middle; }
-
 .progress-fixed-container {
   position: fixed;
   top: 65px;
@@ -153,8 +154,9 @@ svg { flex-shrink: 0; vertical-align: middle; }
 }
 .note-container {
   max-width: var(--max-width);
-  margin: 0 auto;
-  padding: 110px 24px 60px;
+  margin: 110px auto 0 auto;
+  padding: 0 24px 60px;
+  flex: 1;
 }
 .note-header { margin-bottom: 40px; text-align: center; }
 .note-meta-bar {
@@ -215,29 +217,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
   from { opacity: 0; transform: translateY(10px); }
   to { opacity: 1; transform: translateY(0); }
 }
-.daily-fact {
-  background: linear-gradient(135deg, rgba(10, 129, 129, 0.12), rgba(184, 135, 58, 0.08));
-  border-radius: 20px;
-  padding: 16px 24px;
-  margin: 24px 0;
-  display: flex;
-  align-items: center;
-  gap: 16px;
-  border-left: 4px solid var(--clr-magenta);
-}
-.daily-fact-icon {
-  font-size: 2rem;
-  flex-shrink: 0;
-}
-.daily-fact-content p {
-  margin: 0;
-  font-size: 0.9rem;
-  line-height: 1.5;
-}
-.daily-fact-content small {
-  font-size: 0.7rem;
-  color: var(--clr-text-muted);
-}
 .breadcrumbs {
   display: flex;
   align-items: center;
@@ -257,9 +236,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
   text-decoration: underline;
   color: var(--clr-magenta);
 }
-.breadcrumbs svg {
-  opacity: 0.5;
-}
 .level-badge {
   display: inline-flex;
   align-items: center;
@@ -274,7 +250,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
   text-transform: uppercase;
   margin-bottom: 24px;
 }
-.level-badge svg { margin-right: 2px; }
 .note-title {
   font-family: 'Poppins', sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -358,36 +333,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
   transition: all 0.2s;
 }
 .tool-btn:hover { border-color: var(--clr-cyan); color: var(--clr-cyan); }
-.tool-btn svg { margin-right: 2px; }
-.related-notes {
-  margin: 40px 0 20px;
-  padding-top: 30px;
-  border-top: 2px solid var(--clr-border-glow);
-}
-.related-notes h3 {
-  display: flex;
-  align-items: center;
-  gap: 8px;
-  color: var(--clr-cyan);
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-}
-.related-grid {
-  display: grid;
-  grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
-  gap: 16px;
-}
-.related-card {
-  background: var(--clr-navy-light);
-  padding: 16px;
-  border-radius: 12px;
-  text-decoration: none;
-  transition: all 0.2s;
-  border: 1px solid transparent;
-}
-.related-card:hover { border-color: var(--clr-magenta); transform: translateY(-3px); }
-.related-card strong { color: var(--clr-white); font-size: 0.9rem; }
-.related-card p { font-size: 0.7rem; color: var(--clr-text-muted); margin-top: 6px; }
 .reaction-bar {
   display: flex;
   gap: 12px;
@@ -408,9 +353,7 @@ svg { flex-shrink: 0; vertical-align: middle; }
   color: var(--clr-text-dim);
   transition: all 0.2s;
 }
-.reaction-btn:hover { border-color: var(--clr-cyan); transform: translateY(-2px); }
 .reaction-btn.active { background: var(--gradient-cyan); border-color: transparent; color: #fff; }
-.reaction-btn svg { margin-right: 2px; }
 .comment-section { margin-top: 20px; width: 100%; overflow-x: hidden; }
 .comment-input-group {
   display: flex;
@@ -442,7 +385,6 @@ svg { flex-shrink: 0; vertical-align: middle; }
   white-space: nowrap;
   transition: opacity 0.2s;
 }
-.comment-submit:hover { opacity: 0.9; }
 .comments-list { max-height: 300px; overflow-y: auto; }
 .comment-item {
   padding: 12px 0;
@@ -467,10 +409,17 @@ svg { flex-shrink: 0; vertical-align: middle; }
   transition: all 0.2s;
 }
 .back-link:hover { background: var(--clr-cyan); color: #fff; }
-.back-link svg { margin-right: 2px; }
+.loading-spinner-container {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  min-height: 400px;
+  flex: 1;
+  width: 100%;
+}
 .loading-spinner {
   text-align: center;
-  padding: 80px;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -484,19 +433,31 @@ svg { flex-shrink: 0; vertical-align: middle; }
 @keyframes spin {
   to { transform: rotate(360deg); }
 }
+.footer {
+  background: transparent;
+  border-top: 1px solid var(--clr-border-glow);
+  margin-top: auto;
+}
+.footer-content {
+  max-width: 1200px;
+  margin: 0 auto;
+  padding: 40px 24px 24px;
+}
+.footer-inner {
+  display: flex;
+  justify-content: space-between;
+  flex-wrap: wrap;
+  gap: 16px;
+  font-size: 0.75rem;
+  color: var(--clr-text-muted);
+}
 @media (max-width: 768px) {
   .note-content { padding: 24px; }
   .main-nav { display: none; }
-  .note-container { padding: 110px 16px 40px; }
+  .note-container { padding: 0 16px 40px; }
   .comment-input-group { gap: 8px; }
   .comment-submit { padding: 0 16px; font-size: 0.85rem; }
-  .reaction-btn { padding: 5px 12px; font-size: 0.8rem; }
   .resume-prompt { bottom: 20px; right: 20px; padding: 8px 16px; font-size: 0.75rem; }
-  .progress-fixed-container { padding: 8px 16px 0 16px; }
-  .progress-container { height: 10px; }
-  .note-meta-bar { gap: 8px; }
-  .toolbar { justify-content: center; }
-  .daily-fact { flex-direction: column; text-align: center; }
 }
 </style>
 </head>
@@ -507,388 +468,324 @@ svg { flex-shrink: 0; vertical-align: middle; }
     <nav><ul class="main-nav" id="main-nav"></ul></nav>
   </div>
 </header>
-
 <div class="progress-fixed-container">
   <div class="progress-wrapper">
-    <div class="progress-container">
-      <div class="progress-bar-fill" id="progress-bar-fill"></div>
-    </div>
+    <div class="progress-container"><div class="progress-bar-fill" id="progress-bar-fill"></div></div>
     <div class="progress-percentage" id="progress-percentage">0% read</div>
   </div>
 </div>
-
-<main id="app-content"></main>
-<footer class="footer-fat" id="footer"></footer>
-
+<main id="app-content" style="flex:1; display:flex; flex-direction:column;"></main>
+<footer class="footer" id="footer"></footer>
+<script src="https://cdn.jsdelivr.net/npm/dompurify@3.2.4/dist/purify.min.js"></script>
 <script>
-const API_BASE = '/api/query';
-let currentUser = null;
-let currentLevel = null;
-let maxScrollPercentage = 0;
-let saveTimer = null;
-let currentUtterance = null;
-let completionBadgeShown = false;
+(function(){
+  const ALLOWED_LEVELS = ['O-Level', 'A-Level', 'Pharmacy'];
+  const ALLOWED_RETURN = ['olevel', 'alevel', 'pharmacy'];
+  const API_BASE = '/api/query';
+  let currentUser = null;
+  let currentLevel = 'O-Level';
+  let maxScrollPercentage = 0;
+  let saveTimer = null;
+  let currentUtterance = null;
+  let completionBadgeShown = false;
+  let activeFetchController = null;
 
-const urlParams = new URLSearchParams(window.location.search);
-const noteId = urlParams.get('id');
-const level = urlParams.get('level') || 'O-Level';
-const noteTitle = urlParams.get('title') || 'Study Note';
-const returnTo = urlParams.get('return_to');
-const returnSubtopic = urlParams.get('return_subtopic');
-const returnTitle = urlParams.get('return_title');
-currentLevel = level;
-
-let backLinkUrl = '/';
-if (returnTo && returnSubtopic) {
-  if (returnTo === 'olevel') backLinkUrl = `/olevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
-  else if (returnTo === 'alevel') backLinkUrl = `/alevel.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
-  else if (returnTo === 'pharmacy') backLinkUrl = `/pharmacy.html?subtopic=${returnSubtopic}&title=${encodeURIComponent(returnTitle || '')}`;
-}
-
-function esc(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
-}
-
-function redirectToHomepage() { window.location.href = '/'; }
-
-function getScrollPercent() {
-  const winScroll = window.scrollY || document.documentElement.scrollTop || 0;
-  const height = document.documentElement.scrollHeight - window.innerHeight;
-  if (height <= 0) return 0;
-  let percent = (winScroll / height) * 100;
-  return Math.min(100, Math.max(0, percent));
-}
-
-function updateProgressBar(percentage) {
-  const fill = document.getElementById('progress-bar-fill');
-  const text = document.getElementById('progress-percentage');
-  if (fill) fill.style.width = percentage + '%';
-  if (text) text.innerText = Math.floor(percentage) + '% read';
-  if (!completionBadgeShown && percentage >= 95) {
-    completionBadgeShown = true;
-    const badgeContainer = document.getElementById('completion-badge-container');
-    if (badgeContainer && !badgeContainer.querySelector('.badge-completed')) {
-      badgeContainer.innerHTML = '<div class="badge-completed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Completed! You mastered this note.</div>';
-    }
+  function safeUrl(url) {
+    try {
+      if(!url || typeof url !== 'string') return '/';
+      if(url.startsWith('/')) return url;
+      if(url.startsWith('https://aliverbiopharm.com')) return url;
+      return '/';
+    } catch(e) { return '/'; }
   }
-}
-
-function saveProgressToLocal() {
-  if (maxScrollPercentage >= 10) {
-    localStorage.setItem('progress_' + noteId, maxScrollPercentage);
-    localStorage.setItem('progress_' + noteId + '_time', Date.now());
+  function isSafeHref(url) {
+    if(!url || typeof url !== 'string') return false;
+    const lower = url.toLowerCase();
+    const blocked = ['javascript:', 'vbscript:', 'data:'];
+    return !blocked.some(proto => lower.startsWith(proto));
   }
-}
-
-function loadProgressFromLocal() {
-  const saved = localStorage.getItem('progress_' + noteId);
-  if (saved) {
-    let percentage = parseFloat(saved);
-    percentage = Math.min(100, Math.max(0, percentage));
-    if (percentage > 10 && percentage < 95) {
-      maxScrollPercentage = percentage;
-      updateProgressBar(maxScrollPercentage);
-      showResumePrompt(percentage);
-    } else if (percentage >= 95) {
-      maxScrollPercentage = percentage;
-      updateProgressBar(maxScrollPercentage);
-    }
-    return percentage;
+  function esc(str) {
+    if(!str) return '';
+    return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
   }
-  return 0;
-}
-
-function handleScroll() {
-  let currentPercent = getScrollPercent();
-  currentPercent = Math.min(100, currentPercent);
-  if (currentPercent > maxScrollPercentage) {
-    maxScrollPercentage = currentPercent;
-    updateProgressBar(maxScrollPercentage);
-    if (saveTimer) clearTimeout(saveTimer);
-    saveTimer = setTimeout(() => saveProgressToLocal(), 1000);
+  function validateId(id) {
+    if(!id || typeof id !== 'string') return false;
+    return /^[a-zA-Z0-9_-]+$/.test(id);
   }
-}
-
-function showResumePrompt(savedPercentage) {
-  if (!savedPercentage || savedPercentage <= 10 || savedPercentage >= 95) return;
-  const existing = document.querySelector('.resume-prompt');
-  if (existing) existing.remove();
-  const prompt = document.createElement('div');
-  prompt.className = 'resume-prompt';
-  prompt.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Resume from ${Math.floor(savedPercentage)}%`;
-  prompt.onclick = () => {
+  function redirectToHomepage() { window.location.href = '/'; }
+  function getScrollPercent() {
+    const winScroll = window.scrollY || document.documentElement.scrollTop || 0;
     const height = document.documentElement.scrollHeight - window.innerHeight;
-    window.scrollTo({ top: (savedPercentage / 100) * height, behavior: 'smooth' });
-    prompt.remove();
-  };
-  document.body.appendChild(prompt);
-  setTimeout(() => prompt.remove(), 8000);
-}
-
-async function apiCall(action, params) {
-  try {
-    const res = await fetch(API_BASE, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify({ action, ...params })
-    });
-    const json = await res.json();
-    if (!res.ok) throw new Error(json.error);
-    return json.data !== undefined ? json.data : json;
-  } catch(e) { console.error('API call failed:', e); return null; }
-}
-
-function showContent() {
-  document.getElementById('app-content').innerHTML = `<div class="loading-spinner"><svg class="spinner-svg" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p>Loading note...</p></div>`;
-  loadNote();
-}
-
-function generateTableOfContents(contentHtml) {
-  const headingMatches = contentHtml.match(/<h2[^>]*>.*?<\/h2>/gi);
-  if (!headingMatches || headingMatches.length < 2) return '';
-  let tocHtml = '<div class="table-of-contents"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Contents</h3><ul>';
-  headingMatches.forEach((heading, idx) => {
-    const title = heading.replace(/<[^>]*>/g, '');
-    tocHtml += `<li><a href="#section-${idx}">${esc(title)}</a></li>`;
-  });
-  tocHtml += '</ul></div>';
-  return tocHtml;
-}
-
-function addHeadingIds(contentHtml) {
-  let idx = 0;
-  return contentHtml.replace(/<h2>/gi, () => `<h2 id="section-${idx++}">`);
-}
-
-function extractKeyPoints(contentHtml) {
-  const strongMatches = contentHtml.match(/<strong>([^<]+)<\/strong>/g);
-  if (strongMatches && strongMatches.length >= 3) {
-    let points = '';
-    for (let i = 0; i < Math.min(6, strongMatches.length); i++) {
-      const term = strongMatches[i].replace(/<[^>]*>/g, '');
-      if (term.length > 3 && term.length < 60) points += `<li>${esc(term)}</li>`;
+    if(height <= 0) return 0;
+    return Math.min(100, Math.max(0, (winScroll / height) * 100));
+  }
+  function updateProgressBar(percentage) {
+    const fill = document.getElementById('progress-bar-fill');
+    const text = document.getElementById('progress-percentage');
+    if(fill) fill.style.width = percentage + '%';
+    if(text) text.innerText = Math.floor(percentage) + '% read';
+    if(!completionBadgeShown && percentage >= 95) {
+      completionBadgeShown = true;
+      const badgeContainer = document.getElementById('completion-badge-container');
+      if(badgeContainer && !badgeContainer.querySelector('.badge-completed')) {
+        badgeContainer.innerHTML = '<div class="badge-completed"><svg width="16" height="16" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="20 6 9 17 4 12"/></svg> Completed! You mastered this note.</div>';
+      }
     }
-    if (points) return `<div class="key-points"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> Key Terms to Remember</h3><ul>${points}</ul></div>`;
   }
-  return '';
-}
-
-function calculateReadTime(content) {
-  const words = content.replace(/<[^>]*>/g, '').trim().split(/\s+/).length;
-  return `${Math.max(2, Math.ceil(words / 200))} min read`;
-}
-
-async function getDailyFact(level) {
-  try {
-    const sections = await apiCall('get_all_site_sections');
-    const factsData = sections?.daily_facts || {};
-    const levelFacts = factsData[level] || factsData['default'] || [];
-    if (levelFacts.length === 0) {
-      return { fact: 'Stay curious! Keep exploring science.', source: 'AliverBiopharm' };
+  function saveProgressToLocal() {
+    try {
+      if(maxScrollPercentage >= 10 && noteId) {
+        localStorage.setItem('progress_' + noteId, maxScrollPercentage);
+        localStorage.setItem('progress_' + noteId + '_time', Date.now());
+      }
+    } catch(e) {}
+  }
+  function loadProgressFromLocal() {
+    try {
+      const saved = localStorage.getItem('progress_' + noteId);
+      if(saved) {
+        let percentage = parseFloat(saved);
+        percentage = Math.min(100, Math.max(0, percentage));
+        if(percentage > 10 && percentage < 95) {
+          maxScrollPercentage = percentage;
+          updateProgressBar(maxScrollPercentage);
+          showResumePrompt(percentage);
+        } else if(percentage >= 95) {
+          maxScrollPercentage = percentage;
+          updateProgressBar(maxScrollPercentage);
+        }
+        return percentage;
+      }
+    } catch(e) {}
+    return 0;
+  }
+  function handleScroll() {
+    let currentPercent = getScrollPercent();
+    if(currentPercent > maxScrollPercentage) {
+      maxScrollPercentage = currentPercent;
+      updateProgressBar(maxScrollPercentage);
+      if(saveTimer) clearTimeout(saveTimer);
+      saveTimer = setTimeout(() => saveProgressToLocal(), 1000);
     }
-    const dayIndex = new Date().getDate() % levelFacts.length;
-    return levelFacts[dayIndex];
-  } catch(e) {
-    console.error('Failed to load daily fact:', e);
-    return { fact: 'Science is fascinating! Keep learning.', source: 'AliverBiopharm' };
   }
-}
-
-function toggleTextSize(size) {
-  const wrapper = document.querySelector('.note-content-wrapper');
-  if (wrapper) {
-    wrapper.classList.remove('small', 'medium', 'large');
-    wrapper.classList.add(size);
-    localStorage.setItem('note_text_size', size);
-  }
-}
-
-function speakNote() {
-  if (currentUtterance) window.speechSynthesis.cancel();
-  const textElem = document.querySelector('.note-content-wrapper');
-  if (!textElem) return;
-  const rawText = textElem.innerText;
-  if (!rawText) return;
-  currentUtterance = new SpeechSynthesisUtterance(rawText);
-  currentUtterance.rate = 0.9;
-  currentUtterance.pitch = 1.0;
-  currentUtterance.onend = () => { currentUtterance = null; };
-  window.speechSynthesis.speak(currentUtterance);
-}
-
-function stopSpeech() {
-  if (currentUtterance) {
-    window.speechSynthesis.cancel();
-    currentUtterance = null;
-  }
-}
-
-function printNote() {
-  const content = document.querySelector('.note-content-wrapper');
-  if (!content) return;
-  const originalTitle = document.title;
-  const printWindow = window.open('', '_blank');
-  printWindow.document.write(`
-    <html><head><title>${esc(originalTitle)}</title>
-    <style>body { font-family: 'Inter', sans-serif; padding: 40px; max-width: 900px; margin: 0 auto; line-height: 1.6; }
-    h1 { color: #0a7e7e; } h2 { color: #b8873a; } img { max-width: 100%; }</style>
-    </head><body><h1>${esc(document.querySelector('.note-title')?.innerText || '')}</h1>${content.innerHTML}</body></html>
-  `);
-  printWindow.document.close();
-  printWindow.print();
-}
-
- async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
-  console.log('=== RELATED NOTES DEBUG ===');
-  console.log('Current note ID:', currentNoteId);
-  console.log('Current level:', currentLevel);
-  console.log('Current topic from note:', currentTopic);
-  try {
-    const allNotes = await apiCall('get_notes_by_level', { level: currentLevel });
-    console.log('All notes from API (count:', allNotes?.length, '):', allNotes);
-    if (!allNotes || !allNotes.length) return '';
-    const related = allNotes.filter(n => n.id !== currentNoteId && n.topic === currentTopic);
-    console.log('Filtered related notes (same topic):', related);
-    if (related.length === 0) return '';
-    return `<div class="related-notes"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Related Notes</h3><div class="related-grid">` +
-      related.map(n => `<a href="note.html?id=${n.id}&level=${currentLevel}&title=${encodeURIComponent(n.title)}" class="related-card"><strong>${esc(n.title)}</strong><p>${esc(n.preview ? n.preview.substring(0, 80) : 'Click to read')}...</p></a>`).join('') +
-      `</div></div>`;
-  } catch(e) { 
-    console.error('Related notes error:', e);
-    return ''; 
-  }
-}
-
-function updateFavicon(level) {
-  let svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#0a7e7e"/><text x="50" y="68" font-size="48" text-anchor="middle" fill="#b8873a" font-weight="bold">AB</text></svg>';
-  const dataUrl = "data:image/svg+xml," + encodeURIComponent(svg);
-  let link = document.getElementById('dynamic-favicon');
-  if (!link) { link = document.createElement('link'); link.rel = 'icon'; link.type = 'image/svg+xml'; link.id = 'dynamic-favicon'; document.head.appendChild(link); }
-  link.href = dataUrl;
-}
-
-async function loadNote() {
-  const app = document.getElementById('app-content');
-  try {
-    const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
-    document.title = (note.title || noteTitle) + ' | AliverBiopharm ' + currentLevel + ' Notes';
-    updateFavicon(currentLevel);
-    
-    const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
-    const levelIcon = { 'O-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
-      'A-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M20 12L12 20M12 4L4 12M12 4v16M4 12h16"/><circle cx="12" cy="12" r="3"/></svg>',
-      'Pharmacy': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="6" x2="12" y2="14"/><line x1="8" y1="10" x2="16" y2="10"/></svg>'
+  function showResumePrompt(savedPercentage) {
+    if(!savedPercentage || savedPercentage <= 10 || savedPercentage >= 95) return;
+    const existing = document.querySelector('.resume-prompt');
+    if(existing) existing.remove();
+    const prompt = document.createElement('div');
+    prompt.className = 'resume-prompt';
+    prompt.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Resume from ${Math.floor(savedPercentage)}%`;
+    prompt.onclick = () => {
+      const height = document.documentElement.scrollHeight - window.innerHeight;
+      window.scrollTo({ top: (savedPercentage / 100) * height, behavior: 'smooth' });
+      prompt.remove();
     };
-    const readTime = calculateReadTime(note.content || '');
-    const lastUpdated = note.updated_at ? new Date(note.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : new Date().toLocaleDateString();
-    const levelPath = currentLevel === 'Pharmacy' ? 'pharmacy.html' : (currentLevel === 'A-Level' ? 'alevel.html' : 'olevel.html');
-    const dailyFact = await getDailyFact(currentLevel);
-    
-    let processedContent = note.content || '<p>No content available for this note.</p>';
-    const toc = generateTableOfContents(processedContent);
-    const keyPoints = extractKeyPoints(processedContent);
-    processedContent = addHeadingIds(processedContent);
-    const relatedNotes = await loadRelatedNotes(noteId, currentLevel, note.topic || '');
-    const savedTextSize = localStorage.getItem('note_text_size') || 'medium';
-    
-    maxScrollPercentage = 0; completionBadgeShown = false;
-    updateProgressBar(0);
-    
-    app.innerHTML = `<div class="note-container"><div class="note-header"><div class="level-badge">${levelIcon[currentLevel]} ${levelDisplay[currentLevel]}</div>
-      <h1 class="note-title">${esc(note.title || noteTitle)}</h1>
-      <div class="note-meta-bar"><span class="note-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${readTime}</span>
-      <span class="note-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Updated ${lastUpdated}</span></div>
-      <div class="breadcrumbs"><a href="/">Home</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg><a href="/${levelPath}">${currentLevel}</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg><span>${esc(note.title || noteTitle)}</span></div>
-      <div id="completion-badge-container"></div></div>
-      <div class="toolbar"><div class="text-controls"><button class="text-size-btn" onclick="toggleTextSize('small')">A-</button><button class="text-size-btn" onclick="toggleTextSize('medium')">A</button><button class="text-size-btn" onclick="toggleTextSize('large')">A+</button></div>
-      <button class="tool-btn" onclick="speakNote()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen</button>
-      <button class="tool-btn" onclick="stopSpeech()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12"/></svg> Stop</button>
-      <button class="tool-btn" onclick="printNote()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><rect x="4" y="12" width="16" height="10"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/><path d="M8 12h8"/></svg> Print/PDF</button>
-      <button class="tool-btn" id="copy-link-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link</button>
-      <button class="tool-btn" id="share-note-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share</button></div>
-      <div class="daily-fact"><div class="daily-fact-icon">🧠</div><div class="daily-fact-content"><p>${esc(dailyFact.fact)}</p><small>— ${esc(dailyFact.source)}</small></div></div>
-      <div class="note-content-wrapper ${savedTextSize}"><div class="note-content">${toc}${processedContent}${keyPoints}<div class="reaction-bar" data-note-id="${noteId}">
-        <button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> <span class="reaction-count like-count">0</span></button>
-        <button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="reaction-count love-count">0</span></button>
-        <button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction('${noteId}', 'helpful')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> <span class="reaction-count helpful-count">0</span></button></div>
-        <div class="comment-section"><div class="comment-input-group"><input type="text" id="comment-input" placeholder="Add a comment or question..."><button class="comment-submit" onclick="submitComment()">Post</button></div><div class="comments-list" id="comments-list"></div></div>
-        ${relatedNotes}<div style="margin-top:30px;"><a href="${backLinkUrl}" class="back-link" onclick="sessionStorage.setItem('fromNote', 'true')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to ${currentLevel} Notes</a></div></div></div></div>`;
-    
-    document.getElementById('copy-link-btn')?.addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); });
-    document.getElementById('share-note-btn')?.addEventListener('click', () => { if (navigator.share) navigator.share({ title: document.title, url: window.location.href }); else navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!')); });
-    await loadReactions();
-    await loadComments();
-    loadProgressFromLocal();
-    window.removeEventListener('scroll', handleScroll);
-    window.addEventListener('scroll', handleScroll);
-    window.addEventListener('beforeunload', () => saveProgressToLocal());
-  } catch (err) {
-    console.error(err);
-    document.getElementById('app-content').innerHTML = `<div class="note-container"><div style="text-align:center; padding:80px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="var(--clr-magenta)" stroke="none"/></svg><p>Failed to load note. Please try again.</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link">Back</a></div></div>`;
+    document.body.appendChild(prompt);
+    setTimeout(() => prompt.remove(), 8000);
   }
-}
-
-async function loadReactions() {
-  try {
-    const data = await apiCall('get_note_reactions', { note_id: noteId });
-    if (data) {
-      document.querySelector('.like-count').textContent = data.counts?.like || 0;
-      document.querySelector('.love-count').textContent = data.counts?.love || 0;
-      document.querySelector('.helpful-count').textContent = data.counts?.helpful || 0;
-      if (data.user_reaction) document.querySelector(`.reaction-btn[data-reaction="${data.user_reaction}"]`)?.classList.add('active');
+  async function apiCall(action, params, csrfToken = null) {
+    if(activeFetchController) activeFetchController.abort();
+    const controller = new AbortController();
+    activeFetchController = controller;
+    const timeout = setTimeout(() => controller.abort(), 10000);
+    try {
+      const headers = { 'Content-Type': 'application/json' };
+      if(csrfToken) headers['X-CSRF-Token'] = csrfToken;
+      const res = await fetch(API_BASE, {
+        method: 'POST',
+        headers: headers,
+        credentials: 'include',
+        body: JSON.stringify({ action, ...params }),
+        signal: controller.signal
+      });
+      clearTimeout(timeout);
+      const json = await res.json();
+      if(!res.ok) throw new Error(json.error || 'Request failed');
+      return json.data !== undefined ? json.data : json;
+    } catch(e) {
+      if(e.name === 'AbortError') console.warn('Request aborted');
+      else console.error('API call failed:', e);
+      return null;
+    } finally {
+      activeFetchController = null;
     }
-  } catch(e) { console.error(e); }
-}
-
-window.toggleReaction = async function(nid, type) {
-  if (!currentUser) { redirectToHomepage(); return; }
-  try { await apiCall('toggle_note_reaction', { note_id: nid, reaction_type: type }); await loadReactions(); } catch(e) { console.error(e); }
-};
-
-async function loadComments() {
-  try {
-    const interactions = await apiCall('get_resource_interactions', { resource_id: noteId });
-    const list = document.getElementById('comments-list');
-    if (list && interactions?.comments) {
-      if (!interactions.comments.length) list.innerHTML = '<div style="text-align:center;padding:20px;">No comments yet.</div>';
-      else list.innerHTML = interactions.comments.map(c => `<div class="comment-item"><strong>${esc(c.user_name)}</strong> <small>${new Date(c.created_at).toLocaleDateString()}</small><br>${esc(c.comment)}</div>`).join('');
+  }
+  function toggleTextSize(size) {
+    const wrapper = document.querySelector('.note-content-wrapper');
+    if(wrapper) {
+      wrapper.classList.remove('small', 'medium', 'large');
+      wrapper.classList.add(size);
+      try { localStorage.setItem('note_text_size', size); } catch(e) {}
     }
-  } catch(e) { console.error(e); }
-}
-
-window.submitComment = async function() {
-  if (!currentUser) { redirectToHomepage(); return; }
-  const input = document.getElementById('comment-input');
-  const comment = input?.value.trim();
-  if (!comment) return;
-  try { await apiCall('comment_resource', { resource_id: noteId, comment }); input.value = ''; await loadComments(); } catch(e) { console.error(e); }
-};
-
-async function loadNavigationAndFooter() {
-  try {
-    const sections = await apiCall('get_all_site_sections');
-    if (sections?.site_config?.logo_url) document.querySelectorAll('.logo-link').forEach(link => link.innerHTML = `<img src="${esc(sections.site_config.logo_url)}" alt="AliverBiopharm" style="height:45px;width:auto;max-height:50px;">`);
-    if (sections?.navigation?.links) document.getElementById('main-nav').innerHTML = sections.navigation.links.map(l => `<li><a href="${esc(l.href)}">${esc(l.label)}</a></li>`).join('');
-    if (sections?.footer) document.getElementById('footer').innerHTML = `<div style="max-width:1200px; margin:0 auto; padding:40px 24px 24px; border-top:1px solid var(--clr-border-glow);"><div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-size:0.75rem; color:var(--clr-text-muted);"><p>&copy; ${new Date().getFullYear()} AliverBiopharm. All rights reserved.</p><div style="display:flex;gap:24px;"><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div></div></div>`;
-  } catch(e) { console.error(e); }
-}
-
-window.toggleTextSize = toggleTextSize;
-window.speakNote = speakNote;
-window.stopSpeech = stopSpeech;
-window.printNote = printNote;
-window.toggleReaction = window.toggleReaction;
-
-document.addEventListener('DOMContentLoaded', async () => {
-  await loadNavigationAndFooter();
-  try {
-    const userData = await apiCall('get_user');
-    if (userData?.user) { currentUser = userData.user; showContent(); }
-    else redirectToHomepage();
-  } catch(e) { redirectToHomepage(); }
-});
+  }
+  function speakNote() {
+    if(currentUtterance) window.speechSynthesis.cancel();
+    const textElem = document.querySelector('.note-content-wrapper');
+    if(!textElem) return;
+    const rawText = textElem.innerText;
+    if(!rawText) return;
+    currentUtterance = new SpeechSynthesisUtterance(rawText);
+    currentUtterance.rate = 0.9;
+    currentUtterance.onend = () => { currentUtterance = null; };
+    window.speechSynthesis.speak(currentUtterance);
+  }
+  function stopSpeech() { if(currentUtterance) { window.speechSynthesis.cancel(); currentUtterance = null; } }
+  function printNote() {
+    const content = document.querySelector('.note-content-wrapper');
+    if(!content) return;
+    const title = document.querySelector('.note-title')?.innerText || 'Study Note';
+    const printWindow = window.open('', '_blank');
+    printWindow.document.write(`<html><head><title>${esc(title)}</title><style>body{font-family:'Inter',sans-serif;padding:40px;max-width:900px;margin:0 auto;line-height:1.6;}h1{color:#0a7e7e;}h2{color:#b8873a;}</style></head><body><h1>${esc(title)}</h1>${content.innerHTML}</body></html>`);
+    printWindow.document.close();
+    printWindow.print();
+  }
+  function safeSanitize(html) {
+    if(!html) return '';
+    return DOMPurify.sanitize(html, { USE_PROFILES: { html: true }, ALLOWED_TAGS: ['h1','h2','h3','h4','p','ul','ol','li','strong','em','a','div','span','br','hr','table','thead','tbody','tr','th','td','blockquote','code','pre'], ALLOWED_ATTR: ['href','target','id','class','style'] });
+  }
+  window.toggleTextSize = toggleTextSize;
+  window.speakNote = speakNote;
+  window.stopSpeech = stopSpeech;
+  window.printNote = printNote;
+  window.toggleReaction = async function(nid, type) {
+    if(!currentUser) { redirectToHomepage(); return; }
+    try { await apiCall('toggle_note_reaction', { note_id: nid, reaction_type: type }); await loadReactions(); } catch(e) {}
+  };
+  window.submitComment = async function() {
+    if(!currentUser) { redirectToHomepage(); return; }
+    const input = document.getElementById('comment-input');
+    let comment = input?.value.trim() || '';
+    if(comment.length < 2 || comment.length > 500) { alert('Comment must be 2-500 characters.'); return; }
+    const sanitizedComment = comment.replace(/[<>]/g, '');
+    try { await apiCall('comment_resource', { resource_id: noteId, comment: sanitizedComment }); if(input) input.value = ''; await loadComments(); } catch(e) {}
+  };
+  async function loadReactions() {
+    try {
+      const data = await apiCall('get_note_reactions', { note_id: noteId });
+      if(data) {
+        const likeSpan = document.querySelector('.like-count');
+        const loveSpan = document.querySelector('.love-count');
+        const helpfulSpan = document.querySelector('.helpful-count');
+        if(likeSpan) likeSpan.textContent = data.counts?.like || 0;
+        if(loveSpan) loveSpan.textContent = data.counts?.love || 0;
+        if(helpfulSpan) helpfulSpan.textContent = data.counts?.helpful || 0;
+        if(data.user_reaction) document.querySelector(`.reaction-btn[data-reaction="${data.user_reaction}"]`)?.classList.add('active');
+      }
+    } catch(e) {}
+  }
+  async function loadComments() {
+    try {
+      const interactions = await apiCall('get_resource_interactions', { resource_id: noteId });
+      const list = document.getElementById('comments-list');
+      if(list && interactions?.comments) {
+        if(!interactions.comments.length) list.innerHTML = '<div style="text-align:center;padding:20px;">No comments yet.</div>';
+        else list.innerHTML = interactions.comments.map(c => `<div class="comment-item"><strong>${esc(c.user_name)}</strong> <small>${new Date(c.created_at).toLocaleDateString()}</small><br>${esc(c.comment)}</div>`).join('');
+      }
+    } catch(e) {}
+  }
+  function updateFavicon() {
+    const svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#0a7e7e"/><text x="50" y="68" font-size="48" text-anchor="middle" fill="#b8873a" font-weight="bold">AB</text></svg>';
+    const dataUrl = "data:image/svg+xml," + encodeURIComponent(svg);
+    let link = document.getElementById('dynamic-favicon');
+    if(!link) { link = document.createElement('link'); link.rel = 'icon'; link.type = 'image/svg+xml'; link.id = 'dynamic-favicon'; document.head.appendChild(link); }
+    link.href = dataUrl;
+  }
+  const urlParams = new URLSearchParams(window.location.search);
+  const rawNoteId = urlParams.get('id');
+  const rawLevel = urlParams.get('level');
+  const rawReturnTo = urlParams.get('return_to');
+  const rawReturnSubtopic = urlParams.get('return_subtopic');
+  const rawReturnTitle = urlParams.get('return_title');
+  if(!validateId(rawNoteId)) redirectToHomepage();
+  const noteId = rawNoteId;
+  if(!ALLOWED_LEVELS.includes(rawLevel)) redirectToHomepage();
+  currentLevel = rawLevel;
+  let backLinkUrl = '/';
+  if(rawReturnTo && ALLOWED_RETURN.includes(rawReturnTo) && rawReturnSubtopic && validateId(rawReturnSubtopic)) {
+    const safeSubtopic = encodeURIComponent(rawReturnSubtopic);
+    const safeTitle = rawReturnTitle ? encodeURIComponent(rawReturnTitle) : '';
+    if(rawReturnTo === 'olevel') backLinkUrl = `/olevel.html?subtopic=${safeSubtopic}&title=${safeTitle}`;
+    else if(rawReturnTo === 'alevel') backLinkUrl = `/alevel.html?subtopic=${safeSubtopic}&title=${safeTitle}`;
+    else if(rawReturnTo === 'pharmacy') backLinkUrl = `/pharmacy.html?subtopic=${safeSubtopic}&title=${safeTitle}`;
+  }
+  async function loadNote() {
+    const app = document.getElementById('app-content');
+    app.innerHTML = `<div class="loading-spinner-container"><div class="loading-spinner"><svg class="spinner-svg" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p>Loading note...</p></div></div>`;
+    try {
+      const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
+      if(!note) throw new Error('Note not found');
+      document.title = (note.title || 'Study Note') + ' | AliverBiopharm ' + currentLevel + ' Notes';
+      updateFavicon();
+      const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
+      const levelIcon = { 'O-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>', 'A-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M20 12L12 20M12 4L4 12M12 4v16M4 12h16"/><circle cx="12" cy="12" r="3"/></svg>', 'Pharmacy': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="6" x2="12" y2="14"/><line x1="8" y1="10" x2="16" y2="10"/></svg>' };
+      const readTime = (() => { const words = (note.content || '').replace(/<[^>]*>/g, '').trim().split(/\s+/).length; return `${Math.max(2, Math.ceil(words / 200))} min read`; })();
+      const lastUpdated = note.updated_at ? new Date(note.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : new Date().toLocaleDateString();
+      const levelPath = currentLevel === 'Pharmacy' ? 'pharmacy.html' : (currentLevel === 'A-Level' ? 'alevel.html' : 'olevel.html');
+      let rawContent = note.content || '<p>No content available.</p>';
+      const sanitizedFullContent = safeSanitize(rawContent);
+      const toc = (() => {
+        const matches = sanitizedFullContent.match(/<h2[^>]*>.*?<\/h2>/gi);
+        if(!matches || matches.length<2) return '';
+        let html = '<div class="table-of-contents"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Contents</h3><ul>';
+        matches.forEach((heading, idx) => { const title = heading.replace(/<[^>]*>/g, ''); html += `<li><a href="#section-${idx}">${esc(title)}</a></li>`; });
+        html += '</ul></div>';
+        return html;
+      })();
+      let contentWithIds = sanitizedFullContent.replace(/<h2>/gi, (match, offset) => { const idx = (sanitizedFullContent.slice(0, offset).match(/<h2>/gi) || []).length; return `<h2 id="section-${idx}">`; });
+      const keyPoints = (() => {
+        const strongMatches = contentWithIds.match(/<strong>([^<]+)<\/strong>/g);
+        if(strongMatches && strongMatches.length >= 3) {
+          let points = '';
+          for(let i=0; i<Math.min(6, strongMatches.length); i++) {
+            const term = strongMatches[i].replace(/<[^>]*>/g, '');
+            if(term.length > 3 && term.length < 60) points += `<li>${esc(term)}</li>`;
+          }
+          if(points) return `<div class="key-points"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> Key Terms to Remember</h3><ul>${points}</ul></div>`;
+        }
+        return '';
+      })();
+      const savedTextSize = (() => { try { return localStorage.getItem('note_text_size') || 'medium'; } catch(e){ return 'medium'; } })();
+      maxScrollPercentage = 0; completionBadgeShown = false;
+      updateProgressBar(0);
+      app.innerHTML = `<div class="note-container"><div class="note-header"><div class="level-badge">${levelIcon[currentLevel]} ${levelDisplay[currentLevel]}</div><h1 class="note-title">${esc(note.title)}</h1><div class="note-meta-bar"><span class="note-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><polyline points="12 6 12 12 16 14"/></svg> ${readTime}</span><span class="note-meta-item"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"/><line x1="16" y1="2" x2="16" y2="6"/><line x1="8" y1="2" x2="8" y2="6"/><line x1="3" y1="10" x2="21" y2="10"/></svg> Updated ${lastUpdated}</span></div><div class="breadcrumbs"><a href="/">Home</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg><a href="/${levelPath}">${currentLevel}</a><svg width="12" height="12" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polyline points="9 18 15 12 9 6"/></svg><span>${esc(note.title)}</span></div><div id="completion-badge-container"></div></div><div class="toolbar"><div class="text-controls"><button class="text-size-btn" onclick="toggleTextSize('small')">A-</button><button class="text-size-btn" onclick="toggleTextSize('medium')">A</button><button class="text-size-btn" onclick="toggleTextSize('large')">A+</button></div><button class="tool-btn" onclick="speakNote()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><polygon points="11 5 6 9 2 9 2 15 6 15 11 19 11 5"/><path d="M15.54 8.46a5 5 0 0 1 0 7.07"/><path d="M19.07 4.93a10 10 0 0 1 0 14.14"/></svg> Listen</button><button class="tool-btn" onclick="stopSpeech()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="6" y="6" width="12" height="12"/></svg> Stop</button><button class="tool-btn" onclick="printNote()"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M6 9V3h12v6"/><rect x="4" y="12" width="16" height="10"/><path d="M18 12h2a2 2 0 0 1 2 2v6a2 2 0 0 1-2 2H4a2 2 0 0 1-2-2v-6a2 2 0 0 1 2-2h2"/><path d="M8 12h8"/></svg> Print/PDF</button><button class="tool-btn" id="copy-link-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link</button><button class="tool-btn" id="share-note-btn"><svg width="14" height="14" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share</button></div><div class="note-content-wrapper ${savedTextSize}"><div class="note-content">${toc}${contentWithIds}${keyPoints}<div class="reaction-bar" data-note-id="${noteId}"><button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> <span class="reaction-count like-count">0</span></button><button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="reaction-count love-count">0</span></button><button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction('${noteId}', 'helpful')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> <span class="reaction-count helpful-count">0</span></button></div><div class="comment-section"><div class="comment-input-group"><input type="text" id="comment-input" placeholder="Add a comment or question..." maxlength="500"><button class="comment-submit" onclick="submitComment()">Post</button></div><div class="comments-list" id="comments-list"></div></div><div style="margin-top:30px;"><a href="${safeUrl(backLinkUrl)}" class="back-link" onclick="sessionStorage.setItem('fromNote', 'true')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to ${currentLevel} Notes</a></div></div></div></div>`;
+      document.getElementById('copy-link-btn')?.addEventListener('click', () => { navigator.clipboard.writeText(window.location.href); alert('Link copied!'); });
+      document.getElementById('share-note-btn')?.addEventListener('click', () => { if(navigator.share) navigator.share({ title: document.title, url: window.location.href }); else navigator.clipboard.writeText(window.location.href).then(() => alert('Link copied!')); });
+      await loadReactions();
+      await loadComments();
+      loadProgressFromLocal();
+      window.removeEventListener('scroll', handleScroll);
+      window.addEventListener('scroll', handleScroll);
+      window.addEventListener('beforeunload', () => saveProgressToLocal());
+    } catch(err) {
+      app.innerHTML = `<div class="note-container"><div style="text-align:center;padding:80px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="var(--clr-magenta)" stroke="none"/></svg><p>Failed to load note. Please try again.</p><a href="${safeUrl(backLinkUrl)}" class="back-link">Back</a></div></div>`;
+    }
+  }
+  async function loadNavigationAndFooter() {
+    try {
+      const sections = await apiCall('get_all_site_sections');
+      if(sections?.site_config?.logo_url) {
+        const safeLogo = safeUrl(sections.site_config.logo_url);
+        document.querySelectorAll('.logo-link').forEach(link => { if(safeLogo && isSafeHref(safeLogo)) link.innerHTML = `<img src="${esc(safeLogo)}" alt="AliverBiopharm" style="height:45px;width:auto;max-height:50px;">`; });
+      }
+      if(sections?.navigation?.links) {
+        const navHtml = sections.navigation.links.map(l => { const href = safeUrl(l.href); return isSafeHref(href) ? `<li><a href="${esc(href)}">${esc(l.label)}</a></li>` : ''; }).join('');
+        document.getElementById('main-nav').innerHTML = navHtml;
+      }
+      const footerEl = document.getElementById('footer');
+      if(footerEl) {
+        footerEl.innerHTML = `<div class="footer-content"><div class="footer-inner"><p>&copy; ${new Date().getFullYear()} AliverBiopharm. All rights reserved.</p><div style="display:flex;gap:24px;"><a href="/privacy">Privacy</a><a href="/terms">Terms</a></div></div></div>`;
+      }
+    } catch(e) {}
+  }
+  document.addEventListener('DOMContentLoaded', async () => {
+    await loadNavigationAndFooter();
+    try {
+      const userData = await apiCall('get_user');
+      if(userData?.user) { currentUser = userData.user; loadNote(); }
+      else redirectToHomepage();
+    } catch(e) { redirectToHomepage(); }
+  });
+})();
 </script>
 </body>
 </html>
