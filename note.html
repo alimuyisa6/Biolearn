@@ -10,12 +10,10 @@
 <meta property="og:title" id="og-title" content="AliverBiopharm Study Notes">
 <meta property="og:description" id="og-description" content="Comprehensive study notes with interactive features.">
 <meta name="theme-color" id="theme-color" content="#0a7e7e">
-<link rel="icon" type="image/png" sizes="32x32" href="/favicon-32x32.png">
 <link rel="icon" type="image/svg+xml" id="dynamic-favicon">
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
 <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
 <style>
 :root {
   --clr-deep-space: #eef7f7;
@@ -80,6 +78,8 @@ body {
   transition: color 0.2s;
 }
 .main-nav a:hover { color: var(--clr-magenta); }
+
+svg { flex-shrink: 0; vertical-align: middle; }
 
 .progress-fixed-container {
   position: fixed;
@@ -158,7 +158,9 @@ body {
 }
 .note-header { margin-bottom: 40px; text-align: center; }
 .level-badge {
-  display: inline-block;
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
   background: var(--gradient-magenta);
   color: #fff;
   padding: 6px 20px;
@@ -169,6 +171,7 @@ body {
   text-transform: uppercase;
   margin-bottom: 24px;
 }
+.level-badge svg { margin-right: 2px; }
 .note-title {
   font-family: 'Poppins', sans-serif;
   font-size: clamp(2rem, 5vw, 3.5rem);
@@ -200,6 +203,9 @@ body {
   border-left: 4px solid var(--clr-magenta);
 }
 .table-of-contents h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1rem;
   margin: 0 0 12px 0;
   color: var(--clr-magenta);
@@ -221,6 +227,9 @@ body {
   border-radius: 12px;
 }
 .key-points h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
   font-size: 1rem;
   margin: 0 0 12px 0;
   color: var(--clr-magenta);
@@ -234,6 +243,9 @@ body {
   margin-bottom: 20px;
 }
 .share-action {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: 1px solid var(--clr-border-glow);
   border-radius: 40px;
@@ -244,12 +256,20 @@ body {
   transition: all 0.2s;
 }
 .share-action:hover { border-color: var(--clr-cyan); color: var(--clr-cyan); }
+.share-action svg { margin-right: 2px; }
 .related-notes {
   margin: 40px 0 20px;
   padding-top: 30px;
   border-top: 2px solid var(--clr-border-glow);
 }
-.related-notes h3 { color: var(--clr-cyan); font-size: 1.1rem; margin-bottom: 16px; }
+.related-notes h3 {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+  color: var(--clr-cyan);
+  font-size: 1.1rem;
+  margin-bottom: 16px;
+}
 .related-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -273,6 +293,9 @@ body {
   flex-wrap: wrap;
 }
 .reaction-btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
   background: none;
   border: 1.5px solid var(--clr-border-glow);
   border-radius: 40px;
@@ -280,14 +303,12 @@ body {
   font-weight: 500;
   font-size: 0.85rem;
   cursor: pointer;
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
   color: var(--clr-text-dim);
   transition: all 0.2s;
 }
 .reaction-btn:hover { border-color: var(--clr-cyan); transform: translateY(-2px); }
 .reaction-btn.active { background: var(--gradient-cyan); border-color: transparent; color: #fff; }
+.reaction-btn svg { margin-right: 2px; }
 .comment-section { margin-top: 20px; width: 100%; overflow-x: hidden; }
 .comment-input-group {
   display: flex;
@@ -344,7 +365,23 @@ body {
   transition: all 0.2s;
 }
 .back-link:hover { background: var(--clr-cyan); color: #fff; }
-.loading-spinner { text-align: center; padding: 80px; }
+.back-link svg { margin-right: 2px; }
+.loading-spinner {
+  text-align: center;
+  padding: 80px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: 16px;
+}
+.spinner-svg {
+  width: 60px;
+  height: 60px;
+  animation: spin 1s linear infinite;
+}
+@keyframes spin {
+  to { transform: rotate(360deg); }
+}
 @media (max-width: 768px) {
   .note-content { padding: 24px; }
   .main-nav { display: none; }
@@ -471,7 +508,7 @@ function showResumePrompt(savedPercentage) {
   if (existing) existing.remove();
   const prompt = document.createElement('div');
   prompt.className = 'resume-prompt';
-  prompt.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Resume from ' + Math.floor(savedPercentage) + '%';
+  prompt.innerHTML = `<svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M1 12s4-8 11-8 11 8 11 8-4 8-11 8-11-8-11-8z"/><circle cx="12" cy="12" r="3"/></svg> Resume from ${Math.floor(savedPercentage)}%`;
   prompt.onclick = function() {
     const height = document.documentElement.scrollHeight - window.innerHeight;
     const targetPosition = (savedPercentage / 100) * height;
@@ -502,14 +539,14 @@ async function apiCall(action, params) {
 }
 
 function showContent() {
-  document.getElementById('app-content').innerHTML = '<div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i><p>Loading note...</p></div>';
+  document.getElementById('app-content').innerHTML = `<div class="loading-spinner"><svg class="spinner-svg" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M12 2v4M12 18v4M4.93 4.93l2.83 2.83M16.24 16.24l2.83 2.83M2 12h4M18 12h4M4.93 19.07l2.83-2.83M16.24 7.76l2.83-2.83"/></svg><p>Loading note...</p></div>`;
   loadNote();
 }
 
 function generateTableOfContents(contentHtml) {
   const headingMatches = contentHtml.match(/<h2[^>]*>.*?<\/h2>/gi);
   if (!headingMatches || headingMatches.length < 2) return '';
-  let tocHtml = '<div class="table-of-contents"><h3><i class="fa-solid fa-list"></i> Contents</h3><ul>';
+  let tocHtml = '<div class="table-of-contents"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><line x1="8" y1="6" x2="21" y2="6"/><line x1="8" y1="12" x2="21" y2="12"/><line x1="8" y1="18" x2="21" y2="18"/><line x1="3" y1="6" x2="3.01" y2="6"/><line x1="3" y1="12" x2="3.01" y2="12"/><line x1="3" y1="18" x2="3.01" y2="18"/></svg> Contents</h3><ul>';
   headingMatches.forEach(function(heading, idx) {
     const title = heading.replace(/<[^>]*>/g, '');
     const id = 'section-' + idx;
@@ -532,13 +569,16 @@ function extractKeyPoints(contentHtml) {
       const term = strongMatches[i].replace(/<[^>]*>/g, '');
       if (term.length > 3 && term.length < 60) points += '<li>' + esc(term) + '</li>';
     }
-    if (points) return '<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Terms to Remember</h3><ul>' + points + '</ul></div>';
+    if (points) return '<div class="key-points"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> Key Terms to Remember</h3><ul>' + points + '</ul></div>';
   }
   return '';
 }
 
 function addShareButtons() {
-  return '<div class="share-actions"><button class="share-action" id="copy-link-btn"><i class="fa-regular fa-copy"></i> Copy Link</button><button class="share-action" id="share-note-btn"><i class="fa-regular fa-share-from-square"></i> Share</button></div>';
+  return `<div class="share-actions">
+    <button class="share-action" id="copy-link-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><rect x="9" y="9" width="13" height="13" rx="2" ry="2"/><path d="M5 15H4a2 2 0 0 1-2-2V4a2 2 0 0 1 2-2h9a2 2 0 0 1 2 2v1"/></svg> Copy Link</button>
+    <button class="share-action" id="share-note-btn"><svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><path d="M4 12v8a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2v-8"/><polyline points="16 6 12 2 8 6"/><line x1="12" y1="2" x2="12" y2="15"/></svg> Share</button>
+  </div>`;
 }
 
 async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
@@ -547,7 +587,7 @@ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
     if (!allNotes || !allNotes.length) return '';
     const related = allNotes.filter(function(n) { return n.id !== currentNoteId && n.topic === currentTopic; }).slice(0, 3);
     if (related.length === 0) return '';
-    return '<div class="related-notes"><h3><i class="fa-solid fa-link"></i> Related Notes</h3><div class="related-grid">' + related.map(function(n) {
+    return '<div class="related-notes"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Related Notes</h3><div class="related-grid">' + related.map(function(n) {
       return '<a href="note.html?id=' + n.id + '&level=' + currentLevel + '&title=' + encodeURIComponent(n.title) + '" class="related-card"><strong>' + esc(n.title) + '</strong><p>' + esc(n.preview ? n.preview.substring(0, 80) : 'Click to read') + '...</p></a>';
     }).join('') + '</div></div>';
   } catch(e) {
@@ -557,7 +597,6 @@ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
 
 function updateFavicon(level) {
   let svgContent = '';
-  
   if (level === 'Pharmacy') {
     svgContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0f2b3d"/><defs><linearGradient id="pg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#1a5276"/><stop offset="100%" stop-color="#0a7e7e"/></linearGradient></defs><rect x="8" y="8" width="84" height="84" rx="18" fill="url(#pg)"/><rect x="35" y="25" width="30" height="50" rx="15" fill="#c0392b" opacity="0.9"/><rect x="35" y="25" width="15" height="50" rx="7" fill="#e74c3c" opacity="0.8"/><text x="50" y="58" font-size="24" text-anchor="middle" fill="#b8873a" font-weight="bold" font-family="Arial">Rx</text><circle cx="50" cy="50" r="40" fill="none" stroke="#b8873a" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/></svg>';
   } else if (level === 'A-Level') {
@@ -567,10 +606,8 @@ function updateFavicon(level) {
   } else {
     svgContent = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="22" fill="#0a2e2e"/><defs><linearGradient id="dg" x1="0%" y1="0%" x2="100%" y2="100%"><stop offset="0%" stop-color="#0a7e7e"/><stop offset="100%" stop-color="#1a5276"/></linearGradient></defs><rect x="8" y="8" width="84" height="84" rx="18" fill="url(#dg)"/><text x="50" y="62" font-size="44" text-anchor="middle" fill="#b8873a" font-weight="bold" font-family="Arial">AB</text><circle cx="50" cy="50" r="35" fill="none" stroke="#b8873a" stroke-width="2" opacity="0.4"/></svg>';
   }
-  
   const encodedSvg = encodeURIComponent(svgContent);
   const dataUrl = "data:image/svg+xml," + encodedSvg;
-  
   let link = document.getElementById('dynamic-favicon');
   if (!link) {
     link = document.createElement('link');
@@ -580,7 +617,6 @@ function updateFavicon(level) {
     document.head.appendChild(link);
   }
   link.href = dataUrl;
-  
   let appleLink = document.querySelector("link[rel='apple-touch-icon']");
   if (!appleLink) {
     appleLink = document.createElement('link');
@@ -595,11 +631,14 @@ async function loadNote() {
   try {
     const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
     document.title = (note.title || noteTitle) + ' | AliverBiopharm ' + currentLevel + ' Notes';
-    
     updateFavicon(currentLevel);
     
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
-    const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
+    const levelIcon = {
+      'O-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M12 2L2 7l10 5 10-5-10-5z"/><path d="M2 17l10 5 10-5"/><path d="M2 12l10 5 10-5"/></svg>',
+      'A-Level': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><path d="M20 12L12 20M12 4L4 12M12 4v16M4 12h16"/><circle cx="12" cy="12" r="3"/></svg>',
+      'Pharmacy': '<svg width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="#ffffff" stroke-width="2"><rect x="4" y="2" width="16" height="20" rx="2" ry="2"/><line x1="12" y1="6" x2="12" y2="14"/><line x1="8" y1="10" x2="16" y2="10"/></svg>'
+    };
     
     let processedContent = note.content || '<p>No content available for this note.</p>';
     const toc = generateTableOfContents(processedContent);
@@ -611,7 +650,7 @@ async function loadNote() {
     maxScrollPercentage = 0;
     updateProgressBar(0);
     
-    app.innerHTML = '<div class="note-container"><div class="note-header"><div class="level-badge"><i class="fa-solid ' + levelIcon[currentLevel] + '"></i> ' + levelDisplay[currentLevel] + '</div><h1 class="note-title">' + esc(note.title || noteTitle) + '</h1></div><div class="note-content">' + shareButtons + toc + processedContent + keyPoints + '<div class="reaction-bar" data-note-id="' + noteId + '"><button class="reaction-btn" data-reaction="like" onclick="toggleReaction(\'' + noteId + '\', \'like\')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button><button class="reaction-btn" data-reaction="love" onclick="toggleReaction(\'' + noteId + '\', \'love\')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button><button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction(\'' + noteId + '\', \'helpful\')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count helpful-count">0</span></button></div><div class="comment-section"><div class="comment-input-group"><input type="text" id="comment-input" placeholder="Add a comment or question..."><button class="comment-submit" onclick="submitComment()">Post</button></div><div class="comments-list" id="comments-list"></div></div>' + relatedNotes + '<div style="margin-top:30px;"><a href="' + backLinkUrl + '" class="back-link" onclick="sessionStorage.setItem(\'fromNote\', \'true\')"><i class="fa-solid fa-arrow-left"></i> Back to ' + currentLevel + ' Notes</a></div></div></div>';
+    app.innerHTML = '<div class="note-container"><div class="note-header"><div class="level-badge">' + levelIcon[currentLevel] + ' ' + levelDisplay[currentLevel] + '</div><h1 class="note-title">' + esc(note.title || noteTitle) + '</h1></div><div class="note-content">' + shareButtons + toc + processedContent + keyPoints + '<div class="reaction-bar" data-note-id="' + noteId + '"><button class="reaction-btn" data-reaction="like" onclick="toggleReaction(\'' + noteId + '\', \'like\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M14 9V5a3 3 0 0 0-3-3l-4 9v11h11.28a2 2 0 0 0 2-1.7l1.38-9a2 2 0 0 0-2-2.3zM7 22H4a2 2 0 0 1-2-2v-7a2 2 0 0 1 2-2h3"/></svg> <span class="reaction-count like-count">0</span></button><button class="reaction-btn" data-reaction="love" onclick="toggleReaction(\'' + noteId + '\', \'love\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M20.84 4.61a5.5 5.5 0 0 0-7.78 0L12 5.67l-1.06-1.06a5.5 5.5 0 0 0-7.78 7.78l1.06 1.06L12 21.23l7.78-7.78 1.06-1.06a5.5 5.5 0 0 0 0-7.78z"/></svg> <span class="reaction-count love-count">0</span></button><button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction(\'' + noteId + '\', \'helpful\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M9.5 2.5L12 5l2.5-2.5a4.5 4.5 0 0 1 5.5 5.5L12 19 4 8a4.5 4.5 0 0 1 5.5-5.5z"/><line x1="12" y1="19" x2="12" y2="22"/><line x1="8" y1="22" x2="16" y2="22"/></svg> <span class="reaction-count helpful-count">0</span></button></div><div class="comment-section"><div class="comment-input-group"><input type="text" id="comment-input" placeholder="Add a comment or question..."><button class="comment-submit" onclick="submitComment()">Post</button></div><div class="comments-list" id="comments-list"></div></div>' + relatedNotes + '<div style="margin-top:30px;"><a href="' + backLinkUrl + '" class="back-link" onclick="sessionStorage.setItem(\'fromNote\', \'true\')"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><line x1="19" y1="12" x2="5" y2="12"/><polyline points="12 19 5 12 12 5"/></svg> Back to ' + currentLevel + ' Notes</a></div></div></div>';
     
     document.getElementById('copy-link-btn')?.addEventListener('click', function() {
       navigator.clipboard.writeText(window.location.href);
@@ -628,18 +667,13 @@ async function loadNote() {
     
     await loadReactions();
     await loadComments();
-    
     loadProgressFromLocal();
-    
     window.removeEventListener('scroll', handleScroll);
     window.addEventListener('scroll', handleScroll);
-    
-    window.addEventListener('beforeunload', function() {
-      saveProgressToLocal();
-    });
+    window.addEventListener('beforeunload', function() { saveProgressToLocal(); });
   } catch (err) {
     console.error(err);
-    app.innerHTML = '<div class="note-container"><div style="text-align:center; padding:80px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:2rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="' + (backLinkUrl !== '/' ? backLinkUrl : '/') + '" class="back-link" style="margin-top:10px; display:inline-block;">Back</a></div></div>';
+    document.getElementById('app-content').innerHTML = '<div class="note-container"><div style="text-align:center; padding:80px;"><svg width="40" height="40" viewBox="0 0 24 24" fill="none" stroke="var(--clr-magenta)" stroke-width="2"><circle cx="12" cy="12" r="10"/><line x1="12" y1="8" x2="12" y2="12"/><circle cx="12" cy="16" r="0.5" fill="var(--clr-magenta)" stroke="none"/></svg><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="' + (backLinkUrl !== '/' ? backLinkUrl : '/') + '" class="back-link" style="margin-top:10px; display:inline-block;">Back</a></div></div>';
   }
 }
 
