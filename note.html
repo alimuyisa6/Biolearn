@@ -680,17 +680,20 @@ function calculateReadTime(content) {
   return `${Math.max(2, Math.ceil(words / 200))} min read`;
 }
 
-const factBank = [
-  { fact: "The human body contains around 37 trillion cells.", source: "National Institutes of Health" },
-  { fact: "Penicillin was discovered by Alexander Fleming in 1928.", source: "History of Medicine" },
-  { fact: "DNA strands can be up to 2 meters long when uncoiled.", source: "Molecular Biology" },
-  { fact: "The first complete heart transplant was performed in 1967.", source: "Medical History" },
-  { fact: "Aspirin is derived from willow bark, used for millennia.", source: "Phytochemistry" }
-];
-
-function getDailyFact() {
-  const dayIndex = new Date().getDate() % factBank.length;
-  return factBank[dayIndex];
+async function getDailyFact(level) {
+  try {
+    const sections = await apiCall('get_all_site_sections');
+    const factsData = sections?.daily_facts || {};
+    const levelFacts = factsData[level] || factsData['default'] || [];
+    if (levelFacts.length === 0) {
+      return { fact: 'Stay curious! Keep exploring science.', source: 'AliverBiopharm' };
+    }
+    const dayIndex = new Date().getDate() % levelFacts.length;
+    return levelFacts[dayIndex];
+  } catch(e) {
+    console.error('Failed to load daily fact:', e);
+    return { fact: 'Science is fascinating! Keep learning.', source: 'AliverBiopharm' };
+  }
 }
 
 function toggleTextSize(size) {
@@ -749,7 +752,7 @@ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
   } catch(e) { return ''; }
 }
 
-function updateFavicon(level) { /* kept minimal but functional */ 
+function updateFavicon(level) {
   let svg = '<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100"><rect width="100" height="100" rx="20" fill="#0a7e7e"/><text x="50" y="68" font-size="48" text-anchor="middle" fill="#b8873a" font-weight="bold">AB</text></svg>';
   const dataUrl = "data:image/svg+xml," + encodeURIComponent(svg);
   let link = document.getElementById('dynamic-favicon');
@@ -772,7 +775,7 @@ async function loadNote() {
     const readTime = calculateReadTime(note.content || '');
     const lastUpdated = note.updated_at ? new Date(note.updated_at).toLocaleDateString('en-US', { year: 'numeric', month: 'short', day: 'numeric' }) : new Date().toLocaleDateString();
     const levelPath = currentLevel === 'Pharmacy' ? 'pharmacy.html' : (currentLevel === 'A-Level' ? 'alevel.html' : 'olevel.html');
-    const dailyFact = getDailyFact();
+    const dailyFact = await getDailyFact(currentLevel);
     
     let processedContent = note.content || '<p>No content available for this note.</p>';
     const toc = generateTableOfContents(processedContent);
