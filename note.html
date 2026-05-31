@@ -554,11 +554,98 @@ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
   }
 }
 
+function updateFavicon(level) {
+  let svgContent = '';
+  
+  if (level === 'Pharmacy') {
+    svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#0f2b3d"/>
+      <defs>
+        <linearGradient id="pharmGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#1a5276"/>
+          <stop offset="100%" style="stop-color:#0a7e7e"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="84" height="84" rx="18" fill="url(#pharmGrad)"/>
+      <rect x="35" y="25" width="30" height="50" rx="15" fill="#c0392b" opacity="0.9"/>
+      <rect x="35" y="25" width="15" height="50" rx="7" fill="#e74c3c" opacity="0.8"/>
+      <text x="50" y="58" font-size="24" text-anchor="middle" fill="#b8873a" font-weight="bold" font-family="Arial">Rx</text>
+      <circle cx="50" cy="50" r="40" fill="none" stroke="#b8873a" stroke-width="2" stroke-dasharray="6 4" opacity="0.5"/>
+    </svg>`;
+  } else if (level === 'A-Level') {
+    svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#1a1a2e"/>
+      <defs>
+        <linearGradient id="alevelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#16213e"/>
+          <stop offset="100%" style="stop-color:#0f3460"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="84" height="84" rx="18" fill="url(#alevelGrad)"/>
+      <polygon points="50,20 75,45 50,70 25,45" fill="none" stroke="#e67e22" stroke-width="5" stroke-linejoin="round"/>
+      <polygon points="50,30 68,48 50,66 32,48" fill="none" stroke="#b8873a" stroke-width="3" stroke-linejoin="round"/>
+      <text x="50" y="56" font-size="20" text-anchor="middle" fill="#e67e22" font-weight="bold" font-family="Arial">Adv</text>
+      <circle cx="50" cy="50" r="38" fill="none" stroke="#b8873a" stroke-width="1.5" stroke-dasharray="4 4" opacity="0.4"/>
+    </svg>`;
+  } else if (level === 'O-Level') {
+    svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#1b3b2b"/>
+      <defs>
+        <linearGradient id="olevelGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#1e5631"/>
+          <stop offset="100%" style="stop-color:#2d6a4f"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="84" height="84" rx="18" fill="url(#olevelGrad)"/>
+      <path d="M50 20 L70 35 L70 65 L50 80 L30 65 L30 35 Z" fill="none" stroke="#b8873a" stroke-width="4" stroke-linejoin="round"/>
+      <rect x="35" y="40" width="30" height="25" rx="3" fill="none" stroke="#a7c957" stroke-width="3"/>
+      <line x1="42" y1="48" x2="58" y2="48" stroke="#a7c957" stroke-width="2.5"/>
+      <line x1="42" y1="54" x2="58" y2="54" stroke="#a7c957" stroke-width="2.5"/>
+      <text x="50" y="72" font-size="12" text-anchor="middle" fill="#b8873a" font-weight="bold">O</text>
+    </svg>`;
+  } else {
+    svgContent = `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 100 100">
+      <rect width="100" height="100" rx="22" fill="#0a2e2e"/>
+      <defs>
+        <linearGradient id="defaultGrad" x1="0%" y1="0%" x2="100%" y2="100%">
+          <stop offset="0%" style="stop-color:#0a7e7e"/>
+          <stop offset="100%" style="stop-color:#1a5276"/>
+        </linearGradient>
+      </defs>
+      <rect x="8" y="8" width="84" height="84" rx="18" fill="url(#defaultGrad)"/>
+      <text x="50" y="62" font-size="44" text-anchor="middle" fill="#b8873a" font-weight="bold" font-family="Arial">AB</text>
+      <circle cx="50" cy="50" r="35" fill="none" stroke="#b8873a" stroke-width="2" opacity="0.4"/>
+    </svg>`;
+  }
+  
+  const blob = new Blob([svgContent], { type: 'image/svg+xml' });
+  const url = URL.createObjectURL(blob);
+  
+  let link = document.querySelector("link[rel*='icon']");
+  if (!link) {
+    link = document.createElement('link');
+    link.rel = 'icon';
+    link.sizes = 'any';
+    document.head.appendChild(link);
+  }
+  link.href = url;
+  
+  let appleLink = document.querySelector("link[rel='apple-touch-icon']");
+  if (!appleLink) {
+    appleLink = document.createElement('link');
+    appleLink.rel = 'apple-touch-icon';
+    document.head.appendChild(appleLink);
+  }
+  appleLink.href = url;
+}
+
 async function loadNote() {
   const app = document.getElementById('app-content');
   try {
     const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
     document.title = (note.title || noteTitle) + ' | AliverBiopharm ' + currentLevel + ' Notes';
+    
+    updateFavicon(currentLevel);
     
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
     const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
