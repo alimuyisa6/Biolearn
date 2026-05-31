@@ -95,7 +95,6 @@ body {
   border: 2px solid var(--clr-magenta);
   box-shadow: 0 2px 8px rgba(0,0,0,0.1);
   overflow: hidden;
-  backdrop-filter: blur(4px);
 }
 .progress-bar-fill {
   height: 100%;
@@ -138,9 +137,7 @@ body {
   gap: 10px;
   animation: slideIn 0.3s ease;
 }
-.resume-prompt:hover {
-  transform: translateY(-2px);
-}
+.resume-prompt:hover { transform: translateY(-2px); }
 @keyframes slideIn {
   from { transform: translateX(100%); opacity: 0; }
   to { transform: translateX(0); opacity: 1; }
@@ -198,23 +195,15 @@ body {
   margin: 0 0 12px 0;
   color: var(--clr-magenta);
 }
-.table-of-contents ul {
-  list-style: none;
-  margin: 0;
-}
-.table-of-contents li {
-  margin: 8px 0;
-}
+.table-of-contents ul { list-style: none; margin: 0; }
+.table-of-contents li { margin: 8px 0; }
 .table-of-contents a {
   color: var(--clr-text-dim);
   text-decoration: none;
   font-size: 0.85rem;
   transition: color 0.2s;
 }
-.table-of-contents a:hover {
-  color: var(--clr-magenta);
-  padding-left: 5px;
-}
+.table-of-contents a:hover { color: var(--clr-magenta); padding-left: 5px; }
 .key-points {
   background: rgba(184, 135, 58, 0.08);
   border-left: 4px solid var(--clr-magenta);
@@ -227,13 +216,8 @@ body {
   margin: 0 0 12px 0;
   color: var(--clr-magenta);
 }
-.key-points ul {
-  margin: 0 0 0 20px;
-}
-.key-points li {
-  margin: 8px 0;
-  color: var(--clr-text-dim);
-}
+.key-points ul { margin: 0 0 0 20px; }
+.key-points li { margin: 8px 0; color: var(--clr-text-dim); }
 .share-actions {
   display: flex;
   gap: 12px;
@@ -250,20 +234,13 @@ body {
   color: var(--clr-text-dim);
   transition: all 0.2s;
 }
-.share-action:hover {
-  border-color: var(--clr-cyan);
-  color: var(--clr-cyan);
-}
+.share-action:hover { border-color: var(--clr-cyan); color: var(--clr-cyan); }
 .related-notes {
   margin: 40px 0 20px;
   padding-top: 30px;
   border-top: 2px solid var(--clr-border-glow);
 }
-.related-notes h3 {
-  color: var(--clr-cyan);
-  font-size: 1.1rem;
-  margin-bottom: 16px;
-}
+.related-notes h3 { color: var(--clr-cyan); font-size: 1.1rem; margin-bottom: 16px; }
 .related-grid {
   display: grid;
   grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
@@ -277,30 +254,9 @@ body {
   transition: all 0.2s;
   border: 1px solid transparent;
 }
-.related-card:hover {
-  border-color: var(--clr-magenta);
-  transform: translateY(-3px);
-}
-.related-card strong {
-  color: var(--clr-white);
-  font-size: 0.9rem;
-}
-.related-card p {
-  font-size: 0.7rem;
-  color: var(--clr-text-muted);
-  margin-top: 6px;
-}
-@media (max-width: 768px) {
-  .note-content { padding: 20px; font-size: 0.85rem; }
-  .note-content h1 { font-size: 1.4rem; }
-  .note-content h2 { font-size: 1.2rem; }
-  .note-content h3 { font-size: 1rem; }
-  .table-of-contents { padding: 12px 16px; }
-  .key-points { padding: 12px 16px; }
-  .related-grid { grid-template-columns: 1fr; }
-  .progress-wrapper { padding: 0 16px; margin-top: 78px; }
-  .progress-container { height: 8px; }
-}
+.related-card:hover { border-color: var(--clr-magenta); transform: translateY(-3px); }
+.related-card strong { color: var(--clr-white); font-size: 0.9rem; }
+.related-card p { font-size: 0.7rem; color: var(--clr-text-muted); margin-top: 6px; }
 .reaction-bar {
   display: flex;
   gap: 12px;
@@ -323,11 +279,7 @@ body {
 }
 .reaction-btn:hover { border-color: var(--clr-cyan); transform: translateY(-2px); }
 .reaction-btn.active { background: var(--gradient-cyan); border-color: transparent; color: #fff; }
-.comment-section { 
-  margin-top: 20px;
-  width: 100%;
-  overflow-x: hidden;
-}
+.comment-section { margin-top: 20px; width: 100%; overflow-x: hidden; }
 .comment-input-group {
   display: flex;
   gap: 12px;
@@ -421,10 +373,7 @@ body {
   z-index: 99;
   transition: transform 0.2s, background 0.2s;
 }
-.home-fab:hover {
-  transform: scale(1.05);
-  background: #0c6e6e;
-}
+.home-fab:hover { transform: scale(1.05); background: #0c6e6e; }
 @media (max-width: 768px) {
   .note-content { padding: 24px; }
   .main-nav { display: none; }
@@ -434,6 +383,8 @@ body {
   .comment-submit { padding: 0 16px; font-size: 0.85rem; }
   .reaction-btn { padding: 5px 12px; font-size: 0.8rem; }
   .resume-prompt { bottom: 20px; right: 20px; padding: 8px 16px; font-size: 0.75rem; }
+  .progress-wrapper { padding: 0 16px; margin-top: 78px; }
+  .progress-container { height: 8px; }
 }
 </style>
 </head>
@@ -445,8 +396,8 @@ body {
   </div>
 </header>
 
-<div class="progress-wrapper" id="progress-wrapper">
-  <div class="progress-container" id="progress-container">
+<div class="progress-wrapper">
+  <div class="progress-container">
     <div class="progress-bar-fill" id="progress-bar-fill"></div>
   </div>
   <div class="progress-percentage" id="progress-percentage">0% read</div>
@@ -460,10 +411,7 @@ const API_BASE = '/api/query';
 let currentUser = null;
 let currentLevel = null;
 let maxScrollPercentage = 0;
-let finalPercentageSaved = false;
-let scrollHandlerActive = false;
-let saveProgressTimer = null;
-let lastSavedPercentage = 0;
+let saveTimer = null;
 
 const urlParams = new URLSearchParams(window.location.search);
 const noteId = urlParams.get('id');
@@ -486,107 +434,56 @@ function esc(str) {
   return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;');
 }
 
-async function apiCall(action, params) {
-  const res = await fetch(API_BASE, {
-    method: 'POST',
-    headers: { 'Content-Type': 'application/json' },
-    credentials: 'include',
-    body: JSON.stringify({
-      action,
-      ...params
-    })
-  });
-  const json = await res.json();
-  if (!res.ok) throw new Error(json.error);
-  return json.data !== undefined ? json.data : json;
-}
-
-function showAuthWall() {
-  const app = document.getElementById('app-content');
-  app.innerHTML = `
-    <div class="auth-wall">
-      <i class="fa-solid fa-lock"></i>
-      <h2>Sign In to Read Full Notes</h2>
-      <p>Create a free account to access complete study notes, save your progress, and join our learning community.</p>
-      <div class="auth-buttons">
-        <button class="signin-btn" onclick="window.showAuthForm('signin')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button>
-        <button class="signup-btn" onclick="window.showAuthForm('signup')"><i class="fa-solid fa-user-plus"></i> Create Account</button>
-      </div>
-    </div>
-  `;
-}
-
-function showContent() {
-  const app = document.getElementById('app-content');
-  app.innerHTML = `<div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i><p>Loading note...</p></div>`;
-  loadNote();
-}
-
-function getScrollTop() {
-  return window.scrollY || document.documentElement.scrollTop || 0;
-}
-
-function updateProgressBarUI(percentage) {
-  const fillEl = document.getElementById('progress-bar-fill');
-  const percentText = document.getElementById('progress-percentage');
-  if (fillEl) fillEl.style.width = percentage + '%';
-  if (percentText) percentText.innerText = Math.floor(percentage) + '% read';
-}
-
-function saveCurrentProgress() {
-  if (!currentUser) return;
-  if (finalPercentageSaved) return;
-  
-  const percentage = Math.floor(maxScrollPercentage);
-  const percentageSinceLastSave = Math.abs(percentage - lastSavedPercentage);
-  
-  if (percentage >= 10 && percentageSinceLastSave >= 5) {
-    lastSavedPercentage = percentage;
-    apiCall('save_reading_progress', {
-      note_id: noteId,
-      scroll_percentage: percentage,
-      scroll_position: getScrollTop(),
-      time_spent: 0,
-      completed: false
-    }).catch(e => console.error('Failed to save progress:', e));
-  }
-}
-
-function updateProgressFromScroll() {
-  const winScroll = getScrollTop();
+function getScrollPercent() {
+  const winScroll = window.scrollY || document.documentElement.scrollTop || 0;
   const height = document.documentElement.scrollHeight - window.innerHeight;
-  if (height <= 0) return;
-  const currentPercentage = (winScroll / height) * 100;
-  
-  if (currentPercentage > maxScrollPercentage) {
-    maxScrollPercentage = currentPercentage;
-    updateProgressBarUI(maxScrollPercentage);
-  }
-  
-  if (maxScrollPercentage >= 95 && !finalPercentageSaved) {
-    if (saveProgressTimer) clearTimeout(saveProgressTimer);
-    saveFinalPercentage();
-  } else if (maxScrollPercentage >= 10 && maxScrollPercentage < 95) {
-    if (saveProgressTimer) clearTimeout(saveProgressTimer);
-    saveProgressTimer = setTimeout(() => {
-      saveCurrentProgress();
-    }, 1500);
+  if (height <= 0) return 0;
+  return (winScroll / height) * 100;
+}
+
+function updateProgressBar(percentage) {
+  const fill = document.getElementById('progress-bar-fill');
+  const text = document.getElementById('progress-percentage');
+  if (fill) fill.style.width = percentage + '%';
+  if (text) text.innerText = Math.floor(percentage) + '% read';
+}
+
+function saveProgressToLocal() {
+  if (maxScrollPercentage >= 10) {
+    localStorage.setItem('progress_' + noteId, maxScrollPercentage);
+    localStorage.setItem('progress_' + noteId + '_time', Date.now());
+    console.log('Progress saved to localStorage:', maxScrollPercentage + '%');
   }
 }
 
-function saveFinalPercentage() {
-  if (!currentUser || finalPercentageSaved) return;
-  finalPercentageSaved = true;
-  
-  if (saveProgressTimer) clearTimeout(saveProgressTimer);
-  
-  apiCall('save_reading_progress', {
-    note_id: noteId,
-    scroll_percentage: Math.floor(maxScrollPercentage),
-    scroll_position: getScrollTop(),
-    time_spent: 0,
-    completed: maxScrollPercentage >= 95
-  }).catch(e => console.error('Failed to save final progress:', e));
+function loadProgressFromLocal() {
+  const saved = localStorage.getItem('progress_' + noteId);
+  if (saved) {
+    const percentage = parseFloat(saved);
+    if (percentage > 10 && percentage < 95) {
+      maxScrollPercentage = percentage;
+      updateProgressBar(maxScrollPercentage);
+      showResumePrompt(percentage);
+    } else if (percentage >= 95) {
+      maxScrollPercentage = percentage;
+      updateProgressBar(maxScrollPercentage);
+    }
+    return percentage;
+  }
+  return 0;
+}
+
+function handleScroll() {
+  const currentPercent = getScrollPercent();
+  if (currentPercent > maxScrollPercentage) {
+    maxScrollPercentage = currentPercent;
+    updateProgressBar(maxScrollPercentage);
+    
+    if (saveTimer) clearTimeout(saveTimer);
+    saveTimer = setTimeout(function() {
+      saveProgressToLocal();
+    }, 1000);
+  }
 }
 
 function showResumePrompt(savedPercentage) {
@@ -595,48 +492,54 @@ function showResumePrompt(savedPercentage) {
   if (existing) existing.remove();
   const prompt = document.createElement('div');
   prompt.className = 'resume-prompt';
-  prompt.innerHTML = `<i class="fa-solid fa-rotate-left"></i> Resume from ${Math.floor(savedPercentage)}%`;
-  prompt.onclick = () => {
+  prompt.innerHTML = '<i class="fa-solid fa-rotate-left"></i> Resume from ' + Math.floor(savedPercentage) + '%';
+  prompt.onclick = function() {
     const height = document.documentElement.scrollHeight - window.innerHeight;
     const targetPosition = (savedPercentage / 100) * height;
     window.scrollTo({ top: targetPosition, behavior: 'smooth' });
     prompt.remove();
   };
   document.body.appendChild(prompt);
-  setTimeout(() => {
+  setTimeout(function() {
     if (prompt.parentNode) prompt.remove();
-  }, 10000);
+  }, 8000);
 }
 
-async function loadSavedProgressAndResume() {
-  if (!currentUser) return;
+async function apiCall(action, params) {
   try {
-    const progress = await apiCall('get_reading_progress', { note_id: noteId });
-    if (progress && progress.scroll_percentage > 10 && progress.scroll_percentage < 95) {
-      showResumePrompt(progress.scroll_percentage);
-      if (progress.scroll_percentage > maxScrollPercentage) {
-        maxScrollPercentage = progress.scroll_percentage;
-        lastSavedPercentage = progress.scroll_percentage;
-        updateProgressBarUI(maxScrollPercentage);
-      }
-    } else if (progress && progress.scroll_percentage >= 95) {
-      finalPercentageSaved = true;
-      maxScrollPercentage = progress.scroll_percentage;
-      updateProgressBarUI(maxScrollPercentage);
-    }
+    const res = await fetch(API_BASE, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      credentials: 'include',
+      body: JSON.stringify({ action, ...params })
+    });
+    const json = await res.json();
+    if (!res.ok) throw new Error(json.error);
+    return json.data !== undefined ? json.data : json;
   } catch(e) {
-    console.error('Failed to load progress:', e);
+    console.error('API call failed:', e);
+    return null;
   }
+}
+
+function showAuthWall() {
+  const app = document.getElementById('app-content');
+  app.innerHTML = '<div class="auth-wall"><i class="fa-solid fa-lock"></i><h2>Sign In to Read Full Notes</h2><p>Create a free account to access complete study notes, save your progress, and join our learning community.</p><div class="auth-buttons"><button class="signin-btn" onclick="window.showAuthForm(\'signin\')"><i class="fa-solid fa-right-to-bracket"></i> Sign In</button><button class="signup-btn" onclick="window.showAuthForm(\'signup\')"><i class="fa-solid fa-user-plus"></i> Create Account</button></div></div>';
+}
+
+function showContent() {
+  document.getElementById('app-content').innerHTML = '<div class="loading-spinner"><i class="fa-solid fa-spinner fa-spin" style="font-size:2rem;"></i><p>Loading note...</p></div>';
+  loadNote();
 }
 
 function generateTableOfContents(contentHtml) {
   const headingMatches = contentHtml.match(/<h2[^>]*>.*?<\/h2>/gi);
   if (!headingMatches || headingMatches.length < 2) return '';
   let tocHtml = '<div class="table-of-contents"><h3><i class="fa-solid fa-list"></i> Contents</h3><ul>';
-  headingMatches.forEach((heading, idx) => {
+  headingMatches.forEach(function(heading, idx) {
     const title = heading.replace(/<[^>]*>/g, '');
-    const id = `section-${idx}`;
-    tocHtml += `<li><a href="#${id}">${esc(title)}</a></li>`;
+    const id = 'section-' + idx;
+    tocHtml += '<li><a href="#' + id + '">' + esc(title) + '</a></li>';
   });
   tocHtml += '</ul></div>';
   return tocHtml;
@@ -644,62 +547,36 @@ function generateTableOfContents(contentHtml) {
 
 function addHeadingIds(contentHtml) {
   let idx = 0;
-  return contentHtml.replace(/<h2>/gi, () => `<h2 id="section-${idx++}">`);
+  return contentHtml.replace(/<h2>/gi, function() { return '<h2 id="section-' + (idx++) + '">'; });
 }
 
 function extractKeyPoints(contentHtml) {
   const strongMatches = contentHtml.match(/<strong>([^<]+)<\/strong>/g);
-  if (!strongMatches || strongMatches.length < 3) {
-    const sentences = contentHtml.match(/<p>.*?<\/p>/g);
-    if (sentences && sentences.length > 2) {
-      let points = '';
-      for (let i = 0; i < Math.min(4, sentences.length); i++) {
-        const text = sentences[i].replace(/<[^>]*>/g, '').substring(0, 100);
-        if (text.length > 10) points += `<li>${esc(text)}...</li>`;
-      }
-      if (points) {
-        return `<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Takeaways</h3><ul>${points}</ul></div>`;
-      }
+  if (strongMatches && strongMatches.length >= 3) {
+    let points = '';
+    for (let i = 0; i < Math.min(6, strongMatches.length); i++) {
+      const term = strongMatches[i].replace(/<[^>]*>/g, '');
+      if (term.length > 3 && term.length < 60) points += '<li>' + esc(term) + '</li>';
     }
-    return '';
+    if (points) return '<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Terms to Remember</h3><ul>' + points + '</ul></div>';
   }
-  let points = '';
-  for (let i = 0; i < Math.min(6, strongMatches.length); i++) {
-    const term = strongMatches[i].replace(/<[^>]*>/g, '');
-    if (term.length > 3 && term.length < 60) {
-      points += `<li>${esc(term)}</li>`;
-    }
-  }
-  if (!points) return '';
-  return `<div class="key-points"><h3><i class="fa-regular fa-lightbulb"></i> Key Terms to Remember</h3><ul>${points}</ul></div>`;
+  return '';
 }
 
 function addShareButtons() {
-  return `<div class="share-actions">
-    <button class="share-action" id="copy-link-btn"><i class="fa-regular fa-copy"></i> Copy Link</button>
-    <button class="share-action" id="share-note-btn"><i class="fa-regular fa-share-from-square"></i> Share</button>
-  </div>`;
+  return '<div class="share-actions"><button class="share-action" id="copy-link-btn"><i class="fa-regular fa-copy"></i> Copy Link</button><button class="share-action" id="share-note-btn"><i class="fa-regular fa-share-from-square"></i> Share</button></div>';
 }
 
 async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
   try {
     const allNotes = await apiCall('get_notes_by_level', { level: currentLevel });
     if (!allNotes || !allNotes.length) return '';
-    const related = allNotes.filter(n => n.id !== currentNoteId && n.topic === currentTopic).slice(0, 3);
+    const related = allNotes.filter(function(n) { return n.id !== currentNoteId && n.topic === currentTopic; }).slice(0, 3);
     if (related.length === 0) return '';
-    return `<div class="related-notes">
-      <h3><i class="fa-solid fa-link"></i> Related Notes</h3>
-      <div class="related-grid">
-        ${related.map(n => `
-          <a href="note.html?id=${n.id}&level=${currentLevel}&title=${encodeURIComponent(n.title)}" class="related-card">
-            <strong>${esc(n.title)}</strong>
-            <p>${esc(n.preview ? n.preview.substring(0, 80) : 'Click to read')}...</p>
-          </a>
-        `).join('')}
-      </div>
-    </div>`;
+    return '<div class="related-notes"><h3><i class="fa-solid fa-link"></i> Related Notes</h3><div class="related-grid">' + related.map(function(n) {
+      return '<a href="note.html?id=' + n.id + '&level=' + currentLevel + '&title=' + encodeURIComponent(n.title) + '" class="related-card"><strong>' + esc(n.title) + '</strong><p>' + esc(n.preview ? n.preview.substring(0, 80) : 'Click to read') + '...</p></a>';
+    }).join('') + '</div></div>';
   } catch(e) {
-    console.error('Failed to load related notes:', e);
     return '';
   }
 }
@@ -707,14 +584,8 @@ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
 async function loadNote() {
   const app = document.getElementById('app-content');
   try {
-    if (saveProgressTimer) clearTimeout(saveProgressTimer);
-    maxScrollPercentage = 0;
-    finalPercentageSaved = false;
-    lastSavedPercentage = 0;
-    saveProgressTimer = null;
-    
     const note = await apiCall('get_note_content', { subtopic_id: noteId, level: currentLevel });
-    document.title = `${note.title || noteTitle} | AliverBiopharm ${currentLevel} Notes`;
+    document.title = (note.title || noteTitle) + ' | AliverBiopharm ' + currentLevel + ' Notes';
     
     const levelDisplay = { 'O-Level': 'O-LEVEL BIOLOGY', 'A-Level': 'A-LEVEL BIOLOGY', 'Pharmacy': 'PHARMACY' };
     const levelIcon = { 'O-Level': 'fa-leaf', 'A-Level': 'fa-dna', 'Pharmacy': 'fa-capsules' };
@@ -726,44 +597,16 @@ async function loadNote() {
     const shareButtons = addShareButtons();
     const relatedNotes = await loadRelatedNotes(noteId, currentLevel, note.topic || '');
     
-    updateProgressBarUI(0);
+    maxScrollPercentage = 0;
+    updateProgressBar(0);
     
-    app.innerHTML = `
-  <div class="note-container">
-    <a href="/" class="home-fab" aria-label="Home"><i class="fa-solid fa-home"></i></a>
-    <div class="note-header">
-      <div class="level-badge"><i class="fa-solid ${levelIcon[currentLevel]}"></i> ${levelDisplay[currentLevel]}</div>
-      <h1 class="note-title">${esc(note.title || noteTitle)}</h1>
-    </div>
-    <div class="note-content">
-      ${shareButtons}
-      ${toc}
-      ${processedContent}
-      ${keyPoints}
-      <div class="reaction-bar" data-note-id="${noteId}">
-        <button class="reaction-btn" data-reaction="like" onclick="toggleReaction('${noteId}', 'like')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button>
-        <button class="reaction-btn" data-reaction="love" onclick="toggleReaction('${noteId}', 'love')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button>
-        <button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction('${noteId}', 'helpful')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count helpful-count">0</span></button>
-      </div>
-      <div class="comment-section">
-        <div class="comment-input-group">
-          <input type="text" id="comment-input" placeholder="Add a comment or question...">
-          <button class="comment-submit" onclick="submitComment()">Post</button>
-        </div>
-        <div class="comments-list" id="comments-list"></div>
-      </div>
-      ${relatedNotes}
-      <div style="margin-top:30px;">
-        <a href="${backLinkUrl}" class="back-link" onclick="sessionStorage.setItem('fromNote', 'true')"><i class="fa-solid fa-arrow-left"></i> Back to ${currentLevel} Notes</a>
-      </div>
-    </div>
-  </div>
-`;
-    document.getElementById('copy-link-btn')?.addEventListener('click', () => {
+    app.innerHTML = '<div class="note-container"><a href="/" class="home-fab" aria-label="Home"><i class="fa-solid fa-home"></i></a><div class="note-header"><div class="level-badge"><i class="fa-solid ' + levelIcon[currentLevel] + '"></i> ' + levelDisplay[currentLevel] + '</div><h1 class="note-title">' + esc(note.title || noteTitle) + '</h1></div><div class="note-content">' + shareButtons + toc + processedContent + keyPoints + '<div class="reaction-bar" data-note-id="' + noteId + '"><button class="reaction-btn" data-reaction="like" onclick="toggleReaction(\'' + noteId + '\', \'like\')"><i class="fa-regular fa-thumbs-up"></i> <span class="reaction-count like-count">0</span></button><button class="reaction-btn" data-reaction="love" onclick="toggleReaction(\'' + noteId + '\', \'love\')"><i class="fa-regular fa-heart"></i> <span class="reaction-count love-count">0</span></button><button class="reaction-btn" data-reaction="helpful" onclick="toggleReaction(\'' + noteId + '\', \'helpful\')"><i class="fa-regular fa-lightbulb"></i> <span class="reaction-count helpful-count">0</span></button></div><div class="comment-section"><div class="comment-input-group"><input type="text" id="comment-input" placeholder="Add a comment or question..."><button class="comment-submit" onclick="submitComment()">Post</button></div><div class="comments-list" id="comments-list"></div></div>' + relatedNotes + '<div style="margin-top:30px;"><a href="' + backLinkUrl + '" class="back-link" onclick="sessionStorage.setItem(\'fromNote\', \'true\')"><i class="fa-solid fa-arrow-left"></i> Back to ' + currentLevel + ' Notes</a></div></div></div>';
+    
+    document.getElementById('copy-link-btn')?.addEventListener('click', function() {
       navigator.clipboard.writeText(window.location.href);
       alert('Link copied to clipboard!');
     });
-    document.getElementById('share-note-btn')?.addEventListener('click', () => {
+    document.getElementById('share-note-btn')?.addEventListener('click', function() {
       if (navigator.share) {
         navigator.share({ title: document.title, url: window.location.href });
       } else {
@@ -771,40 +614,40 @@ async function loadNote() {
         alert('Link copied to clipboard!');
       }
     });
+    
     await loadReactions();
     await loadComments();
-    await loadSavedProgressAndResume();
     
-    if (scrollHandlerActive) window.removeEventListener('scroll', updateProgressFromScroll);
-    window.addEventListener('scroll', updateProgressFromScroll);
-    scrollHandlerActive = true;
-    updateProgressFromScroll();
+    loadProgressFromLocal();
     
-    window.addEventListener('beforeunload', () => {
-      if (maxScrollPercentage >= 10 && !finalPercentageSaved) {
-        saveCurrentProgress();
-      }
+    window.removeEventListener('scroll', handleScroll);
+    window.addEventListener('scroll', handleScroll);
+    
+    window.addEventListener('beforeunload', function() {
+      saveProgressToLocal();
     });
   } catch (err) {
     console.error(err);
-    app.innerHTML = `<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="${backLinkUrl !== '/' ? backLinkUrl : '/'}" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>`;
+    app.innerHTML = '<div class="note-container"><div style="text-align:center; padding:60px;"><i class="fa-solid fa-exclamation-triangle" style="font-size:3rem; color:var(--clr-magenta);"></i><p style="margin-top:16px;">Failed to load note. Please try again.</p><a href="' + (backLinkUrl !== '/' ? backLinkUrl : '/') + '" class="back-link" style="margin-top:20px; display:inline-block;">Back to Notes</a></div></div>';
   }
 }
 
 async function loadReactions() {
   try {
     const data = await apiCall('get_note_reactions', { note_id: noteId });
-    const likeSpan = document.querySelector('.like-count');
-    const loveSpan = document.querySelector('.love-count');
-    const helpfulSpan = document.querySelector('.helpful-count');
-    if (likeSpan) likeSpan.textContent = data.counts?.like || 0;
-    if (loveSpan) loveSpan.textContent = data.counts?.love || 0;
-    if (helpfulSpan) helpfulSpan.textContent = data.counts?.helpful || 0;
-    if (data.user_reaction) {
-      const activeBtn = document.querySelector(`.reaction-btn[data-reaction="${data.user_reaction}"]`);
-      if (activeBtn) activeBtn.classList.add('active');
+    if (data) {
+      const likeSpan = document.querySelector('.like-count');
+      const loveSpan = document.querySelector('.love-count');
+      const helpfulSpan = document.querySelector('.helpful-count');
+      if (likeSpan) likeSpan.textContent = data.counts?.like || 0;
+      if (loveSpan) loveSpan.textContent = data.counts?.love || 0;
+      if (helpfulSpan) helpfulSpan.textContent = data.counts?.helpful || 0;
+      if (data.user_reaction) {
+        const activeBtn = document.querySelector('.reaction-btn[data-reaction="' + data.user_reaction + '"]');
+        if (activeBtn) activeBtn.classList.add('active');
+      }
     }
-  } catch (err) { console.error('Failed to load reactions:', err); }
+  } catch (err) { console.error(err); }
 }
 
 window.toggleReaction = async function(noteId, reactionType) {
@@ -812,23 +655,23 @@ window.toggleReaction = async function(noteId, reactionType) {
   try {
     await apiCall('toggle_note_reaction', { note_id: noteId, reaction_type: reactionType });
     await loadReactions();
-  } catch (err) { console.error('Failed:', err); }
+  } catch (err) { console.error(err); }
 };
 
 async function loadComments() {
   try {
     const interactions = await apiCall('get_resource_interactions', { resource_id: noteId });
     const commentList = document.getElementById('comments-list');
-    if (commentList && interactions.comments) {
+    if (commentList && interactions?.comments) {
       if (interactions.comments.length === 0) {
         commentList.innerHTML = '<div style="text-align:center; padding:20px; color:var(--clr-text-muted);">No comments yet. Be the first to ask a question!</div>';
       } else {
-        commentList.innerHTML = interactions.comments.map(c => `
-          <div class="comment-item"><strong>${esc(c.user_name || 'User')}</strong> <small>${new Date(c.created_at).toLocaleDateString()}</small><br>${esc(c.comment)}</div>
-        `).join('');
+        commentList.innerHTML = interactions.comments.map(function(c) {
+          return '<div class="comment-item"><strong>' + esc(c.user_name || 'User') + '</strong> <small>' + new Date(c.created_at).toLocaleDateString() + '</small><br>' + esc(c.comment) + '</div>';
+        }).join('');
       }
     }
-  } catch (err) { console.error('Failed to load comments:', err); }
+  } catch (err) { console.error(err); }
 }
 
 window.submitComment = async function() {
@@ -840,7 +683,7 @@ window.submitComment = async function() {
     await apiCall('comment_resource', { resource_id: noteId, comment: comment });
     if (input) input.value = '';
     await loadComments();
-  } catch (err) { console.error('Failed to submit comment:', err); }
+  } catch (err) { console.error(err); }
 };
 
 window.showAuthForm = function(mode) {
@@ -849,25 +692,13 @@ window.showAuthForm = function(mode) {
   const modal = document.createElement('div');
   modal.id = 'auth-modal';
   modal.style.cssText = 'position:fixed;inset:0;z-index:300;display:flex;align-items:center;justify-content:center;background:rgba(0,0,0,0.8);';
-  modal.innerHTML = `
-    <div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:20px;padding:2rem;max-width:380px;width:90%;position:relative;">
-      <button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;">✕</button>
-      <h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</h3>
-      <form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;">
-        <input type="email" id="auth-email" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Email" required>
-        <input type="password" id="auth-password" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Password" required>
-        <button type="submit" style="background:var(--gradient-cyan);border:none;padding:12px;border-radius:40px;color:#fff;font-weight:700;cursor:pointer;">${mode === 'signin' ? 'Sign In' : 'Create Account'}</button>
-      </form>
-      <p style="text-align:center;margin-top:1rem;font-size:0.85rem;">${mode === 'signin' ? "No account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign up</a>" : "Have account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign in</a>"}</p>
-      <p id="auth-error" style="color:#e74c3c;text-align:center;margin-top:0.5rem;display:none;"></p>
-    </div>
-  `;
+  modal.innerHTML = '<div style="background:var(--clr-navy-card);border:2px solid var(--clr-cyan);border-radius:20px;padding:2rem;max-width:380px;width:90%;position:relative;"><button id="close-auth" style="position:absolute;top:0.5rem;right:0.5rem;background:none;border:none;color:var(--clr-text-dim);cursor:pointer;">✕</button><h3 style="color:var(--clr-cyan);margin-bottom:1.2rem;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</h3><form id="auth-form" style="display:flex;flex-direction:column;gap:1rem;"><input type="email" id="auth-email" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Email" required><input type="password" id="auth-password" style="padding:12px;border-radius:12px;border:1px solid var(--clr-border-glow);background:rgba(10,129,129,0.05);color:var(--clr-white);" placeholder="Password" required><button type="submit" style="background:var(--gradient-cyan);border:none;padding:12px;border-radius:40px;color:#fff;font-weight:700;cursor:pointer;">' + (mode === 'signin' ? 'Sign In' : 'Create Account') + '</button></form><p style="text-align:center;margin-top:1rem;font-size:0.85rem;">' + (mode === 'signin' ? "No account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign up</a>" : "Have account? <a href='#' id='switch-mode' style='color:var(--clr-cyan);'>Sign in</a>") + '</p><p id="auth-error" style="color:#e74c3c;text-align:center;margin-top:0.5rem;display:none;"></p></div>';
   document.body.appendChild(modal);
-  document.getElementById('close-auth').onclick = () => modal.remove();
-  document.getElementById('switch-mode')?.addEventListener('click', (e) => {
+  document.getElementById('close-auth').onclick = function() { modal.remove(); };
+  document.getElementById('switch-mode')?.addEventListener('click', function(e) {
     e.preventDefault(); modal.remove(); showAuthForm(mode === 'signin' ? 'signup' : 'signin');
   });
-  document.getElementById('auth-form').onsubmit = async (e) => {
+  document.getElementById('auth-form').onsubmit = async function(e) {
     e.preventDefault();
     const email = document.getElementById('auth-email').value.trim();
     const password = document.getElementById('auth-password').value;
@@ -875,8 +706,8 @@ window.showAuthForm = function(mode) {
     errEl.style.display = 'none';
     try {
       const action = mode === 'signin' ? 'signin' : 'signup';
-      const data = await apiCall(action, { email, password });
-      if (data.user) {
+      const data = await apiCall(action, { email: email, password: password });
+      if (data?.user) {
         currentUser = data.user;
         modal.remove();
         showContent();
@@ -896,38 +727,27 @@ async function loadNavigationAndFooter() {
     const sections = await apiCall('get_all_site_sections');
     if (sections) {
       if (sections.site_config?.logo_url) {
-        document.querySelectorAll('.logo-link').forEach(link => {
-          link.innerHTML = `<img src="${esc(sections.site_config.logo_url)}" alt="AliverBiopharm" style="height:45px;width:auto;max-height:50px;">`;
+        document.querySelectorAll('.logo-link').forEach(function(link) {
+          link.innerHTML = '<img src="' + esc(sections.site_config.logo_url) + '" alt="AliverBiopharm" style="height:45px;width:auto;max-height:50px;">';
         });
       }
       if (sections.navigation?.links) {
         const mainNav = document.getElementById('main-nav');
         if (mainNav) {
-          mainNav.innerHTML = sections.navigation.links.map(link => `<li><a href="${esc(link.href)}">${esc(link.label)}</a></li>`).join('');
+          mainNav.innerHTML = sections.navigation.links.map(function(link) { return '<li><a href="' + esc(link.href) + '">' + esc(link.label) + '</a></li>'; }).join('');
         }
       }
       if (sections.footer) {
-        const fd = sections.footer;
         const footer = document.getElementById('footer');
         if (footer) {
-          footer.innerHTML = `
-            <div style="max-width:1200px; margin:0 auto; padding:40px 24px 24px; border-top:1px solid var(--clr-border-glow);">
-              <div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-size:0.75rem; color:var(--clr-text-muted);">
-                <p>&copy; ${new Date().getFullYear()} AliverBiopharm. All rights reserved.</p>
-                <div style="display:flex;gap:24px;">
-                  <a href="/privacy" style="color:var(--clr-text-dim); text-decoration:none;">Privacy Policy</a>
-                  <a href="/terms" style="color:var(--clr-text-dim); text-decoration:none;">Terms of Use</a>
-                </div>
-              </div>
-            </div>
-          `;
+          footer.innerHTML = '<div style="max-width:1200px; margin:0 auto; padding:40px 24px 24px; border-top:1px solid var(--clr-border-glow);"><div style="display:flex; justify-content:space-between; flex-wrap:wrap; gap:16px; font-size:0.75rem; color:var(--clr-text-muted);"><p>&copy; ' + new Date().getFullYear() + ' AliverBiopharm. All rights reserved.</p><div style="display:flex;gap:24px;"><a href="/privacy" style="color:var(--clr-text-dim); text-decoration:none;">Privacy Policy</a><a href="/terms" style="color:var(--clr-text-dim); text-decoration:none;">Terms of Use</a></div></div></div>';
         }
       }
     }
-  } catch (err) { console.error('Failed to load:', err); }
+  } catch (err) { console.error(err); }
 }
 
-document.addEventListener('DOMContentLoaded', async () => {
+document.addEventListener('DOMContentLoaded', async function() {
   await loadNavigationAndFooter();
   try {
     const userData = await apiCall('get_user');
