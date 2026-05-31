@@ -80,7 +80,6 @@ body {
 }
 .main-nav a:hover { color: var(--clr-magenta); }
 
-/* Progress bar container - placed right above note card, full width of card */
 .progress-wrapper {
   max-width: var(--max-width);
   margin: 90px auto 0 auto;
@@ -121,7 +120,6 @@ body {
   margin-top: 6px;
   letter-spacing: 0.5px;
 }
-
 .resume-prompt {
   position: fixed;
   bottom: 30px;
@@ -493,7 +491,10 @@ async function apiCall(action, params) {
     method: 'POST',
     headers: { 'Content-Type': 'application/json' },
     credentials: 'include',
-    body: JSON.stringify({ action, ...params })
+    body: JSON.stringify({
+      action,
+      ...params
+    })
   });
   const json = await res.json();
   if (!res.ok) throw new Error(json.error);
@@ -521,6 +522,10 @@ function showContent() {
   loadNote();
 }
 
+function getScrollTop() {
+  return window.scrollY || document.documentElement.scrollTop || 0;
+}
+
 function updateProgressBarUI(percentage) {
   const fillEl = document.getElementById('progress-bar-fill');
   const percentText = document.getElementById('progress-percentage');
@@ -540,7 +545,7 @@ function saveCurrentProgress() {
     apiCall('save_reading_progress', {
       note_id: noteId,
       scroll_percentage: percentage,
-      scroll_position: document.documentElement.scrollTop,
+      scroll_position: getScrollTop(),
       time_spent: 0,
       completed: false
     }).catch(e => console.error('Failed to save progress:', e));
@@ -548,7 +553,7 @@ function saveCurrentProgress() {
 }
 
 function updateProgressFromScroll() {
-  const winScroll = document.documentElement.scrollTop;
+  const winScroll = getScrollTop();
   const height = document.documentElement.scrollHeight - window.innerHeight;
   if (height <= 0) return;
   const currentPercentage = (winScroll / height) * 100;
@@ -578,7 +583,7 @@ function saveFinalPercentage() {
   apiCall('save_reading_progress', {
     note_id: noteId,
     scroll_percentage: Math.floor(maxScrollPercentage),
-    scroll_position: document.documentElement.scrollTop,
+    scroll_position: getScrollTop(),
     time_spent: 0,
     completed: maxScrollPercentage >= 95
   }).catch(e => console.error('Failed to save final progress:', e));
