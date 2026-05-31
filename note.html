@@ -740,16 +740,25 @@ function printNote() {
   printWindow.print();
 }
 
-async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
+ async function loadRelatedNotes(currentNoteId, currentLevel, currentTopic) {
+  console.log('=== RELATED NOTES DEBUG ===');
+  console.log('Current note ID:', currentNoteId);
+  console.log('Current level:', currentLevel);
+  console.log('Current topic from note:', currentTopic);
   try {
     const allNotes = await apiCall('get_notes_by_level', { level: currentLevel });
+    console.log('All notes from API (count:', allNotes?.length, '):', allNotes);
     if (!allNotes || !allNotes.length) return '';
-    const related = allNotes.filter(n => n.id !== currentNoteId && n.topic === currentTopic).slice(0, 3);
+    const related = allNotes.filter(n => n.id !== currentNoteId && n.topic === currentTopic);
+    console.log('Filtered related notes (same topic):', related);
     if (related.length === 0) return '';
     return `<div class="related-notes"><h3><svg width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="var(--clr-cyan)" stroke-width="2"><path d="M10 13a5 5 0 0 0 7.54.54l3-3a5 5 0 0 0-7.07-7.07l-1.72 1.71"/><path d="M14 11a5 5 0 0 0-7.54-.54l-3 3a5 5 0 0 0 7.07 7.07l1.71-1.71"/></svg> Related Notes</h3><div class="related-grid">` +
       related.map(n => `<a href="note.html?id=${n.id}&level=${currentLevel}&title=${encodeURIComponent(n.title)}" class="related-card"><strong>${esc(n.title)}</strong><p>${esc(n.preview ? n.preview.substring(0, 80) : 'Click to read')}...</p></a>`).join('') +
       `</div></div>`;
-  } catch(e) { return ''; }
+  } catch(e) { 
+    console.error('Related notes error:', e);
+    return ''; 
+  }
 }
 
 function updateFavicon(level) {
