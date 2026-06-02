@@ -5800,14 +5800,55 @@ let notesStructureData = [];
  let notesSelectedLevelData = null;
 let notesSelectedTopicData = null;
 
-  async function loadNotesStructure() {
+   async function loadNotesStructure() {
   try {
     const data = await apiCall('get_notes_structure');
-    notesStructureData = data || [];
+
+    if (!data) {
+      throw new Error('API returned no data');
+    }
+
+    if (!Array.isArray(data)) {
+      throw new Error(
+        `Expected array from API, got ${typeof data}`
+      );
+    }
+
+    notesStructureData = data;
+
+    console.log('Notes loaded successfully:', data.length);
+
     return notesStructureData;
+
   } catch (err) {
-    console.error('Failed to load notes structure:', err);
-    document.getElementById('notes-container').innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);">Failed to load notes. Please try again.</div>';
+
+    console.error('loadNotesStructure failed:', err);
+
+    document.body.insertAdjacentHTML(
+      'afterbegin',
+      `
+      <div style="
+        background:#ffebee;
+        color:#b71c1c;
+        border:1px solid #ef5350;
+        padding:16px;
+        margin:16px;
+        border-radius:8px;
+        white-space:pre-wrap;
+        font-family:monospace;
+        font-size:14px;
+        line-height:1.5;
+        z-index:99999;
+        position:relative;
+      ">
+        <strong>Notes Loading Error</strong><br><br>
+        ${err.message || err}
+      </div>
+      `
+    );
+
+    notesStructureData = [];
+
     return [];
   }
 }
