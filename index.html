@@ -935,11 +935,7 @@ body.dark-mode .f-input { background: rgba(2, 82, 82, 0.35); }
   resize: vertical;
 }
 
-.form-input::placeholder,
-.form-textarea::placeholder,
-.f-input::placeholder { color: var(--clr-text-muted); font-style: normal; }
-
-.form-input:focus,
+ .form-input:focus,
 .form-textarea:focus,
 .f-input:focus {
   outline: none;
@@ -955,17 +951,7 @@ body.dark-mode .f-input:focus {
   box-shadow: 0 0 16px rgba(10, 181, 181, 0.18);
 }
 
-.form-textarea {
-  border-radius: var(--radius-md);
-  min-height: 110px;
-  resize: vertical;
-}
-
-.form-input::placeholder,
-.form-textarea::placeholder,
-.f-input::placeholder { color: var(--clr-text-muted); font-style: normal; }
-
-.form-input:focus,
+ .form-input:focus,
 .form-textarea:focus,
 .f-input:focus {
   outline: none;
@@ -974,14 +960,7 @@ body.dark-mode .f-input:focus {
   box-shadow: 0 0 0 3px rgba(10, 181, 181, 0.14);
 }
 
-body.dark-mode .form-input:focus,
-body.dark-mode .form-textarea:focus,
-body.dark-mode .f-input:focus {
-  background: rgba(2, 82, 82, 0.5);
-  box-shadow: 0 0 16px rgba(10, 181, 181, 0.18);
-}
-
-.f-label {
+ .f-label {
   display: block;
   font-family: var(--font-body);
   font-size: var(--text-xs);
@@ -1089,13 +1068,7 @@ body.dark-mode .f-input:focus {
   transition: box-shadow 0.15s ease, transform 0.1s ease;
 }
 
-.newsletter-box input:active {
-  box-shadow: inset 0 3px 8px rgba(0, 0, 0, 0.2);
-  transform: scale(0.98);
-}
-
-select,
-.flashcard-filter select {
+ .flashcard-filter select {
   box-shadow: inset 0 2px 4px rgba(0, 0, 0, 0.1), 0 1px 0 rgba(255, 255, 255, 0.3);
   transition: all 0.12s ease;
   cursor: pointer;
@@ -3942,15 +3915,10 @@ keyframes fadeInOut {
       <div style="padding:20px 24px;">
         <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:20px; flex-wrap:wrap; gap:12px;">
           <button id="notes-main-filter-btn" class="btn-primary" style="background:linear-gradient(135deg, #e67e22, #b8873a, #0ab5b5); padding:8px 20px; border-radius:50px; font-weight:700; font-size:0.85rem;"><i class="fa-solid fa-filter"></i> Browse Notes by Level</button>
-          <button id="notes-fullscreen-btn" class="btn-primary" style="background:transparent; border:2px solid var(--clr-cyan); color:var(--clr-cyan); padding:8px 20px; border-radius:50px; font-size:0.85rem;"><i class="fa-solid fa-expand"></i> Full Screen</button>
-        </div>
+          </div>
         
           <div id="notes-filter-area" style="display:none; margin-bottom:20px;">
-          <div style="display:flex; justify-content:space-between; align-items:center; margin-bottom:15px; flex-wrap:wrap; gap:10px;">
-            <button id="notes-hide-filter-btn" class="btn-primary" style="background:rgba(184,135,58,0.2); border:1px solid var(--clr-magenta); color:var(--clr-magenta); padding:6px 16px; border-radius:50px; font-size:0.75rem;"><i class="fa-solid fa-eye-slash"></i> Hide Filter</button>
-            <button id="notes-reset-filter-btn" class="btn-primary" style="background:transparent; border:1px solid var(--clr-cyan); color:var(--clr-cyan); padding:6px 16px; border-radius:50px; font-size:0.75rem;"><i class="fa-solid fa-undo"></i> Reset</button>
-          </div>
-          <div id="notes-level-buttons" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;"></div>
+         <div id="notes-level-buttons" style="display:flex; gap:12px; flex-wrap:wrap; margin-bottom:20px;"></div>
           <div id="notes-topics-container" style="margin-bottom:20px;"></div>
           <div id="notes-subtopics-container"></div>
         </div>
@@ -5803,8 +5771,7 @@ let notesCurrentLevel = null;
 let notesCurrentTopic = null;
 let notesCurrentSubtopic = null;
 let notesStructureData = [];
-let notesFullscreenActive = false;
-let notesSelectedLevelData = null;
+ let notesSelectedLevelData = null;
 let notesSelectedTopicData = null;
 
   async function loadNotesStructure() {
@@ -5831,10 +5798,7 @@ let notesSelectedTopicData = null;
   }
 }
 
-function hideFilterArea() {
-  document.getElementById('notes-filter-area').style.display = 'none';
-}
-
+ 
 function resetFilter() {
   notesCurrentLevel = null;
   notesCurrentTopic = null;
@@ -6115,21 +6079,7 @@ function downloadNoteAsPDF() {
   win.print();
 }
 
-function toggleNotesFullscreen() {
-  const notesSection = document.getElementById('notes-section');
-  const fullscreenBtn = document.getElementById('notes-fullscreen-btn');
-  if (!notesFullscreenActive) {
-    notesSection.classList.add('notes-fullscreen');
-    fullscreenBtn.innerHTML = '<i class="fa-solid fa-compress"></i> Exit Full Screen';
-    notesFullscreenActive = true;
-    document.body.style.overflow = 'hidden';
-  } else {
-    notesSection.classList.remove('notes-fullscreen');
-    fullscreenBtn.innerHTML = '<i class="fa-solid fa-expand"></i> Full Screen';
-    notesFullscreenActive = false;
-    document.body.style.overflow = '';
-  }
-}
+ 
 
  document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
   e.preventDefault();
@@ -6142,18 +6092,6 @@ function toggleNotesFullscreen() {
     resetFilter();
   }
 });
-
-document.getElementById('notes-hide-filter-btn').addEventListener('click', (e) => {
-  e.preventDefault();
-  hideFilterArea();
-});
-
-document.getElementById('notes-reset-filter-btn').addEventListener('click', (e) => {
-  e.preventDefault();
-  resetFilter();
-});
-
-document.getElementById('notes-fullscreen-btn').addEventListener('click', toggleNotesFullscreen);
 
 function getLevelColor(level) {
   if (level === 'O-Level') return '#e67e22';
