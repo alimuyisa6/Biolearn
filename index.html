@@ -5843,9 +5843,16 @@ function releaseNotesWakeLock() {
   }
 }
 
-function showFilterArea() {
-  document.getElementById('notes-filter-area').style.display = 'block';
-  renderLevelButtons();
+ function showFilterArea() {
+  if (notesStructureData.length === 0) {
+    loadNotesStructure().then(() => {
+      document.getElementById('notes-filter-area').style.display = 'block';
+      renderLevelButtons();
+    });
+  } else {
+    document.getElementById('notes-filter-area').style.display = 'block';
+    renderLevelButtons();
+  }
 }
 
 function hideFilterArea() {
@@ -6150,11 +6157,8 @@ function toggleNotesFullscreen() {
   }
 }
 
-document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
+ document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
   e.preventDefault();
-  if (notesStructureData.length === 0) {
-    await loadNotesStructure();
-  }
   showFilterArea();
   if (notesCurrentSubtopic) {
     renderLevelButtons();
