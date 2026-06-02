@@ -5894,6 +5894,10 @@ alert('Rows available: ' + notesStructureData.length);
 const levels = {};
   console.log(notesStructureData[0]);
 alert(JSON.stringify(notesStructureData[0]));
+alert(
+  'level_order = ' +
+  JSON.stringify(notesStructureData[0].level_order)
+);
 notesStructureData.forEach(item => {
     if (!levels[item.level]) {
       levels[item.level] = { level_order: item.level_order, topics: {} };
@@ -5907,7 +5911,7 @@ notesStructureData.forEach(item => {
     html += `<button class="level-btn" data-level="${levelName}" style="background:${isActive ? 'var(--clr-cyan)' : 'transparent'}; border:2px solid ${getLevelColor(levelName)}; color:${isActive ? '#fff' : 'var(--clr-white)'}; padding:8px 24px; border-radius:50px; cursor:pointer; font-weight:600; transition:all 0.2s;">${escapeHtml(levelName)}</button>`;
   });
   
-  alert('HTML length: ' + html.length);
+  alert('HTML length: ' + html.length); 
 alert('Levels found: ' + sortedLevels.length);
 
 const testEl = document.getElementById('notes-level-buttons');
