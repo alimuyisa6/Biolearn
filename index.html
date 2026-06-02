@@ -5801,7 +5801,8 @@ let notesStructureData = [];
 let notesSelectedTopicData = null;
 
    async function loadNotesStructure() {
-  try {
+ alert('loadNotesStructure started');
+ try {
     const data = await apiCall('get_notes_structure');
 
     if (!data) {
