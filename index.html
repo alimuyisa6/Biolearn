@@ -5884,94 +5884,172 @@ function resetFilter() {
   document.getElementById('notes-subtopics-container').innerHTML = '';
 }
 
- function renderLevelButtons() {
-  try {
-    console.log('renderLevelButtons started');
-    console.log('Rows:', notesStructureData?.length);
+  function renderLevelButtons() {
+  const levels = {};
 
-    const container = document.getElementById('notes-level-buttons');
+  notesStructureData.forEach(item => {
+    if (!levels[item.level]) {
+      levels[item.level] = {
+        level_order: item.level_order,
+        topics: {}
+      };
+    }
+  });
+
+  const sortedLevels = Object.entries(levels).sort(
+    (a, b) => a[1].level_order - b[1].level_order
+  );
+
+  let html = '';
+
+  sortedLevels.forEach(([levelName]) => {
+    const isActive = notesCurrentLevel === levelName;
+
+    html += `
+      <button
+        class="level-btn"
+        data-level="${levelName}"
+        style="
+          background:${isActive ? 'var(--clr-cyan)' : 'transparent'};
+          border:2px solid ${getLevelColor(levelName)};
+          color:${isActive ? '#fff' : 'var(--clr-white)'};
+          padding:8px 24px;
+          border-radius:50px;
+          cursor:pointer;
+          font-weight:600;
+          transition:all 0.2s;
+        "
+      >
+        ${escapeHtml(levelName)}
+      </button>
+    `;
+  });
+
+  const container = document.getElementById('notes-level-buttons');
+
+  if (!container) return;
+
+  container.innerHTML = html;
+
+  document.querySelectorAll('.level-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const level = btn.dataset.level;
+
+      notesCurrentLevel = level;
+      notesCurrentTopic = null;
+      notesCurrentSubtopic = null;
+      notesSelectedLevelData = null;
+      notesSelectedTopicData = null;
+
+      renderLevelButtons();
+      renderTopicsForLevel(level);
+
+      const subtopicsContainer =
+        document.getElementById('notes-subtopics-container');
+
+      if (subtopicsContainer) {
+        subtopicsContainer.innerHTML = '';
+      }
+    });
+  });
+
+  if (notesCurrentLevel) {
+    renderTopicsForLevel(notesCurrentLevel);
+  }
+}
+
+ function renderTopicsForLevel(level) {
+  try {
+    alert('renderTopicsForLevel called');
+    alert('Level: ' + level);
+
+    const container = document.getElementById('notes-topics-container');
+
+    alert('Container exists: ' + !!container);
 
     if (!container) {
-      throw new Error("Element #notes-level-buttons not found");
+      throw new Error('notes-topics-container not found');
     }
 
-    if (!Array.isArray(notesStructureData)) {
-      throw new Error("notesStructureData is not an array");
-    }
-
-    const levels = {};
+    const topics = {};
+    let matchCount = 0;
 
     notesStructureData.forEach(item => {
-      if (!item || !item.level) return;
+      if (item.level === level) {
+        matchCount++;
 
-      if (!levels[item.level]) {
-        levels[item.level] = {
-          level_order: Number(item.level_order) || 999
-        };
+        if (!topics[item.topic]) {
+          topics[item.topic] = {
+            topic_order: Number(item.topic_order) || 999,
+            subtopics: []
+          };
+        }
       }
     });
 
-    const sortedLevels = Object.entries(levels).sort(
-      (a, b) => a[1].level_order - b[1].level_order
+    alert('Matching rows: ' + matchCount);
+    alert('Topics found: ' + Object.keys(topics).length);
+
+    const sortedTopics = Object.entries(topics).sort(
+      (a, b) => a[1].topic_order - b[1].topic_order
     );
 
-    let html = '';
+    alert('Sorted topics: ' + sortedTopics.length);
 
-    sortedLevels.forEach(([levelName]) => {
-      const isActive = notesCurrentLevel === levelName;
+    let html =
+      '<h4 style="color:var(--clr-magenta); margin-bottom:12px; font-size:0.9rem;">Topics</h4>' +
+      '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
 
+    sortedTopics.forEach(([topicName]) => {
       html += `
         <button
-          class="level-btn"
-          data-level="${levelName}"
+          class="topic-btn"
+          data-topic="${topicName}"
           style="
-            background:${isActive ? 'var(--clr-cyan)' : 'transparent'};
-            border:2px solid ${typeof getLevelColor === 'function'
-              ? getLevelColor(levelName)
-              : '#0ab5b5'};
-            color:${isActive ? '#fff' : 'var(--clr-white)'};
-            padding:8px 24px;
+            background:rgba(184,135,58,0.15);
+            border:1px solid var(--clr-magenta);
+            color:var(--clr-magenta);
+            padding:6px 18px;
             border-radius:50px;
             cursor:pointer;
-            font-weight:600;
-            transition:all .2s;
           "
         >
-          ${levelName}
+          ${topicName}
         </button>
       `;
     });
 
+    html += '</div>';
+
+    alert('HTML length: ' + html.length);
+
     container.innerHTML = html;
 
-    container.querySelectorAll('.level-btn').forEach(btn => {
+    alert('Topics rendered');
+
+    document.querySelectorAll('.topic-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        const level = btn.dataset.level;
+        alert('Topic clicked: ' + btn.dataset.topic);
 
-        notesCurrentLevel = level;
-        notesCurrentTopic = null;
+        notesCurrentTopic = btn.dataset.topic;
         notesCurrentSubtopic = null;
-        notesSelectedLevelData = null;
-        notesSelectedTopicData = null;
 
-        renderLevelButtons();
-        renderTopicsForLevel(level);
-
-        const subtopicsContainer =
-          document.getElementById('notes-subtopics-container');
-
-        if (subtopicsContainer) {
-          subtopicsContainer.innerHTML = '';
-        }
+        renderTopicsForLevel(notesCurrentLevel);
+        renderSubtopicsForTopic(
+          notesCurrentLevel,
+          btn.dataset.topic
+        );
       });
     });
 
-    if (notesCurrentLevel) {
-      renderTopicsForLevel(notesCurrentLevel);
+    if (notesCurrentTopic) {
+      alert('Rendering saved topic');
+      renderSubtopicsForTopic(level, notesCurrentTopic);
     }
 
   } catch (err) {
-    console.error('renderLevelButtons failed:', err);
+
+    console.error(err);
 
     document.body.insertAdjacentHTML(
       'afterbegin',
@@ -5985,49 +6063,14 @@ function resetFilter() {
         border-radius:8px;
         font-family:monospace;
         white-space:pre-wrap;
+        z-index:99999;
+        position:relative;
       ">
-        Render Error:<br><br>
+        <strong>renderTopicsForLevel Error</strong><br><br>
         ${err.message}
       </div>
       `
     );
-  }
-}
-
-function renderTopicsForLevel(level) {
-  const topics = {};
-  notesStructureData.forEach(item => {
-    if (item.level === level) {
-      if (!topics[item.topic]) {
-        topics[item.topic] = { topic_order: item.topic_order, subtopics: [] };
-      }
-    }
-  });
-  
-  const sortedTopics = Object.entries(topics).sort((a,b) => a[1].topic_order - b[1].topic_order);
-  
-  let html = '<h4 style="color:var(--clr-magenta); margin-bottom:12px; font-size:0.9rem;"><i class="fa-solid fa-folder-tree"></i> Topics</h4><div style="display:flex; flex-wrap:wrap; gap:10px;">';
-  sortedTopics.forEach(([topicName]) => {
-    const isActive = notesCurrentTopic === topicName;
-    html += `<button class="topic-btn" data-topic="${escapeHtml(topicName)}" style="background:${isActive ? 'var(--clr-magenta)' : 'rgba(184,135,58,0.15)'}; border:1px solid var(--clr-magenta); color:${isActive ? '#fff' : 'var(--clr-magenta)'}; padding:6px 18px; border-radius:50px; cursor:pointer; font-size:0.85rem; transition:all 0.2s;">${escapeHtml(topicName)}</button>`;
-  });
-  html += '</div>';
-  
-  document.getElementById('notes-topics-container').innerHTML = html;
-  
-  document.querySelectorAll('.topic-btn').forEach(btn => {
-    btn.addEventListener('click', (e) => {
-      const topic = btn.dataset.topic;
-      notesCurrentTopic = topic;
-      notesCurrentSubtopic = null;
-      notesSelectedTopicData = null;
-      renderTopicsForLevel(notesCurrentLevel);
-      renderSubtopicsForTopic(notesCurrentLevel, topic);
-    });
-  });
-  
-  if (notesCurrentTopic) {
-    renderSubtopicsForTopic(level, notesCurrentTopic);
   }
 }
 
