@@ -5584,7 +5584,22 @@ try {
   lazyLoad('#stats',             function() { loadPublicStats(); });
   lazyLoad('#community',         function() { loadCommunityActivity(); });
   lazyLoad('#continue-learning', function() { loadContinueLearning(); });
-  document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
+  
+document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
+  e.preventDefault();
+  const filterArea = document.getElementById('notes-filter-area');
+  const isVisible = filterArea.style.display === 'block';
+  
+  if (!isVisible) {
+    filterArea.style.display = 'block';
+    await loadNotesStructure();
+    renderLevelButtons();
+  } else {
+    filterArea.style.display = 'none';
+  }
+});
+
+document.querySelectorAll('.reveal').forEach(function(el) { el.classList.add('in'); });
   document.getElementById('mood-submit-btn').addEventListener('click', submitMood);
   document.querySelectorAll('.mood-emoji').forEach(function(emoji) {
     emoji.addEventListener('click', function(e) {
