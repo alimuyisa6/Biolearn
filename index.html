@@ -5801,24 +5801,16 @@ let notesStructureData = [];
 let notesSelectedTopicData = null;
 
    async function loadNotesStructure() {
-   try {
-     alert('Before API call');
+  try {
 
-const data = await apiCall('get_notes_structure');
-
-alert('After API call');
-
-console.log(data);
-alert('Rows: ' + (Array.isArray(data) ? data.length : 'Not an array'));
+    const data = await apiCall('get_notes_structure');
 
     if (!data) {
-      throw new Error('API returned no data');
+      throw new Error('No data was returned from the server.');
     }
 
     if (!Array.isArray(data)) {
-      throw new Error(
-        `Expected array from API, got ${typeof data}`
-      );
+      throw new Error('Invalid notes data format received.');
     }
 
     notesStructureData = data;
@@ -5831,28 +5823,23 @@ alert('Rows: ' + (Array.isArray(data) ? data.length : 'Not an array'));
 
     console.error('loadNotesStructure failed:', err);
 
-    document.body.insertAdjacentHTML(
-      'afterbegin',
-      `
-      <div style="
-        background:#ffebee;
-        color:#b71c1c;
-        border:1px solid #ef5350;
-        padding:16px;
-        margin:16px;
-        border-radius:8px;
-        white-space:pre-wrap;
-        font-family:monospace;
-        font-size:14px;
-        line-height:1.5;
-        z-index:99999;
-        position:relative;
-      ">
-        <strong>Notes Loading Error</strong><br><br>
-        ${err.message || err}
-      </div>
-      `
-    );
+    const levelsContainer =
+      document.getElementById('notes-level-buttons');
+
+    if (levelsContainer) {
+      levelsContainer.innerHTML = `
+        <div style="
+          background:rgba(255,0,0,0.08);
+          border:1px solid rgba(255,0,0,0.25);
+          color:#ff6b6b;
+          padding:12px;
+          border-radius:8px;
+          text-align:center;
+        ">
+          Unable to load notes. Please refresh the page and try again.
+        </div>
+      `;
+    }
 
     notesStructureData = [];
 
