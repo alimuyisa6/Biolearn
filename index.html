@@ -5803,7 +5803,14 @@ let notesSelectedTopicData = null;
    async function loadNotesStructure() {
  alert('loadNotesStructure started');
  try {
-    const data = await apiCall('get_notes_structure');
+     alert('Before API call');
+
+const data = await apiCall('get_notes_structure');
+
+alert('After API call');
+
+console.log(data);
+alert('Rows: ' + (Array.isArray(data) ? data.length : 'Not an array'));
 
     if (!data) {
       throw new Error('API returned no data');
