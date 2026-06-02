@@ -5884,77 +5884,109 @@ function resetFilter() {
   document.getElementById('notes-subtopics-container').innerHTML = '';
 }
 
-  function renderLevelButtons() {
-  const levels = {};
+   function renderLevelButtons() {
+  try {
+    const container = document.getElementById('notes-level-buttons');
 
-  notesStructureData.forEach(item => {
-    if (!levels[item.level]) {
-      levels[item.level] = {
-        level_order: item.level_order,
-        topics: {}
-      };
+    if (!container) {
+      console.error('notes-level-buttons container not found');
+      return;
     }
-  });
 
-  const sortedLevels = Object.entries(levels).sort(
-    (a, b) => a[1].level_order - b[1].level_order
-  );
+    if (!Array.isArray(notesStructureData)) {
+      throw new Error('Notes data is unavailable');
+    }
 
-  let html = '';
+    const levels = {};
 
-  sortedLevels.forEach(([levelName]) => {
-    const isActive = notesCurrentLevel === levelName;
+    notesStructureData.forEach(item => {
+      if (!item?.level) return;
 
-    html += `
-      <button
-        class="level-btn"
-        data-level="${levelName}"
-        style="
-          background:${isActive ? 'var(--clr-cyan)' : 'transparent'};
-          border:2px solid ${getLevelColor(levelName)};
-          color:${isActive ? '#fff' : 'var(--clr-white)'};
-          padding:8px 24px;
-          border-radius:50px;
-          cursor:pointer;
-          font-weight:600;
-          transition:all 0.2s;
-        "
-      >
-        ${escapeHtml(levelName)}
-      </button>
-    `;
-  });
-
-  const container = document.getElementById('notes-level-buttons');
-
-  if (!container) return;
-
-  container.innerHTML = html;
-
-  document.querySelectorAll('.level-btn').forEach(btn => {
-    btn.addEventListener('click', () => {
-      const level = btn.dataset.level;
-
-      notesCurrentLevel = level;
-      notesCurrentTopic = null;
-      notesCurrentSubtopic = null;
-      notesSelectedLevelData = null;
-      notesSelectedTopicData = null;
-
-      renderLevelButtons();
-      renderTopicsForLevel(level);
-
-      const subtopicsContainer =
-        document.getElementById('notes-subtopics-container');
-
-      if (subtopicsContainer) {
-        subtopicsContainer.innerHTML = '';
+      if (!levels[item.level]) {
+        levels[item.level] = {
+          level_order: Number(item.level_order) || 999
+        };
       }
     });
-  });
 
-  if (notesCurrentLevel) {
-    renderTopicsForLevel(notesCurrentLevel);
+    const sortedLevels = Object.entries(levels).sort(
+      (a, b) => a[1].level_order - b[1].level_order
+    );
+
+    if (sortedLevels.length === 0) {
+      container.innerHTML = `
+        <div class="empty-state">
+          No levels available.
+        </div>
+      `;
+      return;
+    }
+
+    let html = '';
+
+    sortedLevels.forEach(([levelName]) => {
+      const isActive = notesCurrentLevel === levelName;
+
+      html += `
+        <button
+          class="level-btn"
+          data-level="${levelName}"
+          style="
+            background:${isActive ? 'var(--clr-cyan)' : 'transparent'};
+            border:2px solid ${getLevelColor(levelName)};
+            color:${isActive ? '#fff' : 'var(--clr-white)'};
+            padding:8px 24px;
+            border-radius:50px;
+            cursor:pointer;
+            font-weight:600;
+            transition:all 0.2s;
+          "
+        >
+          ${escapeHtml(levelName)}
+        </button>
+      `;
+    });
+
+    container.innerHTML = html;
+
+    container.querySelectorAll('.level-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        const level = btn.dataset.level;
+
+        notesCurrentLevel = level;
+        notesCurrentTopic = null;
+        notesCurrentSubtopic = null;
+        notesSelectedLevelData = null;
+        notesSelectedTopicData = null;
+
+        renderLevelButtons();
+        renderTopicsForLevel(level);
+
+        const subtopicsContainer =
+          document.getElementById('notes-subtopics-container');
+
+        if (subtopicsContainer) {
+          subtopicsContainer.innerHTML = '';
+        }
+      });
+    });
+
+    if (notesCurrentLevel) {
+      renderTopicsForLevel(notesCurrentLevel);
+    }
+
+  } catch (error) {
+    console.error('renderLevelButtons:', error);
+
+    const container = document.getElementById('notes-level-buttons');
+
+    if (container) {
+      container.innerHTML = `
+        <div class="error-state">
+          Unable to load levels. Please refresh the page.
+        </div>
+      `;
+    }
   }
 }
 
