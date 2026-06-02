@@ -4118,16 +4118,8 @@ async function apiCall(action, params) {
     throw err;
   }
 }
-window.onerror = function(msg, url, line, col, error) {
-  const errorDiv = document.createElement('div');
-  errorDiv.style.cssText = 'position:fixed;bottom:10px;left:10px;right:10px;background:#ff4444;color:white;padding:12px;border-radius:8px;z-index:9999;font-family:monospace;font-size:12px;white-space:pre-wrap;word-break:break-all;box-shadow:0 2px 10px black;';
-  errorDiv.innerHTML = '🔴 ERROR: ' + msg + '<br>' + (error ? error.stack : 'Line: ' + line);
-  document.body.appendChild(errorDiv);
-  console.error(msg, error);
-  return false;
-};
-
-   async function apiCallGet(action, params = {}) {
+ 
+async function apiCallGet(action, params = {}) {
   let url;
   try {
     const baseUrl = API_BASE;
@@ -6113,21 +6105,7 @@ function downloadNoteAsPDF() {
   win.print();
 }
 
- 
-
- document.getElementById('notes-main-filter-btn').addEventListener('click', async (e) => {
-  e.preventDefault();
-  showFilterArea();
-  if (notesCurrentSubtopic) {
-    renderLevelButtons();
-    renderTopicsForLevel(notesCurrentLevel);
-    renderSubtopicsForTopic(notesCurrentLevel, notesCurrentTopic);
-  } else {
-    resetFilter();
-  }
-});
-
-function getLevelColor(level) {
+ function getLevelColor(level) {
   if (level === 'O-Level') return '#e67e22';
   if (level === 'A-Level') return '#b8873a';
   if (level === 'Pharmacy') return '#0ab5b5';
