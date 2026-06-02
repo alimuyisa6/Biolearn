@@ -5892,30 +5892,75 @@ function renderLevelButtons() {
 alert('renderLevelButtons started');
 alert('Rows available: ' + notesStructureData.length);
 const levels = {};
-  console.log(notesStructureData[0]);
-alert(JSON.stringify(notesStructureData[0]));
-alert(
-  'level_order = ' +
-  JSON.stringify(notesStructureData[0].level_order)
-);
+   const levels = {};
+
+alert('Creating levels object');
+
 notesStructureData.forEach(item => {
-    if (!levels[item.level]) {
-      levels[item.level] = { level_order: item.level_order, topics: {} };
-    }
-  });
-  const sortedLevels = Object.entries(levels).sort((a,b) => a[1].level_order - b[1].level_order);
-  
-  let html = '';
-  sortedLevels.forEach(([levelName]) => {
-    const isActive = notesCurrentLevel === levelName;
-    html += `<button class="level-btn" data-level="${levelName}" style="background:${isActive ? 'var(--clr-cyan)' : 'transparent'}; border:2px solid ${getLevelColor(levelName)}; color:${isActive ? '#fff' : 'var(--clr-white)'}; padding:8px 24px; border-radius:50px; cursor:pointer; font-weight:600; transition:all 0.2s;">${escapeHtml(levelName)}</button>`;
-  });
-  
-  alert('HTML length: ' + html.length); 
+  if (!levels[item.level]) {
+    levels[item.level] = {
+      level_order: item.level_order,
+      topics: {}
+    };
+  }
+});
+
+alert('forEach finished');
+
+console.log('LEVELS:', levels);
+alert('Levels object keys: ' + Object.keys(levels).length);
+
+alert('About to sort');
+
+const sortedLevels = Object.entries(levels).sort((a,b) =>
+  a[1].level_order - b[1].level_order
+);
+
+alert('Sort finished');
+
+console.log('SORTED LEVELS:', sortedLevels);
+
 alert('Levels found: ' + sortedLevels.length);
 
-const testEl = document.getElementById('notes-level-buttons');
-alert('Container exists: ' + !!testEl);
+let html = '';
+
+alert('Building HTML');
+
+sortedLevels.forEach(([levelName]) => {
+  const isActive = notesCurrentLevel === levelName;
+
+  html += `
+    <button
+      class="level-btn"
+      data-level="${levelName}"
+      style="
+        background:${isActive ? 'var(--clr-cyan)' : 'transparent'};
+        border:2px solid ${getLevelColor(levelName)};
+        color:${isActive ? '#fff' : 'var(--clr-white)'};
+        padding:8px 24px;
+        border-radius:50px;
+        cursor:pointer;
+        font-weight:600;
+        transition:all 0.2s;
+      "
+    >
+      ${escapeHtml(levelName)}
+    </button>
+  `;
+});
+
+alert('HTML built');
+alert('HTML length: ' + html.length);
+
+const levelContainer = document.getElementById('notes-level-buttons');
+
+alert('Container exists: ' + !!levelContainer);
+
+console.log('LEVEL CONTAINER:', levelContainer);
+
+levelContainer.innerHTML = html;
+
+alert('HTML inserted into container');
   
   document.getElementById('notes-level-buttons').innerHTML = html;
   
