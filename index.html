@@ -5833,13 +5833,15 @@ function releaseNotesWakeLock() {
   }
 }
 
- async function loadNotesStructure() {
+  async function loadNotesStructure() {
   try {
     const data = await apiCall('get_notes_structure');
     notesStructureData = data || [];
+    return notesStructureData;
   } catch (err) {
     console.error('Failed to load notes structure:', err);
     document.getElementById('notes-container').innerHTML = '<div style="text-align:center;padding:40px;color:var(--clr-magenta);">Failed to load notes. Please try again.</div>';
+    return [];
   }
 }
 
