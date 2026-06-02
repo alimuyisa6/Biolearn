@@ -6277,7 +6277,18 @@ function downloadNoteAsPDF() {
   return '#888';
 }
 
- function checkForReturnToNote() {
+ function escapeHtml(str) {
+  if (str == null) return '';
+
+  return String(str)
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
+    .replace(/'/g, '&#039;');
+}
+
+function checkForReturnToNote() {
   const urlParams = new URLSearchParams(window.location.search);
   const returnToNote = urlParams.get('return_to_note');
   const returnSubtopicId = urlParams.get('subtopic_id');
