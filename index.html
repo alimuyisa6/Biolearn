@@ -5885,8 +5885,12 @@ function resetFilter() {
 }
 
 function renderLevelButtons() {
-  const levels = {};
-  notesStructureData.forEach(item => {
+  alert('renderLevelButtons started');
+alert('Rows available: ' + notesStructureData.length);
+const levels = {};
+  console.log(notesStructureData[0]);
+alert(JSON.stringify(notesStructureData[0]));
+notesStructureData.forEach(item => {
     if (!levels[item.level]) {
       levels[item.level] = { level_order: item.level_order, topics: {} };
     }
