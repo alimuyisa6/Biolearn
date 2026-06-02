@@ -5445,9 +5445,10 @@ document.addEventListener('DOMContentLoaded', async function() {
   } catch (e) {
     currentUser = null;
   }
-  updateAuthUI();
-  try {
-    const sections = await apiCall('get_all_site_sections');
+   updateAuthUI();
+checkForReturnToNote();
+try {
+  const sections = await apiCall('get_all_site_sections');
     if (sections) {
      
  if (sections.site_config && sections.site_config.logo_url) {
@@ -6183,10 +6184,89 @@ function getLevelColor(level) {
   return '#888';
 }
 
-function escapeHtml(str) {
-  if (!str) return '';
-  return String(str).replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;').replace(/'/g, '&#39;');
+ function checkForReturnToNote() {
+  const urlParams = new URLSearchParams(window.location.search);
+  const returnToNote = urlParams.get('return_to_note');
+  const returnSubtopicId = urlParams.get('subtopic_id');
+  const returnSubtopicName = urlParams.get('subtopic_name');
+  const returnLevel = urlParams.get('level');
+  
+  if (returnToNote === 'true' && returnSubtopicId && returnLevel) {
+    sessionStorage.setItem('highlight_note_id', returnSubtopicId);
+    sessionStorage.setItem('highlight_note_name', returnSubtopicName);
+    sessionStorage.setItem('highlight_note_level', returnLevel);
+    sessionStorage.setItem('highlight_note_topic', urlParams.get('topic') || '');
+    
+    const cleanUrl = window.location.protocol + '//' + window.location.host + window.location.pathname;
+    window.history.replaceState({}, document.title, cleanUrl);
+    
+    setTimeout(() => {
+      const browseBtn = document.getElementById('notes-main-filter-btn');
+      if (browseBtn) {
+        browseBtn.click();
+        setTimeout(() => {
+          highlightSavedNote();
+        }, 500);
+      }
+    }, 100);
+  } else {
+    const savedId = sessionStorage.getItem('highlight_note_id');
+    if (savedId) {
+      setTimeout(() => {
+        highlightSavedNote();
+      }, 300);
+    }
+  }
 }
+
+function highlightSavedNote() {
+  const savedId = sessionStorage.getItem('highlight_note_id');
+  const savedLevel = sessionStorage.getItem('highlight_note_level');
+  const savedTopic = sessionStorage.getItem('highlight_note_topic');
+  
+  if (!savedId) return;
+  
+  let targetCard = document.querySelector('.subtopic-card[data-subtopic-id="' + savedId + '"]');
+  
+  if (targetCard) {
+    targetCard.style.transition = 'all 0.3s ease';
+    targetCard.style.border = '3px solid var(--clr-magenta)';
+    targetCard.style.boxShadow = '0 0 0 4px rgba(184, 135, 58, 0.2)';
+    targetCard.scrollIntoView({ behavior: 'smooth', block: 'center' });
+    
+    setTimeout(() => {
+      targetCard.style.border = '1px solid var(--clr-border-glow)';
+      targetCard.style.boxShadow = '';
+    }, 3000);
+    
+    sessionStorage.removeItem('highlight_note_id');
+    sessionStorage.removeItem('highlight_note_name');
+    sessionStorage.removeItem('highlight_note_level');
+    sessionStorage.removeItem('highlight_note_topic');
+  } else if (savedLevel && savedTopic) {
+    let levelFound = false;
+    const levelBtns = document.querySelectorAll('.level-btn');
+    levelBtns.forEach(btn => {
+      if (btn.dataset.level === savedLevel && !levelFound) {
+        btn.click();
+        levelFound = true;
+        setTimeout(() => {
+          const topicBtns = document.querySelectorAll('.topic-btn');
+          topicBtns.forEach(tbtn => {
+            if (tbtn.dataset.topic === savedTopic) {
+              tbtn.click();
+              setTimeout(() => {
+                highlightSavedNote();
+              }, 300);
+            }
+          });
+        }, 300);
+      }
+    });
+  }
+}
+
+function escapeHtml(str) {
 
 const notesObserver = new IntersectionObserver((entries) => {
   entries.forEach(entry => {

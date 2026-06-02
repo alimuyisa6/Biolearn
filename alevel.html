@@ -649,7 +649,7 @@ function showContent() {
         <div class="notes-grid" id="notes-grid" style="display:none;"></div>
       </div>
       <div class="back-buttons-container">
-        <a href="/" class="back-link" style="background:var(--gradient-cyan); color:#fff; border-color:var(--clr-cyan);"><i class="fa-solid fa-home"></i> Back to Homepage</a>
+     <a href="#" id="back-to-homepage-btn" class="back-link" style="background:var(--gradient-cyan); color:#fff; border-color:var(--clr-cyan);"><i class="fa-solid fa-home"></i> Back to Homepage</a>
       </div>
     </section>
   `;
@@ -959,6 +959,19 @@ document.addEventListener('DOMContentLoaded', async () => {
   } catch(e) {
     showAuthWall();
   }
+});
+document.getElementById('back-to-homepage-btn')?.addEventListener('click', (e) => {
+  e.preventDefault();
+  const urlParams = new URLSearchParams(window.location.search);
+  const subtopicId = urlParams.get('subtopic');
+  const subtopicTitle = urlParams.get('title');
+  const currentLevel = CURRENT_LEVEL;
+  
+  let returnUrl = '/';
+  if (subtopicId && subtopicTitle) {
+    returnUrl = '/?return_to_note=true&subtopic_id=' + subtopicId + '&subtopic_name=' + encodeURIComponent(subtopicTitle) + '&level=' + encodeURIComponent(currentLevel);
+  }
+  window.location.href = returnUrl;
 });
 </script>
 </body>
