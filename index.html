@@ -5977,26 +5977,19 @@ function resetFilter() {
   }
 }
 
- function renderTopicsForLevel(level) {
+  function renderTopicsForLevel(level) {
   try {
-    alert('renderTopicsForLevel called');
-    alert('Level: ' + level);
 
     const container = document.getElementById('notes-topics-container');
 
-    alert('Container exists: ' + !!container);
-
     if (!container) {
-      throw new Error('notes-topics-container not found');
+      throw new Error('Topics container not found');
     }
 
     const topics = {};
-    let matchCount = 0;
 
     notesStructureData.forEach(item => {
       if (item.level === level) {
-        matchCount++;
-
         if (!topics[item.topic]) {
           topics[item.topic] = {
             topic_order: Number(item.topic_order) || 999,
@@ -6006,90 +5999,102 @@ function resetFilter() {
       }
     });
 
-    alert('Matching rows: ' + matchCount);
-    alert('Topics found: ' + Object.keys(topics).length);
-
     const sortedTopics = Object.entries(topics).sort(
       (a, b) => a[1].topic_order - b[1].topic_order
     );
 
-    alert('Sorted topics: ' + sortedTopics.length);
+    if (sortedTopics.length === 0) {
+      container.innerHTML = `
+        <div style="
+          color:var(--clr-white);
+          opacity:0.7;
+          padding:12px;
+          text-align:center;
+        ">
+          No topics available.
+        </div>
+      `;
+      return;
+    }
 
-    let html =
-      '<h4 style="color:var(--clr-magenta); margin-bottom:12px; font-size:0.9rem;">Topics</h4>' +
-      '<div style="display:flex; flex-wrap:wrap; gap:10px;">';
+    let html = `
+      <h4 style="color:var(--clr-magenta); margin-bottom:12px; font-size:0.9rem;">
+        <i class="fa-solid fa-folder-tree"></i> Topics
+      </h4>
+      <div style="display:flex; flex-wrap:wrap; gap:10px;">
+    `;
 
     sortedTopics.forEach(([topicName]) => {
+      const isActive = notesCurrentTopic === topicName;
+
       html += `
         <button
           class="topic-btn"
-          data-topic="${topicName}"
+          data-topic="${escapeHtml(topicName)}"
           style="
-            background:rgba(184,135,58,0.15);
+            background:${isActive ? 'var(--clr-magenta)' : 'rgba(184,135,58,0.15)'};
             border:1px solid var(--clr-magenta);
-            color:var(--clr-magenta);
+            color:${isActive ? '#fff' : 'var(--clr-magenta)'};
             padding:6px 18px;
             border-radius:50px;
             cursor:pointer;
+            font-size:0.85rem;
+            transition:all 0.2s;
           "
         >
-          ${topicName}
+          ${escapeHtml(topicName)}
         </button>
       `;
     });
 
     html += '</div>';
 
-    alert('HTML length: ' + html.length);
-
     container.innerHTML = html;
 
-    alert('Topics rendered');
-
-    document.querySelectorAll('.topic-btn').forEach(btn => {
+    container.querySelectorAll('.topic-btn').forEach(btn => {
       btn.addEventListener('click', () => {
-        alert('Topic clicked: ' + btn.dataset.topic);
 
-        notesCurrentTopic = btn.dataset.topic;
+        const topic = btn.dataset.topic;
+
+        notesCurrentTopic = topic;
         notesCurrentSubtopic = null;
+        notesSelectedTopicData = null;
 
         renderTopicsForLevel(notesCurrentLevel);
         renderSubtopicsForTopic(
           notesCurrentLevel,
-          btn.dataset.topic
+          topic
         );
       });
     });
 
     if (notesCurrentTopic) {
-      alert('Rendering saved topic');
-      renderSubtopicsForTopic(level, notesCurrentTopic);
+      renderSubtopicsForTopic(
+        level,
+        notesCurrentTopic
+      );
     }
 
   } catch (err) {
 
-    console.error(err);
+    console.error('renderTopicsForLevel failed:', err);
 
-    document.body.insertAdjacentHTML(
-      'afterbegin',
-      `
-      <div style="
-        background:#ffebee;
-        color:#b71c1c;
-        border:1px solid #ef5350;
-        padding:16px;
-        margin:16px;
-        border-radius:8px;
-        font-family:monospace;
-        white-space:pre-wrap;
-        z-index:99999;
-        position:relative;
-      ">
-        <strong>renderTopicsForLevel Error</strong><br><br>
-        ${err.message}
-      </div>
-      `
-    );
+    const container = document.getElementById('notes-topics-container');
+
+    if (container) {
+      container.innerHTML = `
+        <div style="
+          background:rgba(255,0,0,0.08);
+          border:1px solid rgba(255,0,0,0.25);
+          color:#ff6b6b;
+          padding:12px;
+          border-radius:8px;
+          text-align:center;
+        ">
+          Unable to load topics. Please refresh the page.
+        </div>
+      `;
+    }
   }
 }
 
