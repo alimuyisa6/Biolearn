@@ -14,8 +14,8 @@
     * { margin: 0; padding: 0; box-sizing: border-box; }
     :root {
       --green: #2ecc71;
-      --cyan: #00d2d3;
-      --magenta: #f368e0;
+      --cyan: #0a7e7e;
+      --magenta: #b8873a;
       --orange: #f39c12;
       --bg-light: #f8fafc;
       --text-dark: #0f172a;
@@ -33,11 +33,11 @@
       overflow-x: hidden;
     }
     body.theme-olevel { --primary: var(--green); --secondary: var(--cyan); --primary-glow: rgba(46,204,113,0.25); background: radial-gradient(circle at 10% 30%, #e0f7e8, #c8f0e6); }
-    body.theme-alevel { --primary: var(--cyan); --secondary: var(--magenta); --primary-glow: rgba(0,210,211,0.25); background: radial-gradient(circle at 80% 20%, #d9f0ff, #e9e0ff); }
+    body.theme-alevel { --primary: var(--cyan); --secondary: var(--magenta); --primary-glow: rgba(10,126,126,0.25); background: radial-gradient(circle at 80% 20%, #d9f0ff, #e9e0ff); }
     body.theme-pharmacy { --primary: var(--orange); --secondary: var(--magenta); --primary-glow: rgba(243,156,18,0.25); background: radial-gradient(circle at 30% 70%, #fff0e0, #ffe0e5); }
     
     body.theme-olevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Ccircle cx='50' cy='50' r='20' fill='%232ecc71'/%3E%3Cpath d='M100 30 L130 80 L70 80 Z' fill='%232ecc71'/%3E%3Ccircle cx='150' cy='130' r='15' fill='%232ecc71'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
-    body.theme-alevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpath d='M50 50 L80 50 L80 80 L50 80 Z' fill='%2300d2d3'/%3E%3Cpath d='M130 30 L160 40 L150 70 L120 60 Z' fill='%2300d2d3'/%3E%3Cpath d='M70 120 C90 100,110 140,90 160' fill='none' stroke='%2300d2d3' stroke-width='3'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-alevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpath d='M50 50 L80 50 L80 80 L50 80 Z' fill='%230a7e7e'/%3E%3Cpath d='M130 30 L160 40 L150 70 L120 60 Z' fill='%230a7e7e'/%3E%3Cpath d='M70 120 C90 100,110 140,90 160' fill='none' stroke='%230a7e7e' stroke-width='3'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
     body.theme-pharmacy::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpolygon points='100,30 120,70 160,70 130,95 140,135 100,110 60,135 70,95 40,70 80,70' fill='%23f39c12'/%3E%3Ccircle cx='50' cy='160' r='10' fill='%23f39c12'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
     
     .recall-container { max-width: 1280px; margin: 0 auto; padding: 1.5rem 2rem 3rem; position: relative; z-index: 1; }
@@ -49,7 +49,6 @@
     
     .floating-cards-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
     .float-card { position: absolute; background: rgba(255,255,245,0.85); backdrop-filter: blur(12px); border-radius: 28px; padding: 0.6rem 1.3rem; font-weight: 600; font-size: 1.1rem; color: #1e293b; box-shadow: 0 10px 20px rgba(0,0,0,0.1); white-space: nowrap; border-left: 5px solid var(--primary); animation: floatPremium 3s ease forwards; display: flex; align-items: center; gap: 8px; }
-    .float-card svg { width: 24px; height: 24px; color: var(--primary); fill: currentColor; stroke: currentColor; }
     @keyframes floatPremium { 0% { transform: translateX(-30px) translateY(0) scale(0.9); opacity: 0; } 15% { opacity: 0.9; transform: translateX(0) scale(1); } 85% { opacity: 0.8; } 100% { transform: translateX(calc(100vw + 200px)) translateY(var(--drift, -30px)) scale(1.1); opacity: 0; } }
     
     .question-card-enter { animation: slideInFromRight 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
@@ -57,22 +56,7 @@
     @keyframes slideInFromRight { 0% { opacity: 0; transform: translateX(60px); } 100% { opacity: 1; transform: translateX(0); } }
     @keyframes slideOutToLeft { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-60px); } }
     
-    .recall-card { background: var(--card-glass); backdrop-filter: blur(16px); border-radius: var(--radius-xl); padding: 2.5rem 2rem; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.5); max-width: 780px; margin: 0 auto; position: relative; overflow: hidden; }
-    .recall-card > * { position: relative; z-index: 1; }
-    .card-watermark { position: absolute; top: 0; right: 0; width: 180px; height: 180px; opacity: 0.08; pointer-events: none; z-index: 0; }
-    .card-watermark svg,
-    .hero-svg svg,
-    .empty-state-svg svg {
-      width: 100%;
-      height: 100%;
-      color: var(--primary);
-      fill: currentColor;
-      stroke: currentColor;
-    }
-    .hero-svg { width: 180px; height: 180px; margin: 0 auto 1rem; display: block; animation: float 4s ease-in-out infinite; }
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
-    .empty-state-svg { width: 100px; height: 100px; margin: 0 auto 1rem; display: block; opacity: 0.6; }
-    
+    .recall-card { background: var(--card-glass); backdrop-filter: blur(16px); border-radius: var(--radius-xl); padding: 2.5rem 2rem; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.5); max-width: 780px; margin: 0 auto; position: relative; }
     .progress-badge { font-size: 0.85rem; font-weight: 600; color: var(--primary); background: rgba(0,0,0,0.05); display: inline-block; padding: 0.3rem 1rem; border-radius: 50px; }
     .question-text { font-size: 1.9rem; font-weight: 700; line-height: 1.7; margin: 1rem 0 1.5rem; color: #0f172a; }
     .answer-input { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 60px; background: white; outline: none; }
@@ -128,16 +112,7 @@
   </div>
   <div id="entranceScreen" class="entrance-screen">
     <div class="recall-card" style="text-align: center;">
-      <div class="hero-svg">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 170 C140 170 170 140 170 100 C170 60 140 30 100 30 C60 30 30 60 30 100 C30 140 60 170 100 170Z" stroke="currentColor" stroke-width="4" fill="none"/>
-          <path d="M100 120 C115 120 120 110 120 100 C120 90 115 80 100 80 C85 80 80 90 80 100 C80 110 85 120 100 120Z" fill="currentColor" opacity="0.5"/>
-          <path d="M70 70 L50 50 M130 70 L150 50 M70 130 L50 150 M130 130 L150 150" stroke="currentColor" stroke-width="3" stroke-linecap="round"/>
-          <circle cx="100" cy="100" r="25" fill="currentColor" opacity="0.2"/>
-          <path d="M100 75 L100 125 M75 100 L125 100" stroke="currentColor" stroke-width="2"/>
-          <path d="M100 100 L130 130 M100 100 L70 130 M100 100 L130 70 M100 100 L70 70" stroke="currentColor" stroke-width="1.5" opacity="0.4"/>
-        </svg>
-      </div>
+      <i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--primary);"></i>
       <h2 style="font-size: 2rem; margin: 1rem 0 0.5rem;">Train your memory.</h2>
       <p style="font-size: 1.2rem; opacity: 0.8;">Strengthen your understanding.</p>
       <div id="authGateArea"></div>
@@ -157,8 +132,7 @@
     </div>
   </div>
   <div id="sessionScreen" class="session-screen hidden">
-    <div class="recall-card" id="recallCardWrapper">
-      <div class="card-watermark" id="watermarkContainer"></div>
+    <div class="recall-card">
       <div style="display: flex; justify-content: space-between;">
         <span class="progress-badge" id="questionCounter">Question -- of --</span>
         <span id="levelBadge" style="font-size: 0.7rem; background: var(--primary-glow); padding: 0.2rem 0.8rem; border-radius: 50px;"></span>
@@ -278,7 +252,6 @@
           if($('xpDisplay')) $('xpDisplay').innerHTML = `<i class="fa-solid fa-star"></i> Recall Level ${recallLevel} · ${xpTotal} XP`; 
           if($('streakCount')) $('streakCount').innerText = streakDays; 
           renderMasteryMap(); renderHeatmap(stats.heatmap||{}); renderRadarChart(); 
-          updateWatermark();
         } 
       } catch(e) { 
         showMessage('Could not load your progress. Please refresh.', 'warning'); 
@@ -286,26 +259,12 @@
       }
     }
     
-    function updateWatermark() {
-      const container = $('watermarkContainer');
-      if (!container) return;
-      let svg = '';
-      if (currentLevel === 'O-Level') {
-        svg = `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><circle cx="100" cy="100" r="60" stroke="currentColor" stroke-width="2" fill="none"/><circle cx="100" cy="100" r="30" fill="currentColor" opacity="0.3"/><path d="M100 40 L100 160 M40 100 L160 100" stroke="currentColor" stroke-width="2"/><circle cx="70" cy="70" r="8" fill="currentColor"/><circle cx="130" cy="130" r="8" fill="currentColor"/></svg>`;
-      } else if (currentLevel === 'A-Level') {
-        svg = `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><path d="M70 40 L130 40 L100 100 L70 160 L130 160" stroke="currentColor" stroke-width="3" fill="none"/><path d="M100 40 L100 160" stroke="currentColor" stroke-width="2"/><path d="M70 40 L130 160 M130 40 L70 160" stroke="currentColor" stroke-width="1.5" opacity="0.5"/></svg>`;
-      } else {
-        svg = `<svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg"><rect x="60" y="40" width="80" height="120" rx="10" stroke="currentColor" stroke-width="3" fill="none"/><circle cx="100" cy="70" r="10" fill="currentColor"/><circle cx="100" cy="100" r="10" fill="currentColor" opacity="0.7"/><circle cx="100" cy="130" r="10" fill="currentColor" opacity="0.4"/></svg>`;
-      }
-      container.innerHTML = svg;
-    }
-    
     function renderMasteryMap() { 
       const container = $('masteryMapContainer'); 
       if(!container) return; 
       const topics = Object.entries(masteryTopics); 
       if(!topics.length) { 
-        container.innerHTML = `<div class="empty-state-svg"><svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2"><rect x="40" y="40" width="120" height="120" rx="10"/><path d="M60 60 L140 60 M60 100 L140 100 M60 140 L140 140"/><circle cx="100" cy="80" r="10"/></svg></div><p style="text-align:center;">Complete sessions to see mastery</p>`; 
+        container.innerHTML = '<p style="text-align:center;">Complete sessions to see mastery</p>'; 
         return; 
       } 
       container.innerHTML = topics.map(([t,p]) => `<div class="mastery-item"><div><span>${sanitizeHTML(t)}</span><span>${Math.round(p)}%</span></div><div class="mastery-bar-bg"><div class="mastery-bar-fill" style="width:${p}%;"></div></div></div>`).join(''); 
@@ -343,7 +302,7 @@
       const radius = Math.min(w, h) * 0.4;
       const angleStep = (Math.PI * 2) / topicNames.length;
       
-      const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#00d2d3';
+      const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#0a7e7e';
       
       ctx.clearRect(0, 0, w, h);
       ctx.beginPath();
@@ -357,7 +316,7 @@
       ctx.closePath();
       ctx.strokeStyle = primaryColor;
       ctx.stroke();
-      ctx.fillStyle = 'rgba(0,210,211,0.1)';
+      ctx.fillStyle = 'rgba(10,126,126,0.1)';
       ctx.fill();
       for (let lvl = 0.25; lvl <= 1; lvl += 0.25) {
         ctx.beginPath();
@@ -398,7 +357,6 @@
       else if(currentLevel==='Pharmacy') document.body.classList.add('theme-pharmacy'); 
       if($('dynamicTitle')) $('dynamicTitle').innerText = currentLevel==='Pharmacy'?'RecallRx':`BioRecall ${currentLevel}`; 
       if($('levelBadge')) $('levelBadge').innerText = currentLevel; 
-      updateWatermark();
     }
     
     async function restoreActiveSession() {
