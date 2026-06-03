@@ -36,37 +36,83 @@
     body.theme-alevel { --primary: var(--cyan); --secondary: var(--magenta); --primary-glow: rgba(0,210,211,0.25); background: radial-gradient(circle at 80% 20%, #d9f0ff, #e9e0ff); }
     body.theme-pharmacy { --primary: var(--orange); --secondary: var(--magenta); --primary-glow: rgba(243,156,18,0.25); background: radial-gradient(circle at 30% 70%, #fff0e0, #ffe0e5); }
     
-    /* Background SVG patterns */
-    body.theme-olevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.04'%3E%3Ccircle cx='50' cy='50' r='20' fill='%232ecc71'/%3E%3Cpath d='M100 30 L130 80 L70 80 Z' fill='%232ecc71'/%3E%3Ccircle cx='150' cy='130' r='15' fill='%232ecc71'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
-    body.theme-alevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.04'%3E%3Cpath d='M50 50 L80 50 L80 80 L50 80 Z' fill='%2300d2d3'/%3E%3Cpath d='M130 30 L160 40 L150 70 L120 60 Z' fill='%2300d2d3'/%3E%3Cpath d='M70 120 C90 100,110 140,90 160' fill='none' stroke='%2300d2d3' stroke-width='3'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
-    body.theme-pharmacy::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.04'%3E%3Cpolygon points='100,30 120,70 160,70 130,95 140,135 100,110 60,135 70,95 40,70 80,70' fill='%23f39c12'/%3E%3Ccircle cx='50' cy='160' r='10' fill='%23f39c12'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-olevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Ccircle cx='50' cy='50' r='20' fill='%232ecc71'/%3E%3Cpath d='M100 30 L130 80 L70 80 Z' fill='%232ecc71'/%3E%3Ccircle cx='150' cy='130' r='15' fill='%232ecc71'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-alevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpath d='M50 50 L80 50 L80 80 L50 80 Z' fill='%2300d2d3'/%3E%3Cpath d='M130 30 L160 40 L150 70 L120 60 Z' fill='%2300d2d3'/%3E%3Cpath d='M70 120 C90 100,110 140,90 160' fill='none' stroke='%2300d2d3' stroke-width='3'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-pharmacy::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpolygon points='100,30 120,70 160,70 130,95 140,135 100,110 60,135 70,95 40,70 80,70' fill='%23f39c12'/%3E%3Ccircle cx='50' cy='160' r='10' fill='%23f39c12'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
     
-    /* Card watermark container */
-    .recall-card { position: relative; overflow: hidden; }
-    .card-watermark { position: absolute; top: 0; right: 0; width: 180px; height: 180px; opacity: 0.05; pointer-events: none; z-index: 0; }
-    .card-watermark svg { width: 100%; height: 100%; color: var(--primary); }
+    .recall-container { max-width: 1280px; margin: 0 auto; padding: 1.5rem 2rem 3rem; position: relative; z-index: 1; }
+    .recall-header { text-align: center; margin-bottom: 2rem; }
+    .recall-header h1 { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; }
+    .level-selector { display: flex; justify-content: center; gap: 1rem; margin-top: 1rem; flex-wrap: wrap; }
+    .level-btn { padding: 0.7rem 1.8rem; border-radius: 60px; font-weight: 600; border: 2px solid rgba(0,0,0,0.1); background: rgba(255,255,240,0.7); backdrop-filter: blur(6px); cursor: pointer; transition: 0.2s; color: #1e293b; }
+    .level-btn.active { background: var(--primary); border-color: var(--primary); color: white; box-shadow: 0 6px 14px var(--primary-glow); }
     
-    /* Entrance hero SVG */
-    .hero-svg { width: 180px; height: 180px; margin: 0 auto 1rem; display: block; }
-    .hero-svg svg { width: 100%; height: 100%; color: var(--primary); filter: drop-shadow(0 8px 20px rgba(0,0,0,0.1)); animation: float 4s ease-in-out infinite; }
-    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+    .floating-cards-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
+    .float-card { position: absolute; background: rgba(255,255,245,0.85); backdrop-filter: blur(12px); border-radius: 28px; padding: 0.6rem 1.3rem; font-weight: 600; font-size: 1.1rem; color: #1e293b; box-shadow: 0 10px 20px rgba(0,0,0,0.1); white-space: nowrap; border-left: 5px solid var(--primary); animation: floatPremium 3s ease forwards; display: flex; align-items: center; gap: 8px; }
+    .float-card svg { width: 24px; height: 24px; color: var(--primary); fill: currentColor; stroke: currentColor; }
+    @keyframes floatPremium { 0% { transform: translateX(-30px) translateY(0) scale(0.9); opacity: 0; } 15% { opacity: 0.9; transform: translateX(0) scale(1); } 85% { opacity: 0.8; } 100% { transform: translateX(calc(100vw + 200px)) translateY(var(--drift, -30px)) scale(1.1); opacity: 0; } }
     
-    /* Analytics card SVGs */
-    .stat-svg { width: 28px; height: 28px; display: inline-block; vertical-align: middle; margin-right: 8px; }
-    .stat-svg svg { width: 100%; height: 100%; color: var(--primary); }
+    .question-card-enter { animation: slideInFromRight 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
+    .question-card-exit { animation: slideOutToLeft 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+    @keyframes slideInFromRight { 0% { opacity: 0; transform: translateX(60px); } 100% { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOutToLeft { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-60px); } }
     
-    /* Empty state SVG */
-    .empty-state-svg { width: 120px; height: 120px; margin: 0 auto 1rem; display: block; opacity: 0.6; }
-    .empty-state-svg svg { width: 100%; height: 100%; color: var(--primary); }
-    
-    /* Floating card upgrade */
-    .float-card { display: flex; align-items: center; gap: 8px; }
-    .float-card svg { width: 24px; height: 24px; color: var(--primary); }
-    
-    /* Remove backdrop-filter on small screens for performance */
-    @media (max-width: 768px) {
-      .recall-card, .stat-card, .level-btn, .float-card { backdrop-filter: none !important; }
+    .recall-card { background: var(--card-glass); backdrop-filter: blur(16px); border-radius: var(--radius-xl); padding: 2.5rem 2rem; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.5); max-width: 780px; margin: 0 auto; position: relative; overflow: hidden; }
+    .recall-card > * { position: relative; z-index: 1; }
+    .card-watermark { position: absolute; top: 0; right: 0; width: 180px; height: 180px; opacity: 0.08; pointer-events: none; z-index: 0; }
+    .card-watermark svg,
+    .hero-svg svg,
+    .empty-state-svg svg {
+      width: 100%;
+      height: 100%;
+      color: var(--primary);
+      fill: currentColor;
+      stroke: currentColor;
     }
+    .hero-svg { width: 180px; height: 180px; margin: 0 auto 1rem; display: block; animation: float 4s ease-in-out infinite; }
+    @keyframes float { 0% { transform: translateY(0px); } 50% { transform: translateY(-8px); } 100% { transform: translateY(0px); } }
+    .empty-state-svg { width: 100px; height: 100px; margin: 0 auto 1rem; display: block; opacity: 0.6; }
+    
+    .progress-badge { font-size: 0.85rem; font-weight: 600; color: var(--primary); background: rgba(0,0,0,0.05); display: inline-block; padding: 0.3rem 1rem; border-radius: 50px; }
+    .question-text { font-size: 1.9rem; font-weight: 700; line-height: 1.7; margin: 1rem 0 1.5rem; color: #0f172a; }
+    .answer-input { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 60px; background: white; outline: none; }
+    .answer-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .btn-check { background: var(--primary); border: none; padding: 0.9rem 2rem; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 1.2rem; width: 100%; }
+    .btn-check:disabled { opacity: 0.6; cursor: not-allowed; }
+    .feedback-area { margin-top: 2rem; padding: 1.5rem; border-radius: var(--radius-md); background: rgba(255,255,245,0.6); }
+    .recall-strength { font-size: 1.4rem; font-weight: 800; }
+    .strength-excellent { color: var(--green); }
+    .strength-strong { color: var(--cyan); }
+    .strength-developing { color: var(--orange); }
+    .next-timer { margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .countdown { font-family: monospace; font-weight: 600; background: #eef2ff; padding: 0.4rem 1rem; border-radius: 40px; }
+    .next-btn { background: transparent; border: 2px solid var(--primary); padding: 0.5rem 1.8rem; border-radius: 60px; font-weight: 600; cursor: pointer; }
+    .next-btn:hover { background: var(--primary); color: white; }
+    .analytics-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; justify-content: space-between; }
+    .stat-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 28px; padding: 1rem 1.5rem; flex: 1; min-width: 150px; border: 1px solid white; display: flex; align-items: center; gap: 0.8rem; }
+    .stat-card i { font-size: 1.8rem; color: var(--primary); }
+    .spinner-overlay { display: inline-flex; gap: 8px; align-items: center; }
+    .dot-spin { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; display: inline-block; animation: bounce 0.6s infinite alternate; }
+    @keyframes bounce { 0% { transform: translateY(0); opacity: 0.4; } 100% { transform: translateY(-6px); opacity: 1; } }
+    .hidden { display: none; }
+    .mastery-map { margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .mastery-item { background: rgba(255,255,255,0.6); border-radius: 20px; padding: 0.8rem; }
+    .mastery-bar-bg { background: #e2e8f0; border-radius: 20px; height: 10px; overflow: hidden; margin-top: 0.5rem; }
+    .mastery-bar-fill { height: 100%; border-radius: 20px; transition: width 0.5s ease; background: var(--primary); }
+    .heatmap-grid { display: grid; grid-template-columns: repeat(53, 1fr); gap: 4px; margin-top: 1rem; overflow-x: auto; }
+    .heatmap-day { aspect-ratio: 1; border-radius: 3px; background: #e2e8f0; }
+    .heatmap-day.level-1 { background: var(--primary); opacity: 0.3; }
+    .heatmap-day.level-2 { background: var(--primary); opacity: 0.6; }
+    .heatmap-day.level-3 { background: var(--primary); opacity: 1; }
+    .xp-float { position: fixed; animation: floatUp 1s ease-out forwards; pointer-events: none; font-weight: 800; z-index: 200; background: var(--primary); color: white; padding: 4px 12px; border-radius: 40px; font-size: 0.9rem; }
+    @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-80px); opacity: 0; } }
+    .confetti { position: fixed; pointer-events: none; z-index: 150; font-size: 20px; animation: floatUp 1s ease-out forwards; }
+    .radar-canvas { max-width: 300px; margin: 1rem auto; display: block; background: rgba(255,255,255,0.5); border-radius: 20px; }
+    .user-message { background: #e8f4f8; border-left: 4px solid var(--primary); padding: 0.8rem 1rem; margin: 0.5rem 0; border-radius: 12px; font-size: 0.9rem; color: #1e3a5f; }
+    .user-message.warning { background: #fff3cd; border-left-color: #ffc107; color: #856404; }
+    .user-message.error { background: #f8d7da; border-left-color: #e74c3c; color: #721c24; }
+    @media (max-width: 680px) { .recall-container { padding: 1rem; } .question-text { font-size: 1.4rem; } .heatmap-grid { gap: 2px; } }
+    @media (max-width: 768px) { .recall-card { padding: 1.5rem; } .answer-input { font-size: 16px; } .stat-card { padding: 0.8rem 1rem; } .analytics-row { gap: 0.8rem; } }
   </style>
 </head>
 <body>
@@ -98,7 +144,7 @@
       <div id="streakDisplay" style="margin-top: 1rem;"></div>
       <div id="xpDisplay" style="margin-top: 0.5rem;"></div>
       <div id="messageArea" style="margin-top: 1rem;"></div>
-      <button id="enterClassroomBtn" class="btn-check" style="width: auto; margin-top: 2rem; display: none;"><svg width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" style="margin-right: 8px; vertical-align: middle;"><path d="M12 3v12m0 0-3-3m3 3 3-3M5 3h14a2 2 0 0 1 2 2v14a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V5a2 2 0 0 1 2-2z"/></svg> Enter Classroom</button>
+      <button id="enterClassroomBtn" class="btn-check" style="width: auto; margin-top: 2rem; display: none;"><i class="fa-regular fa-door-open"></i> Enter Classroom</button>
     </div>
   </div>
   <div id="readyScreen" class="ready-screen hidden">
@@ -124,9 +170,9 @@
       <div id="nextArea" class="next-timer" style="display: none;"></div>
     </div>
     <div class="analytics-row">
-      <div class="stat-card"><span class="stat-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M12 2L15 9H22L16 14L19 21L12 16.5L5 21L8 14L2 9H9L12 2Z"/></svg></span> <span id="recallSummary">--</span></div>
-      <div class="stat-card"><span class="stat-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><circle cx="12" cy="12" r="10"/><path d="M12 2v4M12 18v4M2 12h4M18 12h4"/></svg></span> Mastery: <span id="masteryPercent">0%</span></div>
-      <div class="stat-card"><span class="stat-svg"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2"><path d="M8 6H21M8 12H21M8 18H21M3 6h.01M3 12h.01M3 18h.01"/></svg></span> Streak: <span id="streakCount">0</span> days</div>
+      <div class="stat-card"><i class="fa-solid fa-chart-line"></i> <span id="recallSummary">--</span></div>
+      <div class="stat-card"><i class="fa-solid fa-trophy"></i> Mastery: <span id="masteryPercent">0%</span></div>
+      <div class="stat-card"><i class="fa-solid fa-fire"></i> Streak: <span id="streakCount">0</span> days</div>
     </div>
     <canvas id="radarCanvas" class="radar-canvas" width="300" height="300" style="width:100%; max-width:300px; height:auto;"></canvas>
     <div id="masteryMapContainer" class="mastery-map"></div>
@@ -134,18 +180,7 @@
   </div>
   <div id="reportScreen" class="report-screen hidden">
     <div class="recall-card" style="text-align: center;">
-      <div class="hero-svg" style="width: 140px; height: 140px;">
-        <svg viewBox="0 0 200 200" fill="none" xmlns="http://www.w3.org/2000/svg">
-          <path d="M100 170 C140 170 170 140 170 100 C170 60 140 30 100 30 C60 30 30 60 30 100 C30 140 60 170 100 170Z" stroke="currentColor" stroke-width="3" fill="none"/>
-          <path d="M100 120 C110 120 115 110 115 100 C115 90 110 80 100 80 C90 80 85 90 85 100 C85 110 90 120 100 120Z" fill="currentColor"/>
-          <path d="M70 80 L130 80 M100 60 L100 100" stroke="currentColor" stroke-width="2"/>
-          <path d="M60 60 L80 80 M140 60 L120 80" stroke="currentColor" stroke-width="2"/>
-          <path d="M60 140 L140 140 M100 120 L100 150" stroke="currentColor" stroke-width="2"/>
-          <path d="M30 60 L50 80 M170 60 L150 80" stroke="currentColor" stroke-width="2"/>
-          <path d="M170 140 L150 120 M30 140 L50 120" stroke="currentColor" stroke-width="2"/>
-          <polygon points="100,160 110,140 90,140" fill="currentColor"/>
-        </svg>
-      </div>
+      <i class="fa-solid fa-chart-simple" style="font-size: 3rem; color: var(--primary);"></i>
       <h2>Today's Recall Report</h2>
       <div id="reportContent"></div>
       <button id="closeReportBtn" class="btn-check" style="width: auto; margin-top: 2rem;">See You Tomorrow</button>
@@ -273,7 +308,7 @@
         container.innerHTML = `<div class="empty-state-svg"><svg viewBox="0 0 200 200" fill="none" stroke="currentColor" stroke-width="2"><rect x="40" y="40" width="120" height="120" rx="10"/><path d="M60 60 L140 60 M60 100 L140 100 M60 140 L140 140"/><circle cx="100" cy="80" r="10"/></svg></div><p style="text-align:center;">Complete sessions to see mastery</p>`; 
         return; 
       } 
-      container.innerHTML = topics.map(([t,p]) => `<div class="mastery-item"><div><span>${sanitizeHTML(t)}</span><span>${Math.round(p)}%</span></div><div class="mastery-bar-bg"><div class="mastery-bar-fill" style="width:${p}%; background:var(--primary);"></div></div></div>`).join(''); 
+      container.innerHTML = topics.map(([t,p]) => `<div class="mastery-item"><div><span>${sanitizeHTML(t)}</span><span>${Math.round(p)}%</span></div><div class="mastery-bar-bg"><div class="mastery-bar-fill" style="width:${p}%;"></div></div></div>`).join(''); 
     }
     
     function renderHeatmap(data){ const container=$('heatmapContainer'); if(!container) return; const today=new Date(); let html=''; for(let i=364;i>=0;i--){ let d=new Date(); d.setDate(today.getDate()-i); const key=d.toISOString().slice(0,10); let level=data[key]||0; html+=`<div class="heatmap-day level-${Math.min(level,3)}" title="${key}: ${level} sessions"></div>`; } container.innerHTML=html; }
@@ -307,6 +342,9 @@
       const centerX = w / 2, centerY = h / 2;
       const radius = Math.min(w, h) * 0.4;
       const angleStep = (Math.PI * 2) / topicNames.length;
+      
+      const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#00d2d3';
+      
       ctx.clearRect(0, 0, w, h);
       ctx.beginPath();
       for (let i = 0; i <= topicNames.length; i++) {
@@ -317,7 +355,7 @@
         else ctx.lineTo(x, y);
       }
       ctx.closePath();
-      ctx.strokeStyle = 'var(--primary)';
+      ctx.strokeStyle = primaryColor;
       ctx.stroke();
       ctx.fillStyle = 'rgba(0,210,211,0.1)';
       ctx.fill();
@@ -341,7 +379,7 @@
         const y = centerY + radius * val * Math.sin(angle);
         ctx.beginPath();
         ctx.arc(x, y, 5, 0, 2 * Math.PI);
-        ctx.fillStyle = 'var(--primary)';
+        ctx.fillStyle = primaryColor;
         ctx.fill();
         const labelX = centerX + (radius + 15) * Math.cos(angle);
         const labelY = centerY + (radius + 15) * Math.sin(angle);
@@ -410,9 +448,9 @@
     
     async function submitRecallAnswer(questionId, userAnswer) { return await recallApiCall('answer', 'POST', { session_id: sessionId, question_id: questionId, user_answer: userAnswer }); }
     async function fetchUserStats() { if(!currentUser) return; try { const stats = await recallApiCall('stats', 'GET', { level: currentLevel }); if(stats && typeof stats==='object'){ if($('recallSummary')) $('recallSummary').innerHTML = `E:${stats.excellent||0} S:${stats.strong||0} D:${stats.developing||0}`; if($('masteryPercent')) $('masteryPercent').innerText = stats.mastery_percent||'0%'; if($('streakCount')) $('streakCount').innerText = stats.streak_days||0; masteryTopics = stats.topic_mastery||{}; renderMasteryMap(); renderRadarChart(); renderHeatmap(stats.heatmap||{}); } } catch(e) { console.warn(e); } }
-    function showXPFloat(xp){ const div=document.createElement('div'); div.className='xp-float'; div.textContent=`+${xp} XP`; div.style.left='50%'; div.style.bottom='30%'; div.style.color='var(--primary)'; document.body.appendChild(div); setTimeout(()=>div.remove(),1000); }
-    function showStreakCelebration(days){ if(days===7||days===30||days===100){ showMessage(`🎉 Amazing! ${days}‑day streak! Keep it up!`, 'info'); for(let i=0;i<30;i++){ const conf=document.createElement('div'); conf.className='confetti'; conf.innerHTML='🎉'; conf.style.left=Math.random()*100+'%'; conf.style.top='0px'; conf.style.position='fixed'; conf.style.fontSize='20px'; conf.style.animation='floatUp 1s ease-out forwards'; document.body.appendChild(conf); setTimeout(()=>conf.remove(),1000); } } }
-    async function startClassroomAnimation() { return new Promise((resolve)=>{ const container=document.createElement('div'); container.className='floating-cards-area'; document.body.appendChild(container); const concepts = { 'O-Level': [{text:'Cell', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"10\"/><path d=\"M12 2v4M12 18v4M2 12h4M18 12h4\"/></svg>'}, {text:'Nucleus', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><circle cx=\"12\" cy=\"12\" r=\"8\"/><circle cx=\"12\" cy=\"12\" r=\"3\"/></svg>'}, {text:'Mitochondria', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M6 12c0-4 4-6 6-6s6 2 6 6-4 6-6 6-6-2-6-6z\"/><path d=\"M12 6v12\"/></svg>'}], 'A-Level':[{text:'DNA', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M6 6c2 2 4 2 6 0s4-2 6 0M6 18c2-2 4-2 6 0s4 2 6 0\"/><path d=\"M6 6v12M18 6v12\"/></svg>'}, {text:'Enzyme', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M12 2v20M2 12h20\"/><circle cx=\"12\" cy=\"12\" r=\"4\"/></svg>'}, {text:'Chromosome', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"10\" y=\"4\" width=\"4\" height=\"16\" rx=\"2\"/><path d=\"M10 6H4M14 6h6M10 12H6M14 12h4M10 18H8M14 18h6\"/></svg>'}], 'Pharmacy':[{text:'Insulin', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><rect x=\"8\" y=\"4\" width=\"8\" height=\"16\" rx=\"4\"/><path d=\"M10 8h4M10 12h4M10 16h4\"/></svg>'}, {text:'CYP450', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><polygon points=\"12,2 15,9 22,9 16,14 18,21 12,17 6,21 8,14 2,9 9,9 12,2\"/></svg>'}, {text:'Statins', svg:'<svg viewBox=\"0 0 24 24\" fill=\"none\" stroke=\"currentColor\" stroke-width=\"2\"><path d=\"M4 4l16 16M20 4L4 20\"/><circle cx=\"12\" cy=\"12\" r=\"6\"/></svg>'}]}; const items = concepts[currentLevel] || concepts['O-Level']; for(let i=0;i<12;i++){ const item = items[Math.floor(Math.random() * items.length)]; const card=document.createElement('div'); card.className='float-card'; card.style.display='flex'; card.style.alignItems='center'; card.style.gap='8px'; card.innerHTML = item.svg + '<span>' + item.text + '</span>'; card.style.top=Math.random()*70+10+'%'; card.style.left='-100px'; container.appendChild(card); } setTimeout(()=>{ container.remove(); resolve(); },2800); }); }
+    function showXPFloat(xp){ const div=document.createElement('div'); div.className='xp-float'; div.textContent=`+${xp} XP`; div.style.left='50%'; div.style.bottom='30%'; document.body.appendChild(div); setTimeout(()=>div.remove(),1000); }
+    function showStreakCelebration(days){ if(days===7||days===30||days===100){ showMessage(`🎉 Amazing! ${days}‑day streak! Keep it up!`, 'info'); for(let i=0;i<30;i++){ const conf=document.createElement('div'); conf.className='confetti'; conf.innerHTML='🎉'; conf.style.left=Math.random()*100+'%'; conf.style.top='0px'; conf.style.position='fixed'; document.body.appendChild(conf); setTimeout(()=>conf.remove(),1000); } } }
+    async function startClassroomAnimation() { return new Promise((resolve)=>{ const container=document.createElement('div'); container.className='floating-cards-area'; document.body.appendChild(container); const concepts = { 'O-Level': ['Cell', 'Nucleus', 'Mitochondria'], 'A-Level': ['DNA', 'Enzyme', 'Chromosome'], 'Pharmacy': ['Insulin', 'CYP450', 'Statins'] }; const items = concepts[currentLevel] || concepts['O-Level']; for(let i=0;i<12;i++){ const card=document.createElement('div'); card.className='float-card'; card.innerHTML = '<i class="fa-solid fa-' + (currentLevel === 'O-Level' ? 'microscope' : (currentLevel === 'A-Level' ? 'dna' : 'capsules')) + '"></i> <span>' + items[Math.floor(Math.random() * items.length)] + '</span>'; card.style.top=Math.random()*70+10+'%'; card.style.left='-100px'; container.appendChild(card); } setTimeout(()=>{ container.remove(); resolve(); },2800); }); }
     function animateCardTransition(newText){ const container=$('questionContainer'); if(!container) return; container.classList.add('question-card-exit'); setTimeout(()=>{ container.textContent=newText; container.classList.remove('question-card-exit'); container.classList.add('question-card-enter'); setTimeout(()=>container.classList.remove('question-card-enter'),400); },280); }
     function renderCurrentQuestion(){ if(!sessionQuestions.length) return; const q=sessionQuestions[currentIndex]; animateCardTransition(q.text); if($('questionCounter')) $('questionCounter').innerText=`Question ${currentIndex+1} of ${sessionQuestions.length}`; if($('answerInput')) $('answerInput').value=''; if($('feedbackContainer')) $('feedbackContainer').style.display='none'; if($('nextArea')) $('nextArea').style.display='none'; if(countdownInterval) clearInterval(countdownInterval); announceToScreenReader(`Question ${currentIndex+1}: ${q.text}`); }
     async function handleAnswerSubmission() {
