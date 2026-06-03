@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -278,19 +278,79 @@
     
     function renderMasteryMap() { const container = $('masteryMapContainer'); if(!container) return; const topics = Object.entries(masteryTopics); if(!topics.length) { container.textContent = 'Complete sessions to see mastery'; return; } container.innerHTML = topics.map(([t,p]) => `<div class="mastery-item"><div><span>${sanitizeHTML(t)}</span><span>${Math.round(p)}%</span></div><div class="mastery-bar-bg"><div class="mastery-bar-fill" style="width:${p}%; background:var(--primary);"></div></div></div>`).join(''); }
     function renderHeatmap(data){ const container=$('heatmapContainer'); if(!container) return; const today=new Date(); let html=''; for(let i=364;i>=0;i--){ let d=new Date(); d.setDate(today.getDate()-i); const key=d.toISOString().slice(0,10); let level=data[key]||0; html+=`<div class="heatmap-day level-${Math.min(level,3)}" title="${key}: ${level} sessions"></div>`; } container.innerHTML=html; }
-    function renderRadarChart(){
-      const canvas = $('radarCanvas'); if(!canvas || !Object.keys(masteryTopics).length) return;
-      const ctx = canvas.getContext('2d'); const w=300, h=300; canvas.width=w; canvas.height=h;
-      const topics = Object.keys(masteryTopics).slice(0,5); const values = topics.map(t=>masteryTopics[t]/100);
-      if(!topics.length) return; const centerX=w/2, centerY=h/2, radius=110;
-      ctx.clearRect(0,0,w,h); ctx.beginPath(); const angleStep = (Math.PI*2)/topics.length;
-      for(let i=0;i<=topics.length;i++){ let angle = i*angleStep - Math.PI/2; let x=centerX+radius*Math.cos(angle), y=centerY+radius*Math.sin(angle); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); } ctx.closePath(); ctx.strokeStyle='var(--primary)'; ctx.stroke(); ctx.fillStyle='rgba(0,210,211,0.1)'; ctx.fill();
-      for(let lvl=0.25; lvl<=1; lvl+=0.25){ ctx.beginPath(); for(let i=0;i<=topics.length;i++){ let angle = i*angleStep - Math.PI/2; let x=centerX+radius*lvl*Math.cos(angle), y=centerY+radius*lvl*Math.sin(angle); if(i===0) ctx.moveTo(x,y); else ctx.lineTo(x,y); } ctx.closePath(); ctx.strokeStyle='#ccc'; ctx.stroke(); }
-      for(let i=0;i<topics.length;i++){ let angle = i*angleStep - Math.PI/2; let val = values[i]||0; let x=centerX+radius*val*Math.cos(angle), y=centerY+radius*val*Math.sin(angle); ctx.beginPath(); ctx.arc(x,y,5,0,2*Math.PI); ctx.fillStyle='var(--primary)'; ctx.fill(); let labelX=centerX+(radius+15)*Math.cos(angle), labelY=centerY+(radius+15)*Math.sin(angle); ctx.fillStyle='#333'; ctx.font='10px Poppins'; ctx.fillText(topics[i].slice(0,8), labelX-15, labelY-5); }
+    
+    function renderRadarChart() {
+      const canvas = $('radarCanvas');
+      if (!canvas) return;
+      const entries = Object.entries(masteryTopics);
+      if (entries.length === 0) return;
+      
+      let topics = entries.map(([t, p]) => ({ topic: t, percent: p }));
+      topics.sort((a, b) => a.percent - b.percent);
+      topics = topics.slice(0, 5);
+      
+      const values = topics.map(t => t.percent / 100);
+      const topicNames = topics.map(t => t.topic);
+      if (topicNames.length === 0) return;
+      
+      const ctx = canvas.getContext('2d');
+      const w = 300, h = 300;
+      canvas.width = w;
+      canvas.height = h;
+      const centerX = w / 2, centerY = h / 2, radius = 110;
+      const angleStep = (Math.PI * 2) / topicNames.length;
+      
+      ctx.clearRect(0, 0, w, h);
+      
+      ctx.beginPath();
+      for (let i = 0; i <= topicNames.length; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = 'var(--primary)';
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(0,210,211,0.1)';
+      ctx.fill();
+      
+      for (let lvl = 0.25; lvl <= 1; lvl += 0.25) {
+        ctx.beginPath();
+        for (let i = 0; i <= topicNames.length; i++) {
+          const angle = i * angleStep - Math.PI / 2;
+          const x = centerX + radius * lvl * Math.cos(angle);
+          const y = centerY + radius * lvl * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = '#ccc';
+        ctx.stroke();
+      }
+      
+      for (let i = 0; i < topicNames.length; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const val = values[i] || 0;
+        const x = centerX + radius * val * Math.cos(angle);
+        const y = centerY + radius * val * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = 'var(--primary)';
+        ctx.fill();
+        const labelX = centerX + (radius + 15) * Math.cos(angle);
+        const labelY = centerY + (radius + 15) * Math.sin(angle);
+        ctx.fillStyle = '#333';
+        ctx.font = '10px Poppins';
+        let shortName = topicNames[i];
+        if (shortName.length > 8) shortName = shortName.substring(0, 6) + '..';
+        ctx.fillText(shortName, labelX - 15, labelY - 5);
+      }
     }
+    
     function applyTheme() { document.body.classList.remove('theme-olevel','theme-alevel','theme-pharmacy'); if(currentLevel==='O-Level') document.body.classList.add('theme-olevel'); else if(currentLevel==='A-Level') document.body.classList.add('theme-alevel'); else if(currentLevel==='Pharmacy') document.body.classList.add('theme-pharmacy'); if($('dynamicTitle')) $('dynamicTitle').innerText = currentLevel==='Pharmacy'?'RecallRx':`BioRecall ${currentLevel}`; if($('levelBadge')) $('levelBadge').innerText = currentLevel; }
     
-    // Restore active session from backend (no client storage)
     async function restoreActiveSession() {
       try {
         const data = await recallApiCall('session', 'GET', { level: currentLevel });
@@ -304,7 +364,6 @@
           if($('checkAnswerBtn')) $('checkAnswerBtn').disabled = false;
           if($('answerInput')) $('answerInput').disabled = false;
           fetchUserStats();
-          // Switch to session screen directly
           if($('entranceScreen')) $('entranceScreen').classList.add('hidden');
           if($('readyScreen')) $('readyScreen').classList.add('hidden');
           if($('sessionScreen')) $('sessionScreen').classList.remove('hidden');
@@ -428,10 +487,8 @@
       await checkAuth(); 
       applyTheme(); 
       if(currentUser && $('entranceScreen') && !$('entranceScreen').classList.contains('hidden')){ 
-         
         const restored = await restoreActiveSession();
         if (!restored) {
-          
         }
       } 
     })();
