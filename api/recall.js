@@ -377,13 +377,14 @@ async function handleGetStats(userId, params) {
   };
 }
 
-async function getTopicsForLevel(level) {
+ async function getTopicsForLevel(level) {
   const { data, error } = await supabase
     .from('recall_questions_bank')
     .select('topic')
     .eq('level', level)
     .eq('is_active', true);
   if (error) throw error;
+  if (!data || data.length === 0) return [];
   const uniqueTopics = [...new Set(data.map(row => row.topic))];
   return uniqueTopics;
 }
