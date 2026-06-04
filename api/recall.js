@@ -481,26 +481,31 @@ async function handleSubmitAnswer(userId, params) {
   };
 }
 
-async function handleCompleteSession(userId, { session_id }) {
-  const { data: session } = await supabase
+ async function handleCompleteSession(userId, { session_id }) {
+  const { data: session, error: sessionError } = await supabase
     .from('recall_sessions')
-    .select('user_answers, topic')
+    .select('user_answers, topic, is_active')
     .eq('session_id', session_id)
     .eq('user_id', userId)
-    .single();
+    .maybeSingle();
+  if (sessionError) throw new Error(`Session not found: ${sessionError.message}`);
   if (!session) throw new Error('Session not found');
+  if (!session.is_active) {
+    return { success: true, xp_earned_total: 0, streak_updated: 0, already_completed: true };
+  }
   const totalXpEarned = session?.user_answers?.reduce((sum, a) => sum + (a.xp_earned || 0), 0) || 0;
-  await supabase
+  const { error: updateError } = await supabase
     .from('recall_sessions')
     .update({ is_active: false, completed_at: new Date().toISOString() })
     .eq('session_id', session_id);
-
+  if (updateError) throw new Error(`Failed to complete session: ${updateError.message}`);
+  
   const today = new Date().toISOString().split('T')[0];
   const topicKey = session.topic || 'all';
   await supabase
     .from('user_topic_completion')
     .upsert({ user_id: userId, topic_key: topicKey, last_completed: today }, { onConflict: 'user_id,topic_key' });
-
+  
   const { data: stats } = await supabase
     .from('user_recall_stats')
     .select('total_sessions, current_streak')
