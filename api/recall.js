@@ -436,19 +436,24 @@ async function handleSubmitAnswer(userId, params) {
     await supabase.from('recall_xp_log').insert({ user_id: userId, amount: result.xp, reason: result.strength, session_id: session_id, question_id: question_id });
   } catch (e) {}
 
-  const relatedConcepts = (questionBank.alternate_answers || [])
-    .filter(a => a.term !== result.matched)
-    .map(a => ({ term: a.term, explanation: a.explanation }));
+    feedback: {
+    correct_answer: questionBank.correct_answer,
 
-  return {
-    strength: result.strength,
-    matched_concept: result.matched,
-    xp_awarded: result.xp,
-    correct_explanation: questionBank.correct_explanation || null,
+    answer_explanation:
+      questionBank.correct_explanation || null,
+
     related_concepts: relatedConcepts,
-    common_mistake_explanation: result.mistakeExplanation || null,
-    study_note: result.note || null
-  };
+
+    common_mistakes:
+      questionBank.common_mistakes || []
+  },
+
+  common_mistake_explanation:
+    result.mistakeExplanation || null,
+
+  study_note:
+    result.note || null
+};
 }
 
 async function handleCompleteSession(userId, params) {
