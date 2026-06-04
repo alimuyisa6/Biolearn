@@ -233,7 +233,7 @@ async function handleGetSession(userId, { level, topic }) {
   const weakQs = rawQuestions.filter(q => weakSet.has(q.correct_answer));
   const normalQs = rawQuestions.filter(q => !weakSet.has(q.correct_answer));
   shuffleArray(normalQs);
-  const selected = [...weakQs, ...normalQs].slice(0, 10);
+  const selected = [...weakQs, ...normalQs].slice(0, 5);
   const questionIds = selected.map(q => q.id);
 
   const { data: newSession, error: sessionError } = await supabase
