@@ -1,4 +1,4 @@
-<!DOCTYPE html>
+ <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
@@ -270,6 +270,45 @@
     .admin-change-btn:hover {
       background: rgba(255,255,255,0.3);
     }
+    .custom-confirm-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.6);
+      backdrop-filter: blur(4px);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 2000;
+    }
+    .custom-confirm-box {
+      background: white;
+      border-radius: 32px;
+      padding: 2rem;
+      max-width: 400px;
+      text-align: center;
+      box-shadow: 0 20px 35px rgba(0,0,0,0.2);
+    }
+    .custom-confirm-box p {
+      font-size: 1.2rem;
+      margin-bottom: 1.5rem;
+    }
+    .custom-confirm-box button {
+      background: var(--primary);
+      border: none;
+      color: white;
+      padding: 0.6rem 1.5rem;
+      border-radius: 60px;
+      margin: 0 0.5rem;
+      cursor: pointer;
+      font-weight: 600;
+    }
+    .custom-confirm-box button:last-child {
+      background: #e2e8f0;
+      color: #1e293b;
+    }
     @media (max-width: 680px) { .recall-container { padding: 1rem; } .question-text { font-size: 1.4rem; } .heatmap-grid { gap: 2px; } .level-input-area p { font-size: 1.4rem; } }
     @media (max-width: 768px) { .recall-card { padding: 1.5rem; } .answer-input { font-size: 16px; } .stat-card { padding: 0.8rem 1rem; } .analytics-row { gap: 0.8rem; } }
   </style>
@@ -401,6 +440,29 @@
       msgDiv.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : (type === 'warning' ? 'fa-triangle-exclamation' : 'fa-info-circle')}"></i> ${escapeHtml(message)}`;
       container.appendChild(msgDiv);
       setTimeout(() => { if (msgDiv.parentNode) msgDiv.remove(); }, 8000);
+    }
+    
+    function customConfirm(message) {
+      return new Promise((resolve) => {
+        const overlay = document.createElement('div');
+        overlay.className = 'custom-confirm-overlay';
+        overlay.innerHTML = `
+          <div class="custom-confirm-box">
+            <p>${escapeHtml(message)}</p>
+            <button id="customConfirmYes">Yes, continue</button>
+            <button id="customConfirmNo">Cancel</button>
+          </div>
+        `;
+        document.body.appendChild(overlay);
+        const yesBtn = overlay.querySelector('#customConfirmYes');
+        const noBtn = overlay.querySelector('#customConfirmNo');
+        const cleanup = (result) => {
+          overlay.remove();
+          resolve(result);
+        };
+        yesBtn.addEventListener('click', () => cleanup(true));
+        noBtn.addEventListener('click', () => cleanup(false));
+      });
     }
     
     async function apiCall(action, params = {}) {
@@ -840,9 +902,10 @@
       backToTopicsBtn = document.createElement('button');
       backToTopicsBtn.className = 'back-to-topics';
       backToTopicsBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Back to topics';
-      backToTopicsBtn.addEventListener('click', () => {
+      backToTopicsBtn.addEventListener('click', async () => {
         if (sessionActive) {
-          if (confirm('Going back will end your current session. Continue?')) {
+          const confirmed = await customConfirm('Going back will end your current session. Continue?');
+          if (confirmed) {
             endSessionAndBackToTopics();
           }
         } else {
