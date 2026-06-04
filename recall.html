@@ -1,0 +1,878 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, viewport-fit=cover">
+  <title>BioRecall · Active Recall Engine</title>
+  <meta name="description" content="Master biology and pharmacy with active recall. Train memory, strengthen understanding.">
+  <meta name="author" content="AliverBiopharm">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@400;500;600;700;800;900&family=Inter:wght@300;400;500;600&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
+  <style>
+    * { margin: 0; padding: 0; box-sizing: border-box; }
+    :root {
+      --green: #2ecc71;
+      --cyan: #0a7e7e;
+      --magenta: #b8873a;
+      --orange: #f39c12;
+      --bg-light: #f8fafc;
+      --text-dark: #0f172a;
+      --card-glass: rgba(255, 255, 255, 0.92);
+      --shadow-sm: 0 20px 35px -12px rgba(0, 0, 0, 0.1);
+      --radius-xl: 32px;
+      --radius-md: 24px;
+    }
+    body {
+      font-family: 'Poppins', sans-serif;
+      background: var(--bg-light);
+      color: var(--text-dark);
+      min-height: 100vh;
+      transition: background 0.3s ease;
+      overflow-x: hidden;
+    }
+    body.theme-olevel { --primary: var(--green); --secondary: var(--cyan); --primary-glow: rgba(46,204,113,0.25); background: radial-gradient(circle at 10% 30%, #e0f7e8, #c8f0e6); }
+    body.theme-alevel { --primary: var(--cyan); --secondary: var(--magenta); --primary-glow: rgba(10,126,126,0.25); background: radial-gradient(circle at 80% 20%, #d9f0ff, #e9e0ff); }
+    body.theme-pharmacy { --primary: var(--orange); --secondary: var(--magenta); --primary-glow: rgba(243,156,18,0.25); background: radial-gradient(circle at 30% 70%, #fff0e0, #ffe0e5); }
+    
+    body.theme-olevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Ccircle cx='50' cy='50' r='20' fill='%232ecc71'/%3E%3Cpath d='M100 30 L130 80 L70 80 Z' fill='%232ecc71'/%3E%3Ccircle cx='150' cy='130' r='15' fill='%232ecc71'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-alevel::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpath d='M50 50 L80 50 L80 80 L50 80 Z' fill='%230a7e7e'/%3E%3Cpath d='M130 30 L160 40 L150 70 L120 60 Z' fill='%230a7e7e'/%3E%3Cpath d='M70 120 C90 100,110 140,90 160' fill='none' stroke='%230a7e7e' stroke-width='3'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    body.theme-pharmacy::before { content: ''; position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 0; background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 200 200' opacity='0.05'%3E%3Cpolygon points='100,30 120,70 160,70 130,95 140,135 100,110 60,135 70,95 40,70 80,70' fill='%23f39c12'/%3E%3Ccircle cx='50' cy='160' r='10' fill='%23f39c12'/%3E%3C/svg%3E"); background-repeat: repeat; background-size: 60px; }
+    
+    .recall-container { max-width: 1280px; margin: 0 auto; padding: 1.5rem 2rem 3rem; position: relative; z-index: 1; }
+    .recall-header { text-align: center; margin-bottom: 2rem; }
+    .recall-header h1 { font-size: 2.4rem; font-weight: 800; background: linear-gradient(135deg, var(--primary), var(--secondary)); -webkit-background-clip: text; background-clip: text; color: transparent; display: inline-block; }
+    .level-badge { display: inline-block; background: var(--primary); color: white; padding: 0.3rem 1rem; border-radius: 50px; font-size: 0.9rem; font-weight: 600; margin-left: 1rem; }
+    
+    .floating-cards-area { position: fixed; top: 0; left: 0; width: 100%; height: 100%; pointer-events: none; z-index: 50; overflow: hidden; }
+    .float-card { position: absolute; background: rgba(255,255,245,0.85); backdrop-filter: blur(12px); border-radius: 28px; padding: 0.6rem 1.3rem; font-weight: 600; font-size: 1.1rem; color: #1e293b; box-shadow: 0 10px 20px rgba(0,0,0,0.1); white-space: nowrap; border-left: 5px solid var(--primary); animation: floatPremium 3s ease forwards; display: flex; align-items: center; gap: 8px; }
+    @keyframes floatPremium { 0% { transform: translateX(-30px) translateY(0) scale(0.9); opacity: 0; } 15% { opacity: 0.9; transform: translateX(0) scale(1); } 85% { opacity: 0.8; } 100% { transform: translateX(calc(100vw + 200px)) translateY(var(--drift, -30px)) scale(1.1); opacity: 0; } }
+    
+    .question-card-enter { animation: slideInFromRight 0.4s cubic-bezier(0.2, 0.9, 0.4, 1.1) forwards; }
+    .question-card-exit { animation: slideOutToLeft 0.3s cubic-bezier(0.4, 0, 0.6, 1) forwards; }
+    @keyframes slideInFromRight { 0% { opacity: 0; transform: translateX(60px); } 100% { opacity: 1; transform: translateX(0); } }
+    @keyframes slideOutToLeft { 0% { opacity: 1; transform: translateX(0); } 100% { opacity: 0; transform: translateX(-60px); } }
+    
+    .recall-card { background: var(--card-glass); backdrop-filter: blur(16px); border-radius: var(--radius-xl); padding: 2.5rem 2rem; box-shadow: var(--shadow-sm); border: 1px solid rgba(255,255,255,0.5); max-width: 780px; margin: 0 auto; position: relative; }
+    .progress-badge { font-size: 0.85rem; font-weight: 600; color: var(--primary); background: rgba(0,0,0,0.05); display: inline-block; padding: 0.3rem 1rem; border-radius: 50px; }
+    .question-text { font-size: 1.9rem; font-weight: 700; line-height: 1.7; margin: 1rem 0 1.5rem; color: #0f172a; }
+    .answer-input { width: 100%; padding: 1rem 1.5rem; font-size: 1.1rem; border: 2px solid #e2e8f0; border-radius: 60px; background: white; outline: none; }
+    .answer-input:focus { border-color: var(--primary); box-shadow: 0 0 0 3px var(--primary-glow); }
+    .btn-check { background: var(--primary); border: none; padding: 0.9rem 2rem; border-radius: 60px; color: white; font-weight: 700; font-size: 1rem; cursor: pointer; margin-top: 1.2rem; width: 100%; }
+    .btn-check:disabled { opacity: 0.6; cursor: not-allowed; }
+    .feedback-area { margin-top: 2rem; padding: 1.5rem; border-radius: var(--radius-md); background: rgba(255,255,245,0.6); }
+    .recall-strength { font-size: 1.4rem; font-weight: 800; }
+    .strength-excellent { color: var(--green); }
+    .strength-strong { color: var(--cyan); }
+    .strength-developing { color: var(--orange); }
+    .next-timer { margin-top: 1.5rem; display: flex; justify-content: space-between; align-items: center; flex-wrap: wrap; gap: 1rem; }
+    .countdown { font-family: monospace; font-weight: 600; background: #eef2ff; padding: 0.4rem 1rem; border-radius: 40px; }
+    .next-btn { background: transparent; border: 2px solid var(--primary); padding: 0.5rem 1.8rem; border-radius: 60px; font-weight: 600; cursor: pointer; }
+    .next-btn:hover { background: var(--primary); color: white; }
+    .analytics-row { display: flex; flex-wrap: wrap; gap: 1.5rem; margin-top: 2rem; justify-content: space-between; }
+    .stat-card { background: rgba(255,255,255,0.7); backdrop-filter: blur(8px); border-radius: 28px; padding: 1rem 1.5rem; flex: 1; min-width: 150px; border: 1px solid white; display: flex; align-items: center; gap: 0.8rem; }
+    .stat-card i { font-size: 1.8rem; color: var(--primary); }
+    .spinner-overlay { display: inline-flex; gap: 8px; align-items: center; }
+    .dot-spin { width: 10px; height: 10px; background: var(--primary); border-radius: 50%; display: inline-block; animation: bounce 0.6s infinite alternate; }
+    @keyframes bounce { 0% { transform: translateY(0); opacity: 0.4; } 100% { transform: translateY(-6px); opacity: 1; } }
+    .hidden { display: none; }
+    .mastery-map { margin-top: 2rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .mastery-item { background: rgba(255,255,255,0.6); border-radius: 20px; padding: 0.8rem; }
+    .mastery-bar-bg { background: #e2e8f0; border-radius: 20px; height: 10px; overflow: hidden; margin-top: 0.5rem; }
+    .mastery-bar-fill { height: 100%; border-radius: 20px; transition: width 0.5s ease; background: var(--primary); }
+    .topic-stats-grid { margin-top: 1.5rem; display: grid; grid-template-columns: repeat(auto-fit, minmax(200px, 1fr)); gap: 1rem; }
+    .topic-stat-card { background: rgba(255,255,255,0.6); border-radius: 20px; padding: 0.8rem; text-align: center; }
+    .topic-stat-name { font-weight: 700; color: var(--primary); margin-bottom: 0.3rem; font-size: 1rem; }
+    .topic-stat-xp { font-size: 0.8rem; color: var(--cyan); }
+    .topic-stat-streak { font-size: 0.8rem; color: var(--magenta); }
+    .section-intro { font-family: 'Poppins', sans-serif; font-size: 1.3rem; font-weight: 700; margin: 1.5rem 0 0.5rem 0; color: var(--primary); letter-spacing: -0.01em; }
+    .heatmap-grid { display: grid; grid-template-columns: repeat(53, 1fr); gap: 4px; margin-top: 1rem; overflow-x: auto; }
+    .heatmap-day { aspect-ratio: 1; border-radius: 3px; background: #e2e8f0; }
+    .heatmap-day.level-1 { background: var(--primary); opacity: 0.3; }
+    .heatmap-day.level-2 { background: var(--primary); opacity: 0.6; }
+    .heatmap-day.level-3 { background: var(--primary); opacity: 1; }
+    .xp-float { position: fixed; animation: floatUp 1s ease-out forwards; pointer-events: none; font-weight: 800; z-index: 200; background: var(--primary); color: white; padding: 4px 12px; border-radius: 40px; font-size: 0.9rem; }
+    @keyframes floatUp { 0% { transform: translateY(0); opacity: 1; } 100% { transform: translateY(-80px); opacity: 0; } }
+    .confetti { position: fixed; pointer-events: none; z-index: 150; font-size: 20px; animation: floatUp 1s ease-out forwards; }
+    .radar-canvas { max-width: 300px; margin: 1rem auto; display: block; background: rgba(255,255,255,0.5); border-radius: 20px; }
+    .user-message { background: #e8f4f8; border-left: 4px solid var(--primary); padding: 0.8rem 1rem; margin: 0.5rem 0; border-radius: 12px; font-size: 0.9rem; color: #1e3a5f; }
+    .user-message.warning { background: #fff3cd; border-left-color: #ffc107; color: #856404; }
+    .user-message.error { background: #f8d7da; border-left-color: #e74c3c; color: #721c24; }
+    .error-detail-panel {
+      background: #fef2f2;
+      border: 2px solid #e74c3c;
+      border-radius: 16px;
+      padding: 12px;
+      margin: 12px 0;
+      font-family: monospace;
+      font-size: 0.8rem;
+      color: #c0392b;
+      white-space: pre-wrap;
+      word-break: break-word;
+      max-height: 200px;
+      overflow-y: auto;
+    }
+    .modal-overlay {
+      position: fixed;
+      top: 0;
+      left: 0;
+      width: 100%;
+      height: 100%;
+      background: rgba(0,0,0,0.7);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      z-index: 1000;
+    }
+    .modal-content {
+      background: var(--card-glass);
+      backdrop-filter: blur(16px);
+      border-radius: 32px;
+      padding: 2rem;
+      max-width: 90%;
+      width: 480px;
+      text-align: center;
+    }
+    .option-btn {
+      background: rgba(255,255,255,0.2);
+      border: 1px solid var(--primary);
+      padding: 0.5rem 1.2rem;
+      border-radius: 40px;
+      cursor: pointer;
+      margin: 8px;
+      transition: 0.2s;
+    }
+    .option-btn:hover {
+      background: var(--primary);
+      color: white;
+    }
+    .back-to-topics {
+      position: fixed;
+      bottom: 20px;
+      left: 20px;
+      background: var(--primary);
+      color: white;
+      border: none;
+      border-radius: 40px;
+      padding: 8px 16px;
+      font-size: 0.8rem;
+      font-weight: 600;
+      cursor: pointer;
+      z-index: 90;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.2);
+      transition: transform 0.2s;
+    }
+    .back-to-topics:hover {
+      transform: translateY(-2px);
+    }
+    .loading-spinner {
+      position: fixed;
+      top: 50%;
+      left: 50%;
+      transform: translate(-50%, -50%);
+      z-index: 1001;
+      background: var(--card-glass);
+      backdrop-filter: blur(16px);
+      border-radius: 32px;
+      padding: 2rem;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+      box-shadow: 0 20px 35px -12px rgba(0,0,0,0.2);
+    }
+    .spinner-colors {
+      display: flex;
+      gap: 12px;
+    }
+    .spinner-dot-color {
+      width: 16px;
+      height: 16px;
+      border-radius: 50%;
+      animation: pulseScale 1.2s ease-in-out infinite;
+    }
+    .spinner-dot-color:nth-child(1) { background: var(--green); animation-delay: 0s; }
+    .spinner-dot-color:nth-child(2) { background: var(--cyan); animation-delay: 0.15s; }
+    .spinner-dot-color:nth-child(3) { background: var(--magenta); animation-delay: 0.3s; }
+    .spinner-dot-color:nth-child(4) { background: var(--orange); animation-delay: 0.45s; }
+    @keyframes pulseScale {
+      0%, 100% { transform: scale(0.6); opacity: 0.4; }
+      50% { transform: scale(1.2); opacity: 1; }
+    }
+    @media (max-width: 680px) { .recall-container { padding: 1rem; } .question-text { font-size: 1.4rem; } .heatmap-grid { gap: 2px; } }
+    @media (max-width: 768px) { .recall-card { padding: 1.5rem; } .answer-input { font-size: 16px; } .stat-card { padding: 0.8rem 1rem; } .analytics-row { gap: 0.8rem; } }
+  </style>
+</head>
+<body>
+<div aria-live="polite" aria-atomic="true" id="a11y-live-region" style="position: absolute; width: 1px; height: 1px; padding: 0; margin: -1px; overflow: hidden;"></div>
+<div class="recall-container">
+  <div class="recall-header">
+    <h1 id="dynamicTitle">BioRecall</h1>
+    <div id="levelBadgeContainer" style="display: inline-block;"></div>
+  </div>
+  
+  <div id="levelSelectionScreen" class="entrance-screen" style="display: none;">
+    <div class="recall-card" style="text-align: center;">
+      <i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--primary);"></i>
+      <h2 style="font-size: 2rem; margin: 1rem 0 0.5rem;">Welcome to BioRecall</h2>
+      <p style="font-size: 1.2rem; opacity: 0.8;">This is your first time. Please choose your level carefully – you cannot change it later.</p>
+      <div id="levelChoiceButtons" class="level-selector" style="margin: 2rem 0;">
+        <button class="option-btn" data-level="O-Level">O-Level Biology</button>
+        <button class="option-btn" data-level="A-Level">A-Level Biology</button>
+        <button class="option-btn" data-level="Pharmacy">RecallRx · Pharmacy</button>
+      </div>
+      <div id="authGateArea"></div>
+      <div id="messageArea" style="margin-top: 1rem;"></div>
+      <div id="errorDetailPanel" class="error-detail-panel hidden"></div>
+    </div>
+  </div>
+
+  <div id="mainContent" style="display: none;">
+    <div id="entranceScreen" class="entrance-screen">
+      <div class="recall-card" style="text-align: center;">
+        <i class="fa-solid fa-brain" style="font-size: 3rem; color: var(--primary);"></i>
+        <h2 style="font-size: 2rem; margin: 1rem 0 0.5rem;">Train your memory.</h2>
+        <p style="font-size: 1.2rem; opacity: 0.8;">Strengthen your understanding.</p>
+        <div id="streakDisplay" style="margin-top: 1rem;"></div>
+        <div id="xpDisplay" style="margin-top: 0.5rem;"></div>
+        <div id="welcomeBackMsg" style="margin-top: 0.5rem; font-size: 0.9rem; color: var(--cyan);"></div>
+      </div>
+    </div>
+    <div id="sessionScreen" class="session-screen hidden">
+      <div class="recall-card">
+        <div style="display: flex; justify-content: space-between;">
+          <span class="progress-badge" id="questionCounter">Question -- of --</span>
+          <span id="levelBadge" style="font-size: 0.7rem; background: var(--primary-glow); padding: 0.2rem 0.8rem; border-radius: 50px;"></span>
+        </div>
+        <div id="questionContainer" class="question-text">Loading...</div>
+        <input type="text" id="answerInput" class="answer-input" placeholder="Type your answer..." autocomplete="off">
+        <button id="checkAnswerBtn" class="btn-check"><i class="fa-regular fa-pen-to-square"></i> Check</button>
+        <div id="feedbackContainer" class="feedback-area" style="display: none;"></div>
+        <div id="nextArea" class="next-timer" style="display: none;"></div>
+      </div>
+      <div class="analytics-row">
+        <div class="stat-card"><i class="fa-solid fa-chart-line"></i> <span id="recallSummary">--</span></div>
+        <div class="stat-card"><i class="fa-solid fa-trophy"></i> Mastery: <span id="masteryPercent">0%</span></div>
+        <div class="stat-card"><i class="fa-solid fa-fire"></i> Streak: <span id="streakCount">0</span> days</div>
+      </div>
+      <div class="section-intro">📊 Topic Mastery Radar</div>
+      <canvas id="radarCanvas" class="radar-canvas" width="300" height="300" style="width:100%; max-width:300px; height:auto;"></canvas>
+      <div class="section-intro">📈 Mastery per Topic</div>
+      <div id="masteryMapContainer" class="mastery-map"></div>
+      <div class="section-intro">🎯 Topic XP & Streak</div>
+      <div id="topicStatsContainer" class="topic-stats-grid"></div>
+      <div style="margin-top: 1.5rem;"><h4 style="color:var(--primary);">📅 Recall Activity (365 days)</h4><div id="heatmapContainer" class="heatmap-grid"></div></div>
+    </div>
+    <div id="reportScreen" class="report-screen hidden">
+      <div class="recall-card" style="text-align: center;">
+        <i class="fa-solid fa-chart-simple" style="font-size: 3rem; color: var(--primary);"></i>
+        <h2>Today's Recall Report</h2>
+        <div id="reportContent"></div>
+        <button id="closeReportBtn" class="btn-check" style="width: auto; margin-top: 2rem;">See You Tomorrow</button>
+      </div>
+    </div>
+  </div>
+</div>
+
+<div id="loadingSpinner" class="loading-spinner" style="display: none;">
+  <div class="spinner-colors">
+    <div class="spinner-dot-color"></div>
+    <div class="spinner-dot-color"></div>
+    <div class="spinner-dot-color"></div>
+    <div class="spinner-dot-color"></div>
+  </div>
+  <div style="font-weight: 600; color: var(--primary);">Preparing your session...</div>
+</div>
+
+<script>
+  (function(){
+    const API_BASE = '/api/query';
+    const RECALL_API = '/api/recall.js';
+    let currentUser = null, currentLevel = null, sessionQuestions = [], currentIndex = 0, sessionActive = false, analyzing = false;
+    let countdownInterval = null, userAnswersRecord = [], sessionId = null, xpTotal = 0, recallLevel = 1, streakDays = 0, masteryTopics = {};
+    let topicXpMap = {}, topicStreakMap = {};
+    let pendingAnswerSubmit = false, sessionEnding = false, currentMsgInterval = null, forceNextHandler = null;
+    let offlineQueue = []; let csrfToken = null;
+    let selectedTopicForSession = null;
+    let isAwaitingSelection = false;
+    let currentLevelForBack = null;
+    let backToTopicsBtn = null;
+    let activeModal = null;
+    let levelLocked = false;
+    const levelSpinMessages = { 'O-Level': ['Checking...', 'Reviewing biology...', 'Comparing terms...', 'Feedback ready'], 'A-Level': ['Reviewing pathways...', 'Analyzing science...', 'Evaluating precision...', 'Feedback ready'], 'Pharmacy': ['Analyzing pharmacology...', 'Reviewing terminology...', 'Evaluating recall...', 'Feedback ready'] };
+    
+    function escapeHtml(str) {
+      if (str == null) return '';
+      const div = document.createElement('div');
+      div.textContent = str;
+      return div.innerHTML;
+    }
+    function announceToScreenReader(msg) { const el = document.getElementById('a11y-live-region'); if(el) { el.textContent = msg; setTimeout(()=>{ if(el) el.textContent=''; },1000); } }
+    function $(id) { return document.getElementById(id); }
+    
+    function showLoadingSpinner(show) {
+      const spinner = document.getElementById('loadingSpinner');
+      if (spinner) spinner.style.display = show ? 'flex' : 'none';
+    }
+    
+    function showErrorDetail(errorTitle, errorDetails) {
+      const panel = $('errorDetailPanel');
+      if (!panel) return;
+      panel.classList.remove('hidden');
+      const timestamp = new Date().toLocaleTimeString();
+      panel.innerHTML = `<strong>⚠️ ${escapeHtml(errorTitle)}</strong> <span style="font-size:0.7rem;">${timestamp}</span><br><pre style="margin-top:6px; white-space:pre-wrap; font-size:0.75rem;">${escapeHtml(errorDetails)}</pre>`;
+      console.error('[BioRecall Error]', errorTitle, errorDetails);
+      setTimeout(() => {
+        if (panel.innerHTML.includes(timestamp)) panel.classList.add('hidden');
+      }, 15000);
+    }
+    
+    function showMessage(message, type = 'info') {
+      const container = $('messageArea');
+      if (!container) return;
+      const msgDiv = document.createElement('div');
+      msgDiv.className = `user-message ${type}`;
+      msgDiv.innerHTML = `<i class="fa-solid ${type === 'error' ? 'fa-circle-exclamation' : (type === 'warning' ? 'fa-triangle-exclamation' : 'fa-info-circle')}"></i> ${escapeHtml(message)}`;
+      container.appendChild(msgDiv);
+      setTimeout(() => { if (msgDiv.parentNode) msgDiv.remove(); }, 8000);
+    }
+    
+    async function apiCall(action, params = {}) {
+      const headers = { 'Content-Type': 'application/json' };
+      if(csrfToken) headers['X-CSRF-Token'] = csrfToken;
+      const res = await fetch(API_BASE, { method: 'POST', headers, credentials: 'include', body: JSON.stringify({ action, ...params }) });
+      const json = await res.json();
+      if(!res.ok) throw new Error(json.error || 'Request failed');
+      if(json.csrf_token) csrfToken = json.csrf_token;
+      return json.data !== undefined ? json.data : json;
+    }
+    
+    async function recallApiCall(action, method = 'GET', body = null) {
+      const headers = { 'Content-Type': 'application/json' };
+      if(csrfToken) headers['X-CSRF-Token'] = csrfToken;
+      let url = `${RECALL_API}?action=${action}`;
+      if (method === 'GET' && body && typeof body === 'object') {
+        const params = new URLSearchParams(body);
+        url += `&${params.toString()}`;
+      }
+      const options = { method, credentials: 'include', headers };
+      if (method === 'POST' && body) options.body = JSON.stringify(body);
+      const res = await fetch(url, options);
+      const data = await res.json();
+      if (data.csrf_token) csrfToken = data.csrf_token;
+      if (!res.ok) {
+        throw new Error(data.error || `HTTP ${res.status}`);
+      }
+      return data.data !== undefined ? data.data : data;
+    }
+    
+    async function checkAuth() { 
+      try { 
+        const data = await apiCall('get_user'); 
+        if(data && data.user) currentUser = data.user; 
+      } catch(e) { 
+        currentUser = null; 
+        showMessage('Please sign in to continue.', 'warning');
+        showErrorDetail('Authentication check failed', e.message);
+      } 
+      updateAuthUI(); 
+      if(currentUser) await checkSelectedLevel(); 
+      return !!currentUser; 
+    }
+    
+    async function checkSelectedLevel() {
+      try {
+        const res = await recallApiCall('get_selected_level', 'GET');
+        if (res && res.selected_level) {
+          currentLevel = res.selected_level;
+          levelLocked = true;
+          document.getElementById('levelBadgeContainer').innerHTML = `<span class="level-badge">${escapeHtml(currentLevel)}</span>`;
+          document.getElementById('levelSelectionScreen').style.display = 'none';
+          document.getElementById('mainContent').style.display = 'block';
+          const welcomeDiv = document.getElementById('welcomeBackMsg');
+          if (welcomeDiv && currentUser) {
+            welcomeDiv.innerHTML = `<i class="fa-regular fa-hand-peace"></i> Welcome back, ${escapeHtml(currentUser.email.split('@')[0])}!`;
+          }
+          applyTheme();
+          await loadUserProgress();
+          await restoreActiveSession();
+        } else {
+          document.getElementById('levelSelectionScreen').style.display = 'block';
+          document.getElementById('mainContent').style.display = 'none';
+          const authGate = document.getElementById('authGateArea');
+          if (authGate && !currentUser) {
+            authGate.innerHTML = `<p style="margin-top: 0.5rem; color: var(--primary);"><a href="/" style="color: var(--primary); text-decoration: underline;">Sign in or Create an account</a> to start your recall journey.</p>`;
+          } else if (authGate && currentUser) {
+            authGate.innerHTML = `<p style="margin-top: 0.5rem; color: var(--primary);">Welcome, ${escapeHtml(currentUser.email.split('@')[0])}! Please select your level to begin.</p>`;
+          }
+        }
+      } catch(e) {
+        showErrorDetail('Check selected level failed', e.message);
+        document.getElementById('levelSelectionScreen').style.display = 'block';
+        document.getElementById('mainContent').style.display = 'none';
+      }
+    }
+    
+    async function setSelectedLevel(level) {
+      try {
+        await recallApiCall('set_selected_level', 'POST', { level: level });
+        currentLevel = level;
+        levelLocked = true;
+        document.getElementById('levelBadgeContainer').innerHTML = `<span class="level-badge">${escapeHtml(currentLevel)}</span>`;
+        document.getElementById('levelSelectionScreen').style.display = 'none';
+        document.getElementById('mainContent').style.display = 'block';
+        const welcomeDiv = document.getElementById('welcomeBackMsg');
+        if (welcomeDiv && currentUser) {
+          welcomeDiv.innerHTML = `<i class="fa-regular fa-hand-peace"></i> Welcome back, ${escapeHtml(currentUser.email.split('@')[0])}!`;
+        }
+        applyTheme();
+        await loadUserProgress();
+        showMessage(`Level set to ${level}. You can now start recalling!`, 'info');
+      } catch(e) {
+        showErrorDetail('Set level failed', e.message);
+        showMessage('Could not set level. Please try again.', 'error');
+      }
+    }
+    
+    function updateAuthUI() {
+      const authGate = $('authGateArea');
+      if(!authGate) return;
+      if(currentUser && document.getElementById('levelSelectionScreen').style.display !== 'none') {
+        authGate.innerHTML = `<p style="margin-top: 0.5rem; color: var(--primary);">Welcome, ${escapeHtml(currentUser.email.split('@')[0])}! Please select your level to begin.</p>`;
+      } else if(currentUser && document.getElementById('levelSelectionScreen').style.display === 'none') {
+      } else {
+        authGate.innerHTML = `<p style="margin-top: 0.5rem; color: var(--primary);"><a href="/" style="color: var(--primary); text-decoration: underline;">Sign in or Create an account</a> to start your recall journey.</p>`;
+      }
+    }
+    
+    function showAuthForm(mode) { window.location.href = '/'; }
+    
+    async function loadUserProgress() {
+      if(!currentUser) return;
+      try { 
+        const stats = await recallApiCall('stats', 'GET', { level: currentLevel }); 
+        if(stats) { 
+          xpTotal = stats.total_xp||0; recallLevel = Math.floor(xpTotal/100)+1; 
+          streakDays = stats.streak_days||0; masteryTopics = stats.topic_mastery||{}; 
+          topicXpMap = stats.topic_xp || {};
+          topicStreakMap = stats.topic_streak || {};
+          if($('streakDisplay')) $('streakDisplay').innerHTML = `<i class="fa-solid fa-fire"></i> ${streakDays} Day Recall Streak`; 
+          if($('xpDisplay')) $('xpDisplay').innerHTML = `<i class="fa-solid fa-star"></i> Recall Level ${recallLevel} · ${xpTotal} XP`; 
+          if($('streakCount')) $('streakCount').innerText = streakDays; 
+          renderMasteryMap(); 
+          renderTopicStats();
+          renderHeatmap(stats.heatmap||{}); 
+          renderRadarChart(); 
+        } 
+      } catch(e) { 
+        showMessage('Could not load your progress. Please refresh.', 'warning'); 
+        showErrorDetail('Load user progress failed', e.message);
+      }
+    }
+    
+    function renderTopicStats() {
+      const container = $('topicStatsContainer');
+      if (!container) return;
+      const topics = Object.keys(masteryTopics);
+      if (topics.length === 0) {
+        container.innerHTML = '<p style="text-align:center;">Complete sessions to see topic stats</p>';
+        return;
+      }
+      container.innerHTML = topics.map(topic => `
+        <div class="topic-stat-card">
+          <div class="topic-stat-name">${escapeHtml(topic)}</div>
+          <div class="topic-stat-xp"><i class="fa-solid fa-star"></i> ${topicXpMap[topic] || 0} XP</div>
+          <div class="topic-stat-streak"><i class="fa-solid fa-fire"></i> ${topicStreakMap[topic] || 0} day streak</div>
+        </div>
+      `).join('');
+    }
+    
+    function renderMasteryMap() { 
+      const container = $('masteryMapContainer'); 
+      if(!container) return; 
+      const topics = Object.entries(masteryTopics); 
+      if(!topics.length) { 
+        container.innerHTML = '<p style="text-align:center;">Complete sessions to see mastery</p>'; 
+        return; 
+      } 
+      container.innerHTML = topics.map(([t,p]) => `<div class="mastery-item"><div><span>${escapeHtml(t)}</span><span>${Math.round(p)}%</span></div><div class="mastery-bar-bg"><div class="mastery-bar-fill" style="width:${p}%;"></div></div></div>`).join(''); 
+    }
+    
+    function renderHeatmap(data){ const container=$('heatmapContainer'); if(!container) return; const today=new Date(); let html=''; for(let i=364;i>=0;i--){ let d=new Date(); d.setDate(today.getDate()-i); const key=d.toISOString().slice(0,10); let level=data[key]||0; html+=`<div class="heatmap-day level-${Math.min(level,3)}" title="${key}: ${level} sessions"></div>`; } container.innerHTML=html; }
+    
+    function renderRadarChart() {
+      const canvas = $('radarCanvas');
+      if (!canvas) return;
+      const entries = Object.entries(masteryTopics);
+      if (entries.length === 0) {
+        const ctx = canvas.getContext('2d');
+        canvas.width = 300; canvas.height = 300;
+        ctx.clearRect(0,0,300,300);
+        ctx.fillStyle = '#ccc';
+        ctx.font = '12px Poppins';
+        ctx.fillText('No data yet', 110, 150);
+        return;
+      }
+      let topics = entries.map(([t, p]) => ({ topic: t, percent: p }));
+      topics.sort((a, b) => a.percent - b.percent);
+      topics = topics.slice(0, 5);
+      const values = topics.map(t => t.percent / 100);
+      const topicNames = topics.map(t => t.topic);
+      if (topicNames.length === 0) return;
+      const rect = canvas.getBoundingClientRect();
+      canvas.width = rect.width;
+      canvas.height = rect.height;
+      const ctx = canvas.getContext('2d');
+      const w = canvas.width;
+      const h = canvas.height;
+      if (w === 0 || h === 0) return;
+      const centerX = w / 2, centerY = h / 2;
+      const radius = Math.min(w, h) * 0.4;
+      const angleStep = (Math.PI * 2) / topicNames.length;
+      const primaryColor = getComputedStyle(document.body).getPropertyValue('--primary').trim() || '#0a7e7e';
+      ctx.clearRect(0, 0, w, h);
+      ctx.beginPath();
+      for (let i = 0; i <= topicNames.length; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const x = centerX + radius * Math.cos(angle);
+        const y = centerY + radius * Math.sin(angle);
+        if (i === 0) ctx.moveTo(x, y);
+        else ctx.lineTo(x, y);
+      }
+      ctx.closePath();
+      ctx.strokeStyle = primaryColor;
+      ctx.stroke();
+      ctx.fillStyle = 'rgba(10,126,126,0.1)';
+      ctx.fill();
+      for (let lvl = 0.25; lvl <= 1; lvl += 0.25) {
+        ctx.beginPath();
+        for (let i = 0; i <= topicNames.length; i++) {
+          const angle = i * angleStep - Math.PI / 2;
+          const x = centerX + radius * lvl * Math.cos(angle);
+          const y = centerY + radius * lvl * Math.sin(angle);
+          if (i === 0) ctx.moveTo(x, y);
+          else ctx.lineTo(x, y);
+        }
+        ctx.closePath();
+        ctx.strokeStyle = '#ccc';
+        ctx.stroke();
+      }
+      for (let i = 0; i < topicNames.length; i++) {
+        const angle = i * angleStep - Math.PI / 2;
+        const val = values[i] || 0;
+        const x = centerX + radius * val * Math.cos(angle);
+        const y = centerY + radius * val * Math.sin(angle);
+        ctx.beginPath();
+        ctx.arc(x, y, 5, 0, 2 * Math.PI);
+        ctx.fillStyle = primaryColor;
+        ctx.fill();
+        const labelX = centerX + (radius + 15) * Math.cos(angle);
+        const labelY = centerY + (radius + 15) * Math.sin(angle);
+        ctx.fillStyle = '#333';
+        ctx.font = '10px Poppins';
+        let shortName = topicNames[i];
+        if (shortName.length > 8) shortName = shortName.substring(0, 6) + '..';
+        ctx.fillText(shortName, labelX - 15, labelY - 5);
+      }
+    }
+    
+    function applyTheme() { 
+      document.body.classList.remove('theme-olevel','theme-alevel','theme-pharmacy'); 
+      if(currentLevel==='O-Level') document.body.classList.add('theme-olevel'); 
+      else if(currentLevel==='A-Level') document.body.classList.add('theme-alevel'); 
+      else if(currentLevel==='Pharmacy') document.body.classList.add('theme-pharmacy'); 
+      if($('dynamicTitle')) $('dynamicTitle').innerText = currentLevel==='Pharmacy'?'RecallRx':`BioRecall ${currentLevel}`; 
+      if($('levelBadge')) $('levelBadge').innerText = currentLevel; 
+    }
+    
+    async function restoreActiveSession() {
+      if (!currentLevel) return false;
+      try {
+        const params = { level: currentLevel };
+        if (selectedTopicForSession) params.topic = selectedTopicForSession;
+        const data = await recallApiCall('session', 'GET', params);
+        if (data && data.questions && data.questions.length > 0 && data.session_id) {
+          sessionQuestions = data.questions;
+          sessionId = data.session_id;
+          currentIndex = data.current_index || 0;
+          userAnswersRecord = data.user_answers || [];
+          sessionActive = true;
+          renderCurrentQuestion();
+          if($('checkAnswerBtn')) $('checkAnswerBtn').disabled = false;
+          if($('answerInput')) $('answerInput').disabled = false;
+          fetchUserStats();
+          if($('entranceScreen')) $('entranceScreen').classList.add('hidden');
+          if($('sessionScreen')) $('sessionScreen').classList.remove('hidden');
+          showMessage('Your previous session was restored.', 'info');
+          addBackToTopicsButton();
+          return true;
+        }
+        return false;
+      } catch(e) {
+        console.warn('No active session to restore', e);
+        return false;
+      }
+    }
+    
+    async function fetchRecallQuestions() { 
+      try { 
+        const params = { level: currentLevel };
+        if (selectedTopicForSession) params.topic = selectedTopicForSession;
+        const data = await recallApiCall('session', 'GET', params); 
+        if(data && data.questions && data.questions.length) { 
+          sessionQuestions = data.questions; 
+          sessionId = data.session_id; 
+          currentIndex = data.current_index || 0;
+          userAnswersRecord = data.user_answers || [];
+          return true; 
+        } 
+        showMessage('No recall questions available for this level and topic yet.', 'warning');
+        showErrorDetail('No questions returned', `Level: ${currentLevel}, Topic: ${selectedTopicForSession || 'none'}`);
+        return false; 
+      } catch(e) { 
+        showMessage('Unable to start your recall session. Please try again later.', 'error'); 
+        showErrorDetail('Fetch recall questions failed', e.message);
+        return false; 
+      } 
+    }
+    
+    async function submitRecallAnswer(questionId, userAnswer) { return await recallApiCall('answer', 'POST', { session_id: sessionId, question_id: questionId, user_answer: userAnswer }); }
+    async function fetchUserStats() { if(!currentUser) return; try { const stats = await recallApiCall('stats', 'GET', { level: currentLevel }); if(stats && typeof stats==='object'){ if($('recallSummary')) $('recallSummary').innerHTML = `E:${stats.excellent||0} S:${stats.strong||0} D:${stats.developing||0}`; if($('masteryPercent')) $('masteryPercent').innerText = stats.mastery_percent||'0%'; if($('streakCount')) $('streakCount').innerText = stats.streak_days||0; masteryTopics = stats.topic_mastery||{}; topicXpMap = stats.topic_xp || {}; topicStreakMap = stats.topic_streak || {}; renderMasteryMap(); renderTopicStats(); renderRadarChart(); renderHeatmap(stats.heatmap||{}); } } catch(e) { showErrorDetail('Fetch stats error', e.message); } }
+    function showXPFloat(xp){ const div=document.createElement('div'); div.className='xp-float'; div.textContent=`+${xp} XP`; div.style.left='50%'; div.style.bottom='30%'; document.body.appendChild(div); setTimeout(()=>div.remove(),1000); }
+    function showStreakCelebration(days){ if(days===7||days===30||days===100){ showMessage(`🎉 Amazing! ${days}‑day streak! Keep it up!`, 'info'); for(let i=0;i<30;i++){ const conf=document.createElement('div'); conf.className='confetti'; conf.innerHTML='🎉'; conf.style.left=Math.random()*100+'%'; conf.style.top='0px'; conf.style.position='fixed'; document.body.appendChild(conf); setTimeout(()=>conf.remove(),1000); } } }
+    async function startClassroomAnimation() { return new Promise((resolve)=>{ const container=document.createElement('div'); container.className='floating-cards-area'; document.body.appendChild(container); const concepts = { 'O-Level': ['Cell', 'Nucleus', 'Mitochondria'], 'A-Level': ['DNA', 'Enzyme', 'Chromosome'], 'Pharmacy': ['Insulin', 'CYP450', 'Statins'] }; const items = concepts[currentLevel] || concepts['O-Level']; for(let i=0;i<12;i++){ const card=document.createElement('div'); card.className='float-card'; card.innerHTML = '<i class="fa-solid fa-' + (currentLevel === 'O-Level' ? 'microscope' : (currentLevel === 'A-Level' ? 'dna' : 'capsules')) + '"></i> <span>' + items[Math.floor(Math.random() * items.length)] + '</span>'; card.style.top=Math.random()*70+10+'%'; card.style.left='-100px'; container.appendChild(card); } setTimeout(()=>{ container.remove(); resolve(); },2800); }); }
+    function animateCardTransition(newText){ const container=$('questionContainer'); if(!container) return; container.classList.add('question-card-exit'); setTimeout(()=>{ container.textContent=newText; container.classList.remove('question-card-exit'); container.classList.add('question-card-enter'); setTimeout(()=>container.classList.remove('question-card-enter'),400); },280); }
+    function renderCurrentQuestion(){ if(!sessionQuestions.length) return; const q=sessionQuestions[currentIndex]; animateCardTransition(q.text); if($('questionCounter')) $('questionCounter').innerText=`Question ${currentIndex+1} of ${sessionQuestions.length}`; if($('answerInput')) $('answerInput').value=''; if($('feedbackContainer')) $('feedbackContainer').style.display='none'; if($('nextArea')) $('nextArea').style.display='none'; if(countdownInterval) clearInterval(countdownInterval); announceToScreenReader(`Question ${currentIndex+1}: ${q.text}`); }
+    async function handleAnswerSubmission() {
+      if(analyzing || !sessionActive || !currentUser || pendingAnswerSubmit) return;
+      const answerInput=$('answerInput'); const answer=answerInput?.value.trim(); if(!answer) return;
+      const question=sessionQuestions[currentIndex]; analyzing=true; pendingAnswerSubmit=true;
+      const checkBtn=$('checkAnswerBtn'), feedbackDiv=$('feedbackContainer'), nextDiv=$('nextArea');
+      if(checkBtn) checkBtn.disabled=true; if(answerInput) answerInput.disabled=true; if(feedbackDiv) feedbackDiv.style.display='block';
+      const spinPool=levelSpinMessages[currentLevel]||levelSpinMessages['O-Level']; let msgIdx=0;
+      if(feedbackDiv) feedbackDiv.innerHTML=`<div class="spinner-overlay">${spinPool[0]} <span class="dot-spin"></span><span class="dot-spin"></span><span class="dot-spin"></span></div>`;
+      if(currentMsgInterval) clearInterval(currentMsgInterval);
+      currentMsgInterval=setInterval(()=>{ msgIdx=(msgIdx+1)%spinPool.length; const spinner=feedbackDiv?.querySelector('.spinner-overlay'); if(spinner) spinner.innerHTML=`${spinPool[msgIdx]} <span class="dot-spin"></span><span class="dot-spin"></span><span class="dot-spin"></span>`; },1500);
+      await new Promise(r=>setTimeout(r,3000)); if(currentMsgInterval){ clearInterval(currentMsgInterval); currentMsgInterval=null; }
+      let result=null; 
+      try{ 
+        result=await submitRecallAnswer(question.id,answer); 
+      } catch(err){ 
+        if (err.message === 'Question already answered') {
+          showMessage('You have already answered this question. Moving to the next one...', 'warning');
+          moveToNextQuestion();
+          analyzing=false; pendingAnswerSubmit=false;
+          if(checkBtn) checkBtn.disabled=false;
+          if(answerInput) answerInput.disabled=false;
+          return;
+        }
+        offlineQueue.push({questionId:question.id, answer, timestamp:Date.now()}); 
+        if(feedbackDiv) feedbackDiv.innerHTML='<div class="study-note">📡 Connection issue. Your answer is saved and will be submitted when you\'re back online.</div>'; 
+        showMessage('Your answer was saved offline and will be synced automatically.', 'warning');
+        showErrorDetail('Answer submission offline', err.message);
+        analyzing=false; pendingAnswerSubmit=false; 
+        if(checkBtn) checkBtn.disabled=false; 
+        if(answerInput) answerInput.disabled=false; 
+        return; 
+      }
+      if(!result){ 
+        if(feedbackDiv) feedbackDiv.innerHTML='<div class="study-note">⚠️ Server error. Please try again.</div>'; 
+        showMessage('Something went wrong. Please try again.', 'error');
+        showErrorDetail('Empty answer result', 'API returned null');
+        analyzing=false; pendingAnswerSubmit=false; 
+        if(checkBtn) checkBtn.disabled=false; 
+        if(answerInput) answerInput.disabled=false; 
+        return; 
+      }
+      const strengthClass=result.strength==='excellent'?'strength-excellent':(result.strength==='strong'?'strength-strong':'strength-developing');
+      const strengthLabel=result.strength==='excellent'?'Excellent':(result.strength==='strong'?'Strong':'Developing');
+      const matchedConcept=escapeHtml(result.matched_concept||(question.concepts?.[0]||'concept'));
+      let fbHtml=`<div class="recall-strength ${strengthClass}">Recall Strength: ${strengthLabel}</div><div>✓ ${matchedConcept}</div>`;
+      if(result.study_note) fbHtml+=`<div class="study-note">${escapeHtml(result.study_note)}</div>`;
+      if(feedbackDiv) feedbackDiv.innerHTML=fbHtml;
+      userAnswersRecord.push({strength:result.strength, topic:question.topic});
+      await fetchUserStats(); await loadUserProgress();
+      if(result.xp_awarded){ showXPFloat(result.xp_awarded); const newLevel=Math.floor((xpTotal+result.xp_awarded)/100)+1; if(newLevel>recallLevel){ showMessage(`🎉 Level Up! You've reached Recall Level ${newLevel}!`, 'info'); } }
+      if(nextDiv) nextDiv.style.display='flex'; let cd=8; if(nextDiv) nextDiv.innerHTML=`<div class="countdown">Next in <span id="timerSeconds">${cd}</span>s</div><button id="forceNextBtn" class="next-btn">Next</button>`;
+      const timerSpan=$('timerSeconds'); if(countdownInterval) clearInterval(countdownInterval);
+      countdownInterval=setInterval(()=>{ cd--; if(timerSpan) timerSpan.innerText=cd; if(cd<=0){ clearInterval(countdownInterval); moveToNextQuestion(); } },1000);
+      if(forceNextHandler){ const old=$('forceNextBtn'); if(old) old.removeEventListener('click',forceNextHandler); }
+      forceNextHandler=()=>{ if(countdownInterval) clearInterval(countdownInterval); moveToNextQuestion(); };
+      const fnb=$('forceNextBtn'); if(fnb) fnb.addEventListener('click',forceNextHandler,{once:true});
+      analyzing=false; pendingAnswerSubmit=false; announceToScreenReader(`Recall strength ${strengthLabel}`);
+    }
+    async function moveToNextQuestion(){ if(!sessionActive) return; if($('nextArea')) $('nextArea').style.display='none'; if($('feedbackContainer')) $('feedbackContainer').style.display='none'; const ai=$('answerInput'); if(ai){ ai.disabled=false; ai.value=''; } if(currentIndex+1<sessionQuestions.length){ currentIndex++; renderCurrentQuestion(); if($('checkAnswerBtn')) $('checkAnswerBtn').disabled=false; if(ai) ai.focus(); }else{ await endSession(); } }
+    async function endSession(){ if(sessionEnding) return; sessionEnding=true; sessionActive=false; if(countdownInterval) clearInterval(countdownInterval); if(sessionId) await recallApiCall('complete', 'POST', { session_id: sessionId }).catch(()=>{}); const e=userAnswersRecord.filter(r=>r.strength==='excellent').length, s=userAnswersRecord.filter(r=>r.strength==='strong').length, d=userAnswersRecord.filter(r=>r.strength==='developing').length; const topicCounts={}; userAnswersRecord.forEach(r=>{ if(r.topic) topicCounts[r.topic]=(topicCounts[r.topic]||0)+1; }); const topTopic=Object.entries(topicCounts).sort((a,b)=>b[1]-a[1])[0]?.[0]||'N/A'; const masteryScore=Math.round(((e*100+s*70)/(sessionQuestions.length*100))*100); const reportHtml=`<p>Reviewed: ${sessionQuestions.length}</p><p>Excellent: ${e} Strong: ${s} Developing: ${d}</p><p>Mastery: ${masteryScore}%</p><p>Top Topic: ${escapeHtml(topTopic)}</p><p>🔥 Streak: ${streakDays} days</p>`; if($('reportContent')) $('reportContent').innerHTML=reportHtml; if($('sessionScreen')) $('sessionScreen').classList.add('hidden'); if($('reportScreen')) $('reportScreen').classList.remove('hidden'); await loadUserProgress(); showStreakCelebration(streakDays); sessionEnding=false; removeBackToTopicsButton(); }
+    
+    async function loadTopicsForLevel(level) {
+      try {
+        const data = await recallApiCall('topics', 'GET', { level: level });
+        return data || [];
+      } catch(e) {
+        showErrorDetail('loadTopicsForLevel failed', `Level: ${level}, Error: ${e.message}`);
+        throw e;
+      }
+    }
+    
+    async function startFullSessionWithTopic(level, topic) {
+      showLoadingSpinner(true);
+      currentLevel = level;
+      selectedTopicForSession = topic;
+      currentLevelForBack = level;
+      applyTheme();
+      if(!currentUser){ showMessage('Please sign in to start a recall session.', 'warning'); showLoadingSpinner(false); return; }
+      try{ 
+        await recallApiCall('session_check', 'GET', { level: currentLevel, topic: selectedTopicForSession }); 
+      }catch(e){ 
+        showMessage(e.message === 'Daily session already completed' ? 'You have already completed today’s session. Come back tomorrow!' : 'Unable to start session. Please try again.', 'warning'); 
+        showErrorDetail('Session check failed', e.message);
+        showLoadingSpinner(false);
+        return; 
+      } 
+      const success=await fetchRecallQuestions(); 
+      if(!success||!sessionQuestions.length){ showLoadingSpinner(false); return; } 
+      await startClassroomAnimation(); 
+      showLoadingSpinner(false);
+      if($('entranceScreen')) $('entranceScreen').classList.add('hidden');
+      if($('sessionScreen')) $('sessionScreen').classList.remove('hidden');
+      sessionActive=true;
+      renderCurrentQuestion();
+      if($('checkAnswerBtn')) $('checkAnswerBtn').disabled=false;
+      if($('answerInput')){ $('answerInput').disabled=false; $('answerInput').focus(); }
+      fetchUserStats();
+      addBackToTopicsButton();
+    }
+    
+    function addBackToTopicsButton() {
+      if (backToTopicsBtn) return;
+      backToTopicsBtn = document.createElement('button');
+      backToTopicsBtn.className = 'back-to-topics';
+      backToTopicsBtn.innerHTML = '<i class="fa-solid fa-arrow-left"></i> Back to topics';
+      backToTopicsBtn.addEventListener('click', () => {
+        if (sessionActive) {
+          if (confirm('Going back will end your current session. Continue?')) {
+            endSessionAndBackToTopics();
+          }
+        } else {
+          showTopicModal(currentLevelForBack);
+        }
+      });
+      document.body.appendChild(backToTopicsBtn);
+    }
+    
+    function removeBackToTopicsButton() {
+      if (backToTopicsBtn && backToTopicsBtn.parentNode) {
+        backToTopicsBtn.remove();
+        backToTopicsBtn = null;
+      }
+    }
+    
+    async function endSessionAndBackToTopics() {
+      if (countdownInterval) clearInterval(countdownInterval);
+      if (currentMsgInterval) clearInterval(currentMsgInterval);
+      sessionActive = false;
+      if (sessionId) {
+        await recallApiCall('complete', 'POST', { session_id: sessionId }).catch(() => {});
+      }
+      resetToEntrance();
+      showTopicModal(currentLevelForBack);
+    }
+    
+    function closeModal() {
+      if (activeModal && activeModal.parentNode) activeModal.remove();
+      activeModal = null;
+      isAwaitingSelection = false;
+    }
+    
+    async function showTopicModal(level) {
+      if (isAwaitingSelection) return;
+      closeModal();
+      isAwaitingSelection = true;
+      currentLevelForBack = level;
+      const modal = document.createElement('div');
+      modal.className = 'modal-overlay';
+      modal.innerHTML = `
+        <div class="modal-content">
+          <h3 style="color: var(--primary); margin-bottom: 1rem;">Choose a topic for ${escapeHtml(level)}</h3>
+          <div id="topicModalList" style="margin-bottom: 1rem;">Loading topics...</div>
+          <button id="skipTopicBtn" class="option-btn">All topics (any order)</button>
+          <button id="closeTopicModal" class="btn-check" style="width: auto; margin-top: 0.5rem;">Cancel</button>
+        </div>
+      `;
+      document.body.appendChild(modal);
+      activeModal = modal;
+      const topicContainer = modal.querySelector('#topicModalList');
+      const closeBtn = modal.querySelector('#closeTopicModal');
+      const skipBtn = modal.querySelector('#skipTopicBtn');
+      
+      closeBtn.addEventListener('click', () => {
+        closeModal();
+      });
+      
+      skipBtn.addEventListener('click', () => {
+        closeModal();
+        startFullSessionWithTopic(level, null);
+      });
+      
+      try {
+        const topics = await loadTopicsForLevel(level);
+        if (!topics || topics.length === 0) {
+          topicContainer.innerHTML = '<p>No specific topics. Starting session...</p>';
+          setTimeout(() => {
+            closeModal();
+            startFullSessionWithTopic(level, null);
+          }, 1500);
+          return;
+        }
+        topicContainer.innerHTML = topics.map(t => `<button class="option-btn" data-topic="${escapeHtml(t)}">${escapeHtml(t)}</button>`).join('');
+        const topicBtns = topicContainer.querySelectorAll('.option-btn');
+        topicBtns.forEach(btn => {
+          btn.addEventListener('click', () => {
+            const topic = btn.getAttribute('data-topic');
+            closeModal();
+            startFullSessionWithTopic(level, topic);
+          });
+        });
+      } catch(err) {
+        topicContainer.innerHTML = '<p>Error loading topics. Starting session...</p>';
+        setTimeout(() => {
+          closeModal();
+          startFullSessionWithTopic(level, null);
+        }, 2000);
+      }
+    }
+    
+    function resetToEntrance(){ 
+      if(countdownInterval) clearInterval(countdownInterval); 
+      if($('sessionScreen')) $('sessionScreen').classList.add('hidden'); 
+      if($('reportScreen')) $('reportScreen').classList.add('hidden'); 
+      if($('entranceScreen')) $('entranceScreen').classList.remove('hidden'); 
+      sessionActive=false; 
+      selectedTopicForSession = null;
+      isAwaitingSelection = false;
+      removeBackToTopicsButton();
+      closeModal();
+    }
+    
+    document.querySelectorAll('#levelChoiceButtons .option-btn').forEach(btn => {
+      btn.addEventListener('click', async () => {
+        if (!currentUser) { showMessage('Please sign in first', 'warning'); return; }
+        const level = btn.getAttribute('data-level');
+        await setSelectedLevel(level);
+      });
+    });
+    
+    if($('checkAnswerBtn')) $('checkAnswerBtn').addEventListener('click', handleAnswerSubmission);
+    if($('answerInput')) $('answerInput').addEventListener('keypress',(e)=>{ if(e.key==='Enter' && !analyzing && sessionActive) handleAnswerSubmission(); });
+    if($('closeReportBtn')) $('closeReportBtn').addEventListener('click', resetToEntrance);
+    window.addEventListener('online',async()=>{ while(offlineQueue.length){ const item=offlineQueue.shift(); try{ await submitRecallAnswer(item.questionId,item.answer); showMessage('Your saved answer has been submitted!', 'info'); }catch(e){ console.warn('sync failed'); } } });
+    window.addEventListener('beforeunload',()=>{ if(countdownInterval) clearInterval(countdownInterval); if(currentMsgInterval) clearInterval(currentMsgInterval); });
+    
+    (async function init(){ 
+      await checkAuth(); 
+    })();
+  })();
+</script>
+</body>
+</html>
