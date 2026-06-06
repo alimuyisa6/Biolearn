@@ -181,12 +181,19 @@ async function checkRateLimit(ip, userId, action) {
 
   console.log("TOKEN HASH:", hashedToken);
 
-  const { data, error } = await supabase
-    .from('user_sessions')
-    .select('user_id, expires_at, is_active, csrf_secret')
-    .eq('session_token_hash', hashedToken)
-    .eq('is_active', true)
-    .maybeSingle();
+   const { data, error } = await supabase
+  .from('user_sessions')
+  .select('*')
+  .eq('session_token_hash', hashedToken)
+  .maybeSingle();
+
+console.log("LOOKUP RESULT:", {
+  found: !!data,
+  is_active: data?.is_active,
+  expires_at: data?.expires_at,
+  user_id: data?.user_id,
+  error
+});
 
   console.log("SESSION QUERY:", {
     error,
