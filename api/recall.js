@@ -161,20 +161,57 @@ async function checkRateLimit(ip, userId, action) {
   return true;
 }
 
-async function getUserFromSession(req) {
+ async function getUserFromSession(req) {
   const cookies = parseCookies(req);
+
+  console.log("COOKIE HEADER:", req.headers.cookie);
+  console.log("SESSION COOKIE:", cookies.session);
+
   const token = cookies.session || '';
-  if (!token || token.length < 20) return null;
-  const hashedToken = crypto.createHash('sha256').update(token).digest('hex');
+
+  if (!token || token.length < 20) {
+    console.log("AUTH FAIL: Missing or short token");
+    return null;
+  }
+
+  const hashedToken = crypto
+    .createHash('sha256')
+    .update(token)
+    .digest('hex');
+
+  console.log("TOKEN HASH:", hashedToken);
+
   const { data, error } = await supabase
     .from('user_sessions')
     .select('user_id, expires_at, is_active, csrf_secret')
     .eq('session_token_hash', hashedToken)
     .eq('is_active', true)
     .maybeSingle();
-  if (error || !data) return null;
-  if (new Date(data.expires_at) < new Date()) return null;
-  return { user_id: data.user_id, csrf_secret: data.csrf_secret };
+
+  console.log("SESSION QUERY:", {
+    error,
+    data
+  });
+
+  if (error || !data) {
+    console.log("AUTH FAIL: Session not found");
+    return null;
+  }
+
+  console.log("EXPIRES:", data.expires_at);
+  console.log("NOW:", new Date().toISOString());
+
+  if (new Date(data.expires_at) < new Date()) {
+    console.log("AUTH FAIL: Session expired");
+    return null;
+  }
+
+  console.log("AUTH SUCCESS:", data.user_id);
+
+  return {
+    user_id: data.user_id,
+    csrf_secret: data.csrf_secret
+  };
 }
 
 function verifyCsrf(req, secret, userId, ip) {
