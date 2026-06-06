@@ -601,13 +601,12 @@
             throw new Error('Authentication required');
           }
           const text = await res.text();
-let data;
-
-try {
-  data = JSON.parse(text);
-} catch (e) {
-  throw new Error("Non-JSON response: " + text);
-}
+          let data;
+          try {
+            data = JSON.parse(text);
+          } catch (e) {
+            throw new Error("Non-JSON response: " + text);
+          }
           if (data.csrf_token) csrfToken = data.csrf_token;
           if (!res.ok) throw new Error(data.error || `HTTP ${res.status}`);
           return data.data !== undefined ? data.data : data;
@@ -620,6 +619,32 @@ try {
         }
       }
       throw lastError;
+    }
+    
+    async function fetchCsrfToken() {
+      try {
+        const res = await fetch(RECALL_API + '?action=get_selected_level', {
+          method: 'GET',
+          credentials: 'include',
+          headers: { 'Content-Type': 'application/json' }
+        });
+        const text = await res.text();
+        let data;
+        try {
+          data = JSON.parse(text);
+        } catch (e) {
+          throw new Error('Invalid JSON from token endpoint');
+        }
+        if (data && data.data && data.data.csrf_token) {
+          csrfToken = data.data.csrf_token;
+        } else if (data && data.csrf_token) {
+          csrfToken = data.csrf_token;
+        } else {
+          throw new Error('No CSRF token in response');
+        }
+      } catch (e) {
+        console.error('Failed to fetch CSRF token', e);
+      }
     }
     
     async function checkAuth() { 
@@ -1412,8 +1437,9 @@ try {
     window.addEventListener('online',async()=>{ while(offlineQueue.length){ const item=offlineQueue.shift(); try{ await submitRecallAnswer(item.questionId,item.answer); showMessage('Your saved answer has been submitted!', 'info'); }catch(e){ console.warn('sync failed'); } } });
     window.addEventListener('beforeunload',()=>{ if(countdownInterval) clearInterval(countdownInterval); if(currentMsgInterval) clearInterval(currentMsgInterval); });
     
-    (async function init(){ 
-      await checkAuth(); 
+    (async function init() {
+      await fetchCsrfToken();
+      await checkAuth();
       setupAutoLevelDetection();
     })();
   })();
