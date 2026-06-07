@@ -537,10 +537,11 @@
         if (spinnerArea) spinnerArea.innerHTML = '';
         renderDashboard();
       } catch(e) {
-        if (retryCount < 2 && (e.message.includes('CSRF') || e.message.includes('Invalid'))) {
-          await fetchCsrfToken();
-          return setUserLevel(level, retryCount + 1);
-        }
+         if (retryCount < 2 && (e.message.includes('CSRF') || e.message.includes('Invalid'))) {
+  await fetchCsrfToken();
+  await new Promise(r => setTimeout(r, 300));
+  return setUserLevel(level, retryCount + 1);
+}
         showErrorDetail('Set level failed', e.message);
         showMessage(`Could not set level: ${e.message}. Please try again.`, 'error');
         if (spinnerArea) spinnerArea.innerHTML = '<span style="color:#e74c3c; font-size:0.8rem;">Failed to set level.</span>';
