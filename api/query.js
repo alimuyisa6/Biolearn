@@ -366,17 +366,22 @@ function logSecurityEvent(event, details, req) {
 }
 
 async function verifyTurnstile(token, ip) {
+  const secretKey = process.env.TURNSTILE_SECRET_KEY;
+  if (!secretKey) return true;
   if (!token) return false;
   try {
-    const secretKey = process.env.TURNSTILE_SECRET_KEY;
-    if (!secretKey) return true;
     const response = await fetch('https://challenges.cloudflare.com/turnstile/v0/siteverify', {
-      method: 'POST', headers: { 'Content-Type': 'application/json' },
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ secret: secretKey, response: token, remoteip: ip })
     });
+    if (!response.ok) return false;
     const data = await response.json();
     return data.success === true;
-  } catch(e) { return true; }
+  } catch (e) {
+    console.error('Turnstile verification failed:', e.message);
+    return false;
+  }
 }
 
 function calculateStreak(activities) {
@@ -566,12 +571,18 @@ setInterval(() => {
 module.exports = async (req, res) => {
   const requestId = crypto.randomBytes(8).toString('hex');
   req.requestId = requestId;
-  const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://aliverbiopharm.com').split(',').map(o => o.trim());
-  const requestOrigin = req.headers.origin || '';
-  const corsOrigin = allowedOrigins.includes(requestOrigin) ? requestOrigin : allowedOrigins[0];
-  res.setHeader('Access-Control-Allow-Origin', corsOrigin);
-  res.setHeader('Access-Control-Allow-Credentials', 'true');
-  res.setHeader('Vary', 'Origin');
+  const allowedOrigins = (process.env.ALLOWED_ORIGINS || 'https://aliver-biopharma.vercel.app')
+    .split(',')
+    .map(o => o.trim().replace(/\\/$/, ''))
+    .filter(Boolean);
+  const requestOrigin = (req.headers.origin || '').trim().replace(/\\/$/, '');
+  const isAllowedOrigin = !requestOrigin || allowedOrigins.includes(requestOrigin);
+
+  if (requestOrigin && isAllowedOrigin) {
+    res.setHeader('Access-Control-Allow-Origin', requestOrigin);
+    res.setHeader('Access-Control-Allow-Credentials', 'true');
+    res.setHeader('Vary', 'Origin');
+  }
   res.setHeader('Access-Control-Allow-Methods', 'POST, GET, OPTIONS');
   res.setHeader('Access-Control-Allow-Headers', 'Content-Type, Authorization, X-Requested-With, X-CSRF-Token, X-Request-ID, X-Turnstile-Token, X-Session-Token, Cookie');
   res.setHeader('Access-Control-Max-Age', '86400');
